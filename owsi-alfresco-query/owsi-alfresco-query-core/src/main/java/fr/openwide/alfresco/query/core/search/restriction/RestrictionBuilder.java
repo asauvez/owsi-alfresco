@@ -1,0 +1,87 @@
+package fr.openwide.alfresco.query.core.search.restriction;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.openwide.alfresco.query.core.node.model.TypeModel;
+import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
+import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
+
+public class RestrictionBuilder extends Restriction {
+
+	public enum LogicalOperator { AND, OR }
+
+	private final List<Restriction> restrictions = new ArrayList<Restriction>();
+	private final LogicalOperator operator;
+
+	public RestrictionBuilder(RestrictionBuilder parent, LogicalOperator operator) {
+		super(parent);
+		this.operator = operator;
+	}
+
+	public RestrictionBuilder or() {
+		return add(new RestrictionBuilder(this, LogicalOperator.OR));
+	}
+
+	public RestrictionBuilder and() {
+		return add(new RestrictionBuilder(this, LogicalOperator.AND));
+	}
+
+	public TypeRestriction isType(TypeModel type) {
+		return add(new TypeRestriction(this, type));
+	}
+
+	public TextMatchRestriction match(TextPropertyModel property, String value) {
+		return add(new TextMatchRestriction(this, property, value));
+	}
+
+	public <C> MatchRestriction<C> match(PropertyModel<C> property, C value) {
+		return add(new MatchRestriction<C>(this, property, value));
+	}
+
+	public <C> BetweenRestriction<C> between(PropertyModel<C> property, C from, C to) {
+		return add(new BetweenRestriction<C>(this, property, from, to));
+	}
+
+	public <C> BetweenRestriction<C> ge(PropertyModel<C> property, C value) {
+		return between(property, value, null);
+	}
+	public <C> BetweenRestriction<C> gt(PropertyModel<C> property, C value) {
+		return between(property, value, null)
+				.minInclusive(false);
+	}
+	public <C> BetweenRestriction<C> lt(PropertyModel<C> property, C value) {
+		return between(property, null, value)
+				.maxInclusive(false);
+	}
+	public <C> BetweenRestriction<C> le(PropertyModel<C> property, C value) {
+		return between(property, null, value);
+	}
+
+	public CustomRestriction custom(String customQuery) {
+		return add(new CustomRestriction(this, customQuery));
+	} 
+
+	private <R extends Restriction> R add(R restriction) {
+		restrictions.add(restriction);
+		return restriction;
+	}
+
+	@Override
+	protected String toLuceneQueryInternal() {
+		StringBuilder buf = new StringBuilder();
+		for (Restriction restriction : restrictions) {
+			String query = restriction.toLuceneQuery();
+			if (query.length() > 0) {
+				if (buf.length() > 0) {
+					buf.append("\n").append(operator.name()).append(" ");
+				}
+				buf.append("(")
+					.append(query)
+					.append(")");
+			}
+		}
+		return buf.toString();
+	}
+
+}
