@@ -3,8 +3,9 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-query</artifactId>
+		<artifactId>owsi-alfresco-app</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../../owsi-alfresco-app/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-query-web</artifactId>
 

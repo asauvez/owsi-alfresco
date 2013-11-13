@@ -18,11 +18,11 @@
 	</modules>
 
 	<properties>
-		<hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
+		<owsi-alfresco.hibernate-validator.version>5.0.1.Final</owsi-alfresco.hibernate-validator.version>
 		
-		<webjars.jquery.version>1.10.2-1</webjars.jquery.version>
-		<webjars.bootstrap.version>3.0.0</webjars.bootstrap.version>
-		<webjars.bootstrap-datepicker.version>1.2.0</webjars.bootstrap-datepicker.version>
+		<owsi-alfresco.webjars.jquery.version>1.10.2-1</owsi-alfresco.webjars.jquery.version>
+		<owsi-alfresco.webjars.bootstrap.version>3.0.0</owsi-alfresco.webjars.bootstrap.version>
+		<owsi-alfresco.webjars.bootstrap-datepicker.version>1.2.0</owsi-alfresco.webjars.bootstrap-datepicker.version>
 	</properties>
 
 	<dependencyManagement>
@@ -43,23 +43,23 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
-				<version>${hibernate-validator.version}</version>
+				<version>${owsi-alfresco.hibernate-validator.version}</version>
 			</dependency>
 			
 			<dependency>
 				<groupId>org.webjars</groupId>
 				<artifactId>jquery</artifactId>
-				<version>${webjars.jquery.version}</version>
+				<version>${owsi-alfresco.webjars.jquery.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.webjars</groupId>
 				<artifactId>bootstrap</artifactId>
-				<version>${webjars.bootstrap.version}</version>
+				<version>${owsi-alfresco.webjars.bootstrap.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.webjars</groupId>
 				<artifactId>bootstrap-datepicker</artifactId>
-				<version>${webjars.bootstrap-datepicker.version}</version>
+				<version>${owsi-alfresco.webjars.bootstrap-datepicker.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
