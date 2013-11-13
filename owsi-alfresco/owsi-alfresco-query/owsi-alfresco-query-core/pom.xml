@@ -12,6 +12,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-app-core</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>

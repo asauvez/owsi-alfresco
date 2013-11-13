@@ -3,16 +3,16 @@ package fr.openwide.alfresco.query.web.form.field;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.openwide.alfresco.query.web.form.view.SelectInputFieldView;
-import fr.openwide.alfresco.query.web.search.model.FormQuery;
+import fr.openwide.alfresco.query.web.form.view.input.ChoiceItem;
+import fr.openwide.alfresco.query.web.form.view.input.InputFieldView;
 
-public class ChoiceInputField extends TextInputField implements SelectInputFieldView {
+public class ChoiceInputField extends TextInputField {
 
-	private List<ChoiceItem> items = new ArrayList<ChoiceItem>();
+	private List<ChoiceItem> items = new ArrayList<>();
 	private int selectTrigger = 5;
 
-	public ChoiceInputField(FormQuery formQuery, String name) {
-		super(formQuery, name);
+	public ChoiceInputField(FieldSet fieldSet, String name) {
+		super(fieldSet, name);
 	}
 
 	public ChoiceInputField addChoice(ChoiceItem item) {
@@ -20,8 +20,8 @@ public class ChoiceInputField extends TextInputField implements SelectInputField
 		return this;
 	}
 
-	public ChoiceInputField addChoice(String key, String message, Object ... messageArgs) {
-		return addChoice(new ChoiceItem(key, message, messageArgs));
+	public ChoiceInputField addChoice(String key, String messageCode, Object ... messageArgs) {
+		return addChoice(new ChoiceItem(key, messageCode, messageArgs));
 	}
 
 	public ChoiceInputField addChoiceAllItems() {
@@ -41,14 +41,13 @@ public class ChoiceInputField extends TextInputField implements SelectInputField
 		return selectTrigger(0);
 	}
 
-	@Override
 	public List<ChoiceItem> getItems() {
 		return items;
 	}
 
 	@Override
-	public String getView() {
-		return (getItems().size() <= selectTrigger) ? SelectInputFieldView.RADIO : SelectInputFieldView.SELECT;
+	public InputFieldView getView() {
+		return (getItems().size() <= selectTrigger) ? InputFieldView.RADIO : InputFieldView.SELECT;
 	}
 
 }

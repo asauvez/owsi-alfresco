@@ -1,33 +1,29 @@
 package fr.openwide.alfresco.query.web.form.field;
 
-import fr.openwide.alfresco.query.web.form.view.TextInputFieldView;
-import fr.openwide.alfresco.query.web.search.model.FormQuery;
+import org.springframework.context.MessageSourceResolvable;
 
-public class TextInputField extends InputField<String> implements TextInputFieldView {
+import fr.openwide.alfresco.query.web.form.util.MessageUtils;
+import fr.openwide.alfresco.query.web.form.view.input.InputFieldView;
 
-	private String placeholder;
+public class TextInputField extends InputField<String> {
 
-	public TextInputField(FormQuery formQuery, String name) {
-		super(formQuery, name);
+	private MessageSourceResolvable placeholder;
+
+	public TextInputField(FieldSet fieldSet, String name) {
+		super(fieldSet, name);
 	}
 
-	public TextInputField placeholder(String placeholder) {
-		this.placeholder = placeholder;
+	public TextInputField placeholder(String placeholderCode, Object ... placeholderArgs) {
+		this.placeholder = MessageUtils.code(placeholderCode, placeholderArgs);
 		return this;
 	}
 
 	@Override
-	protected String parseNotNull(String value) {
-		return (value.length() > 0) ? value : null;
+	public InputFieldView getView() {
+		return InputFieldView.TEXT;
 	}
 
-	@Override
-	public String getView() {
-		return TextInputFieldView.TEXT;
-	}
-
-	@Override
-	public String getPlaceholder() {
+	public MessageSourceResolvable getPlaceholder() {
 		return placeholder;
 	}
 

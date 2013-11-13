@@ -10,12 +10,16 @@ public class CellFormQueryResult<T> {
 		this.item = item;
 	}
 
-	public String getValue() {
-		return column.getResultFormatter().apply(item);
+	public Object getValue() {
+		return column.getTransformer().apply(item);
 	}
 
 	public ColumnFormQueryResult<T> getColumn() {
 		return column;
+	}
+	
+	public T getRow() {
+		return item;
 	}
 
 }

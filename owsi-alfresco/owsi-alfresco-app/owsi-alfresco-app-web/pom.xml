@@ -12,11 +12,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-query-web</artifactId>
-		</dependency>
-		
-		<dependency>
 			<groupId>fr.openwide.core.packages</groupId>
 			<artifactId>owsi-core-package-web-spring-security</artifactId>
 			<type>pom</type>
@@ -68,7 +63,10 @@
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap-datepicker</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>

@@ -57,12 +57,17 @@
 		<dependencies>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-core</artifactId>
+				<artifactId>owsi-alfresco-app-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-web</artifactId>
+				<artifactId>owsi-alfresco-app-web</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-query-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>

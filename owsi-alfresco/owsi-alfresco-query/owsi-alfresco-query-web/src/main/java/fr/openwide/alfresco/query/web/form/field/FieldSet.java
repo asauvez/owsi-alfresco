@@ -1,24 +1,35 @@
 package fr.openwide.alfresco.query.web.form.field;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import org.springframework.context.MessageSourceResolvable;
+
+import fr.openwide.alfresco.query.core.node.model.property.BooleanPropertyModel;
+import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
+import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
+import fr.openwide.alfresco.query.core.node.model.value.NameReference;
+import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 
 public class FieldSet {
 
-	private String message;
-	private Object[] messageArgs;
-	private List<InputField<?>> inputFields;
+	private InputFieldBuilder builder;
+	private List<InputField<?>> inputFields = new ArrayList<>();
+
+	private MessageSourceResolvable label;
 	private boolean visible = true;
 	private boolean inRow = false;
 
-	public FieldSet(InputField<?> ... inputFields) {
-		this.inputFields = new ArrayList<InputField<?>>(Arrays.asList(inputFields));
+	public FieldSet(InputFieldBuilder builder) {
+		this.builder = builder;
+	}
+
+	public InputFieldBuilder of() {
+		return builder;
 	}
 	
-	public FieldSet message(String message, String ... messageArgs) {
-		this.message = message;
-		this.messageArgs = messageArgs;
+	public FieldSet label(String labelCode, Object ... labelArgs) {
+		this.label = MessageUtils.code(labelCode, labelArgs);
 		return this;
 	}
 
@@ -31,13 +42,40 @@ public class FieldSet {
 		this.inRow = inRow;
 		return this;
 	}
-
-	public String getMessage() {
-		return message;
+	
+	
+	public TextInputField newText(String name) {
+		return add(new TextInputField(this, name));
 	}
 
-	public Object[] getMessageArgs() {
-		return messageArgs;
+	public DateInputField newDate(String name) {
+		return add(new DateInputField(this, name));
+	}
+
+	public ChoiceInputField newChoice(String name) {
+		return add(new ChoiceInputField(this, name));
+	}
+
+	private String toName(PropertyModel<?> property) {
+		NameReference nameReference = property.getNameReference();
+		return nameReference.getNamespace() + "_" + nameReference.getName();
+	}
+
+	public TextInputField newText(TextPropertyModel property) {
+		return newText(toName(property));
+	}
+
+	public ChoiceInputField newChoice(BooleanPropertyModel property) {
+		ChoiceInputField choice = newChoice(toName(property));
+		choice.addChoiceAllItems();
+		choice.addChoice("true", "booleanField.true");
+		choice.addChoice("false", "booleanField.false");
+		return choice;
+	}
+
+	
+	public MessageSourceResolvable getLabel() {
+		return label;
 	}
 
 	public boolean isVisible() {
@@ -59,4 +97,8 @@ public class FieldSet {
 		return inputFields;
 	}
 
+	private <T extends InputField<?>> T add(T inputField) {
+		inputFields.add(inputField);
+		return inputField;
+	}
 }

@@ -1,68 +1,41 @@
 package fr.openwide.alfresco.query.web.form.field;
 
-import java.util.Map;
+import org.springframework.context.MessageSourceResolvable;
 
-import fr.openwide.alfresco.query.web.form.view.InputFieldView;
-import fr.openwide.alfresco.query.web.search.model.FormQuery;
+import fr.openwide.alfresco.query.web.form.util.MessageUtils;
+import fr.openwide.alfresco.query.web.form.view.input.InputFieldView;
 
-public abstract class InputField<T> implements InputFieldView {
+public abstract class InputField<T> {
 
-	private final FormQuery formQuery;
+	private FieldSet fieldSet;
 	private final String name;
 
-	private String message;
-	private String description;
+	private MessageSourceResolvable label;
+	private MessageSourceResolvable description;
 	private boolean visible = true;
-	private boolean mandatory = false;
 	private int rowSpan = 4;
 	private int rowOffset = 0;
-	private T value;
-	private T defaultValue;
 
-	public InputField(FormQuery formQuery, String name) {
-		this.formQuery = formQuery;
+	public InputField(FieldSet fieldSet, String name) {
+		this.fieldSet = fieldSet;
 		this.name = name;
 	}
+	
+	public FieldSet of() {
+		return fieldSet;
+	}
 
-	public InputField<T> defaultValue(T defaultValue) {
-		this.defaultValue = defaultValue;
+	public InputField<T> label(String labelCode, Object ... labelArgs) {
+		this.label = MessageUtils.code(labelCode, labelArgs);
 		return this;
 	}
-
-	public void init(Map<String, String[]> params) {
-		setValue(parse(params));
-		if (getValue() == null && defaultValue != null) {
-			setValue(defaultValue);
-		}
-	}
-
-	protected T parse(Map<String, String[]> params) {
-		String[] values = params.get(getName());
-		return (values != null) 
-				? (values.length == 0) ? parseNullable(null) : parseNullable(values[0])
-				: parseNullable(null);
-	}
-	protected T parseNullable(String value) {
-		return (value != null) ? parseNotNull(value) : null;
-	}
-
-	protected abstract T parseNotNull(String value);
-
-	public InputField<T> message(String message) {
-		this.message = message;
-		return this;
-	}
-	public InputField<T> description(String description) {
-		this.description = description;
+	public InputField<T> description(String descriptionCode, Object ... descriptionArgs) {
+		this.description = MessageUtils.code(descriptionCode, descriptionArgs);
 		return this;
 	}
 
 	public InputField<T> visible(boolean visible) {
 		this.visible = visible;
-		return this;
-	}
-	public InputField<T> mandatory(boolean mandatory) {
-		this.mandatory = mandatory;
 		return this;
 	}
 
@@ -79,44 +52,29 @@ public abstract class InputField<T> implements InputFieldView {
 		return name;
 	}
 
-	public String getPath() {
-		return "inputFieldsMap[" + getName() + "].value";
+	public abstract InputFieldView getView();
+	
+	public MessageSourceResolvable getLabel() {
+		return label;
 	}
-	public String getFullPath() {
-		return formQuery.getBeanName() + "." + getPath();
+	public void setLabel(MessageSourceResolvable label) {
+		this.label = label;
 	}
-
-	public T getValue() {
-		return value;
-	}
-	public void setValue(T value) {
-		this.value = value;
-	}
-
-	@Override
-	public String getMessage() {
-		return message;
-	}
-
-	public String getFullName() {
-		return formQuery.getClass().getName() + "." + getName();
-	}
-
-	public String getDescription() {
+	public MessageSourceResolvable getDescription() {
 		return description;
 	}
-
+	public void setDescription(MessageSourceResolvable description) {
+		this.description = description;
+	}
+	
 	public boolean isVisible() {
 		return visible;
 	}
-	public boolean isMandatory() {
-		return mandatory;
-	}
 	public String getRowSpan() {
-		return "span" + rowSpan;
+		return "col-md-" + rowSpan;
 	}
 	public String getRowOffset() {
-		return (rowOffset != 0) ? " offset" + rowOffset : "";
+		return (rowOffset != 0) ? " col-md-offset-" + rowOffset : "";
 	}
 
 }

@@ -11,7 +11,7 @@ public class RestrictionBuilder extends Restriction {
 
 	public enum LogicalOperator { AND, OR }
 
-	private final List<Restriction> restrictions = new ArrayList<Restriction>();
+	private final List<Restriction> restrictions = new ArrayList<>();
 	private final LogicalOperator operator;
 
 	public RestrictionBuilder(RestrictionBuilder parent, LogicalOperator operator) {

@@ -17,8 +17,8 @@ public class NodeResult implements Serializable {
 
 	private final NodeReference reference;
 	private final TypeModel type;
-	private final Map<NameReference, Object> properties = new LinkedHashMap<NameReference, Object>();
-	private final Set<NameReference> aspects = new LinkedHashSet<NameReference>();
+	private final Map<NameReference, Object> properties = new LinkedHashMap<>();
+	private final Set<NameReference> aspects = new LinkedHashSet<>();
 
 	public NodeResult(NodeReference nodeReference, TypeModel type) {
 		this.reference = nodeReference;
