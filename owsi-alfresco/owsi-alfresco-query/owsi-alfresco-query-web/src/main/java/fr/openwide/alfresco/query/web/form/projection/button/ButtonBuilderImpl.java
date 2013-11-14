@@ -11,15 +11,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
-import fr.openwide.alfresco.query.core.search.model.NodeResult;
-import fr.openwide.alfresco.query.web.form.projection.Projection;
 import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 
-public class ButtonBuilderImpl<P, T> implements TopButtonBuilder<P, T>, Function<NodeResult, Object> {
+public class ButtonBuilderImpl<PARENT, I> implements TopButtonBuilder<PARENT, I>, Function<I, Object> {
 
-	private final Projection<T> projection;
-	private final P parent;
-
+	private final PARENT parent;
+	private final Function<I, Object> transformer;
+	
 	private MessageSourceResolvable label;
 
 	private MessageFormat hrefPattern;
@@ -28,102 +26,102 @@ public class ButtonBuilderImpl<P, T> implements TopButtonBuilder<P, T>, Function
 	private String cssClass = "";
 	private String iconClass = "";
 
-	private Predicate<? super NodeResult> visible = Predicates.alwaysTrue();
-	private Predicate<? super NodeResult> enabled = Predicates.alwaysTrue();
+	private Predicate<? super I> visible = Predicates.alwaysTrue();
+	private Predicate<? super I> enabled = Predicates.alwaysTrue();
 
-	private List<ButtonBuilderImpl<TopButtonBuilder<P, T>, T>> dropDown = new ArrayList<>();
+	private List<ButtonBuilderImpl<TopButtonBuilder<PARENT, I>, I>> dropDown = new ArrayList<>();
 
-	private NodeResult currentNode;
+	private I currentItem;
 
-	public ButtonBuilderImpl(P parent, Projection<T> projection, String labelCode, Object [] labelArgs) {
-		this.projection = projection;
+	public ButtonBuilderImpl(PARENT parent, Function<I, Object> transformer, String labelCode, Object [] labelArgs) {
 		this.parent = parent;
+		this.transformer = transformer;
 		this.label = MessageUtils.code(labelCode, labelArgs);
 	}
 
 	@Override
-	public P of() {
+	public PARENT of() {
 		return parent;
 	}
 
 	@Override
-	public ButtonBuilderImpl<P, T> visible(Predicate<? super NodeResult> visible) {
+	public ButtonBuilderImpl<PARENT, I> visible(Predicate<? super I> visible) {
 		this.visible = visible;
 		return this;
 	}	
 	@Override
-	public ButtonBuilderImpl<P, T> visible(boolean visible) {
+	public ButtonBuilderImpl<PARENT, I> visible(boolean visible) {
 		return visible(visible ? Predicates.alwaysTrue() : Predicates.alwaysFalse());
 	}
 
 	@Override
-	public ButtonBuilderImpl<P, T> enabled(Predicate<? super NodeResult> enabled) {
+	public ButtonBuilderImpl<PARENT, I> enabled(Predicate<? super I> enabled) {
 		this.enabled = enabled;
 		return this;
 	}
 	@Override
-	public ButtonBuilderImpl<P, T> enabled(boolean enabled) {
+	public ButtonBuilderImpl<PARENT, I> enabled(boolean enabled) {
 		return enabled(enabled ? Predicates.alwaysTrue() : Predicates.alwaysFalse());
 	}
 
 	@Override
-	public ButtonBuilderImpl<P, T> primary() {
+	public ButtonBuilderImpl<PARENT, I> primary() {
 		return primary(true);
 	}
 	@Override
-	public ButtonBuilderImpl<P, T> primary(boolean primary) {
+	public ButtonBuilderImpl<PARENT, I> primary(boolean primary) {
 		this.primary = primary;
 		return this;
 	}
 
 	@Override
-	public ButtonBuilderImpl<P, T> icon(String iconClass) {
+	public ButtonBuilderImpl<PARENT, I> icon(String iconClass) {
 		this.iconClass = Joiner.on(" ").join(this.iconClass, iconClass);
 		return this;
 	}
 	@Override
-	public ButtonBuilderImpl<P, T> cssClass(String cssClass) {
+	public ButtonBuilderImpl<PARENT, I> cssClass(String cssClass) {
 		this.cssClass = Joiner.on(" ").join(this.cssClass, cssClass);
 		return this;
 	}
 
 	@Override
-	public ButtonBuilderImpl<P, T> url(String urlPattern) {
+	public ButtonBuilderImpl<PARENT, I> url(String urlPattern) {
 		hrefPattern = new MessageFormat(urlPattern);
 		return this;
 	}
 
 	@Override
-	public ButtonBuilderImpl<P, T> dropDownSeparator() {
+	public ButtonBuilderImpl<PARENT, I> dropDownSeparator() {
 		dropDown.add(null);
 		return this;
 	}
 
 	@Override
-	public ButtonBuilder<TopButtonBuilder<P, T>, T> dropDownButton(String message, Object ... messageArgs) {
-		ButtonBuilderImpl<TopButtonBuilder<P, T>, T> subButton = new ButtonBuilderImpl<TopButtonBuilder<P, T>, T>(this, projection, message, messageArgs);
+	public ButtonBuilder<TopButtonBuilder<PARENT, I>, I> dropDownButton(String message, Object ... messageArgs) {
+		ButtonBuilderImpl<TopButtonBuilder<PARENT, I>, I> subButton = new ButtonBuilderImpl<TopButtonBuilder<PARENT, I>, I>(this, transformer, message, messageArgs);
 		dropDown.add(subButton);
 		return subButton;
 	}
 
 	@Override
-	public Object apply(NodeResult currentValue) {
-		this.currentNode = currentValue;
-		for (ButtonBuilderImpl<TopButtonBuilder<P, T>, T> sub : dropDown) {
+	public Object apply(I currentItem) {
+		this.currentItem = currentItem;
+		for (ButtonBuilderImpl<TopButtonBuilder<PARENT, I>, I> sub : dropDown) {
 			if (sub != null) {
-				sub.apply(currentValue);
+				sub.apply(currentItem);
 			}
 		}
 		return this;
 	}
 	public Object getCurrentValue() {
-		return projection.getResultTransformer().apply(projection.apply(currentNode));
+		return transformer.apply(currentItem);
 	}
 	
 	public MessageSourceResolvable getLabel() {
 		return label;
 	}
-	public List<ButtonBuilderImpl<TopButtonBuilder<P, T>, T>> getDropDown() {
+	public List<ButtonBuilderImpl<TopButtonBuilder<PARENT, I>, I>> getDropDown() {
 		return dropDown;
 	}
 	public String getHref() {
@@ -132,10 +130,10 @@ public class ButtonBuilderImpl<P, T> implements TopButtonBuilder<P, T>, Function
 			}) : "#";
 	}
 	public boolean isVisible() {
-		return visible.apply(currentNode);
+		return visible.apply(currentItem);
 	}
 	public boolean isEnabled() {
-		return enabled.apply(currentNode);
+		return enabled.apply(currentItem);
 	}
 	public boolean isPrimary() {
 		return primary;

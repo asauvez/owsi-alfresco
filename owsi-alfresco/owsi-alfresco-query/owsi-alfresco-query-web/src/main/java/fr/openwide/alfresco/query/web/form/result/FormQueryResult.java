@@ -7,15 +7,16 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 
+import fr.openwide.alfresco.query.web.form.projection.ProjectionColumn;
 import fr.openwide.alfresco.query.web.search.model.PaginationParams;
 
 public class FormQueryResult<T> {
 
-	private final List<ColumnFormQueryResult<T>> columns = new ArrayList<>();
+	private final List<ProjectionColumn<T>> columns = new ArrayList<>();
 	private List<T> rows = new ArrayList<>();
 	private PaginationParams pagination = null;
 
-	public List<ColumnFormQueryResult<T>> getColumns() {
+	public List<ProjectionColumn<T>> getColumns() {
 		return columns;
 	}
 

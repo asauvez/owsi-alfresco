@@ -1,22 +1,17 @@
 package fr.openwide.alfresco.query.web.form.projection.node;
 
+import fr.openwide.alfresco.query.core.search.model.NodeFetchDetails;
 import fr.openwide.alfresco.query.core.search.model.NodeResult;
-import fr.openwide.alfresco.query.web.form.projection.Projection;
-import fr.openwide.alfresco.query.web.form.projection.ProjectionBuilder;
+import fr.openwide.alfresco.query.web.form.projection.ProjectionImpl;
 
-public class NodeProjection extends Projection<NodeResult> {
+public abstract class NodeProjection<P> extends ProjectionImpl<NodeResult, NodeProjectionBuilder, P> {
 
-	public NodeProjection(ProjectionBuilder builder) {
-		super(builder, NodeResult.class);
+	public NodeProjection(NodeProjectionBuilder builder, Class<P> mappedClass) {
+		super(builder, mappedClass);
 	}
 
-	@Override
-	public NodeResult apply(NodeResult result) {
-		return result;
+	public void initNodeFetchDetails(@SuppressWarnings("unused") NodeFetchDetails nodeFetchDetails) {
+		// to override
 	}
 
-	@Override
-	public String getDefaultLabelCode() {
-		return "nodeprojection.label";
-	}
 }

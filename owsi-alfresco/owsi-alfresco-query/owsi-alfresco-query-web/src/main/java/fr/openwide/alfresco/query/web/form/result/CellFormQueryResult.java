@@ -1,24 +1,26 @@
 package fr.openwide.alfresco.query.web.form.result;
 
-public class CellFormQueryResult<T> {
+import fr.openwide.alfresco.query.web.form.projection.ProjectionColumn;
 
-	private final ColumnFormQueryResult<T> column;
-	private final T item;
+public class CellFormQueryResult<I> {
 
-	public CellFormQueryResult(ColumnFormQueryResult<T> column, T item) {
+	private final ProjectionColumn<I> column;
+	private final I item;
+
+	public CellFormQueryResult(ProjectionColumn<I> column, I item) {
 		this.column = column;
 		this.item = item;
 	}
 
 	public Object getValue() {
-		return column.getTransformer().apply(item);
+		return column.getItemTransformer().apply(item);
 	}
 
-	public ColumnFormQueryResult<T> getColumn() {
+	public ProjectionColumn<I> getColumn() {
 		return column;
 	}
 	
-	public T getRow() {
+	public I getRow() {
 		return item;
 	}
 

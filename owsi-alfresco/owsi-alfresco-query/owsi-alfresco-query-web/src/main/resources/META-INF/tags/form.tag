@@ -8,7 +8,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="formQuery" uri="http://app.alfresco.openwide.fr/tags/formQuery" %>
 
-<form:form modelAttribute="${name}" method="get" role="form" id="formQuery">
+<form:form modelAttribute="${name}" method="get" role="form" class="form-query">
 	<form:errors element="div" cssClass="alert alert-error" />
 
 	<c:forEach var="fieldSet" items="${query.inputFieldBuilder.fieldSets}">
@@ -80,9 +80,9 @@
 		</c:if>
 	</c:forEach>
 	
-	<input type="hidden" id="pagination-sortColumn" name="pagination.sortColumn" value="${query.pagination.sortColumn}">
-	<input type="hidden" id="pagination-sortDirection" name="pagination.sortDirection" value="${query.pagination.sortDirection}">
-	<input type="hidden" id="pagination-currentPage" name="pagination.currentPage" value="${query.pagination.currentPage}">
+	<input type="hidden" class="pagination-sortColumn" name="pagination.sortColumn" value="${query.pagination.sortColumn}">
+	<input type="hidden" class="pagination-sortDirection" name="pagination.sortDirection" value="${query.pagination.sortDirection}">
+	<input type="hidden" class="pagination-currentPage" name="pagination.currentPage" value="${query.pagination.currentPage}">
 	
 	<c:if test="${not empty query.inputFieldBuilder.fieldSets}">
 		<div>

@@ -3,7 +3,6 @@ package fr.openwide.alfresco.query.web.search.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSourceResolvable;
 import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.query.core.node.model.value.NameReference;
@@ -14,10 +13,9 @@ import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder.LogicalOperator;
 import fr.openwide.alfresco.query.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.query.web.form.projection.Projection;
-import fr.openwide.alfresco.query.web.form.projection.ProjectionBuilder;
-import fr.openwide.alfresco.query.web.form.result.ColumnFormQueryResult;
+import fr.openwide.alfresco.query.web.form.projection.node.NodeProjection;
+import fr.openwide.alfresco.query.web.form.projection.node.NodeProjectionBuilder;
 import fr.openwide.alfresco.query.web.form.result.FormQueryResult;
-import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 import fr.openwide.alfresco.query.web.search.model.NodeFormQuery;
 import fr.openwide.alfresco.query.web.search.model.SearchFormQuery;
 import fr.openwide.alfresco.query.web.search.service.NodeFormQueryService;
@@ -29,7 +27,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 	
 	@Override
 	public FormQueryResult<NodeResult> list(NodeFormQuery formQuery, List<NodeResult> list) {
-		ProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
+		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		FormQueryResult<NodeResult> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
@@ -40,7 +38,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		formQuery.initRestrictions(restrictionBuilder);
 		String luceneQuery = restrictionBuilder.toLuceneQuery();		
 
-		ProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
+		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
 		List<NodeResult> list = nodeSearchService.search(luceneQuery, nodeFetchDetails);
@@ -51,7 +49,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 
 	@Override
 	public FormQueryResult<NodeResult> children(NodeFormQuery formQuery, NodeReference parent, NameReference nameReference) {
-		ProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
+		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
 		List<NodeResult> list = nodeSearchService.getChildren(parent, nameReference, nodeFetchDetails);
@@ -59,42 +57,18 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		return initResult(formQuery, result, list);
 	}
 	
-	private FormQueryResult<NodeResult> createQueryResult(NodeFormQuery formQuery, ProjectionBuilder projectionBuilder) {
-		FormQueryResult<NodeResult> result = new FormQueryResult<NodeResult>();
-		for (Projection<?> projection : projectionBuilder.getProjections()) {
-			if (projection.isVisible()) {
-				MessageSourceResolvable label = projection.getLabel();
-				if (label == null) {
-					label = MessageUtils.codes(
-						formQuery.getClass().getName() + "." + projection.getDefaultLabelCode(),
-						formQuery.getClass().getSimpleName() + "." + projection.getDefaultLabelCode(),
-						projection.getDefaultLabelCode());
-				}
-				
-				ColumnFormQueryResult<NodeResult> column = new ColumnFormQueryResult<NodeResult>(
-						label, 
-						projection.getOutputFieldView())
-					.transformer(projection.getNodeTransformer())
-					.sort(projection.getSortDirection(), projection.getSortPriority())
-					.align("text-" + projection.getAlign().name().toLowerCase())
-					.comparator(projection.getNodeComparator());
-					;
-				result.getColumns().add(column);
-			}
-		}
-		return result;
-	}
-
-	private ProjectionBuilder createProjectionBuilder(NodeFormQuery formQuery) {
-		ProjectionBuilder projectionBuilder = new ProjectionBuilder();
-		formQuery.initProjections(projectionBuilder);
+	private NodeProjectionBuilder createProjectionBuilder(NodeFormQuery formQuery) {
+		NodeProjectionBuilder projectionBuilder = new NodeProjectionBuilder();
+		formQuery.initNodeProjections(projectionBuilder);
 		return projectionBuilder;
 	}
 	
-	private NodeFetchDetails createNodeFetchDetails(ProjectionBuilder projectionBuilder) {
+	private NodeFetchDetails createNodeFetchDetails(NodeProjectionBuilder projectionBuilder) {
 		NodeFetchDetails nodeFetchDetails = new NodeFetchDetails();
-		for (Projection<?> projection : projectionBuilder.getProjections()) {
-			projection.initNodeFetchDetails(nodeFetchDetails);
+		for (Projection<NodeResult, ?, ?> projection : projectionBuilder.getProjections()) {
+			if (projection instanceof NodeProjection) {
+				((NodeProjection<?>) projection).initNodeFetchDetails(nodeFetchDetails);
+			}
 		}
 		return nodeFetchDetails;
 	}

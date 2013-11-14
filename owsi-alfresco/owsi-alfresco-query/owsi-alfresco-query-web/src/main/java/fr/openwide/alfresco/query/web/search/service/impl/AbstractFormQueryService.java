@@ -7,22 +7,42 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.springframework.context.MessageSourceResolvable;
+
 import com.google.common.collect.Ordering;
 
-import fr.openwide.alfresco.query.web.form.result.ColumnFormQueryResult;
+import fr.openwide.alfresco.query.web.form.projection.ProjectionBuilder;
+import fr.openwide.alfresco.query.web.form.projection.ProjectionColumn;
+import fr.openwide.alfresco.query.web.form.projection.ProjectionImpl;
 import fr.openwide.alfresco.query.web.form.result.FormQueryResult;
+import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 import fr.openwide.alfresco.query.web.search.model.AbstractFormQuery;
 import fr.openwide.alfresco.query.web.search.model.PaginationParams;
 import fr.openwide.alfresco.query.web.search.model.PaginationParams.SortDirection;
 
 public class AbstractFormQueryService {
 	
-	protected <T> FormQueryResult<T> initResult(AbstractFormQuery<T> formQuery, final FormQueryResult<T> result, List<T> list) {
-		List<T> rows = new ArrayList<>();
+	protected <I> FormQueryResult<I> createQueryResult(AbstractFormQuery<I> formQuery, ProjectionBuilder<I, ?> projectionBuilder) {
+		FormQueryResult<I> result = new FormQueryResult<I>();
+		for (ProjectionImpl<I, ?, ?> projection : projectionBuilder.getProjections()) {
+			MessageSourceResolvable label = projection.getLabel();
+			if (label == null) {
+				projection.setLabel(MessageUtils.codes(
+					formQuery.getClass().getName() + "." + projection.getDefaultLabelCode(),
+					formQuery.getClass().getSimpleName() + "." + projection.getDefaultLabelCode(),
+					projection.getDefaultLabelCode()));
+			}
+			result.getColumns().add(projection);
+		}
+		return result;
+	}
+	
+	protected <I> FormQueryResult<I> initResult(AbstractFormQuery<I> formQuery, final FormQueryResult<I> result, List<I> list) {
+		List<I> rows = new ArrayList<>();
 		formQuery.initResult(result);
 
 		// Filtre
-		for (T item : list) {
+		for (I item : list) {
 			if (formQuery.filterResult(item)) {
 				rows.add(item);
 			}
@@ -33,40 +53,42 @@ public class AbstractFormQueryService {
 		
 		// Tri
 		if (pagination.getSortColumn() != null) { 
-			ColumnFormQueryResult<T> sortColumn = result.getColumns().get(Math.min(pagination.getSortColumn(), result.getColumns().size()-1));
+			ProjectionColumn<I> sortColumn = result.getColumns().get(Math.min(pagination.getSortColumn(), result.getColumns().size()-1));
 			sortColumn.sort(pagination.getSortDirection(), Integer.MAX_VALUE);
 		}
 		
-		Set<ColumnFormQueryResult<T>> sortColumns = new TreeSet<ColumnFormQueryResult<T>>(new Comparator<ColumnFormQueryResult<T>>() {
+		Set<ProjectionColumn<I>> sortColumns = new TreeSet<ProjectionColumn<I>>(new Comparator<ProjectionColumn<I>>() {
 			@Override
-			public int compare(ColumnFormQueryResult<T> o1, ColumnFormQueryResult<T> o2) {
-				int d = o2.getSortPriority() - o1.getSortPriority();
+			public int compare(ProjectionColumn<I> p1, ProjectionColumn<I> p2) {
+				int d = p2.getSortPriority() - p1.getSortPriority();
 				if (d != 0) {
 					return d;
 				}
-				return result.getColumns().indexOf(o1) - result.getColumns().indexOf(o2);
+				return result.getColumns().indexOf(p1) - result.getColumns().indexOf(p2);
 			}
 		});
-		for (ColumnFormQueryResult<T> column : result.getColumns()) {
-			if (column.getComparator() != null && column.getSortDirection() != SortDirection.NONE) {
-				sortColumns.add(column);
+		for (ProjectionColumn<I> projection : result.getColumns()) {
+			if (projection.getItemComparator() != null && projection.getSortDirection() != SortDirection.NONE) {
+				sortColumns.add(projection);
 			}
 		}
 		
-		List<Comparator<T>> comparators = new ArrayList<>();
-		for (ColumnFormQueryResult<T> column : sortColumns) {
-			switch (column.getSortDirection()) {
-			case NONE: break;
-			case ASC:  comparators.add(column.getComparator()); break;
-			case DESC: comparators.add(Ordering.from(column.getComparator()).reverse()); break;
+		if (! sortColumns.isEmpty()) {
+			List<Comparator<I>> comparators = new ArrayList<>();
+			for (ProjectionColumn<I> projection : sortColumns) {
+				switch (projection.getSortDirection()) {
+				case NONE: break;
+				case ASC:  comparators.add(projection.getItemComparator()); break;
+				case DESC: comparators.add(Ordering.from(projection.getItemComparator()).reverse()); break;
+				}
 			}
-		}
-		Collections.sort(rows, Ordering.compound(comparators));
-
-		ColumnFormQueryResult<T> firstSortColumn = sortColumns.iterator().next();
-		for (ColumnFormQueryResult<T> column : result.getColumns()) {
-			if (column != firstSortColumn) {
-				column.sort(SortDirection.NONE, 0);
+			Collections.sort(rows, Ordering.compound(comparators));
+	
+			ProjectionColumn<I> firstSortColumn = sortColumns.iterator().next();
+			for (ProjectionColumn<I> column : result.getColumns()) {
+				if (column != firstSortColumn) {
+					column.sort(SortDirection.NONE, 0);
+				}
 			}
 		}
 

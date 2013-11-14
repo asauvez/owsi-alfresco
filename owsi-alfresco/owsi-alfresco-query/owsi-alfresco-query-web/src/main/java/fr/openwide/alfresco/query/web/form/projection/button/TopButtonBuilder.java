@@ -1,10 +1,10 @@
 package fr.openwide.alfresco.query.web.form.projection.button;
 
 
-public interface TopButtonBuilder<P, T> extends ButtonBuilder<P, T> {
+public interface TopButtonBuilder<PARENT, I> extends ButtonBuilder<PARENT, I> {
 
-	TopButtonBuilder<P, T> dropDownSeparator();
+	TopButtonBuilder<PARENT, I> dropDownSeparator();
 
-	ButtonBuilder<TopButtonBuilder<P, T>, T> dropDownButton(String message, Object ... messageArgs);
+	ButtonBuilder<TopButtonBuilder<PARENT, I>, I> dropDownButton(String message, Object ... messageArgs);
 
 }

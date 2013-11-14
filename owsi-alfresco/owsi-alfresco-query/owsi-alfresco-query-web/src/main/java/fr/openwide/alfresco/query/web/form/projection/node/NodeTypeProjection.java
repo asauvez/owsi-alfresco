@@ -3,12 +3,10 @@ package fr.openwide.alfresco.query.web.form.projection.node;
 import fr.openwide.alfresco.query.core.node.model.TypeModel;
 import fr.openwide.alfresco.query.core.search.model.NodeFetchDetails;
 import fr.openwide.alfresco.query.core.search.model.NodeResult;
-import fr.openwide.alfresco.query.web.form.projection.Projection;
-import fr.openwide.alfresco.query.web.form.projection.ProjectionBuilder;
 
-public class NodeTypeProjection extends Projection<TypeModel> {
+public class NodeTypeProjection extends NodeProjection<TypeModel> {
 
-	public NodeTypeProjection(ProjectionBuilder builder) {
+	public NodeTypeProjection(NodeProjectionBuilder builder) {
 		super(builder, TypeModel.class);
 	}
 

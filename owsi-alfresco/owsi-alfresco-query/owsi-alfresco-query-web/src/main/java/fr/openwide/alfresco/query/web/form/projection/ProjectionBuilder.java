@@ -3,34 +3,31 @@ package fr.openwide.alfresco.query.web.form.projection;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
-import fr.openwide.alfresco.query.web.form.projection.node.NodePropertyProjection;
-import fr.openwide.alfresco.query.web.form.projection.node.NodeReferenceProjection;
-import fr.openwide.alfresco.query.web.form.projection.node.NodeTypeProjection;
+import com.google.common.base.Function;
 
-public class ProjectionBuilder {
+public class ProjectionBuilder<I, PB extends ProjectionBuilder<I, PB>> {
 
-	private final List<Projection<?>> projections = new ArrayList<Projection<?>>();
-
-	public NodeReferenceProjection ref() {
-		return add(new NodeReferenceProjection(this));
+	private final List<ProjectionImpl<I, ? extends ProjectionBuilder<I, ?>, ?>> projections = new ArrayList<>();
+	
+	public Projection<I, PB, I> item() {
+		return add(new ItemProjection<I, PB>(getThis()));
 	}
-
-	public NodeTypeProjection type() {
-		return add(new NodeTypeProjection(this));
+	
+	public <P> Projection<I, PB, P> function(Function<I, P> function) {
+		return add(new FunctionProjection<I, PB, P>(getThis(), function));
 	}
-
-	public <T> NodePropertyProjection<T> prop(PropertyModel<T> property) {
-		return add(new NodePropertyProjection<T>(this, property));
-	}
-
-	protected <P extends Projection<?>> P add(P projection) {
+	
+	protected <P extends ProjectionImpl<I, PB, ?>> P add(P projection) {
 		projections.add(projection);
 		return projection;
 	}
 
-	public List<Projection<?>> getProjections() {
+	public List<ProjectionImpl<I, ? extends ProjectionBuilder<I, ?>, ?>> getProjections() {
 		return projections;
 	}
 
+	@SuppressWarnings("unchecked")
+	private PB getThis() {
+		return (PB) this;
+	}
 }
