@@ -11,13 +11,19 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
+import fr.openwide.alfresco.query.web.form.projection.ProjectionVisitor;
+import fr.openwide.alfresco.query.web.form.projection.ProjectionVisitorAcceptor;
 import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 
-public class ButtonBuilderImpl<PARENT, I> implements TopButtonBuilder<PARENT, I>, Function<I, Object> {
+public class ButtonBuilderImpl<PARENT, I>
+	implements 
+		TopButtonBuilder<PARENT, I>,
+		Function<I, Object>,
+		ProjectionVisitorAcceptor {
 
 	private final PARENT parent;
 	private final Function<I, Object> transformer;
-	
+
 	private MessageSourceResolvable label;
 
 	private MessageFormat hrefPattern;
@@ -48,7 +54,7 @@ public class ButtonBuilderImpl<PARENT, I> implements TopButtonBuilder<PARENT, I>
 	public ButtonBuilderImpl<PARENT, I> visible(Predicate<? super I> visible) {
 		this.visible = visible;
 		return this;
-	}	
+	}
 	@Override
 	public ButtonBuilderImpl<PARENT, I> visible(boolean visible) {
 		return visible(visible ? Predicates.alwaysTrue() : Predicates.alwaysFalse());
@@ -117,7 +123,7 @@ public class ButtonBuilderImpl<PARENT, I> implements TopButtonBuilder<PARENT, I>
 	public Object getCurrentValue() {
 		return transformer.apply(currentItem);
 	}
-	
+
 	public MessageSourceResolvable getLabel() {
 		return label;
 	}
@@ -125,8 +131,8 @@ public class ButtonBuilderImpl<PARENT, I> implements TopButtonBuilder<PARENT, I>
 		return dropDown;
 	}
 	public String getHref() {
-		return (isEnabled() && hrefPattern != null) ? hrefPattern.format(new Object[] { 
-				getCurrentValue() 
+		return (isEnabled() && hrefPattern != null) ? hrefPattern.format(new Object[] {
+				getCurrentValue()
 			}) : "#";
 	}
 	public boolean isVisible() {
@@ -146,5 +152,15 @@ public class ButtonBuilderImpl<PARENT, I> implements TopButtonBuilder<PARENT, I>
 	}
 	public boolean isSubButton() {
 		return (parent instanceof ButtonBuilderImpl);
+	}
+	
+	@Override
+	public void accept(ProjectionVisitor visitor) {
+		visitor.visit(transformer);
+		visitor.visit(visible);
+		visitor.visit(enabled);
+		for (ButtonBuilderImpl<?, I> subButton : getDropDown()) {
+			visitor.visit(subButton);
+		}
 	}
 }

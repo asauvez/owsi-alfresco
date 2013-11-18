@@ -12,7 +12,7 @@ public abstract class Restriction {
 	public Restriction(RestrictionBuilder parent) {
 		this.parent = parent;
 	}
-	
+
 	public Restriction not() {
 		not = true;
 		return this;

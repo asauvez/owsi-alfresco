@@ -10,20 +10,20 @@
 <c:if test="${not empty result}">
 	<table class="table table-striped table-bordered table-hover form-query-result">
 		<thead>
-			<c:forEach var="column" items="${result.columns}" varStatus="columnStatus">
+			<c:forEach var="column" items="${result.columns}">
 				<c:if test="${column.visible}">
 					<th>
 						<spring:message message="${column.label}"/>
 						<c:if test="${not empty column.itemComparator}">
 							<c:choose>
 								<c:when test="${column.sortDirection eq 'NONE'}">
-									<span class="sort-column glyphicon glyphicon-sort" data-sort-column="${columnStatus.index}" data-sort-direction="ASC"></span>
+									<span class="sort-column glyphicon glyphicon-sort" data-sort-column="${column.id}" data-sort-direction="ASC"></span>
 								</c:when>
 								<c:when test="${column.sortDirection eq 'ASC'}">
-									<span class="sort-column glyphicon glyphicon-sort-by-attributes" data-sort-column="${columnStatus.index}" data-sort-direction="DESC"></span>									
+									<span class="sort-column glyphicon glyphicon-sort-by-attributes" data-sort-column="${column.id}" data-sort-direction="DESC"></span>									
 								</c:when>
 								<c:when test="${column.sortDirection eq 'DESC'}">
-									<span class="sort-column glyphicon glyphicon-sort-by-attributes-alt" data-sort-column="${columnStatus.index}" data-sort-direction="ASC"></span>									
+									<span class="sort-column glyphicon glyphicon-sort-by-attributes-alt" data-sort-column="${column.id}" data-sort-direction="ASC"></span>									
 								</c:when>
 							</c:choose>
 						</c:if>
@@ -54,6 +54,9 @@
 										</c:when>
 										<c:when test="${column.view eq 'DATE'}">
 											<fmt:formatDate value="${value}"/>
+										</c:when>
+										<c:when test="${column.view eq 'CHECKBOX'}">
+											<input type="checkbox" name="${column.id}" value="${value}"/>
 										</c:when>
 										<c:when test="${column.view eq 'BUTTON'}">
 											<c:set var="button" value="${value}"/>

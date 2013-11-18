@@ -16,15 +16,10 @@
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-app-core</artifactId>
 		</dependency>
-		
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-query-api</artifactId>
+		</dependency>		
 	</dependencies>
 
 </project>

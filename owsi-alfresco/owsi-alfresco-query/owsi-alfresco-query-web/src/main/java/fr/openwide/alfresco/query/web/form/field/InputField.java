@@ -20,7 +20,7 @@ public abstract class InputField<T> {
 		this.fieldSet = fieldSet;
 		this.name = name;
 	}
-	
+
 	public FieldSet of() {
 		return fieldSet;
 	}
@@ -53,7 +53,7 @@ public abstract class InputField<T> {
 	}
 
 	public abstract InputFieldView getView();
-	
+
 	public MessageSourceResolvable getLabel() {
 		return label;
 	}
@@ -66,7 +66,7 @@ public abstract class InputField<T> {
 	public void setDescription(MessageSourceResolvable description) {
 		this.description = description;
 	}
-	
+
 	public boolean isVisible() {
 		return visible;
 	}

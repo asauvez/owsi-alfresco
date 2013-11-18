@@ -14,5 +14,5 @@ public class DateInputField extends InputField<Date> {
 	public InputFieldView getView() {
 		return InputFieldView.DATE;
 	}
-	
+
 }

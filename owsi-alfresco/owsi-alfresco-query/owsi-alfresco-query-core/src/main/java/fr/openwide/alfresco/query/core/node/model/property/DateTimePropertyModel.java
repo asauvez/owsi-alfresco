@@ -2,8 +2,8 @@ package fr.openwide.alfresco.query.core.node.model.property;
 
 import java.util.Date;
 
+import fr.openwide.alfresco.query.api.node.model.NameReference;
 import fr.openwide.alfresco.query.core.node.model.TypeModel;
-import fr.openwide.alfresco.query.core.node.model.value.NameReference;
 
 public class DateTimePropertyModel extends PropertyModel<Date> {
 

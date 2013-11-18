@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.query.core.search.restriction;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,32 +36,32 @@ public class RestrictionBuilder extends Restriction {
 		return add(new TextMatchRestriction(this, property, value));
 	}
 
-	public <C> MatchRestriction<C> match(PropertyModel<C> property, C value) {
+	public <C extends Serializable> MatchRestriction<C> match(PropertyModel<C> property, C value) {
 		return add(new MatchRestriction<C>(this, property, value));
 	}
 
-	public <C> BetweenRestriction<C> between(PropertyModel<C> property, C from, C to) {
+	public <C extends Serializable> BetweenRestriction<C> between(PropertyModel<C> property, C from, C to) {
 		return add(new BetweenRestriction<C>(this, property, from, to));
 	}
 
-	public <C> BetweenRestriction<C> ge(PropertyModel<C> property, C value) {
+	public <C extends Serializable> BetweenRestriction<C> ge(PropertyModel<C> property, C value) {
 		return between(property, value, null);
 	}
-	public <C> BetweenRestriction<C> gt(PropertyModel<C> property, C value) {
+	public <C extends Serializable> BetweenRestriction<C> gt(PropertyModel<C> property, C value) {
 		return between(property, value, null)
 				.minInclusive(false);
 	}
-	public <C> BetweenRestriction<C> lt(PropertyModel<C> property, C value) {
+	public <C extends Serializable> BetweenRestriction<C> lt(PropertyModel<C> property, C value) {
 		return between(property, null, value)
 				.maxInclusive(false);
 	}
-	public <C> BetweenRestriction<C> le(PropertyModel<C> property, C value) {
+	public <C extends Serializable> BetweenRestriction<C> le(PropertyModel<C> property, C value) {
 		return between(property, null, value);
 	}
 
 	public CustomRestriction custom(String customQuery) {
 		return add(new CustomRestriction(this, customQuery));
-	} 
+	}
 
 	private <R extends Restriction> R add(R restriction) {
 		restrictions.add(restriction);

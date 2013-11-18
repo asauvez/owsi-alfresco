@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.springframework.context.MessageSourceResolvable;
 
+import fr.openwide.alfresco.query.api.node.model.NameReference;
 import fr.openwide.alfresco.query.core.node.model.property.BooleanPropertyModel;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
 import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
-import fr.openwide.alfresco.query.core.node.model.value.NameReference;
 import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 
 public class FieldSet {
@@ -27,7 +27,7 @@ public class FieldSet {
 	public InputFieldBuilder of() {
 		return builder;
 	}
-	
+
 	public FieldSet label(String labelCode, Object ... labelArgs) {
 		this.label = MessageUtils.code(labelCode, labelArgs);
 		return this;
@@ -42,8 +42,8 @@ public class FieldSet {
 		this.inRow = inRow;
 		return this;
 	}
-	
-	
+
+
 	public TextInputField newText(String name) {
 		return add(new TextInputField(this, name));
 	}
@@ -73,7 +73,7 @@ public class FieldSet {
 		return choice;
 	}
 
-	
+
 	public MessageSourceResolvable getLabel() {
 		return label;
 	}
@@ -88,7 +88,7 @@ public class FieldSet {
 		}
 		return false;
 	}
-	
+
 	public boolean isInRow() {
 		return inRow;
 	}

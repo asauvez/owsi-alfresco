@@ -19,7 +19,7 @@ public class CellFormQueryResult<I> {
 	public ProjectionColumn<I> getColumn() {
 		return column;
 	}
-	
+
 	public I getRow() {
 		return item;
 	}

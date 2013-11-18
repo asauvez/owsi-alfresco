@@ -12,13 +12,14 @@ import fr.openwide.alfresco.query.web.search.model.PaginationParams.SortDirectio
 
 public interface ProjectionColumn<I> {
 
+	String getId();
 	MessageSourceResolvable getLabel();
 	OutputFieldView getView();
 
 	boolean isVisible();
 	String getAlign();
 	Function<I, Object> getItemTransformer();
-	
+
 	SortDirection getSortDirection();
 	int getSortPriority();
 

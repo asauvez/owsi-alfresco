@@ -1,8 +1,10 @@
 package fr.openwide.alfresco.query.core.search.restriction;
 
+import java.io.Serializable;
+
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
 
-public class BetweenRestriction<C> extends Restriction {
+public class BetweenRestriction<C extends Serializable> extends Restriction {
 
 	private final PropertyModel<C> property;
 	private final C min;
@@ -35,12 +37,12 @@ public class BetweenRestriction<C> extends Restriction {
 		}
 		return property.toLucene() + ":"
 			+ (minInclusive ? "[" : "{")
-			+ ((min == null) 
-					? ((max instanceof String) ? "\\\\u0000" : "MIN") 
+			+ ((min == null)
+					? ((max instanceof String) ? "\\\\u0000" : "MIN")
 					: toLuceneValue(min))
 			+ " TO "
-			+ ((max == null) 
-					? ((min instanceof String) ? "\\\\uFFFF" : "MAX") 
+			+ ((max == null)
+					? ((min instanceof String) ? "\\\\uFFFF" : "MAX")
 					: toLuceneValue(max))
 			+ (maxInclusive ? "]" : "}");
 	}

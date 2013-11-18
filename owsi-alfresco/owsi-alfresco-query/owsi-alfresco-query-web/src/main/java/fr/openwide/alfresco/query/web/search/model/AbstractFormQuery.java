@@ -12,10 +12,10 @@ public abstract class AbstractFormQuery<I> {
 
 	private PaginationParams pagination = new PaginationParams();
 	private InputFieldBuilder inputFieldBuilder = new InputFieldBuilder();
-	
+
 	public AbstractFormQuery() {
 		initFields(inputFieldBuilder);
-		
+
 		for (FieldSet fieldSet : inputFieldBuilder.getFieldSets()) {
 			for (InputField<?> inputField : fieldSet.getInputFields()) {
 				if (inputField.getLabel() == null) {
@@ -27,24 +27,24 @@ public abstract class AbstractFormQuery<I> {
 			}
 		}
 	}
-	
+
 	public void initFields(@SuppressWarnings("unused") InputFieldBuilder builder) {
 		// to override
 	}
-	
+
 	public InputFieldBuilder getInputFieldBuilder() {
 		return inputFieldBuilder;
 	}
-	
+
 	public PaginationParams getPagination() {
 		return pagination;
 	}
-	
+
 	public boolean filterResult(@SuppressWarnings("unused") I item) {
 		// to override
 		return true;
 	}
-	
+
 	public void initResult(@SuppressWarnings("unused") FormQueryResult<I> result) {
 		// to override
 	}

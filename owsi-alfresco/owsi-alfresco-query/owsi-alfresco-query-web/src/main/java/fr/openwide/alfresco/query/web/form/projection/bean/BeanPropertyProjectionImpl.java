@@ -5,13 +5,13 @@ import org.springframework.beans.BeanWrapperImpl;
 import fr.openwide.alfresco.query.web.form.projection.ProjectionBuilder;
 import fr.openwide.alfresco.query.web.form.projection.ProjectionImpl;
 
-public class BeanPropertyProjection<I, PB extends ProjectionBuilder<I, PB>, P> extends ProjectionImpl<I, PB, P> {
+public class BeanPropertyProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P> extends ProjectionImpl<I, PB, P> {
 
 	private final String property;
 
-	public BeanPropertyProjection(PB builder, String property, Class<P> propertyClass) {
+	public BeanPropertyProjectionImpl(PB builder, String property, Class<P> propertyClass) {
 		super(builder, propertyClass);
-		this.property = property;		
+		this.property = property;
 	}
 
 	@Override

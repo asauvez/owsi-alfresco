@@ -6,7 +6,7 @@ public interface ButtonBuilder<PARENT, I> {
 
 	PARENT of();
 
-	ButtonBuilder<PARENT, I> visible(Predicate<? super I> visible);	
+	ButtonBuilder<PARENT, I> visible(Predicate<? super I> visible);
 	ButtonBuilder<PARENT, I> visible(boolean visible);
 
 	ButtonBuilder<PARENT, I> enabled(Predicate<? super I> enabled);

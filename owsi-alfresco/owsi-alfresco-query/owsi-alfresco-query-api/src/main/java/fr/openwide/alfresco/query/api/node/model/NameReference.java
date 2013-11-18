@@ -1,8 +1,12 @@
-package fr.openwide.alfresco.query.core.node.model.value;
+package fr.openwide.alfresco.query.api.node.model;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
 
 public class NameReference implements Serializable {
 
@@ -11,6 +15,12 @@ public class NameReference implements Serializable {
 	private final String namespace;
 	private final String name;
 
+	private NameReference(String s) {
+		Iterator<String> it = Splitter.on(":").split(s).iterator();
+		namespace = it.next();
+		name = it.next();
+	}
+	
 	private NameReference(String namespace, String name) {
 		this.namespace = namespace;
 		this.name = name;
@@ -28,20 +38,25 @@ public class NameReference implements Serializable {
 		return name;
 	}
 
+	@JsonValue
+	public String getFullName() {
+		return Joiner.on(":").join(namespace, name); 
+	}
+	
 	@Override
 	public String toString() {
-		return namespace + ":" + name;
+		return getFullName();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
         if (obj instanceof NameReference) {
-            return getNamespace().equals(((NameReference) obj).getNamespace())
-            	&& getName().equals(     ((NameReference) obj).getName());
+            return Objects.equal(getNamespace(), ((NameReference) obj).getNamespace())
+            	&& Objects.equal(getName(),      ((NameReference) obj).getName());
         }
         return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getNamespace(), getName());

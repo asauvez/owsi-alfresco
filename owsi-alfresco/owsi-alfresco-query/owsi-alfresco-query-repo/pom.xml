@@ -11,7 +11,29 @@
 
 	<name>OWSI Alfresco - Query - Repository</name>
 
+	<properties>
+		<alfresco.version>4.2.0</alfresco.version>
+		<servlet.version>2.5</servlet.version>
+	</properties>
+
 	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-query-api</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-repository</artifactId>
+			<version>${alfresco.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 </project>

@@ -1,7 +1,9 @@
-package fr.openwide.alfresco.query.core.node.model.value;
+package fr.openwide.alfresco.query.api.node.model;
 
 import java.io.Serializable;
-import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.base.Objects;
 
 public class NodeReference implements Serializable {
 
@@ -9,10 +11,15 @@ public class NodeReference implements Serializable {
 
 	private final String reference;
 
-	public NodeReference(String reference) {
+	private NodeReference(String reference) {
 		this.reference = reference;
 	}
+	
+	public static NodeReference create(String reference) {
+		return new NodeReference(reference);
+	}
 
+	@JsonValue
 	public String getReference() {
 		return reference;
 	}
@@ -25,11 +32,11 @@ public class NodeReference implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
         if (obj instanceof NodeReference) {
-            return getReference().equals(((NodeReference) obj).getReference());
+            return Objects.equal(getReference(), ((NodeReference) obj).getReference());
         }
         return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getReference());

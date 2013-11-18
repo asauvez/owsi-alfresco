@@ -18,21 +18,26 @@ import fr.openwide.alfresco.query.web.form.view.output.IconOutputFieldView;
 import fr.openwide.alfresco.query.web.form.view.output.OutputFieldView;
 import fr.openwide.alfresco.query.web.search.model.PaginationParams.SortDirection;
 
-public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P> 
-	implements Projection<I, PB, P>, Function<I, P>, ProjectionColumn<I> {
+public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
+	implements 
+		Projection<I, PB, P>,
+		ProjectionColumn<I>,
+		Function<I, P>,
+		ProjectionVisitorAcceptor {
 
 	private final PB builder;
+	private String id;
 	private MessageSourceResolvable label;
-	
+
 	private OutputFieldView view = OutputFieldView.PLAIN;
-	
+
 	private Function<I, Object> itemTransformer = null;
 	private Function<? super P, Object> resultTransformer = Functions.identity();
-	
+
 	private SortDirection sortDirection = SortDirection.NONE;
 	private int sortPriority = 0;
 	private Comparator<? super P> comparator = null;
-	
+
 	private Align align = Align.LEFT;
 	private boolean visible = true;
 
@@ -44,7 +49,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 		} else if (Comparable.class.isAssignableFrom(mappedClass)) {
 			comparatorNatural();
 		}
-		
+
 		if (Number.class.isAssignableFrom(mappedClass)) {
 			setView(OutputFieldView.NUMBER);
 			align(Align.RIGHT);
@@ -54,7 +59,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 			transform(new Function<P, Object>() {
 				@Override
 				public Object apply(P value) {
-					return ((Boolean) value) 
+					return ((Boolean) value)
 						? new IconOutputFieldView("glyphicon glyphicon-check", "boolean.true")
 						: new IconOutputFieldView("", "boolean.false");
 				}
@@ -70,8 +75,19 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	}
 
 	@Override
+	public Projection<I, PB, P> id(String id) {
+		this.id = id;
+		return this;
+	}
+	
+	@Override
 	public ProjectionImpl<I, PB, P> label(String labelCode, Object ... labelArgs) {
 		this.label = MessageUtils.code(labelCode, labelArgs);
+		return this;
+	}
+	@Override
+	public Projection<I, PB, P> labelEmpty() {
+		this.label = MessageUtils.direct("");
 		return this;
 	}
 
@@ -100,7 +116,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 
 	@Override
 	public TopButtonBuilder<Projection<I, PB, P>, I> button(String message, Object ... messageArgs) {
-		ButtonBuilderImpl<Projection<I, PB, P>, I> buttonBuilder 
+		ButtonBuilderImpl<Projection<I, PB, P>, I> buttonBuilder
 			= new ButtonBuilderImpl<Projection<I, PB, P>, I>(this, getItemTransformer(), message, messageArgs);
 		itemTransformer = buttonBuilder;
 		setView(OutputFieldView.BUTTON);
@@ -115,21 +131,26 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	}
 
 	@Override
+	public Projection<I, PB, P> asCheckBox() {
+		setView(OutputFieldView.CHECKBOX);
+		return align(Align.CENTER);
+	}
+	@Override
 	public ProjectionImpl<I, PB, P> asEmail() {
 		setView(OutputFieldView.EMAIL);
 		return this;
-	} 
+	}
 	@Override
 	public ProjectionImpl<I, PB, P> asExternalLink() {
 		setView(OutputFieldView.EXTERNAL_LINK);
 		return this;
-	} 
+	}
 	@Override
 	public ProjectionImpl<I, PB, P> asCustom() {
 		setView(OutputFieldView.CUSTOM);
 		return this;
-	} 
-	
+	}
+
 	@Override
 	public OutputFieldView getView() {
 		return view;
@@ -181,7 +202,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	public ProjectionImpl<I, PB, P> sortDesc() {
 		return sort(SortDirection.DESC, 0);
 	}
-	
+
 	@Override
 	public SortDirection getSortDirection() {
 		return sortDirection;
@@ -196,23 +217,27 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	}
 	@Override
 	public Function<I, Object> getItemTransformer() {
-		return (itemTransformer != null) 
-				? itemTransformer 
+		return (itemTransformer != null)
+				? itemTransformer
 				: Functions.compose(resultTransformer, this);
 	}
-		
+
 	@Override
 	public Comparator<I> getItemComparator() {
-		return (comparator != null) 
+		return (comparator != null)
 			? new Comparator<I>() {
 				@Override
 				public int compare(I o1, I o2) {
 					return comparator.compare(apply(o1), apply(o2));
 				}
-			} 
+			}
 			: null;
 	}
-	
+
+	@Override
+	public String getId() {
+		return id;
+	}
 	@Override
 	public MessageSourceResolvable getLabel() {
 		return label;
@@ -221,7 +246,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 		this.label = label;
 	}
 	public abstract String getDefaultLabelCode();
-	
+
 	@Override
 	public boolean isVisible() {
 		return visible;
@@ -230,6 +255,12 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	@Override
 	public String getAlign() {
 		return "text-" + align.name().toLowerCase();
+	}
+
+	@Override
+	public void accept(ProjectionVisitor visitor) {
+		visitor.visit(itemTransformer);
+		visitor.visit(comparator);
 	}
 
 }

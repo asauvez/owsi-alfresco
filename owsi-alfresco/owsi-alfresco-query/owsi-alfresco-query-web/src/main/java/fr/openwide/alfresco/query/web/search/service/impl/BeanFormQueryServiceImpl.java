@@ -11,7 +11,7 @@ import fr.openwide.alfresco.query.web.search.service.BeanFormQueryService;
 
 @Service
 public class BeanFormQueryServiceImpl extends AbstractFormQueryService implements BeanFormQueryService {
-	
+
 	@Override
 	public <I> FormQueryResult<I> list(BeanFormQuery<I> formQuery, List<I> list) {
 		BeanProjectionBuilder<I> projectionBuilder = new BeanProjectionBuilder<I>();
@@ -19,5 +19,5 @@ public class BeanFormQueryServiceImpl extends AbstractFormQueryService implement
 		FormQueryResult<I> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
-	
+
 }

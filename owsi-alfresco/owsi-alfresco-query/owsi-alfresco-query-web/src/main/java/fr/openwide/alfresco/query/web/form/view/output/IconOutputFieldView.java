@@ -5,7 +5,7 @@ import org.springframework.context.MessageSourceResolvable;
 import fr.openwide.alfresco.query.web.form.util.MessageUtils;
 
 public class IconOutputFieldView {
-	
+
 	private String cssClass;
 	private MessageSourceResolvable label;
 
@@ -13,7 +13,7 @@ public class IconOutputFieldView {
 		this.cssClass = cssClass;
 		this.label = MessageUtils.code(labelCode, labelArgs);
 	}
-	
+
 	public String getCssClass() {
 		return cssClass;
 	}

@@ -2,11 +2,11 @@ package fr.openwide.alfresco.query.web.form.projection;
 
 import com.google.common.base.Function;
 
-public class FunctionProjection<I, PB extends ProjectionBuilder<I, PB>, P> extends ProjectionImpl<I, PB, P> {
+public class FunctionProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P> extends ProjectionImpl<I, PB, P> {
 
 	private Function<I, P> transformer;
 
-	public FunctionProjection(PB builder, Function<I, P> transformer) {
+	public FunctionProjectionImpl(PB builder, Function<I, P> transformer) {
 		super(builder, Object.class);
 		this.transformer = transformer;
 	}

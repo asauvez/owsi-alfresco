@@ -1,17 +1,19 @@
 package fr.openwide.alfresco.query.web.form.projection.node;
 
+import java.io.Serializable;
+
+import fr.openwide.alfresco.query.api.node.model.NameReference;
+import fr.openwide.alfresco.query.api.search.model.NodeFetchDetails;
+import fr.openwide.alfresco.query.api.search.model.NodeResult;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
-import fr.openwide.alfresco.query.core.node.model.value.NameReference;
-import fr.openwide.alfresco.query.core.search.model.NodeFetchDetails;
-import fr.openwide.alfresco.query.core.search.model.NodeResult;
 
-public class NodePropertyProjection<P> extends NodeProjection<P> {
+public class NodePropertyProjectionImpl<P extends Serializable> extends NodeProjectionImpl<P> {
 
-	private final PropertyModel<?> property;
+	private final PropertyModel<P> property;
 
-	public NodePropertyProjection(NodeProjectionBuilder builder, PropertyModel<P> property) {
+	public NodePropertyProjectionImpl(NodeProjectionBuilder builder, PropertyModel<P> property) {
 		super(builder, property.getValueClass());
-		this.property = property;		
+		this.property = property;
 	}
 
 	@Override
@@ -22,14 +24,14 @@ public class NodePropertyProjection<P> extends NodeProjection<P> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public P apply(NodeResult result) {
-		return (P) result.get(property);
+	public P apply(NodeResult node) {
+		return (P) node.getProperties().get(property.getNameReference());
 	}
 
 	@Override
 	public void initNodeFetchDetails(NodeFetchDetails nodeFetchDetails) {
 		super.initNodeFetchDetails(nodeFetchDetails);
-		
+
 		nodeFetchDetails.getProperties().add(property.getNameReference());
 	}
 }

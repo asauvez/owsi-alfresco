@@ -5,20 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaginationParams implements Serializable {
-	
+
 	public enum SortDirection { NONE, ASC, DESC }
-	
-	private Integer sortColumn = null;
+
+	private String sortColumn = null;
 	private SortDirection sortDirection = SortDirection.NONE;
-	
+
 	private int currentPage = 1;
 	private int nbItemsPerPage = Integer.MAX_VALUE;
 	private Integer nbItemsTotal = null;
-	
-	public Integer getSortColumn() {
+
+	public String getSortColumn() {
 		return sortColumn;
 	}
-	public void setSortColumn(Integer sortColumn) {
+	public void setSortColumn(String sortColumn) {
 		this.sortColumn = sortColumn;
 	}
 	public SortDirection getSortDirection() {
@@ -39,14 +39,14 @@ public class PaginationParams implements Serializable {
 	public void setNbItemsPerPage(int nbItemsPerPage) {
 		this.nbItemsPerPage = nbItemsPerPage;
 	}
-	
+
 	public Integer getNbItemsTotal() {
 		return nbItemsTotal;
 	}
 	public boolean isInitialized() {
 		return (nbItemsTotal != null);
 	}
-	
+
 	public boolean isHasPagination() {
 		return nbItemsTotal > nbItemsPerPage;
 	}
@@ -70,22 +70,22 @@ public class PaginationParams implements Serializable {
 		return pages;
 	}
 	public boolean isHasNextPage() {
-		return currentPage < getLastPage(); 
+		return currentPage < getLastPage();
 	}
 	public int getNextPage() {
 		return currentPage + 1;
 	}
-	
+
 	public <T> List<T> filterList(List<T> list) {
 		this.nbItemsTotal = list.size();
 		this.currentPage = Math.min(currentPage, getLastPage());
-		return isHasPagination() ? list.subList(getFirstResult(), Math.min(list.size(), currentPage*nbItemsPerPage)) 
+		return isHasPagination() ? list.subList(getFirstResult(), Math.min(list.size(), currentPage*nbItemsPerPage))
 				                 : list;
 	}
-	
+
 	// Pour Hibernate
 	public int getFirstResult() {
-		return (currentPage-1)*nbItemsPerPage; 
+		return (currentPage-1)*nbItemsPerPage;
 	}
 	public int getMaxResult() {
 		return nbItemsPerPage;

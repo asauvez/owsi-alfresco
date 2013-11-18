@@ -1,6 +1,7 @@
-package fr.openwide.alfresco.query.core.node.model;
+package fr.openwide.alfresco.query.core.node.model.value;
 
-import fr.openwide.alfresco.query.core.node.model.value.NameReference;
+import fr.openwide.alfresco.query.api.node.model.NameReference;
+
 
 public abstract class AspectModel extends Model {
 

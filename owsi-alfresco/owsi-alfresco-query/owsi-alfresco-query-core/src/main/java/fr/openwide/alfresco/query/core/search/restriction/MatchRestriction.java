@@ -1,8 +1,10 @@
 package fr.openwide.alfresco.query.core.search.restriction;
 
+import java.io.Serializable;
+
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
 
-public class MatchRestriction<C> extends Restriction {
+public class MatchRestriction<C extends Serializable> extends Restriction {
 
 	private final PropertyModel<C> property;
 	private final C value;

@@ -3,11 +3,11 @@ package fr.openwide.alfresco.query.web.search.service.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.springframework.context.MessageSourceResolvable;
 
 import com.google.common.collect.Ordering;
 
@@ -21,12 +21,20 @@ import fr.openwide.alfresco.query.web.search.model.PaginationParams;
 import fr.openwide.alfresco.query.web.search.model.PaginationParams.SortDirection;
 
 public class AbstractFormQueryService {
-	
+
 	protected <I> FormQueryResult<I> createQueryResult(AbstractFormQuery<I> formQuery, ProjectionBuilder<I, ?> projectionBuilder) {
 		FormQueryResult<I> result = new FormQueryResult<I>();
+		Map<String, Integer> alreadyUseIds = new HashMap<>();
 		for (ProjectionImpl<I, ?, ?> projection : projectionBuilder.getProjections()) {
-			MessageSourceResolvable label = projection.getLabel();
-			if (label == null) {
+			String id = projection.getId();
+			if (id == null) {
+				id = projection.getDefaultLabelCode();
+			}
+			Integer n = alreadyUseIds.get(id);
+			alreadyUseIds.put(id, (n != null) ? n + 1 : 1);
+			projection.id((n != null) ? id + "_" + n: id);
+			
+			if (projection.getLabel() == null) {
 				projection.setLabel(MessageUtils.codes(
 					formQuery.getClass().getName() + "." + projection.getDefaultLabelCode(),
 					formQuery.getClass().getSimpleName() + "." + projection.getDefaultLabelCode(),
@@ -36,7 +44,7 @@ public class AbstractFormQueryService {
 		}
 		return result;
 	}
-	
+
 	protected <I> FormQueryResult<I> initResult(AbstractFormQuery<I> formQuery, final FormQueryResult<I> result, List<I> list) {
 		List<I> rows = new ArrayList<>();
 		formQuery.initResult(result);
@@ -47,16 +55,19 @@ public class AbstractFormQueryService {
 				rows.add(item);
 			}
 		}
-		
+
 		PaginationParams pagination = formQuery.getPagination();
 		result.setPagination(pagination);
-		
+
 		// Tri
-		if (pagination.getSortColumn() != null) { 
-			ProjectionColumn<I> sortColumn = result.getColumns().get(Math.min(pagination.getSortColumn(), result.getColumns().size()-1));
-			sortColumn.sort(pagination.getSortDirection(), Integer.MAX_VALUE);
+		if (pagination.getSortColumn() != null) {
+			for (ProjectionColumn<I> column : result.getColumns()) {
+				if (pagination.getSortColumn().equals(column.getId())) {
+					column.sort(pagination.getSortDirection(), Integer.MAX_VALUE);
+				}
+			}
 		}
-		
+
 		Set<ProjectionColumn<I>> sortColumns = new TreeSet<ProjectionColumn<I>>(new Comparator<ProjectionColumn<I>>() {
 			@Override
 			public int compare(ProjectionColumn<I> p1, ProjectionColumn<I> p2) {
@@ -72,7 +83,7 @@ public class AbstractFormQueryService {
 				sortColumns.add(projection);
 			}
 		}
-		
+
 		if (! sortColumns.isEmpty()) {
 			List<Comparator<I>> comparators = new ArrayList<>();
 			for (ProjectionColumn<I> projection : sortColumns) {
@@ -83,7 +94,7 @@ public class AbstractFormQueryService {
 				}
 			}
 			Collections.sort(rows, Ordering.compound(comparators));
-	
+
 			ProjectionColumn<I> firstSortColumn = sortColumns.iterator().next();
 			for (ProjectionColumn<I> column : result.getColumns()) {
 				if (column != firstSortColumn) {
@@ -95,8 +106,8 @@ public class AbstractFormQueryService {
 		// Pagination
 		rows = pagination.filterList(rows);
 		result.setRows(rows);
-		
+
 		return result;
 	}
-	
+
 }
