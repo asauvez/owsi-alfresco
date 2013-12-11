@@ -23,10 +23,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
@@ -34,47 +32,44 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
-@Component("kerberosPreAuthenticatedFilter")
 public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(KerberosPreAuthenticatedFilter.class);
 
-	private static final String AUTHORIZATION = "Authorization";
+	protected static final String HEADER_AUTHORIZATION = "Authorization";
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	@Autowired
-	private Environment environment;
+	protected AuthenticationManager authenticationManager;
 
-	private boolean enabled;
-	private String configEntryName;
-	private String bypassUriPattern;
+	protected boolean enabled;
+	protected String configEntryName;
+	protected String bypassUriPattern;
+	protected String bypassHeader;
+	protected boolean continueFilterChainOnUnsuccessfulAuthentication = true;
 
-	private boolean continueFilterChainOnUnsuccessfulAuthentication = true;
+	protected ApplicationEventPublisher eventPublisher;
 
-	private ApplicationEventPublisher eventPublisher;
+	protected String serviceAccountName;
+	protected Subject privilegedSubject;
 
-	private String serviceAccountName;
-	private Subject privilegedSubject;
+	public KerberosPreAuthenticatedFilter(AuthenticationManager authenticationManager, boolean enabled, String configEntryName) {
+		this.authenticationManager = authenticationManager;
+		this.enabled = enabled;
+		this.configEntryName = configEntryName;
+	}
 
 	@PostConstruct
 	public void serviceAuthentication() {
-		enabled = environment.getRequiredProperty("jaas.login.enabled", Boolean.class);
 		if (enabled) {
-			configEntryName = environment.getRequiredProperty("jaas.login.configuration");
-			bypassUriPattern = environment.getProperty("jaas.login.bypass.uriPattern");
 			try {
 				LoginContext loginContext = new LoginContext(configEntryName);
 				loginContext.login();
 				logger.info("Kerberos Preauthentification enabled using configuration: " + configEntryName);
-				
+				// retrieve service account
 				serviceAccountName = loginContext.getSubject().getPrincipals().iterator().next().getName();
 				logger.info("Kerberos Preauthentification enabled using service account: " + serviceAccountName);
-				
 				this.privilegedSubject = loginContext.getSubject();
 			} catch (LoginException e) {
 				throw new IllegalStateException("Could not authenticate using Kerberos", e);
@@ -87,12 +82,8 @@ public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements
 	}
 
 	@Override
-	public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain) 
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain) throws IOException, ServletException {
 		if (enabled && rq instanceof HttpServletRequest && rs instanceof HttpServletResponse) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Checking secure context token: " + SecurityContextHolder.getContext().getAuthentication());
-			}
 			HttpServletRequest request = (HttpServletRequest) rq;
 			if (requiresAuthentication(request)) {
 				HttpServletResponse response = (HttpServletResponse) rs;
@@ -106,7 +97,7 @@ public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements
 		chain.doFilter(rq, rs);
 	}
 
-	private boolean doAuthenticate(HttpServletRequest request, HttpServletResponse response) {
+	protected boolean doAuthenticate(HttpServletRequest request, HttpServletResponse response) {
 		Authentication authResult = null;
 		Object principal = getPreAuthenticatedPrincipal(request, response);
 		if (principal == null) {
@@ -132,7 +123,7 @@ public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements
 	}
 
 	public Object getPreAuthenticatedPrincipal(HttpServletRequest request, HttpServletResponse response) {
-		String authHeader = request.getHeader(AUTHORIZATION);
+		String authHeader = request.getHeader(HEADER_AUTHORIZATION);
 		if (authHeader != null) {
 			// Check for a Kerberos/SPNEGO authorization header
 			if (authHeader.startsWith("Negotiate")) {
@@ -225,17 +216,26 @@ public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements
 	}
 
 	protected boolean requiresAuthentication(HttpServletRequest request) {
+		Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+		if (logger.isDebugEnabled()) {
+			logger.debug("Checking secure context token: " + currentUser);
+		}
+		if (currentUser != null) {
+			return false;
+		}
 		if (StringUtils.isNotEmpty(bypassUriPattern) && PatternMatchUtils.simpleMatch(bypassUriPattern, request.getServletPath())) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("No authentication required for path: " + request.getServletPath());
 			}
 			return false;
 		}
-		Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
-		if (currentUser == null) {
-			return true;
+		if (StringUtils.isNotEmpty(bypassHeader) && request.getHeader(bypassHeader) != null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("No authentication required with bypass header");
+			}
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -289,6 +289,12 @@ public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements
 
 	public void setContinueFilterChainOnUnsuccessfulAuthentication(boolean shouldContinue) {
 		continueFilterChainOnUnsuccessfulAuthentication = shouldContinue;
+	}
+	public void setBypassUriPattern(String bypassUriPattern) {
+		this.bypassUriPattern = bypassUriPattern;
+	}
+	public void setBypassHeader(String bypassHeader) {
+		this.bypassHeader = bypassHeader;
 	}
 
 }

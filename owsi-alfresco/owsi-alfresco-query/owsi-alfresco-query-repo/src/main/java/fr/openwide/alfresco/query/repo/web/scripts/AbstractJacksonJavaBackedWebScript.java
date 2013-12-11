@@ -8,8 +8,8 @@ import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
@@ -41,7 +41,7 @@ import fr.openwide.alfresco.query.repo.mapper.ObjectMapperProvider;
  */
 public abstract class AbstractJacksonJavaBackedWebScript<R> extends AbstractWebScript {
 
-	private final Log logger = LogFactory.getLog(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected ObjectMapperProvider objectMapperProvider;
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Framework configuration -->
+
+	<bean id="owsi.objectMapper" 
+			class="fr.openwide.alfresco.repository.remote.framework.service.impl.ObjectMapperProvider" />
+
+	<bean id="webscript.owsi.remote" parent="webscript" abstract="true"
+			class="fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript">
+		<property name="objectMapper" ref="owsi.objectMapper" />
+	</bean>
+
+	<!-- Authentication service -->
+
+	<bean id="owsi.service.authentication" 
+			class="fr.openwide.alfresco.repository.remote.authentication.service.impl.AuthenticationRemoteServiceImpl">
+		<property name="authenticationService" ref="AuthenticationService"/>
+		<property name="ticketComponent" ref="ticketComponent"/>
+		<property name="personService" ref="PersonService" />
+		<property name="nodeService" ref="NodeService" />
+		<property name="authorityService" ref="AuthorityService" />
+	</bean>
+
+	<!-- Authentication webscripts -->
+
+	<bean id="webscript.owsi.remote.authentication" parent="webscript.owsi.remote" abstract="true">
+		<property name="authenticationRemoteService" ref="owsi.service.authentication" />
+	</bean>
+
+	<bean id="webscript.owsi.remote.authentication.login.post" parent="webscript.owsi.remote.authentication"
+			class="fr.openwide.alfresco.repository.remote.authentication.web.script.LoginWebScript" />
+
+	<bean id="webscript.owsi.remote.authentication.logout.delete" parent="webscript.owsi.remote.authentication"
+			class="fr.openwide.alfresco.repository.remote.authentication.web.script.LogoutWebScript" />
+
+	<bean id="webscript.owsi.remote.authentication.user.get" parent="webscript.owsi.remote.authentication"
+			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UserWebScript" />
+
+</beans>

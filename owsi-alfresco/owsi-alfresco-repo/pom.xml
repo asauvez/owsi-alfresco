@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>owsi-alfresco-repo</artifactId>
+	<packaging>pom</packaging>
+
+	<name>OWSI Alfresco - Repository</name>
+	<description>Composants à inclure dans l'application Alfresco</description>
+
+	<properties>
+		<owsi-core.spring.version>3.0.5.RELEASE</owsi-core.spring.version>
+	</properties>
+
+	<modules>
+		<module>owsi-alfresco-repo-api</module>
+		<module>owsi-alfresco-repo-remote</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.alfresco</groupId>
+				<artifactId>alfresco-platform-distribution</artifactId>
+				<version>${alfresco.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco</groupId>
+				<artifactId>alfresco-web-client</artifactId>
+				<version>${alfresco.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-web-framework-commons</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

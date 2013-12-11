@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.framework.spring.interceptor;
+package fr.openwide.alfresco.app.web.framework.spring.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

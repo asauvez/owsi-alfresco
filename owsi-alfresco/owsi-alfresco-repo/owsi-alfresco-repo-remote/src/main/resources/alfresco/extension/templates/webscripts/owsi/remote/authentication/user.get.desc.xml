@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>user</shortname>
+	<description>Retrieve user information using a reference</description>
+	<url>/owsi/authentication/user</url>
+	<format default="json" />
+	<authentication>user</authentication>
+	<transaction allow="readonly">required</transaction>
+	<family>OWSI</family>
+</webscript>

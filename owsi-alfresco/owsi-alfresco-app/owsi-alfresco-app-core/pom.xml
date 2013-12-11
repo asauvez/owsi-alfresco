@@ -12,10 +12,16 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-api</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>fr.openwide.core.packages</groupId>
 			<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
 			<type>pom</type>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>

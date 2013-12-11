@@ -5,33 +5,19 @@
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-repo</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
-		<relativePath>../../owsi-alfresco-repo/pom.xml</relativePath>
 	</parent>
-	<artifactId>owsi-alfresco-query-repo</artifactId>
+	<artifactId>owsi-alfresco-repo-remote</artifactId>
 
-	<name>OWSI Alfresco - Query - Repository</name>
-
-	<properties>
-		<alfresco.version>4.2.0</alfresco.version>
-		<servlet.version>2.5</servlet.version>
-	</properties>
+	<name>OWSI Alfresco - Repository - Remote</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-query-api</artifactId>
+			<artifactId>owsi-alfresco-repo-api</artifactId>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-repository</artifactId>
-			<version>${alfresco.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>${servlet.version}</version>
+			<artifactId>alfresco-web-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

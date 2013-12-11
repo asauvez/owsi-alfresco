@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>login</shortname>
+	<description>Login using username and password</description>
+	<url>/owsi/authentication/request</url>
+	<format default="json" />
+	<authentication>none</authentication>
+	<transaction allow="readonly">required</transaction>
+	<family>OWSI</family>
+</webscript>

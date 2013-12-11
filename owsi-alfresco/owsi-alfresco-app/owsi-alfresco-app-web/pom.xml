@@ -12,6 +12,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-app-core</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>fr.openwide.core.packages</groupId>
 			<artifactId>owsi-core-package-web-spring-security</artifactId>
 			<type>pom</type>
