@@ -26,7 +26,7 @@ public class BusinessUser extends User implements RepositoryTicketAware {
 		return repositoryUser.getFirstName();
 	}
 
-	public String getPrenom() {
+	public String getLastName() {
 		return repositoryUser.getLastName();
 	}
 

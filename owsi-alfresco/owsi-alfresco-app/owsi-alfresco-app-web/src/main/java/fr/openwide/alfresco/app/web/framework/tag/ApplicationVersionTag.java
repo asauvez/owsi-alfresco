@@ -6,8 +6,6 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.taglibs.standard.tag.common.core.Util;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.web.util.TagUtils;
 
 public class ApplicationVersionTag extends ApplicationContextAwareTag {
@@ -15,9 +13,6 @@ public class ApplicationVersionTag extends ApplicationContextAwareTag {
 	private String var;
 
 	private String scope = TagUtils.SCOPE_PAGE;
-
-	@Autowired
-	private Environment environment;
 
 	@Override
 	protected final void doTag(PageContext pageContext) throws JspException, IOException {
@@ -36,7 +31,6 @@ public class ApplicationVersionTag extends ApplicationContextAwareTag {
 	public void setVar(String var) {
 		this.var = var;
 	}
-
 	public void setScope(String scope) {
 		this.scope = scope;
 	}

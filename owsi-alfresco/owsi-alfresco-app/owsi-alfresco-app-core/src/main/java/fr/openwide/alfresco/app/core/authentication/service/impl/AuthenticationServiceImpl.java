@@ -16,7 +16,6 @@ import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUserRequest;
 import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
 import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.InvalidPayloadRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
 import fr.openwide.core.jpa.exception.SecurityServiceException;
 

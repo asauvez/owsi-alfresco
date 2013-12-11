@@ -6,18 +6,11 @@ import java.util.regex.Pattern;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.SimpleTagSupport;
 
 import org.apache.taglibs.standard.tag.common.core.Util;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.util.TagUtils;
 
-import fr.openwide.core.spring.util.SpringBeanUtils;
-
-public class WebjarVersionTag extends SimpleTagSupport {
+public class WebjarVersionTag extends ApplicationContextAwareTag {
 
 	private String webjar;
 
@@ -27,21 +20,10 @@ public class WebjarVersionTag extends SimpleTagSupport {
 
 	private Pattern versionPattern = Pattern.compile("(-[0-9]+)$");
 
-	@Autowired
-	private Environment environment;
-
-	private PageContext initTag() {
-		PageContext pageContext = (PageContext) getJspContext();
-		WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(pageContext.getServletContext());
-		SpringBeanUtils.autowireBean(applicationContext, this);
-		return pageContext;
-	}
-
 	@Override
-	public void doTag() throws JspException, IOException {
-		PageContext pageContext = initTag();
+	public void doTag(PageContext pageContext) throws JspException, IOException {
 		// get version
-		String version = environment.getRequiredProperty("application.webjars." + webjar + ".version");
+		String version = environment.getRequiredProperty("application.webjar." + webjar + ".version");
 		// escaping, just in case...
 		version = Util.escapeXml(version);
 		// get the upstream version (for instance 1.10.2-1 -> 1.10.2)
@@ -60,11 +42,9 @@ public class WebjarVersionTag extends SimpleTagSupport {
 	public void setWebjar(String webjar) {
 		this.webjar = webjar;
 	}
-
 	public void setVar(String var) {
 		this.var = var;
 	}
-
 	public void setScope(String scope) {
 		this.scope = scope;
 	}
