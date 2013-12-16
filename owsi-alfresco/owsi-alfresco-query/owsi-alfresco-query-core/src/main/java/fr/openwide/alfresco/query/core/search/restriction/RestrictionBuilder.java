@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.openwide.alfresco.query.core.node.model.AspectModel;
 import fr.openwide.alfresco.query.core.node.model.TypeModel;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
 import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
@@ -30,6 +31,10 @@ public class RestrictionBuilder extends Restriction {
 
 	public TypeRestriction isType(TypeModel type) {
 		return add(new TypeRestriction(this, type));
+	}
+
+	public AspectRestriction hasAspect(AspectModel aspect) {
+		return add(new AspectRestriction(this, aspect));
 	}
 
 	public TextMatchRestriction match(TextPropertyModel property, String value) {

@@ -13,7 +13,6 @@ import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryPayloadParame
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUserRequest;
 import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
 import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
@@ -77,21 +76,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public RepositoryUser authenticate(String username, String password) throws SecurityServiceException, RepositoryRemoteException {
-		RepositoryUserRequest request = new RepositoryUserRequest();
-		request.setUsername(username);
-		request.setPassword(password);
+	public RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException {
+		LOGIN_REQUEST_SERVICE request = new LOGIN_REQUEST_SERVICE();
+		request.username = username;
+		request.password = password;
 		try {
-			return authenticate(request);
+			return unauthenticatedRepositoryRemoteBinding.exchange(LOGIN_REQUEST_SERVICE.URL, 
+					LOGIN_REQUEST_SERVICE.METHOD, request, RepositoryUser.class);
 		} catch (AccessDeniedRemoteException e) {
-			throw new SecurityServiceException(e);
+			throw e;
+		} catch (RepositoryRemoteException e) {
+			// do not deal with other types of remote exception
+			throw new IllegalStateException(e);
 		}
-	}
-
-	@Override
-	public RepositoryUser authenticate(RepositoryUserRequest request) throws RepositoryRemoteException {
-		return unauthenticatedRepositoryRemoteBinding.exchange(LOGIN_REQUEST_SERVICE.URL, 
-				LOGIN_REQUEST_SERVICE.METHOD, request, RepositoryUser.class);
 	}
 
 	@Override

@@ -15,6 +15,10 @@ public interface NodeFormQueryService {
 
 	FormQueryResult<NodeResult> search(SearchFormQuery formQuery);
 
-	FormQueryResult<NodeResult>	children(NodeFormQuery formQuery, NodeReference parent, NameReference nameReference);
+	FormQueryResult<NodeResult>	getChildren(NodeFormQuery formQuery, NodeReference parent, NameReference childAssocName);
+
+	FormQueryResult<NodeResult> getTargetAssocs(NodeFormQuery formQuery, NodeReference parent, NameReference assocName);
+	
+	FormQueryResult<NodeResult> getSourceAssocs(NodeFormQuery formQuery, NodeReference parent, NameReference assocName);
 
 }

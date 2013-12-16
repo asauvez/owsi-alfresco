@@ -18,7 +18,6 @@ import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUserRequest;
 import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
@@ -31,13 +30,10 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	private NodeService nodeService;
 	private AuthorityService authorityService;
 
-	/**
-	 * {@see org.alfresco.repo.web.scripts.bean.LoginPost}
-	 */
 	@Override
-	public RepositoryUser authenticate(RepositoryUserRequest request) throws AccessDeniedRemoteException {
+	public RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException {
 		try {
-			authenticationService.authenticate(request.getUsername(), request.getPassword().toCharArray());
+			authenticationService.authenticate(username, password.toCharArray());
 			return getCurrentUser();
 		} catch (AuthenticationException e) {
 			throw new AccessDeniedRemoteException(e);

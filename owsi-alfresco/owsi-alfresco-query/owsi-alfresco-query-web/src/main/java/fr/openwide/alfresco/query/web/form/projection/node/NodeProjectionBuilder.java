@@ -5,7 +5,6 @@ import java.io.Serializable;
 import com.google.common.base.Predicate;
 
 import fr.openwide.alfresco.query.api.node.model.NameReference;
-import fr.openwide.alfresco.query.api.node.model.NodePermission;
 import fr.openwide.alfresco.query.api.node.model.NodeReference;
 import fr.openwide.alfresco.query.api.search.model.NodeResult;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
@@ -26,7 +25,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<NodeResult, NodePro
 		return add(new NodePropertyProjectionImpl<P>(this, property));
 	}
 
-	public Predicate<NodeResult> ifHasPermission(final NodePermission permission) {
+	public Predicate<NodeResult> ifHasPermission(String permission) {
 		return new UserPermissionPredicate(permission);
 	}
 

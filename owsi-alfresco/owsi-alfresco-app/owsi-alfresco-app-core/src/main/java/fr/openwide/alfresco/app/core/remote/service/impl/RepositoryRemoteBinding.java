@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -93,6 +94,33 @@ public class RepositoryRemoteBinding {
 		}
 	}
 
+	public <T> T exchangeCollection(String path, HttpMethod method,  Object request, ParameterizedTypeReference<T> responseType, Object... urlVariables) throws RepositoryRemoteException {
+		return exchangeCollection(path, method, request, responseType, null, urlVariables);
+	}
+
+	public <T> T exchangeCollection(String path, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
+		URI uri = getURI(path, urlVariables);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing " + method + " method to uri: " + uri);
+		}
+		try {
+			ResponseEntity<T> exchange = restTemplate.exchange(uri, method, new HttpEntity<Object>(request, headers), responseType);
+			return exchange.getBody();
+		} catch (ResourceAccessException e) {
+			// log to debug, target exception should be logged by the caller/framework
+			if (logger.isDebugEnabled()) {
+				logger.debug("Exception on " + method + " method to uri: " + uri, e);
+			}
+			throw mapResourceAccessException(e);
+		} catch (Exception e) {
+			// log to debug, target exception should be logged by the caller/framework
+			if (logger.isDebugEnabled()) {
+				logger.debug("Unexpected exception on " + method + " method to uri: " + uri, e);
+			}
+			throw new IllegalStateException(e);
+		}
+	}
+	
 	protected URI getURI(String path, Object... uriVars) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(rootUri).path(path);
 		Object[] uriVariables = uriVars;

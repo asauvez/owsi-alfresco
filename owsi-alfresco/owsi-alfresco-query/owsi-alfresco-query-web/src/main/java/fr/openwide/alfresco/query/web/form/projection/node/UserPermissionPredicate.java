@@ -2,15 +2,14 @@ package fr.openwide.alfresco.query.web.form.projection.node;
 
 import com.google.common.base.Predicate;
 
-import fr.openwide.alfresco.query.api.node.model.NodePermission;
 import fr.openwide.alfresco.query.api.search.model.NodeFetchDetails;
 import fr.openwide.alfresco.query.api.search.model.NodeResult;
 
 public class UserPermissionPredicate implements Predicate<NodeResult>, NodeFetchDetailsInitializer {
 
-	private final NodePermission permission;
+	private final String permission;
 
-	public UserPermissionPredicate(NodePermission permission) {
+	public UserPermissionPredicate(String permission) {
 		this.permission = permission;
 	}
 

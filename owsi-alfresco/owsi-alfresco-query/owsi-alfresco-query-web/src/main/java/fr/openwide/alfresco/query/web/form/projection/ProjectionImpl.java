@@ -59,7 +59,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 			transform(new Function<P, Object>() {
 				@Override
 				public Object apply(P value) {
-					return ((Boolean) value)
+					return (value != null && (Boolean) value)
 						? new IconOutputFieldView("glyphicon glyphicon-check", "boolean.true")
 						: new IconOutputFieldView("", "boolean.false");
 				}

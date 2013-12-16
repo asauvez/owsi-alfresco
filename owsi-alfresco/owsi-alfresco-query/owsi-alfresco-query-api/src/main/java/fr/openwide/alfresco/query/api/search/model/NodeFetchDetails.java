@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.openwide.alfresco.query.api.node.model.NameReference;
-import fr.openwide.alfresco.query.api.node.model.NodePermission;
 
 public class NodeFetchDetails implements Serializable {
 
@@ -20,7 +19,7 @@ public class NodeFetchDetails implements Serializable {
 	// private Map<NameReference, NodeFetchDetails> childAssociations;
 	// private Map<NameReference, NodeFetchDetails> targetAssocs;
 	// private Map<NameReference, NodeFetchDetails> sourceAssocs;
-	private Set<NodePermission> userPermissions = new HashSet<>();
+	private Set<String> userPermissions = new HashSet<>();
 
 	public boolean isNodeReference() {
 		return nodeReference;
@@ -46,7 +45,7 @@ public class NodeFetchDetails implements Serializable {
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}
-	public Set<NodePermission> getUserPermissions() {
+	public Set<String> getUserPermissions() {
 		return userPermissions;
 	}
 

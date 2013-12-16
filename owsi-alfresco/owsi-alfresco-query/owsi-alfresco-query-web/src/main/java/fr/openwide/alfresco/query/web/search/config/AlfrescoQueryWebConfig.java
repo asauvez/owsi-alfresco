@@ -4,12 +4,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 
+import fr.openwide.alfresco.query.core.search.service.impl.NodeSearchServiceImpl;
 import fr.openwide.alfresco.query.web.search.service.impl.NodeFormQueryServiceImpl;
 
 @Configuration
 @ComponentScan(
 	basePackageClasses = {
-		NodeFormQueryServiceImpl.class
+		NodeFormQueryServiceImpl.class,
+		NodeSearchServiceImpl.class
 	},
 	// https://jira.springsource.org/browse/SPR-8808
 	// on veut charger de manière explicite le contexte ; de ce fait,

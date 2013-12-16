@@ -49,11 +49,31 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 	}
 
 	@Override
-	public FormQueryResult<NodeResult> children(NodeFormQuery formQuery, NodeReference parent, NameReference nameReference) {
+	public FormQueryResult<NodeResult> getChildren(NodeFormQuery formQuery, NodeReference parent, NameReference childAssocName) {
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
-		List<NodeResult> list = nodeSearchService.getChildren(parent, nameReference, nodeFetchDetails);
+		List<NodeResult> list = nodeSearchService.getChildren(parent, childAssocName, nodeFetchDetails);
+		FormQueryResult<NodeResult> result = createQueryResult(formQuery, projectionBuilder);
+		return initResult(formQuery, result, list);
+	}
+
+	@Override
+	public FormQueryResult<NodeResult> getTargetAssocs(NodeFormQuery formQuery, NodeReference parent, NameReference assocName) {
+		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
+		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
+
+		List<NodeResult> list = nodeSearchService.getTargetAssocs(parent, assocName, nodeFetchDetails);
+		FormQueryResult<NodeResult> result = createQueryResult(formQuery, projectionBuilder);
+		return initResult(formQuery, result, list);
+	}
+
+	@Override
+	public FormQueryResult<NodeResult> getSourceAssocs(NodeFormQuery formQuery, NodeReference parent, NameReference assocName) {
+		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
+		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
+
+		List<NodeResult> list = nodeSearchService.getSourceAssocs(parent, assocName, nodeFetchDetails);
 		FormQueryResult<NodeResult> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}

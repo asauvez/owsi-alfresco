@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>targetAssoc</shortname>
+	<description>Get target nodes</description>
+	<url>/owsi/query/node/targetassoc</url>
+	<format default="json" />
+	<authentication>user</authentication>
+	<transaction allow="readonly">required</transaction>
+	<family>OWSI</family>
+</webscript>

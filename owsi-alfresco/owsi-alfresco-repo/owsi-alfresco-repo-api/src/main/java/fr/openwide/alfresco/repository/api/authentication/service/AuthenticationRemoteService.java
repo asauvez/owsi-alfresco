@@ -4,15 +4,15 @@ import org.springframework.http.HttpMethod;
 
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUserRequest;
 import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
 
 public interface AuthenticationRemoteService {
 
-	interface LOGIN_REQUEST_SERVICE {
-		String URL = "/owsi/authentication/request";
-		HttpMethod METHOD = HttpMethod.POST;
+	class LOGIN_REQUEST_SERVICE {
+		public static final String URL = "/owsi/authentication/request";
+		public static final HttpMethod METHOD = HttpMethod.POST;
+		public String username;
+		public String password;
 	}
 
 	interface AUTHENTICATED_USER_SERVICE {
@@ -28,7 +28,7 @@ public interface AuthenticationRemoteService {
 	/**
 	 * Authenticate an unknown user
 	 */
-	RepositoryUser authenticate(RepositoryUserRequest request) throws RepositoryRemoteException;
+	RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException;
 
 	/**
 	 * Retrieve user information from a pre-authenticated user

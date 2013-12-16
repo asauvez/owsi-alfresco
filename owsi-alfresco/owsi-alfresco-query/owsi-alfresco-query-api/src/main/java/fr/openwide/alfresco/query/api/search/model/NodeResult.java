@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import fr.openwide.alfresco.query.api.node.model.NameReference;
-import fr.openwide.alfresco.query.api.node.model.NodePermission;
 import fr.openwide.alfresco.query.api.node.model.NodeReference;
 
 public class NodeResult implements Serializable {
@@ -32,7 +31,7 @@ public class NodeResult implements Serializable {
 	})
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
-	private Set<NodePermission> userPermissions = new HashSet<>();
+	private Set<String> userPermissions = new HashSet<>();
 
 	public NodeReference getNodeReference() {
 		return nodeReference;
@@ -58,7 +57,7 @@ public class NodeResult implements Serializable {
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}
-	public Set<NodePermission> getUserPermissions() {
+	public Set<String> getUserPermissions() {
 		return userPermissions;
 	}
 
