@@ -6,6 +6,7 @@
 		<artifactId>owsi-core-parent-base</artifactId>
 		<version>0.8.6-SNAPSHOT</version>
 	</parent>
+
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
@@ -18,12 +19,11 @@
 		<module>owsi-alfresco-app</module>
 		<module>owsi-alfresco-query</module>
 		<module>owsi-alfresco-repo</module>
+		<module>owsi-alfresco-parent</module>
 	</modules>
 
 	<properties>
 		<jdk.version>1.7</jdk.version>
-		<alfresco.version>4.2.0</alfresco.version>
-		<owsi-core.version>0.8.6-SNAPSHOT</owsi-core.version>
 	</properties>
 
 	<distributionManagement>
@@ -53,46 +53,6 @@
 		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools/owsi-alfresco</developerConnection>
 		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/browser/owsi-alfresco</url>
 	</scm>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-app-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-app-web</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-api</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-web</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-repo-api</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-repo-remote</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
@@ -124,11 +84,6 @@
 			<releases>
 				<enabled>false</enabled>
 			</releases>
-		</repository>
-		<repository>
-			<id>alfresco-enterprise</id>
-			<name>Alfresco Enterprise Artifacts</name>
-			<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
 		</repository>
 	</repositories>
 

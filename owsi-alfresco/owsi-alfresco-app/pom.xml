@@ -3,8 +3,9 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco</artifactId>
+		<artifactId>owsi-alfresco-parent-app</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-app/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-app</artifactId>
 	<packaging>pom</packaging>
@@ -16,52 +17,5 @@
 		<module>owsi-alfresco-app-core</module>
 		<module>owsi-alfresco-app-web</module>
 	</modules>
-
-	<properties>
-		<owsi-alfresco.hibernate-validator.version>5.0.1.Final</owsi-alfresco.hibernate-validator.version>
-		
-		<owsi-alfresco.webjars.jquery.version>1.10.2-1</owsi-alfresco.webjars.jquery.version>
-		<owsi-alfresco.webjars.bootstrap.version>3.0.0</owsi-alfresco.webjars.bootstrap.version>
-		<owsi-alfresco.webjars.bootstrap-datepicker.version>1.2.0</owsi-alfresco.webjars.bootstrap-datepicker.version>
-	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>fr.openwide.core.packages</groupId>
-				<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
-				<version>${owsi-core.version}</version>
-				<type>pom</type>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.core.packages</groupId>
-				<artifactId>owsi-core-package-web-spring-security</artifactId>
-				<version>${owsi-core.version}</version>
-				<type>pom</type>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-validator</artifactId>
-				<version>${owsi-alfresco.hibernate-validator.version}</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.webjars</groupId>
-				<artifactId>jquery</artifactId>
-				<version>${owsi-alfresco.webjars.jquery.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.webjars</groupId>
-				<artifactId>bootstrap</artifactId>
-				<version>${owsi-alfresco.webjars.bootstrap.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.webjars</groupId>
-				<artifactId>bootstrap-datepicker</artifactId>
-				<version>${owsi-alfresco.webjars.bootstrap-datepicker.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 </project>
