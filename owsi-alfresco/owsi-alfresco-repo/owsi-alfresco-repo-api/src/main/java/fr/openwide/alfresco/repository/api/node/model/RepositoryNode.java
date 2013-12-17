@@ -35,6 +35,13 @@ public class RepositoryNode implements Serializable {
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 
+	public RepositoryNode() {
+	}
+
+	public RepositoryNode(NodeReference nodeReference) {
+		this.nodeReference = nodeReference;
+	}
+
 	public NodeReference getNodeReference() {
 		return nodeReference;
 	}

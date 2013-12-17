@@ -41,7 +41,7 @@ public class ConversionServiceImpl implements ConversionService {
 			return convert((NodeRef) value);
 		} else if (value instanceof QName) {
 			return convert((QName) value);
-		} else if (value instanceof org.alfresco.service.cmr.repository.ContentData) {
+		} else if (value instanceof ContentData) {
 			ContentData repoContent = (ContentData) value;
 			RepositoryContentData appContent = new RepositoryContentData();
 			
@@ -64,6 +64,9 @@ public class ConversionServiceImpl implements ConversionService {
 			return convert((NodeReference) value);
 		} else if (value instanceof NameReference) {
 			return convert((NameReference) value);
+		} else if (value instanceof RepositoryContentData) {
+			// Sera traité de manière particulière directement.
+			return value;
 		}
 		return value;
 	}

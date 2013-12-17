@@ -1,11 +1,14 @@
 package fr.openwide.alfresco.app.core.node.service.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang3.CharEncoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryPayloadParameterHandler;
@@ -28,12 +31,18 @@ public class NodeServiceImpl implements NodeService {
 	private RepositoryPayloadParameterHandler payloadParameterHandler;
 
 	@Override
-	public NodeReference createContent(NodeReference parent, String fileName, String mimeType, String encoding, InputStream content) throws DuplicateChildNameException {
-		RepositoryNode parentNode = new RepositoryNode();
-		parentNode.setNodeReference(parent);
-		
+	public NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNameException {
 		RepositoryNode node = new RepositoryNode();
-		node.setPrimaryParent(parentNode);
+		node.setPrimaryParent(new RepositoryNode(parentRef));
+		node.setType(NameReference.create("cm", "folder"));
+		node.getProperties().put(NameReference.create("cm", "name"), folderName);
+		return create(node, null);
+	}
+
+	@Override
+	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, InputStream content) throws DuplicateChildNameException {
+		RepositoryNode node = new RepositoryNode();
+		node.setPrimaryParent(new RepositoryNode(parentRef));
 		node.setType(NameReference.create("cm", "content"));
 		node.getProperties().put(NameReference.create("cm", "name"), fileName);
 		
@@ -42,7 +51,12 @@ public class NodeServiceImpl implements NodeService {
 		node.getProperties().put(NameReference.create("cm", "content"), contentData);
 		return create(node, content);
 	}
-	
+
+	@Override
+	public NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNameException, IOException {
+		return createContent(parent, file.getOriginalFilename(), file.getContentType(), CharEncoding.UTF_8, file.getInputStream());
+	}
+
 	@Override
 	public NodeReference create(RepositoryNode node, InputStream content) throws DuplicateChildNameException {
 		try {
