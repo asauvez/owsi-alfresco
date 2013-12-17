@@ -5,6 +5,7 @@
 		<groupId>fr.openwide.core.parents</groupId>
 		<artifactId>owsi-core-parent-base</artifactId>
 		<version>0.8.7</version>
+		<relativePath></relativePath>
 	</parent>
 
 	<groupId>fr.openwide.alfresco</groupId>
