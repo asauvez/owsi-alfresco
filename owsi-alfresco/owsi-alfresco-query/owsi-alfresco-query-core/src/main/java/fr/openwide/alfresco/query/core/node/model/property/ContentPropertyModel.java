@@ -1,17 +1,18 @@
 package fr.openwide.alfresco.query.core.node.model.property;
 
-import fr.openwide.alfresco.query.api.node.model.NameReference;
 import fr.openwide.alfresco.query.core.node.model.TypeModel;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
+import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class ContentPropertyModel extends PropertyModel<String> {
+public class ContentPropertyModel extends PropertyModel<RepositoryContentData> {
 
 	public ContentPropertyModel(TypeModel type, NameReference nameReference) {
 		super(type, nameReference);
 	}
 
 	@Override
-	public Class<String> getValueClass() {
-		return String.class;
+	public Class<RepositoryContentData> getValueClass() {
+		return RepositoryContentData.class;
 	}
 
 }

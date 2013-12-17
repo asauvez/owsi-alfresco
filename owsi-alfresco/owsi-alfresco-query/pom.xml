@@ -13,7 +13,6 @@
 	<description>Requêteur de noeuds dans Alfresco : génération de requêtes et de formulaires</description>
 
 	<modules>
-		<module>owsi-alfresco-query-api</module>
 		<module>owsi-alfresco-query-core</module>
 		<module>owsi-alfresco-query-web</module>
 		<module>owsi-alfresco-query-repo</module>

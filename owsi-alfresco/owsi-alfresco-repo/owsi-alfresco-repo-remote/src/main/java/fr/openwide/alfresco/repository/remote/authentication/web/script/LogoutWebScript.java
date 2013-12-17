@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractParameterRemoteWebScript;
 
 public class LogoutWebScript extends AbstractParameterRemoteWebScript<Void, RepositoryTicket> {

@@ -20,8 +20,7 @@ import com.google.common.base.Strings;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.security.model.BusinessUser;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
-import fr.openwide.core.jpa.exception.SecurityServiceException;
+import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
 
 @Component
@@ -56,7 +55,7 @@ public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthent
 		try {
 			RepositoryUser repositoryUser = authenticationService.authenticate(username);
 			return buildUserDetails(repositoryUser, null);
-		} catch (SecurityServiceException e) {
+		} catch (AccessDeniedRemoteException e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Could not authenticate user: " + username, e);
 			}

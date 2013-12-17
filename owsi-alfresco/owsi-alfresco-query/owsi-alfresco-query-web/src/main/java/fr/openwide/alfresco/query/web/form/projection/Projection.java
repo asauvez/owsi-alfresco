@@ -30,6 +30,7 @@ public interface Projection<I, PB extends ProjectionBuilder<I, PB>, P> {
 	Projection<I, PB, P> asCustom();
 
 	Projection<I, PB, P> comparator(Comparator<? super P> comparator);
+	Projection<I, PB, P> comparator(Function<? super P, ? extends Comparable<?>> transformer);
 	Projection<I, PB, P> comparatorNone();
 	Projection<I, PB, P> comparatorNatural();
 	Projection<I, PB, P> comparatorToString();

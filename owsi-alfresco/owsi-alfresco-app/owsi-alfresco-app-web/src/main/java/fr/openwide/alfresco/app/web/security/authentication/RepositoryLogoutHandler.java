@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.security.model.BusinessUser;
 import fr.openwide.alfresco.app.core.security.service.UserService;
-import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 
 @Component
 public class RepositoryLogoutHandler implements LogoutHandler {

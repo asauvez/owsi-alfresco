@@ -43,7 +43,6 @@ public class RepositoryTicket implements Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(ticket);
-
 	}
 
 }

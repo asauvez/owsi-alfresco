@@ -9,8 +9,8 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.JavaType;
 
-import fr.openwide.alfresco.repository.api.remote.model.InvalidPayloadRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 /**
  * Base class for web services that provide automatic one argument handling. Payload must be a unique object in message body,
@@ -20,11 +20,11 @@ public abstract class AbstractPayloadRemoteWebScript<R, P> extends AbstractRemot
 
 	@Override
 	protected R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws RepositoryRemoteException {
-		P payload = extractPayload(req, res);
+		P payload = extractPayload(req);
 		return executeImpl(payload, status, cache);
 	}
 
-	protected P extractPayload(WebScriptRequest req, WebScriptResponse res) throws RepositoryRemoteException {
+	protected P extractPayload(WebScriptRequest req) throws RepositoryRemoteException {
 		P parameter;
 		try {
 			if (getParameterType() == null) {

@@ -14,9 +14,8 @@ import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
-import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
-import fr.openwide.core.jpa.exception.SecurityServiceException;
+import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -47,7 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public RepositoryUser authenticate(String username) throws SecurityServiceException {
+	public RepositoryUser authenticate(String username) throws AccessDeniedRemoteException {
 		UserReference userReference = new UserReference(username);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(authenticationHeader, userReference.getUsername());
@@ -55,7 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return authenticationRemoteBinding.exchange(AUTHENTICATED_USER_SERVICE.URL, 
 					AUTHENTICATED_USER_SERVICE.METHOD, userReference, RepositoryUser.class, headers);
 		} catch (AccessDeniedRemoteException e) {
-			throw new SecurityServiceException(e);
+			throw e;
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);
@@ -63,12 +62,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public RepositoryUser authenticate(RepositoryTicket ticket) throws SecurityServiceException {
+	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
 		try {
 			return requiringExplicitTicketRemoteBinding.exchange(AUTHENTICATED_USER_SERVICE.URL, 
 					AUTHENTICATED_USER_SERVICE.METHOD, RepositoryUser.class, ticket);
 		} catch (AccessDeniedRemoteException e) {
-			throw new SecurityServiceException(e);
+			throw e;
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);

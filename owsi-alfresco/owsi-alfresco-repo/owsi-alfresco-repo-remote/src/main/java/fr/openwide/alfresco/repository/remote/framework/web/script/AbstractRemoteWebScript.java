@@ -20,10 +20,10 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.openwide.alfresco.repository.api.remote.model.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.IllegalStateRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.InvalidPayloadRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.IllegalStateRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 /**
  * Base class which handle web-service returning one object of type R and Serializable.
@@ -90,7 +90,7 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, e.getClass().getName());
 			setRollbackOnly(txn, e);
 		} catch (Throwable e) {
-			// any unexpected exception is encapsulated inside BartocRemoteUnknownException which can be serialized
+			// any unexpected exception is encapsulated inside RemoteUnknownException which can be serialized
 			// concatenate cause message because cause is not serialized
 			String message = "Unexpected error occured: " + e.getMessage();
 			logger.error(message, e);

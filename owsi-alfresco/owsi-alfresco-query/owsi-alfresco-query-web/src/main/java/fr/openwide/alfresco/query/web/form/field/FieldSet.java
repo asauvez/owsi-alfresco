@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.springframework.context.MessageSourceResolvable;
 
-import fr.openwide.alfresco.query.api.node.model.NameReference;
 import fr.openwide.alfresco.query.core.node.model.property.BooleanPropertyModel;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
 import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
 import fr.openwide.alfresco.query.web.form.util.MessageUtils;
+import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class FieldSet {
 

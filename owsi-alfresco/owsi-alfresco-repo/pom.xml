@@ -16,6 +16,7 @@
 	<modules>
 		<module>owsi-alfresco-repo-api</module>
 		<module>owsi-alfresco-repo-remote</module>
+		<module>owsi-alfresco-repo-core</module>
 	</modules>
 
 </project>

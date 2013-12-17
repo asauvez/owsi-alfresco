@@ -23,7 +23,7 @@ import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketAware;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 public class RepositoryRemoteBinding {
 

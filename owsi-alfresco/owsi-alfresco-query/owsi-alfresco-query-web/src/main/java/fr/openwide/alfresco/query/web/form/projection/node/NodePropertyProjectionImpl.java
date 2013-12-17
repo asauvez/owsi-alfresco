@@ -2,10 +2,10 @@ package fr.openwide.alfresco.query.web.form.projection.node;
 
 import java.io.Serializable;
 
-import fr.openwide.alfresco.query.api.node.model.NameReference;
-import fr.openwide.alfresco.query.api.search.model.NodeFetchDetails;
-import fr.openwide.alfresco.query.api.search.model.NodeResult;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
+import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class NodePropertyProjectionImpl<P extends Serializable> extends NodeProjectionImpl<P> {
 
@@ -24,7 +24,7 @@ public class NodePropertyProjectionImpl<P extends Serializable> extends NodeProj
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public P apply(NodeResult node) {
+	public P apply(RepositoryNode node) {
 		return (P) node.getProperties().get(property.getNameReference());
 	}
 

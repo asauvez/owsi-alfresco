@@ -5,17 +5,13 @@
 
 	<!-- Node search service -->
 	
-	<bean id="owsi.service.nodeSearchService" class="fr.openwide.alfresco.query.repo.service.impl.NodeSearchRemoteServiceImpl">
+	<bean id="owsi.service.nodeSearchService" class="fr.openwide.alfresco.repository.remote.search.service.impl.NodeSearchRemoteServiceImpl">
 		<property name="nodeService" ref="NodeService" />
 		<property name="searchService" ref="SearchService" />
 		<property name="permissionService" ref="PermissionService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 
-	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.query.repo.service.impl.ConversionServiceImpl">
-		<property name="namespacePrefixResolver" ref="NamespaceService" />
-	</bean>
-	
 	<!-- Node search webscripts -->
 
 	<bean id="webscript.owsi.query.node" parent="webscript.owsi.remote" abstract="true">
@@ -23,14 +19,14 @@
 	</bean>
 
 	<bean id="webscript.owsi.query.node.get.post" parent="webscript.owsi.query.node"
-			class="fr.openwide.alfresco.query.repo.web.scripts.GetNodeWebScript" />
+			class="fr.openwide.alfresco.repository.remote.search.web.script.GetNodeWebScript" />
 	<bean id="webscript.owsi.query.node.search.post" parent="webscript.owsi.query.node"
-			class="fr.openwide.alfresco.query.repo.web.scripts.SearchNodeWebScript" />
+			class="fr.openwide.alfresco.repository.remote.search.web.script.SearchNodeWebScript" />
 	<bean id="webscript.owsi.query.node.children.post" parent="webscript.owsi.query.node"
-			class="fr.openwide.alfresco.query.repo.web.scripts.ChildrenNodeWebScript" />
+			class="fr.openwide.alfresco.repository.remote.search.web.script.ChildrenNodeWebScript" />
 	<bean id="webscript.owsi.query.node.sourceAssoc.post" parent="webscript.owsi.query.node"
-			class="fr.openwide.alfresco.query.repo.web.scripts.SourceAssocNodeWebScript" />
+			class="fr.openwide.alfresco.repository.remote.search.web.script.SourceAssocNodeWebScript" />
 	<bean id="webscript.owsi.query.node.targetAssoc.post" parent="webscript.owsi.query.node"
-			class="fr.openwide.alfresco.query.repo.web.scripts.TargetAssocNodeWebScript" />
+			class="fr.openwide.alfresco.repository.remote.search.web.script.TargetAssocNodeWebScript" />
 
 </beans>

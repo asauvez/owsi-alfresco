@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+	<!-- Node service -->
+	
+	<bean id="owsi.service.nodeService" class="fr.openwide.alfresco.repository.remote.node.service.impl.NodeRemoteServiceImpl">
+		<property name="nodeService" ref="NodeService" />
+		<property name="contentService" ref="ContentService" />
+		<property name="conversionService" ref="owsi.service.conversionService" />
+	</bean>
+
+	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.repository.remote.conversion.service.impl.ConversionServiceImpl">
+		<property name="namespacePrefixResolver" ref="NamespaceService" />
+		<property name="mimetypeService" ref="MimetypeService" />
+	</bean>
+	
+	<!-- Node webscripts -->
+
+	<bean id="webscript.owsi.node" parent="webscript.owsi.remote" abstract="true">
+		<property name="nodeService" ref="owsi.service.nodeService" />
+	</bean>
+
+	<bean id="webscript.owsi.remote.node.node-create.post" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.CreateNodeWebScript" />
+	<bean id="webscript.owsi.remote.node.node-update.put" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.UpdateNodeWebScript" />
+	<bean id="webscript.owsi.remote.node.node-delete.delete" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.DeleteNodeWebScript" />
+
+</beans>

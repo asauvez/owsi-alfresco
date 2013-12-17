@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>create</shortname>
+	<description>Create a new node</description>
+	<url>/owsi/node</url>
+	<format default="json" />
+	<authentication>none</authentication>
+	<transaction allow="readonly">required</transaction>
+	<family>OWSI</family>
+</webscript>

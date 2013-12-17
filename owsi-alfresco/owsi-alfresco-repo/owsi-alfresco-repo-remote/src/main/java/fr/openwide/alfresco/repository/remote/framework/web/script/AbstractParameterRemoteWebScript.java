@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
-import fr.openwide.alfresco.repository.api.remote.model.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
 
 /**
  * Base class for web services that provide automatic one argument handling. 

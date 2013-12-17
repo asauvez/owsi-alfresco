@@ -2,9 +2,9 @@ package fr.openwide.alfresco.query.core.node.model.property;
 
 import java.io.Serializable;
 
-import fr.openwide.alfresco.query.api.node.model.NameReference;
 import fr.openwide.alfresco.query.core.node.model.Model;
 import fr.openwide.alfresco.query.core.node.model.TypeModel;
+import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public abstract class PropertyModel<C extends Serializable> extends Model {
 

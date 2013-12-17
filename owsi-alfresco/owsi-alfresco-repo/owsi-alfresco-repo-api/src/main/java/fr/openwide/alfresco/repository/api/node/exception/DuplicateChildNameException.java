@@ -1,0 +1,11 @@
+package fr.openwide.alfresco.repository.api.node.exception;
+
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
+
+public class DuplicateChildNameException extends RepositoryRemoteException {
+
+	public DuplicateChildNameException(Throwable cause) {
+		super(cause);
+	}
+
+}

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService.LOGIN_REQUEST_SERVICE;
-import fr.openwide.alfresco.repository.api.remote.model.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractPayloadRemoteWebScript;
 
 public class LoginWebScript extends AbstractPayloadRemoteWebScript<RepositoryUser, LOGIN_REQUEST_SERVICE> {

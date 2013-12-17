@@ -5,7 +5,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import fr.openwide.alfresco.repository.api.remote.model.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
 
 public class RepositoryPayloadParameterHandler {
 

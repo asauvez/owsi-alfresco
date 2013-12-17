@@ -166,7 +166,11 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 
 	@Override
 	public ProjectionImpl<I, PB, P> comparatorNone() {
-		return comparator(null);
+		return comparator((Comparator<P>) null);
+	}
+	@Override
+	public Projection<I, PB, P> comparator(Function<? super P, ? extends Comparable<?>> transformer) {
+		return comparator(Ordering.natural().onResultOf(transformer));
 	}
 	@Override
 	@SuppressWarnings("unchecked")
