@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.query.core.search.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import fr.openwide.alfresco.query.core.repository.model.CmModel;
 import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.query.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.query.core.search.util.NodeFetchDetailsBuilder;
+import fr.openwide.alfresco.query.core.search.util.RepositoryNodeWrapper;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
@@ -24,24 +26,19 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 	private RepositoryRemoteBinding repositoryRemoteBinding;
 
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) {
-		try {
-			return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
-					GET_NODE_SERVICE.METHOD, RepositoryNode.class);
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+	public RepositoryNodeWrapper get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
+		RepositoryNode node = get(nodeReference, nodeFetchDetails.getDetails());
+		return (node != null) ? new RepositoryNodeWrapper(node) : null;
+	}
+	
+	@Override
+	public List<RepositoryNodeWrapper> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
+		return wrapList(search(builder.toLuceneQuery(), nodeFetchDetails.getDetails()));
 	}
 
 	@Override
-	public List<RepositoryNode> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return search(builder.toLuceneQuery(), nodeFetchDetails.getDetails());
-	}
-
-	@Override
-	public RepositoryNode searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
-		List<RepositoryNode> list = search(builder, nodeFetchDetails);
+	public RepositoryNodeWrapper searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
+		List<RepositoryNodeWrapper> list = search(builder, nodeFetchDetails);
 		if (list.size() > 1) {
 			throw new IllegalStateException("More than one result for " + builder.toLuceneQuery());
 		}
@@ -50,23 +47,42 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 
 
 	@Override
-	public List<RepositoryNode> getChildren(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
+	public List<RepositoryNodeWrapper> getChildren(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
 		return getChildren(nodeReference, CmModel.folder.contains, nodeFetchDetails);
 	}
 	
 	@Override
-	public List<RepositoryNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return getChildren(nodeReference, childAssoc.getNameReference(), nodeFetchDetails.getDetails());
+	public List<RepositoryNodeWrapper> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeFetchDetailsBuilder nodeFetchDetails) {
+		return wrapList(getChildren(nodeReference, childAssoc.getNameReference(), nodeFetchDetails.getDetails()));
 	}
 
 	@Override
-	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return getTargetAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails());
+	public List<RepositoryNodeWrapper> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
+		return wrapList(getTargetAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
 	}
 
 	@Override
-	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return getSourceAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails());
+	public List<RepositoryNodeWrapper> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
+		return wrapList(getSourceAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
+	}
+
+	private List<RepositoryNodeWrapper> wrapList(List<RepositoryNode> nodes) {
+		ArrayList<RepositoryNodeWrapper> wrappers = new ArrayList<>();
+		for (RepositoryNode node : nodes) {
+			wrappers.add(new RepositoryNodeWrapper(node));
+		}
+		return wrappers;
+	}
+
+	@Override
+	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) {
+		try {
+			return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
+					GET_NODE_SERVICE.METHOD, RepositoryNode.class);
+		} catch (RepositoryRemoteException e) {
+			// do not deal with other types of remote exception
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override
