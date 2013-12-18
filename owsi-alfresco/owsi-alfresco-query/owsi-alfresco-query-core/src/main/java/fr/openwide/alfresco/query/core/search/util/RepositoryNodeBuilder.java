@@ -42,6 +42,11 @@ public class RepositoryNodeBuilder {
 		return this;
 	}
 
+	public RepositoryNodeBuilder primaryParentRef(NodeReference parentRef) {
+		primaryParent().nodeReference(parentRef);
+		return this;
+	}
+
 	public RepositoryNodeBuilder primaryParent() {
 		RepositoryNodeBuilder primaryParent = new RepositoryNodeBuilder();
 		node.setPrimaryParent(primaryParent.node);
