@@ -16,6 +16,8 @@ public interface NodeFormQueryService {
 
 	FormQueryResult<RepositoryNode> search(SearchFormQuery formQuery);
 
+	FormQueryResult<RepositoryNode>	getChildren(NodeFormQuery formQuery, NodeReference parent);
+	
 	FormQueryResult<RepositoryNode>	getChildren(NodeFormQuery formQuery, NodeReference parent, ChildAssociationModel childAssoc);
 
 	FormQueryResult<RepositoryNode> getTargetAssocs(NodeFormQuery formQuery, NodeReference parent, AssociationModel assoc);

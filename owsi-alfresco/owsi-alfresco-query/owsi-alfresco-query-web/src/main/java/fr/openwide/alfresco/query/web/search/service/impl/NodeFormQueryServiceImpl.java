@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.query.core.node.model.AssociationModel;
 import fr.openwide.alfresco.query.core.node.model.ChildAssociationModel;
+import fr.openwide.alfresco.query.core.repository.model.CmModel;
 import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.query.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.query.web.form.projection.ProjectionVisitor;
@@ -55,6 +56,11 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		return initResult(formQuery, result, list);
 	}
 
+	@Override
+	public FormQueryResult<RepositoryNode> getChildren(NodeFormQuery formQuery, NodeReference parent) {
+		return getChildren(formQuery, parent, CmModel.folder.contains);
+	}
+	
 	@Override
 	public FormQueryResult<RepositoryNode> getTargetAssocs(NodeFormQuery formQuery, NodeReference parent, AssociationModel assoc) {
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);

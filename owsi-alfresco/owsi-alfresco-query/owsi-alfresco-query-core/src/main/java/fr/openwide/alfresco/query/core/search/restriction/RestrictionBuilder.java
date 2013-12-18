@@ -8,6 +8,7 @@ import fr.openwide.alfresco.query.core.node.model.AspectModel;
 import fr.openwide.alfresco.query.core.node.model.TypeModel;
 import fr.openwide.alfresco.query.core.node.model.property.PropertyModel;
 import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
+import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 public class RestrictionBuilder extends Restriction {
 
@@ -41,12 +42,20 @@ public class RestrictionBuilder extends Restriction {
 		return add(new AspectRestriction(this, aspect));
 	}
 
+	public ParentRestriction parent(NodeReference parentRef) {
+		return add(new ParentRestriction(this, parentRef));
+	}
+
 	public TextMatchRestriction match(TextPropertyModel property, String value) {
 		return add(new TextMatchRestriction(this, property, value));
 	}
 
 	public <C extends Serializable> MatchRestriction<C> match(PropertyModel<C> property, C value) {
 		return add(new MatchRestriction<C>(this, property, value));
+	}
+
+	public MatchAllRestriction matchAll(String value) {
+		return add(new MatchAllRestriction(this, value));
 	}
 
 	public <C extends Serializable> BetweenRestriction<C> between(PropertyModel<C> property, C from, C to) {
