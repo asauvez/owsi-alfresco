@@ -40,7 +40,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
-		List<RepositoryNode> list = nodeSearchService.search(restrictionBuilder, nodeFetchDetails);
+		List<RepositoryNode> list = nodeSearchService.search(restrictionBuilder.toLuceneQuery(), nodeFetchDetails);
 
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
