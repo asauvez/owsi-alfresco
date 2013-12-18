@@ -2,15 +2,15 @@ package fr.openwide.alfresco.query.core.node.model.property;
 
 import java.io.Serializable;
 
+import fr.openwide.alfresco.query.core.node.model.ContainerModel;
 import fr.openwide.alfresco.query.core.node.model.Model;
-import fr.openwide.alfresco.query.core.node.model.TypeModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public abstract class PropertyModel<C extends Serializable> extends Model {
 
-	private final TypeModel type;
+	private final ContainerModel type;
 
-	public PropertyModel(TypeModel type, NameReference nameReference) {
+	public PropertyModel(ContainerModel type, NameReference nameReference) {
 		super(nameReference);
 		this.type = type;
 	}
@@ -22,7 +22,7 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 
 	public abstract Class<C> getValueClass();
 
-	public TypeModel getType() {
+	public ContainerModel getType() {
 		return type;
 	}
 

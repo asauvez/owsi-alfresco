@@ -12,6 +12,8 @@ import fr.openwide.alfresco.query.core.repository.model.CmModel;
 import fr.openwide.alfresco.query.web.form.projection.Projection;
 import fr.openwide.alfresco.query.web.form.projection.Projection.Align;
 import fr.openwide.alfresco.query.web.form.projection.ProjectionBuilder;
+import fr.openwide.alfresco.query.web.form.view.output.IconOutputFieldView;
+import fr.openwide.alfresco.query.web.form.view.output.OutputFieldView;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
@@ -32,6 +34,57 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 		return add(new NodePropertyProjectionImpl<P>(this, property));
 	}
 
+	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryNode> node() {
+		return add(new NodeProjectionImpl(this))
+			.asCustom();
+	}
+	
+	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryNode> icon() {
+		type().visible(false).of();
+		contentMimeType().visible(false).of();
+		
+		return add(new NodeProjectionImpl(this)
+			.transform(new Function<RepositoryNode, Object>() {
+					@Override
+					public Object apply(RepositoryNode node) {
+						if (CmModel.folder.getNameReference().equals(node.getType())) {
+							return new IconOutputFieldView("glyphicon glyphicon-folder-close", "mimetype.folder");
+						} else if (CmModel.content.getNameReference().equals(node.getType())) {
+							RepositoryContentData content = (RepositoryContentData) node.getProperties().get(CmModel.content.content);
+							if (content.getMimetype().startsWith("text/")
+								|| content.getMimetype().equals("application/vnd.oasis.opendocument.text")
+								|| content.getMimetype().equals("application/msword")
+								|| content.getMimetype().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+								return new IconOutputFieldView("glyphicon glyphicon-font", "mimetype.text");
+							} else if (content.getMimetype().equals("application/vnd.ms-excel") 
+									|| content.getMimetype().equals("application/vnd.oasis.opendocument.spreadsheet")
+									|| content.getMimetype().equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+								return new IconOutputFieldView("glyphicon glyphicon-stats", "mimetype.spreadsheet");
+							} else if (content.getMimetype().equals("application/vnd.ms-powerpoint") 
+									|| content.getMimetype().equals("application/vnd.oasis.opendocument.presentation")) {
+								return new IconOutputFieldView("glyphicon glyphicon-facetime-video", "mimetype.presentation");
+							} else if (content.getMimetype().equals("application/pdf")) {
+								return new IconOutputFieldView("glyphicon glyphicon-print", "mimetype.pdf");
+							} else if (content.getMimetype().startsWith("image/")) {
+								return new IconOutputFieldView("glyphicon glyphicon-picture", "mimetype.image");
+							} else if (content.getMimetype().startsWith("audio/")) {
+								return new IconOutputFieldView("glyphicon glyphicon-music", "mimetype.audio");
+							} else if (content.getMimetype().startsWith("video/")) {
+								return new IconOutputFieldView("glyphicon glyphicon-volume-film", "mimetype.video");
+							} else if (content.getMimetype().equals("application/zip")) {
+								return new IconOutputFieldView("glyphicon glyphicon-compressed", "mimetype.zip");
+							} 
+							return new IconOutputFieldView("glyphicon glyphicon-file", "mimetype.file");
+						} else if (CmModel.person.getNameReference().equals(node.getType())) {
+							return new IconOutputFieldView("glyphicon glyphicon-use", "mimetype.person");
+						}
+						return null;
+					}
+				})
+			.setView(OutputFieldView.ICON)
+			.align(Align.CENTER));
+	}
+	
 	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentSize() {
 		return contentSize(CmModel.content.content);
 	}
@@ -42,7 +95,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 			.transform(new Function<RepositoryContentData, Object>() {
 				@Override
 				public String apply(RepositoryContentData content) {
-					return FileUtils.byteCountToDisplaySize(content.getSize());
+					return (content != null) ? FileUtils.byteCountToDisplaySize(content.getSize()) : null;
 				}
 			})
 			.comparator(new Function<RepositoryContentData, Long>() {
@@ -62,7 +115,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 			.transform(new Function<RepositoryContentData, Object>() {
 				@Override
 				public String apply(RepositoryContentData content) {
-					return content.getMimetypeDisplay();
+					return (content != null) ? content.getMimetypeDisplay() : null;
 				}
 			})
 			.comparator(new Function<RepositoryContentData, String>() {

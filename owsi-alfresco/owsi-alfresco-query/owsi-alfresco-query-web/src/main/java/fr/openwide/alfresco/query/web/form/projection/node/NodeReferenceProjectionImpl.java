@@ -4,7 +4,7 @@ import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-public class NodeReferenceProjectionImpl extends NodeProjectionImpl<NodeReference> {
+public class NodeReferenceProjectionImpl extends AbstractNodeProjectionImpl<NodeReference> {
 
 	public NodeReferenceProjectionImpl(NodeProjectionBuilder builder) {
 		super(builder, NodeReference.class);

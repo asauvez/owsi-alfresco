@@ -16,6 +16,10 @@ public class RestrictionBuilder extends Restriction {
 	private final List<Restriction> restrictions = new ArrayList<>();
 	private final LogicalOperator operator;
 
+	public RestrictionBuilder() {
+		this (null, LogicalOperator.AND);
+	}
+
 	public RestrictionBuilder(RestrictionBuilder parent, LogicalOperator operator) {
 		super(parent);
 		this.operator = operator;

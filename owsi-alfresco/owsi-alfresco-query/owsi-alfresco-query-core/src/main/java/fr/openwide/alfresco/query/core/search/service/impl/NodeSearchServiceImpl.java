@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.query.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
@@ -14,7 +14,6 @@ import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteExce
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-@Service
 public class NodeSearchServiceImpl implements NodeSearchService {
 
 	@Autowired
@@ -30,7 +29,12 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
+	@Override
+	public List<RepositoryNode> search(RestrictionBuilder builder, NodeFetchDetails nodeFetchDetails) {
+		return search(builder.toLuceneQuery(), nodeFetchDetails);
+	}
+
 	@Override
 	public List<RepositoryNode> search(String query, NodeFetchDetails nodeFetchDetails) {
 		try {

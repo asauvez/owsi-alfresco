@@ -3,10 +3,10 @@ package fr.openwide.alfresco.query.web.search.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import fr.openwide.alfresco.query.core.node.model.AssociationModel;
+import fr.openwide.alfresco.query.core.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder;
-import fr.openwide.alfresco.query.core.search.restriction.RestrictionBuilder.LogicalOperator;
 import fr.openwide.alfresco.query.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.query.web.form.projection.ProjectionVisitor;
 import fr.openwide.alfresco.query.web.form.projection.node.NodeFetchDetailsInitializer;
@@ -17,10 +17,8 @@ import fr.openwide.alfresco.query.web.search.model.SearchFormQuery;
 import fr.openwide.alfresco.query.web.search.service.NodeFormQueryService;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-@Service
 public class NodeFormQueryServiceImpl extends AbstractFormQueryService implements NodeFormQueryService {
 
 	@Autowired
@@ -35,45 +33,44 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 
 	@Override
 	public FormQueryResult<RepositoryNode> search(SearchFormQuery formQuery) {
-		RestrictionBuilder restrictionBuilder = new RestrictionBuilder(null, LogicalOperator.AND);
+		RestrictionBuilder restrictionBuilder = new RestrictionBuilder();
 		formQuery.initRestrictions(restrictionBuilder);
-		String luceneQuery = restrictionBuilder.toLuceneQuery();
 
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
-		List<RepositoryNode> list = nodeSearchService.search(luceneQuery, nodeFetchDetails);
+		List<RepositoryNode> list = nodeSearchService.search(restrictionBuilder, nodeFetchDetails);
 
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
 
 	@Override
-	public FormQueryResult<RepositoryNode> getChildren(NodeFormQuery formQuery, NodeReference parent, NameReference childAssocName) {
+	public FormQueryResult<RepositoryNode> getChildren(NodeFormQuery formQuery, NodeReference parent, ChildAssociationModel childAssoc) {
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
-		List<RepositoryNode> list = nodeSearchService.getChildren(parent, childAssocName, nodeFetchDetails);
+		List<RepositoryNode> list = nodeSearchService.getChildren(parent, childAssoc.getNameReference(), nodeFetchDetails);
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
 
 	@Override
-	public FormQueryResult<RepositoryNode> getTargetAssocs(NodeFormQuery formQuery, NodeReference parent, NameReference assocName) {
+	public FormQueryResult<RepositoryNode> getTargetAssocs(NodeFormQuery formQuery, NodeReference parent, AssociationModel assoc) {
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
-		List<RepositoryNode> list = nodeSearchService.getTargetAssocs(parent, assocName, nodeFetchDetails);
+		List<RepositoryNode> list = nodeSearchService.getTargetAssocs(parent, assoc.getNameReference(), nodeFetchDetails);
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
 
 	@Override
-	public FormQueryResult<RepositoryNode> getSourceAssocs(NodeFormQuery formQuery, NodeReference parent, NameReference assocName) {
+	public FormQueryResult<RepositoryNode> getSourceAssocs(NodeFormQuery formQuery, NodeReference parent, AssociationModel assoc) {
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeFetchDetails nodeFetchDetails = createNodeFetchDetails(projectionBuilder);
 
-		List<RepositoryNode> list = nodeSearchService.getSourceAssocs(parent, assocName, nodeFetchDetails);
+		List<RepositoryNode> list = nodeSearchService.getSourceAssocs(parent, assoc.getNameReference(), nodeFetchDetails);
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}

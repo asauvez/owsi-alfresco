@@ -132,31 +132,29 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 
 	@Override
 	public Projection<I, PB, P> asCheckBox() {
-		setView(OutputFieldView.CHECKBOX);
-		return align(Align.CENTER);
+		return setView(OutputFieldView.CHECKBOX)
+			.align(Align.CENTER);
 	}
 	@Override
 	public ProjectionImpl<I, PB, P> asEmail() {
-		setView(OutputFieldView.EMAIL);
-		return this;
+		return setView(OutputFieldView.EMAIL);
 	}
 	@Override
 	public ProjectionImpl<I, PB, P> asExternalLink() {
-		setView(OutputFieldView.EXTERNAL_LINK);
-		return this;
+		return setView(OutputFieldView.EXTERNAL_LINK);
 	}
 	@Override
 	public ProjectionImpl<I, PB, P> asCustom() {
-		setView(OutputFieldView.CUSTOM);
-		return this;
+		return setView(OutputFieldView.CUSTOM);
 	}
 
 	@Override
 	public OutputFieldView getView() {
 		return view;
 	}
-	protected void setView(OutputFieldView outputFieldView) {
+	public ProjectionImpl<I, PB, P> setView(OutputFieldView outputFieldView) {
 		this.view = outputFieldView;
+		return this;
 	}
 	@Override
 	public ProjectionImpl<I, PB, P> comparator(Comparator<? super P> comparator) {
@@ -170,7 +168,7 @@ public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	}
 	@Override
 	public Projection<I, PB, P> comparator(Function<? super P, ? extends Comparable<?>> transformer) {
-		return comparator(Ordering.natural().onResultOf(transformer));
+		return comparator(Ordering.natural().nullsLast().onResultOf(transformer));
 	}
 	@Override
 	@SuppressWarnings("unchecked")

@@ -7,7 +7,7 @@ import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class NodePropertyProjectionImpl<P extends Serializable> extends NodeProjectionImpl<P> {
+public class NodePropertyProjectionImpl<P extends Serializable> extends AbstractNodeProjectionImpl<P> {
 
 	private final PropertyModel<P> property;
 

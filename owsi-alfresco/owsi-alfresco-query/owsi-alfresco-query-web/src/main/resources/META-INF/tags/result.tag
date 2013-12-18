@@ -42,7 +42,10 @@
 								<c:if test="${not empty value}">
 									<c:choose>
 										<c:when test="${column.view eq 'PLAIN'}">
-											<c:out value="${value}"/>										
+											<c:out value="${value}"/>
+										</c:when>
+										<c:when test="${column.view eq 'HTML'}">
+											<c:out value="${value}" escapeXml="false"/>
 										</c:when>
 										<c:when test="${column.view eq 'ICON'}">
 											<c:set var="title"><spring:message message="${value.label}"/></c:set>

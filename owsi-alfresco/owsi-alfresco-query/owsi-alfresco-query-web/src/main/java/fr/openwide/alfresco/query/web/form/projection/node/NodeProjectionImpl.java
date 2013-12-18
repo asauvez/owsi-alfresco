@@ -1,19 +1,20 @@
 package fr.openwide.alfresco.query.web.form.projection.node;
 
-import fr.openwide.alfresco.query.web.form.projection.ProjectionImpl;
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 
-public abstract class NodeProjectionImpl<P> extends ProjectionImpl<RepositoryNode, NodeProjectionBuilder, P>
-	implements NodeFetchDetailsInitializer {
+public class NodeProjectionImpl extends AbstractNodeProjectionImpl<RepositoryNode> {
 
-	public NodeProjectionImpl(NodeProjectionBuilder builder, Class<P> mappedClass) {
-		super(builder, mappedClass);
+	public NodeProjectionImpl(NodeProjectionBuilder builder) {
+		super(builder, RepositoryNode.class);
 	}
 
 	@Override
-	public void initNodeFetchDetails(NodeFetchDetails nodeFetchDetails) {
-		// to override
+	public RepositoryNode apply(RepositoryNode result) {
+		return result;
 	}
 
+	@Override
+	public String getDefaultLabelCode() {
+		return "nodeprojection.label";
+	}
 }

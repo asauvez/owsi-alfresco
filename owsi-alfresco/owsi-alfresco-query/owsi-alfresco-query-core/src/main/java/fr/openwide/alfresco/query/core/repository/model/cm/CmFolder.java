@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.query.core.repository.model.cm;
 
-import fr.openwide.alfresco.query.core.node.model.property.PropertyModels;
-import fr.openwide.alfresco.query.core.node.model.property.TextPropertyModel;
+import fr.openwide.alfresco.query.core.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.query.core.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
@@ -15,6 +14,5 @@ public class CmFolder extends CmObject {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel name = PropertyModels.newText(this, CmModel.NAMESPACE, "name");
-
+	public ChildAssociationModel contains = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "contains"));
 }
