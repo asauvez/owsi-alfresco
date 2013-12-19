@@ -45,6 +45,12 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 		return (list.isEmpty()) ? null : list.get(0);
 	}
 
+	@Override
+	public NodeReference searchUniqueRef(RestrictionBuilder builder) {
+		RepositoryNodeWrapper node = searchUnique(builder, new NodeFetchDetailsBuilder()
+				.nodeReference());
+		return (node != null) ? node.getNodeReference() : null;
+	}
 
 	@Override
 	public List<RepositoryNodeWrapper> getChildren(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {

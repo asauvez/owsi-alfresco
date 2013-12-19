@@ -18,6 +18,8 @@ public interface NodeSearchService extends NodeSearchRemoteService {
 	
 	RepositoryNodeWrapper searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails);
 	
+	NodeReference searchUniqueRef(RestrictionBuilder builder);
+	
 	List<RepositoryNodeWrapper> getChildren(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails);
 	
 	List<RepositoryNodeWrapper> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeFetchDetailsBuilder nodeFetchDetails);
