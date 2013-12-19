@@ -12,7 +12,7 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 public interface NodeSearchRemoteService {
 
 	class GET_NODE_SERVICE {
-		public static final String URL = "/owsi/query/node/get";
+		public static final String URL = "/owsi/search/node/get";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public NodeReference nodeReference;
 		public NodeFetchDetails nodeFetchDetails;
@@ -20,7 +20,7 @@ public interface NodeSearchRemoteService {
 	RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails);
 
 	class SEARCH_NODE_SERVICE {
-		public static final String URL = "/owsi/query/node/search";
+		public static final String URL = "/owsi/search/node/search";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public String query;
 		public NodeFetchDetails nodeFetchDetails;
@@ -28,7 +28,7 @@ public interface NodeSearchRemoteService {
 	List<RepositoryNode> search(String query, NodeFetchDetails nodeFetchDetails);
 
 	class CHILDREN_NODE_SERVICE {
-		public static final String URL = "/owsi/query/node/children";
+		public static final String URL = "/owsi/search/node/children";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public NodeReference nodeReference;
 		public NameReference childAssocName; 
@@ -37,7 +37,7 @@ public interface NodeSearchRemoteService {
 	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocName, NodeFetchDetails nodeFetchDetails);
 
 	class TARGET_ASSOC_NODE_SERVICE {
-		public static final String URL = "/owsi/query/node/targetassoc";
+		public static final String URL = "/owsi/search/node/targetassoc";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public NodeReference nodeReference;
 		public NameReference assocName; 
@@ -46,7 +46,7 @@ public interface NodeSearchRemoteService {
 	List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails);
 
 	class SOURCE_ASSOC_NODE_SERVICE {
-		public static final String URL = "/owsi/query/node/sourceassoc";
+		public static final String URL = "/owsi/search/node/sourceassoc";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public NodeReference nodeReference;
 		public NameReference assocName; 

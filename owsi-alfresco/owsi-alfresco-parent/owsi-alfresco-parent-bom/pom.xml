@@ -26,17 +26,12 @@
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-core</artifactId>
+				<artifactId>owsi-alfresco-component-model</artifactId>
 				<version>0.1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-web</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-query-repo</artifactId>
+				<artifactId>owsi-alfresco-component-query</artifactId>
 				<version>0.1.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
