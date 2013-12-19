@@ -27,7 +27,7 @@ public class RepositoryNodeBuilder {
 		return this;
 	}
 
-	public <C extends Serializable> RepositoryNodeBuilder property(PropertyModel<?> propertyModel, C value) {
+	public <C extends Serializable> RepositoryNodeBuilder property(PropertyModel<C> propertyModel, C value) {
 		node.getProperties().put(propertyModel.getNameReference(), value);
 		return this;
 	}

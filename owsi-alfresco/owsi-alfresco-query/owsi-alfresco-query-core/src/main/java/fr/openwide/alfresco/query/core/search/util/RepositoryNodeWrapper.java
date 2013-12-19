@@ -34,7 +34,7 @@ public class RepositoryNodeWrapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(PropertyModel<?> propertyModel) {
+	public <C extends Serializable> C getProperty(PropertyModel<C> propertyModel) {
 		return (C) node.getProperties().get(propertyModel.getNameReference());
 	}
 
