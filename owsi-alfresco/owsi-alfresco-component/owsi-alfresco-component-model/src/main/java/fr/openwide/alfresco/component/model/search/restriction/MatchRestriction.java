@@ -7,7 +7,7 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 public class MatchRestriction<C extends Serializable> extends Restriction {
 
 	private final PropertyModel<C> property;
-	private final C value;
+	protected final C value;
 
 	public MatchRestriction(RestrictionBuilder parent, PropertyModel<C> property, C value) {
 		super(parent);

@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.search.util;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
@@ -25,6 +26,12 @@ public class NodeFetchDetailsBuilder {
 
 	public NodeFetchDetailsBuilder property(PropertyModel<?> propertyModel) {
 		details.getProperties().add(propertyModel.getNameReference());
+		return this;
+	}
+	public NodeFetchDetailsBuilder properties(ContainerModel type) {
+		for (PropertyModel<?> property : type.getProperties()) {
+			property(property);
+		}
 		return this;
 	}
 
