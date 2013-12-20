@@ -2,9 +2,11 @@ package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +36,11 @@ public class RepositoryNode implements Serializable {
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Map<NameReference, String> contentsString = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
+	
+	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
+	private Map<NameReference, List<RepositoryNode>> targetAssocs = new HashMap<>();
+	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new HashMap<>();
+
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 
 	public RepositoryNode() {
@@ -70,6 +77,17 @@ public class RepositoryNode implements Serializable {
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}
+
+	public Map<NameReference, List<RepositoryNode>> getChildAssociations() {
+		return childAssociations;
+	}
+	public Map<NameReference, List<RepositoryNode>> getTargetAssocs() {
+		return targetAssocs;
+	}
+	public Map<NameReference, List<RepositoryNode>> getSourceAssocs() {
+		return sourceAssocs;
+	}
+
 	public Set<RepositoryPermission> getUserPermissions() {
 		return userPermissions;
 	}

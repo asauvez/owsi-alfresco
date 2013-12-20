@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.component.model.search.util;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.AssociationModel;
+import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -65,4 +67,24 @@ public class NodeFetchDetailsBuilder {
 		details.setPrimaryParent(primaryParent.details);
 		return primaryParent;
 	}
+	
+	public NodeFetchDetailsBuilder childAssociationContains() {
+		return childAssociation(CmModel.folder.contains);
+	}
+	public NodeFetchDetailsBuilder childAssociation(ChildAssociationModel childAssociation) {
+		NodeFetchDetailsBuilder other = new NodeFetchDetailsBuilder();
+		details.getChildAssociations().put(childAssociation.getNameReference(), other.getDetails());
+		return other;
+	}
+	public NodeFetchDetailsBuilder targetAssociation(AssociationModel association) {
+		NodeFetchDetailsBuilder other = new NodeFetchDetailsBuilder();
+		details.getTargetAssocs().put(association.getNameReference(), other.getDetails());
+		return other;
+	}
+	public NodeFetchDetailsBuilder sourceAssociation(AssociationModel association) {
+		NodeFetchDetailsBuilder other = new NodeFetchDetailsBuilder();
+		details.getSourceAssocs().put(association.getNameReference(), other.getDetails());
+		return other;
+	}
+
 }

@@ -10,6 +10,11 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.TextPropertyModel;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
+/**
+ * Permet de créer de façon propre une requête Lucene à appliquer dans la GED.
+ *  
+ * @author asauvez
+ */
 public class RestrictionBuilder extends Restriction {
 
 	public enum LogicalOperator { AND, OR }
@@ -26,10 +31,28 @@ public class RestrictionBuilder extends Restriction {
 		this.operator = operator;
 	}
 
+	/**
+	 * Permet de faire un OR entre plusieurs conditions :
+	 * <pre>
+	 * 		.or()
+	 * 			.condition1().of()
+	 * 			.condition2().of()
+	 * 			.of()
+	 * </pre>
+	 */
 	public RestrictionBuilder or() {
 		return add(new RestrictionBuilder(this, LogicalOperator.OR));
 	}
 
+	/**
+	 * Permet de faire un AND entre plusieurs conditions :
+	 * <pre>
+	 * 		.and()
+	 * 			.condition1().of()
+	 * 			.condition2().of()
+	 * 			.of()
+	 * </pre>
+	 */
 	public RestrictionBuilder and() {
 		return add(new RestrictionBuilder(this, LogicalOperator.AND));
 	}
@@ -42,15 +65,21 @@ public class RestrictionBuilder extends Restriction {
 		return add(new AspectRestriction(this, aspect));
 	}
 
+	/**
+	 * Est-ce que les noeuds retournés sont les fils directes du noeuds en question
+	 */
 	public ParentRestriction parent(NodeReference parentRef) {
 		return add(new ParentRestriction(this, parentRef));
 	}
 
+	/**
+	 * Si la paramètre est null ou chaîne vide, on ne tient pas compte de la restriction.
+	 */
 	public TextMatchRestriction match(TextPropertyModel property, String value) {
 		return add(new TextMatchRestriction(this, property, value));
 	}
 
-	public <C extends Serializable> MatchRestriction<C> match(PropertyModel<C> property, C value) {
+	public <C extends Serializable> MatchRestriction<C> eq(PropertyModel<C> property, C value) {
 		return add(new MatchRestriction<C>(this, property, value));
 	}
 

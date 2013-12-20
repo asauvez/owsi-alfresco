@@ -11,6 +11,9 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 public interface NodeSearchRemoteService {
 
+	/**
+	 * @return null si la node n'existe pas.
+	 */
 	class GET_NODE_SERVICE {
 		public static final String URL = "/owsi/search/node/get";
 		public static final HttpMethod METHOD = HttpMethod.POST;

@@ -1,8 +1,12 @@
 package fr.openwide.alfresco.component.model.search.util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.AssociationModel;
+import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -95,4 +99,26 @@ public class BusinessNode {
 		node.setPrimaryParent(primaryParent.node);
 		return primaryParent;
 	}
+
+	public List<BusinessNode> getChildAssociationContains() {
+		return getChildAssociation(CmModel.folder.contains);
+	}
+	public List<BusinessNode> getChildAssociation(ChildAssociationModel childAssociation) {
+		return wrapList(node.getChildAssociations().get(childAssociation.getNameReference()));
+	}
+	public List<BusinessNode> getTargetAssociation(AssociationModel association) {
+		return wrapList(node.getTargetAssocs().get(association.getNameReference()));
+	}
+	public List<BusinessNode> getSourceAssociation(AssociationModel association) {
+		return wrapList(node.getSourceAssocs().get(association.getNameReference()));
+	}
+	
+	public static List<BusinessNode> wrapList(List<RepositoryNode> nodes) {
+		ArrayList<BusinessNode> wrappers = new ArrayList<>();
+		for (RepositoryNode node : nodes) {
+			wrappers.add(new BusinessNode(node));
+		}
+		return wrappers;
+	}
+
 }

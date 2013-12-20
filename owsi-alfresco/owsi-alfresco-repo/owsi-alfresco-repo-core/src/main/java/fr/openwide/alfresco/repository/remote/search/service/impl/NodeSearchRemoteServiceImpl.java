@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repository.remote.search.service.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -103,6 +104,8 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	}
 
 	private RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) {
+		NodeReference nodeReference = conversionService.convert(nodeRef);
+		
 		RepositoryNode node = new RepositoryNode();
 		if (details.isNodeReference()) {
 			node.setNodeReference(conversionService.convert(nodeRef));
@@ -130,6 +133,23 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 				node.getAspects().add(aspect);
 			}
 		}
+		
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
+			node.getChildAssociations().put(
+					entry.getKey(), 
+					getChildren(nodeReference, entry.getKey(), entry.getValue()));
+		}
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getTargetAssocs().entrySet()) {
+			node.getTargetAssocs().put(
+					entry.getKey(), 
+					getTargetAssocs(nodeReference, entry.getKey(), entry.getValue()));
+		}
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getSourceAssocs().entrySet()) {
+			node.getSourceAssocs().put(
+					entry.getKey(), 
+					getSourceAssocs(nodeReference, entry.getKey(), entry.getValue()));
+		}
+
 		for (RepositoryPermission permission : details.getUserPermissions()) {
 			if (permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED) {
 				node.getUserPermissions().add(permission);

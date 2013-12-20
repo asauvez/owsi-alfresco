@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -18,9 +20,10 @@ public class NodeFetchDetails implements Serializable {
 	private Set<NameReference> aspects = new HashSet<>();
 
 	private NodeFetchDetails primaryParent;
-	// private Map<NameReference, NodeFetchDetails> childAssociations;
-	// private Map<NameReference, NodeFetchDetails> targetAssocs;
-	// private Map<NameReference, NodeFetchDetails> sourceAssocs;
+	private Map<NameReference, NodeFetchDetails> childAssociations = new HashMap<>();
+	private Map<NameReference, NodeFetchDetails> targetAssocs = new HashMap<>();
+	private Map<NameReference, NodeFetchDetails> sourceAssocs = new HashMap<>();
+	
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 
 	public boolean isNodeReference() {
@@ -50,6 +53,17 @@ public class NodeFetchDetails implements Serializable {
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}
+
+	public Map<NameReference, NodeFetchDetails> getChildAssociations() {
+		return childAssociations;
+	}
+	public Map<NameReference, NodeFetchDetails> getTargetAssocs() {
+		return targetAssocs;
+	}
+	public Map<NameReference, NodeFetchDetails> getSourceAssocs() {
+		return sourceAssocs;
+	}
+
 	public Set<RepositoryPermission> getUserPermissions() {
 		return userPermissions;
 	}

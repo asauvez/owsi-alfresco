@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.component.model.search.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return wrapList(nodeSearchService.search(builder.toLuceneQuery(), nodeFetchDetails.getDetails()));
+		return BusinessNode.wrapList(nodeSearchService.search(builder.toLuceneQuery(), nodeFetchDetails.getDetails()));
 	}
 
 	@Override
@@ -55,25 +54,17 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	
 	@Override
 	public List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return wrapList(nodeSearchService.getChildren(nodeReference, childAssoc.getNameReference(), nodeFetchDetails.getDetails()));
+		return BusinessNode.wrapList(nodeSearchService.getChildren(nodeReference, childAssoc.getNameReference(), nodeFetchDetails.getDetails()));
 	}
 
 	@Override
 	public List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return wrapList(nodeSearchService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
+		return BusinessNode.wrapList(nodeSearchService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
 	}
 
 	@Override
 	public List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return wrapList(nodeSearchService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
-	}
-
-	private List<BusinessNode> wrapList(List<RepositoryNode> nodes) {
-		ArrayList<BusinessNode> wrappers = new ArrayList<>();
-		for (RepositoryNode node : nodes) {
-			wrappers.add(new BusinessNode(node));
-		}
-		return wrappers;
+		return BusinessNode.wrapList(nodeSearchService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
 	}
 
 }
