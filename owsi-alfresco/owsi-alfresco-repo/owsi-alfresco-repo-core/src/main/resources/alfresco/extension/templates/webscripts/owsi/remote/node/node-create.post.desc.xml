@@ -4,7 +4,7 @@
 	<description>Create a new node</description>
 	<url>/owsi/node</url>
 	<format default="json" />
-	<authentication>none</authentication>
-	<transaction allow="readonly">required</transaction>
+	<authentication>user</authentication>
+	<transaction allow="readwrite">required</transaction>
 	<family>OWSI</family>
 </webscript>

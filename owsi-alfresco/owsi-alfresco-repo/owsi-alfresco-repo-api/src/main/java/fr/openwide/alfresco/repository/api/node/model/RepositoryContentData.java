@@ -7,9 +7,29 @@ public class RepositoryContentData implements Serializable {
 
 	private String mimetype;
 	private String mimetypeDisplay;
-	private long size;
+	private Long size;
 	private String encoding;
 	private Locale locale;
+
+	public RepositoryContentData() {
+	}
+
+	public RepositoryContentData(String mimetype) {
+		this.mimetype = mimetype;
+	}
+
+	public RepositoryContentData(String mimetype, String encoding) {
+		this.mimetype = mimetype;
+		this.encoding = encoding;
+	}
+
+	public RepositoryContentData(String mimetype, String mimetypeDisplay, Long size, String encoding, Locale locale) {
+		this.mimetype = mimetype;
+		this.mimetypeDisplay = mimetypeDisplay;
+		this.size = size;
+		this.encoding = encoding;
+		this.locale = locale;
+	}
 
 	public String getMimetype() {
 		return mimetype;
@@ -25,10 +45,10 @@ public class RepositoryContentData implements Serializable {
 		this.mimetypeDisplay = mimetypeDisplay;
 	}
 
-	public long getSize() {
+	public Long getSize() {
 		return size;
 	}
-	public void setSize(long size) {
+	public void setSize(Long size) {
 		this.size = size;
 	}
 

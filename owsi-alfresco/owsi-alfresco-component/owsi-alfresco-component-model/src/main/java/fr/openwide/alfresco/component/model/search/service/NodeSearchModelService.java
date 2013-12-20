@@ -9,6 +9,11 @@ import fr.openwide.alfresco.component.model.search.util.NodeFetchDetailsBuilder;
 import fr.openwide.alfresco.component.model.search.util.BusinessNode;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
+/**
+ * Permet de faire des recherches de noeuds.
+ * 
+ * @author asauvez
+ */
 public interface NodeSearchModelService {
 
 	BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails);

@@ -2,10 +2,17 @@ package fr.openwide.alfresco.component.model.search.util;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 
+/**
+ * Indique les données liés à un noeud à rapporter lors d'une recherche. 
+ *  
+ * @author asauvez
+ */
 public class NodeFetchDetailsBuilder {
 
 	private NodeFetchDetails details = new NodeFetchDetails();
@@ -32,6 +39,14 @@ public class NodeFetchDetailsBuilder {
 		for (PropertyModel<?> property : type.getProperties()) {
 			property(property);
 		}
+		return this;
+	}
+
+	public NodeFetchDetailsBuilder contentString() {
+		return contentString(CmModel.content.content);
+	}
+	public NodeFetchDetailsBuilder contentString(ContentPropertyModel propertyModel) {
+		details.getContentsString().add(propertyModel.getNameReference());
 		return this;
 	}
 

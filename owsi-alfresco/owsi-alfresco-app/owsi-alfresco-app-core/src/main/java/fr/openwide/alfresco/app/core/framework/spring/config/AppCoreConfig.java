@@ -7,6 +7,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import fr.openwide.alfresco.app.core.AlfrescoAppCorePackage;
@@ -34,6 +35,7 @@ public class AppCoreConfig {
 	public RestTemplate remoteRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new RepositoryRemoteExceptionHandler());
+		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setBufferRequestBody(false);
 		return restTemplate;
 	}
 

@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.repository.remote.node.web.script;
 
-import org.springframework.extensions.surf.util.Content;
+import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 
@@ -13,8 +13,8 @@ import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteExce
 public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE_SERVICE> {
 
 	@Override
-	protected Void executeImpl(Content content, UPDATE_NODE_SERVICE request, Status status, Cache cache) throws RepositoryRemoteException {
-		nodeService.update(request.node, request.details, content.getInputStream());
+	protected Void executeImpl(Resource content, UPDATE_NODE_SERVICE request, Status status, Cache cache) throws RepositoryRemoteException {
+		nodeService.update(request.node, request.details, content);
 		return null;
 	}
 

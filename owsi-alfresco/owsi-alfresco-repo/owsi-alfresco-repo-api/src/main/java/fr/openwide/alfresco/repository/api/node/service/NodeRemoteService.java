@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.repository.api.node.service;
 
-import java.io.InputStream;
-
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
@@ -15,7 +14,7 @@ public interface NodeRemoteService {
 		String URL = "/owsi/node";
 		HttpMethod METHOD = HttpMethod.POST;
 	}
-	NodeReference create(RepositoryNode node, InputStream content) throws DuplicateChildNameException;
+	NodeReference create(RepositoryNode node, Resource content) throws DuplicateChildNameException;
 
 	class UPDATE_NODE_SERVICE {
 		public static final String URL = "/owsi/node";
@@ -23,7 +22,7 @@ public interface NodeRemoteService {
 		public RepositoryNode node;
 		public NodeFetchDetails details;
 	}
-	void update(RepositoryNode node, NodeFetchDetails details, InputStream content);
+	void update(RepositoryNode node, NodeFetchDetails details, Resource content);
 
 	interface DELETE_NODE_SERVICE {
 		String URL = "/owsi/node";

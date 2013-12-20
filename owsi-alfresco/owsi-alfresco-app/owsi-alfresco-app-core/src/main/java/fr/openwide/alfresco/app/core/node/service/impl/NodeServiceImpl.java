@@ -1,9 +1,7 @@
 package fr.openwide.alfresco.app.core.node.service.impl;
 
-import java.io.InputStream;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +24,12 @@ public class NodeServiceImpl implements NodeService {
 	private RepositoryPayloadParameterHandler payloadParameterHandler;
 
 	@Override
-	public NodeReference create(RepositoryNode node, InputStream content) throws DuplicateChildNameException {
+	public NodeReference create(RepositoryNode node, Resource content) throws DuplicateChildNameException {
 		try {
 			HttpHeaders headers = payloadParameterHandler.handlePayload(node);
 			return repositoryRemoteBinding.exchange(CREATE_NODE_SERVICE.URL, 
 					CREATE_NODE_SERVICE.METHOD, 
-					(content != null) ? new InputStreamResource(content) : null,
+					content,
 					NodeReference.class, headers);
 		} catch (DuplicateChildNameException e) {
 			throw e;
@@ -42,7 +40,7 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details, InputStream content) {
+	public void update(RepositoryNode node, NodeFetchDetails details, Resource content) {
 		try {
 			UPDATE_NODE_SERVICE request = new UPDATE_NODE_SERVICE();
 			request.node = node;
@@ -51,7 +49,7 @@ public class NodeServiceImpl implements NodeService {
 			
 			repositoryRemoteBinding.exchange(UPDATE_NODE_SERVICE.URL, 
 					UPDATE_NODE_SERVICE.METHOD, 
-					(content != null) ? new InputStreamResource(content) : null, 
+					content, 
 					Void.class, headers);
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception

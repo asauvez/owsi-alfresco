@@ -23,8 +23,11 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) {
 		try {
+			GET_NODE_SERVICE request = new GET_NODE_SERVICE();
+			request.nodeReference = nodeReference;
+			request.nodeFetchDetails = nodeFetchDetails;
 			return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
-					GET_NODE_SERVICE.METHOD, RepositoryNode.class);
+					GET_NODE_SERVICE.METHOD, request, RepositoryNode.class);
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);

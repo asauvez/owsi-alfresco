@@ -35,6 +35,7 @@
 		<property name="nodeService" ref="NodeService" />
 		<property name="searchService" ref="SearchService" />
 		<property name="permissionService" ref="PermissionService" />
+		<property name="contentService" ref="ContentService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 

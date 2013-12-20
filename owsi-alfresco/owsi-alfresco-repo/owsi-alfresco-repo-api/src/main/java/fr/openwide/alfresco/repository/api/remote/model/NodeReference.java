@@ -5,6 +5,13 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Objects;
 
+/**
+ * Reference vers un noeud.
+ * 
+ * Peut être stocké sous forme de chaîne et reconstruit.
+ * 
+ * @author asauvez
+ */
 public class NodeReference implements Serializable {
 
 	private static final long serialVersionUID = -1502875087111354789L;

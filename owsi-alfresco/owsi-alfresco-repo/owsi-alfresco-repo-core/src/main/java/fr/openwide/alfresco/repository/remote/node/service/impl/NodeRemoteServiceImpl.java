@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.repository.remote.node.service.impl;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.springframework.core.io.Resource;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
@@ -32,12 +33,20 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public NodeReference create(RepositoryNode node, InputStream content) throws DuplicateChildNameException {
+	public NodeReference create(RepositoryNode node, Resource content) throws DuplicateChildNameException {
 		if (node.getNodeReference() != null) {
 			throw new IllegalArgumentException("La node est déjà persistée.");
 		}
 		
 		String cmName = (String) node.getProperties().get(conversionService.convert(ContentModel.PROP_NAME));
+		if (cmName == null) {
+			throw new IllegalArgumentException("Vous devez fournir un cm:name.");
+		}
+		
+		NodeReference parentRef = node.getPrimaryParent().getNodeReference();
+		if (parentRef == null) {
+			throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent.");
+		}
 		
 		Map<QName, Serializable> properties = new LinkedHashMap<QName, Serializable>();
 		for (Entry<NameReference, Serializable> property : node.getProperties().entrySet()) {
@@ -48,10 +57,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					conversionService.convertToGed(value));
 			}
 		}
-
+		
 		try {
 			NodeRef nodeRef = nodeService.createNode(
-					 conversionService.convert(node.getPrimaryParent().getNodeReference()), 
+					 conversionService.convert(parentRef), 
 					ContentModel.ASSOC_CONTAINS, 
 					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()), 
 					conversionService.convert(node.getType()), 
@@ -75,7 +84,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details, InputStream content) {
+	public void update(RepositoryNode node, NodeFetchDetails details, Resource content) {
 		if (node.getNodeReference() == null) {
 			throw new IllegalArgumentException("La node n'est pas persistée.");
 		}
@@ -115,11 +124,15 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 	}
 
-	private void setContent(NodeRef nodeRef, NameReference propertyName, RepositoryContentData contentData, InputStream in) {
+	private void setContent(NodeRef nodeRef, NameReference propertyName, RepositoryContentData contentData, Resource content) {
 		ContentWriter writer = contentService.getWriter(nodeRef, 
 				conversionService.convert(propertyName), 
 				false);
-		writer.putContent(in);
+		try {
+			writer.putContent(content.getInputStream());
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 		
 		if (contentData.getMimetype() != null) {
 			writer.setMimetype(contentData.getMimetype());

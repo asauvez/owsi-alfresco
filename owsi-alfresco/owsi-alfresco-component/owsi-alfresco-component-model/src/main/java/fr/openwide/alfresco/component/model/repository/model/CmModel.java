@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
@@ -8,6 +9,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTitled;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
 
 public interface CmModel {
 
@@ -31,5 +33,9 @@ public interface CmModel {
 
 	CmAuditable auditable = new CmAuditable();
 
+	CmVersionable versionable = new CmVersionable();
+
 	CmOwnable ownable = new CmOwnable();
+
+	CmAuthor author = new CmAuthor();
 }

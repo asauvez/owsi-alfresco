@@ -14,6 +14,7 @@ public class NodeFetchDetails implements Serializable {
 	private boolean nodeReference;
 	private boolean type;
 	private Set<NameReference> properties = new HashSet<>();
+	private Set<NameReference> contentsString = new HashSet<>();
 	private Set<NameReference> aspects = new HashSet<>();
 
 	private NodeFetchDetails primaryParent;
@@ -42,6 +43,9 @@ public class NodeFetchDetails implements Serializable {
 	}
 	public Set<NameReference> getProperties() {
 		return properties;
+	}
+	public Set<NameReference> getContentsString() {
+		return contentsString;
 	}
 	public Set<NameReference> getAspects() {
 		return aspects;

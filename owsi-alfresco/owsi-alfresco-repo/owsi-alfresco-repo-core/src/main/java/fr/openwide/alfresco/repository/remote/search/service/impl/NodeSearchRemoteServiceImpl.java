@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -25,14 +28,21 @@ import fr.openwide.alfresco.repository.remote.conversion.service.ConversionServi
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
+	private static final int MAX_CONTENT_STRING_FETCH_LENGTH = 1024*1024;
+	
 	private NodeService nodeService;
 	private SearchService searchService;
 	private PermissionService permissionService;
+	private ContentService contentService;
 	private ConversionService conversionService;
 
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails details) {
-		return getRepositoryNode(conversionService.convert(nodeReference), details);
+		try {
+			return getRepositoryNode(conversionService.convert(nodeReference), details);
+		} catch (InvalidNodeRefException ex) {
+			return null;
+		}
 	}
 	
 	@Override
@@ -106,7 +116,14 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 		}
 		for (NameReference property : details.getProperties()) {
 			Serializable value = nodeService.getProperty(nodeRef, conversionService.convert(property));
-			node.getProperties().put(property, conversionService.convertToApp(value));
+			if (value != null) {
+				node.getProperties().put(property, conversionService.convertToApp(value));
+			}
+		}
+		for (NameReference property : details.getContentsString()) {
+			ContentReader reader = contentService.getReader(nodeRef, conversionService.convert(property));
+			String content = reader.getContentString(MAX_CONTENT_STRING_FETCH_LENGTH);
+			node.getContentsString().put(property, content);
 		}
 		for (NameReference aspect : details.getAspects()) {
 			if (nodeService.hasAspect(nodeRef, conversionService.convert(aspect))) {
@@ -129,6 +146,9 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	}
 	public void setSearchService(SearchService searchService) {
 		this.searchService = searchService;
+	}
+	public void setContentService(ContentService contentService) {
+		this.contentService = contentService;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

@@ -1,10 +1,10 @@
 package fr.openwide.alfresco.component.model.node.service.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.lang3.CharEncoding;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.app.core.node.service.NodeService;
@@ -26,25 +26,28 @@ public class NodeModelServiceImpl implements NodeModelService {
 		return create(new BusinessNode()
 			.primaryParentRef(parentRef)
 			.type(CmModel.folder)
-			.property(CmModel.folder.name, folderName));
+			.name(folderName));
 	}
 
 	@Override
-	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, InputStream content) throws DuplicateChildNameException {
-		RepositoryContentData contentData = new RepositoryContentData();
-		contentData.setMimetype(mimeType);
-		contentData.setEncoding(encoding);
-		
+	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Resource content) throws DuplicateChildNameException {
 		return create(new BusinessNode()
-			.primaryParentRef(parentRef)
-			.type(CmModel.content)
-			.property(CmModel.content.name, fileName)
-			.property(CmModel.content.content, contentData));
+				.primaryParentRef(parentRef)
+				.type(CmModel.content)
+				.name(fileName)
+				.property(CmModel.content.content, new RepositoryContentData(mimeType, encoding)),
+			content);
 	}
 
 	@Override
-	public NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNameException, IOException {
-		return createContent(parent, file.getOriginalFilename(), file.getContentType(), CharEncoding.UTF_8, file.getInputStream());
+	public NodeReference createContent(NodeReference parent, final MultipartFile file) throws DuplicateChildNameException, IOException {
+		Resource resource = new InputStreamResource(file.getInputStream()) {
+			@Override
+			public long contentLength() throws IOException {
+				return file.getSize();
+			}
+		};
+		return createContent(parent, file.getOriginalFilename(), file.getContentType(), null, resource);
 	}
 
 	@Override
@@ -53,7 +56,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 	
 	@Override
-	public NodeReference create(BusinessNode node, InputStream content) throws DuplicateChildNameException {
+	public NodeReference create(BusinessNode node, Resource content) throws DuplicateChildNameException {
 		return nodeService.create(node.getRepositoryNode(), content);
 	}
 
@@ -63,7 +66,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 
 	@Override
-	public void update(BusinessNode node, NodeFetchDetailsBuilder details, InputStream content) {
+	public void update(BusinessNode node, NodeFetchDetailsBuilder details, Resource content) {
 		nodeService.update(node.getRepositoryNode(), details.getDetails(), content);
 	}
 

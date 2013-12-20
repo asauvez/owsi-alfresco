@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
@@ -55,6 +57,21 @@ public class BusinessNode {
 	}
 	public <C extends Serializable> BusinessNode property(PropertyModel<C> propertyModel, C value) {
 		node.getProperties().put(propertyModel.getNameReference(), value);
+		return this;
+	}
+	
+	public String getContentString() {
+		return getContentString(CmModel.content.content);
+	}
+	public String getContentString(ContentPropertyModel propertyModel) {
+		return node.getContentsString().get(propertyModel);
+	}
+	
+	public String getName() {
+		return getProperty(CmModel.object.name);
+	}
+	public BusinessNode name(String name) {
+		property(CmModel.object.name, name);
 		return this;
 	}
 

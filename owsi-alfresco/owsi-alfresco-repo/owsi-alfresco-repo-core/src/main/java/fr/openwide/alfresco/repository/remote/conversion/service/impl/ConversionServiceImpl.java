@@ -32,7 +32,8 @@ public class ConversionServiceImpl implements ConversionService {
 	}
 	@Override
 	public NameReference convert(QName qname) {
-		return NameReference.create(qname.getPrefixString(), qname.getLocalName());
+		String prefix = namespacePrefixResolver.getPrefixes(qname.getNamespaceURI()).iterator().next();
+		return NameReference.create(prefix, qname.getLocalName());
 	}
 	
 	@Override
@@ -43,15 +44,14 @@ public class ConversionServiceImpl implements ConversionService {
 			return convert((QName) value);
 		} else if (value instanceof ContentData) {
 			ContentData repoContent = (ContentData) value;
-			RepositoryContentData appContent = new RepositoryContentData();
-			
-			appContent.setMimetype(repoContent.getMimetype());
+
 			String mimetypeDisplay = mimetypeService.getDisplaysByMimetype().get(repoContent.getMimetype());
-			appContent.setMimetypeDisplay((mimetypeDisplay != null) ? mimetypeDisplay : repoContent.getMimetype());
-			
-			appContent.setSize(repoContent.getSize());
-			appContent.setEncoding(repoContent.getEncoding());
-			appContent.setLocale(repoContent.getLocale());
+			RepositoryContentData appContent = new RepositoryContentData(
+					repoContent.getMimetype(), 
+					(mimetypeDisplay != null) ? mimetypeDisplay : repoContent.getMimetype(), 
+					repoContent.getSize(), 
+					repoContent.getEncoding(), 
+					repoContent.getLocale());
 			
 			return appContent;
 		}
