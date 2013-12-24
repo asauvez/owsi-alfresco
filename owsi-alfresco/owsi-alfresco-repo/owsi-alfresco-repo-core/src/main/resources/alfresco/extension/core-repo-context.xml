@@ -22,6 +22,15 @@
 		<property name="nodeService" ref="owsi.service.nodeService" />
 	</bean>
 
+	<bean id="webscript.owsi.remote.node.node-get.post" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.GetNodeWebScript" />
+	<bean id="webscript.owsi.remote.node.node-children.post" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.ChildrenNodeWebScript" />
+	<bean id="webscript.owsi.remote.node.node-sourceAssoc.post" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.SourceAssocNodeWebScript" />
+	<bean id="webscript.owsi.remote.node.node-targetAssoc.post" parent="webscript.owsi.node"
+			class="fr.openwide.alfresco.repository.remote.node.web.script.TargetAssocNodeWebScript" />
+
 	<bean id="webscript.owsi.remote.node.node-create.post" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.remote.node.web.script.CreateNodeWebScript" />
 	<bean id="webscript.owsi.remote.node.node-update.put" parent="webscript.owsi.node"
@@ -32,29 +41,15 @@
 	<!-- Node search service -->
 	
 	<bean id="owsi.service.nodeSearchService" class="fr.openwide.alfresco.repository.remote.search.service.impl.NodeSearchRemoteServiceImpl">
-		<property name="nodeService" ref="NodeService" />
+		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
 		<property name="searchService" ref="SearchService" />
-		<property name="permissionService" ref="PermissionService" />
-		<property name="contentService" ref="ContentService" />
-		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 
 	<!-- Node search webscripts -->
 
-	<bean id="webscript.owsi.remote.search" parent="webscript.owsi.remote" abstract="true">
+	<bean id="webscript.owsi.remote.search.search.post" parent="webscript.owsi.remote"
+			class="fr.openwide.alfresco.repository.remote.search.web.script.SearchNodeWebScript">
 		<property name="nodeSearchService" ref="owsi.service.nodeSearchService" />
 	</bean>
-
-			 
-	<bean id="webscript.owsi.remote.search.get.post" parent="webscript.owsi.remote.search"
-			class="fr.openwide.alfresco.repository.remote.search.web.script.GetNodeWebScript" />
-	<bean id="webscript.owsi.remote.search.search.post" parent="webscript.owsi.remote.search"
-			class="fr.openwide.alfresco.repository.remote.search.web.script.SearchNodeWebScript" />
-	<bean id="webscript.owsi.remote.search.children.post" parent="webscript.owsi.remote.search"
-			class="fr.openwide.alfresco.repository.remote.search.web.script.ChildrenNodeWebScript" />
-	<bean id="webscript.owsi.remote.search.sourceAssoc.post" parent="webscript.owsi.remote.search"
-			class="fr.openwide.alfresco.repository.remote.search.web.script.SourceAssocNodeWebScript" />
-	<bean id="webscript.owsi.remote.search.targetAssoc.post" parent="webscript.owsi.remote.search"
-			class="fr.openwide.alfresco.repository.remote.search.web.script.TargetAssocNodeWebScript" />
 
 </beans>

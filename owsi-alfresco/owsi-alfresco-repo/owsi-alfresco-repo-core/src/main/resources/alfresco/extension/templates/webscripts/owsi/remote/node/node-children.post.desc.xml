@@ -2,7 +2,7 @@
 <webscript>
 	<shortname>children</shortname>
 	<description>Get children nodes</description>
-	<url>/owsi/search/node/children</url>
+	<url>/owsi/node/children</url>
 	<format default="json" />
 	<authentication>user</authentication>
 	<transaction allow="readonly">required</transaction>

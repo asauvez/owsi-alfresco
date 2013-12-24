@@ -34,7 +34,7 @@ public class RepositoryNode implements Serializable {
 		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content")
 	})
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
-	private final Map<NameReference, String> contentsString = new LinkedHashMap<>();
+	private final Map<NameReference, String> contentStrings = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 	
 	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
@@ -71,8 +71,8 @@ public class RepositoryNode implements Serializable {
 	public Map<NameReference, Serializable> getProperties() {
 		return properties;
 	}
-	public Map<NameReference, String> getContentsString() {
-		return contentsString;
+	public Map<NameReference, String> getContentStrings() {
+		return contentStrings;
 	}
 	public Set<NameReference> getAspects() {
 		return aspects;

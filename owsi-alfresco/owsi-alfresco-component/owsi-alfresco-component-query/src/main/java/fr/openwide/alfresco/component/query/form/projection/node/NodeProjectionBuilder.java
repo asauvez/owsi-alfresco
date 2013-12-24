@@ -125,7 +125,14 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 				}
 			});
 	}
-	
+
+	public Projection<RepositoryNode, NodeProjectionBuilder, String> contentString() {
+		return contentString(CmModel.content.content);
+	}
+	public Projection<RepositoryNode, NodeProjectionBuilder, String> contentString(PropertyModel<RepositoryContentData> property) {
+		return add(new NodeContentStringProjectionImpl(this, property)); 
+	}
+
 	public Predicate<RepositoryNode> ifHasPermission(RepositoryPermission permission) {
 		return new UserPermissionPredicate(permission);
 	}

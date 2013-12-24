@@ -15,8 +15,8 @@ public class NameReference implements Serializable {
 	private final String namespace;
 	private final String name;
 
-	private NameReference(String s) {
-		Iterator<String> it = Splitter.on(":").split(s).iterator();
+	private NameReference(String qname) {
+		Iterator<String> it = Splitter.on(":").split(qname).iterator();
 		namespace = it.next();
 		name = it.next();
 	}
@@ -28,6 +28,9 @@ public class NameReference implements Serializable {
 
 	public static NameReference create(String namespace, String name) {
 		return new NameReference(namespace, name);
+	}
+	public static NameReference create(String qname) {
+		return new NameReference(qname);
 	}
 
 	public String getNamespace() {

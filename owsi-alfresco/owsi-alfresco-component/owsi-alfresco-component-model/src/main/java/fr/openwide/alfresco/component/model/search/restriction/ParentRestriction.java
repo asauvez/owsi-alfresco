@@ -19,7 +19,7 @@ public class ParentRestriction extends Restriction {
 
 	@Override
 	protected String toLuceneQueryInternal() {
-		return ((primary) ? "PRIMARYPARENT:" : "PARENT:") + parentRef.getReference();
+		return ((primary) ? "PRIMARYPARENT:" : "PARENT:") + parentRef.getReference().replace(":", "\\:");
 	}
 
 }

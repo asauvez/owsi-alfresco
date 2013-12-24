@@ -5,14 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
-import fr.openwide.alfresco.component.model.search.util.BusinessNode;
-import fr.openwide.alfresco.component.model.search.util.NodeFetchDetailsBuilder;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 public class NodeSearchModelServiceImpl implements NodeSearchModelService {
@@ -20,12 +16,6 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	@Autowired
 	private NodeSearchService nodeSearchService;
 
-	@Override
-	public BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
-		RepositoryNode node = nodeSearchService.get(nodeReference, nodeFetchDetails.getDetails());
-		return (node != null) ? new BusinessNode(node) : null;
-	}
-	
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
 		return BusinessNode.wrapList(nodeSearchService.search(builder.toLuceneQuery(), nodeFetchDetails.getDetails()));
@@ -45,26 +35,6 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 		BusinessNode node = searchUnique(builder, new NodeFetchDetailsBuilder()
 				.nodeReference());
 		return (node != null) ? node.getNodeReference() : null;
-	}
-
-	@Override
-	public List<BusinessNode> getChildren(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return getChildren(nodeReference, CmModel.folder.contains, nodeFetchDetails);
-	}
-	
-	@Override
-	public List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeSearchService.getChildren(nodeReference, childAssoc.getNameReference(), nodeFetchDetails.getDetails()));
-	}
-
-	@Override
-	public List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeSearchService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
-	}
-
-	@Override
-	public List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeSearchService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
 	}
 
 }

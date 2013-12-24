@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -120,7 +121,11 @@ public class RepositoryRemoteBinding {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
+	public void getRequestContent(String path, HttpMethod method, ResponseExtractor<?> responseExtractor, Object... urlVariables) {
+		restTemplate.execute(getURI(path, urlVariables), method, null, responseExtractor);
+	}
+
 	protected URI getURI(String path, Object... uriVars) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(rootUri).path(path);
 		Object[] uriVariables = uriVars;

@@ -1,13 +1,9 @@
-package fr.openwide.alfresco.component.model.search.util;
+package fr.openwide.alfresco.component.model.node.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -15,6 +11,10 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
+/**
+ * Contient les informations liées à une node. 
+ * @author asauvez
+ */
 public class BusinessNode {
 
 	private RepositoryNode node;
@@ -68,7 +68,7 @@ public class BusinessNode {
 		return getContentString(CmModel.content.content);
 	}
 	public String getContentString(ContentPropertyModel propertyModel) {
-		return node.getContentsString().get(propertyModel);
+		return node.getContentStrings().get(propertyModel);
 	}
 	
 	public String getName() {

@@ -2,7 +2,7 @@
 <webscript>
 	<shortname>sourceAssoc</shortname>
 	<description>Get source nodes</description>
-	<url>/owsi/search/node/sourceassoc</url>
+	<url>/owsi/node/sourceassoc</url>
 	<format default="json" />
 	<authentication>user</authentication>
 	<transaction allow="readonly">required</transaction>

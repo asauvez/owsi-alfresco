@@ -1,9 +1,5 @@
-package fr.openwide.alfresco.component.model.search.util;
+package fr.openwide.alfresco.component.model.node.model;
 
-import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -48,7 +44,7 @@ public class NodeFetchDetailsBuilder {
 		return contentString(CmModel.content.content);
 	}
 	public NodeFetchDetailsBuilder contentString(ContentPropertyModel propertyModel) {
-		details.getContentsString().add(propertyModel.getNameReference());
+		details.getContentStrings().add(propertyModel.getNameReference());
 		return this;
 	}
 

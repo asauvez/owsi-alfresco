@@ -2,25 +2,34 @@ package fr.openwide.alfresco.repository.remote.node.service.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.springframework.core.io.Resource;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
@@ -30,8 +39,113 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 	private NodeService nodeService;
 	private ContentService contentService;
+	private PermissionService permissionService;
+
 	private ConversionService conversionService;
 
+	@Override
+	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails details) {
+		return getRepositoryNode(conversionService.convert(nodeReference), details);
+	}
+
+	@Override
+	public List<RepositoryNode> getChildren(
+			NodeReference nodeReference, NameReference childAssocName, NodeFetchDetails details) {
+		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
+				conversionService.convert(nodeReference), 
+				conversionService.convert(childAssocName), 
+				RegexQNamePattern.MATCH_ALL, true);
+		
+		List<RepositoryNode> res = new ArrayList<>();
+		for (ChildAssociationRef assoc : assocs) {
+			res.add(getRepositoryNode(assoc.getChildRef(), details));
+		}
+		return res;
+	}
+
+	@Override
+	public List<RepositoryNode> getTargetAssocs(
+			NodeReference nodeReference, NameReference assocName, NodeFetchDetails details) {
+		List<AssociationRef> assocs = nodeService.getTargetAssocs(
+				conversionService.convert(nodeReference), 
+				conversionService.convert(assocName));
+		
+		List<RepositoryNode> res = new ArrayList<>();
+		for (AssociationRef assoc : assocs) {
+			res.add(getRepositoryNode(assoc.getTargetRef(), details));
+		}
+		return res;
+	}
+
+	@Override
+	public List<RepositoryNode> getSourceAssocs(
+			NodeReference nodeReference, NameReference assocName, NodeFetchDetails details) {
+		List<AssociationRef> assocs = nodeService.getSourceAssocs(
+				conversionService.convert(nodeReference), 
+				conversionService.convert(assocName));
+		
+		List<RepositoryNode> res = new ArrayList<>();
+		for (AssociationRef assoc : assocs) {
+			res.add(getRepositoryNode(assoc.getSourceRef(), details));
+		}
+		return res;
+	}
+
+	public RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) {
+		NodeReference nodeReference = conversionService.convert(nodeRef);
+		
+		RepositoryNode node = new RepositoryNode();
+		if (details.isNodeReference()) {
+			node.setNodeReference(conversionService.convert(nodeRef));
+		}
+		if (details.isType()) {
+			node.setType(conversionService.convert(nodeService.getType(nodeRef)));
+		}
+		if (details.getPrimaryParent() != null) {
+			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
+			node.setPrimaryParent(getRepositoryNode(primaryParent.getParentRef(), details.getPrimaryParent()));
+		}
+		for (NameReference property : details.getProperties()) {
+			Serializable value = nodeService.getProperty(nodeRef, conversionService.convert(property));
+			if (value != null) {
+				node.getProperties().put(property, conversionService.convertToApp(value));
+			}
+		}
+		for (NameReference property : details.getContentStrings()) {
+			ContentReader reader = contentService.getReader(nodeRef, conversionService.convert(property));
+			String content = reader.getContentString();
+			node.getContentStrings().put(property, content);
+		}
+		for (NameReference aspect : details.getAspects()) {
+			if (nodeService.hasAspect(nodeRef, conversionService.convert(aspect))) {
+				node.getAspects().add(aspect);
+			}
+		}
+		
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
+			node.getChildAssociations().put(
+					entry.getKey(), 
+					getChildren(nodeReference, entry.getKey(), entry.getValue()));
+		}
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getTargetAssocs().entrySet()) {
+			node.getTargetAssocs().put(
+					entry.getKey(), 
+					getTargetAssocs(nodeReference, entry.getKey(), entry.getValue()));
+		}
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getSourceAssocs().entrySet()) {
+			node.getSourceAssocs().put(
+					entry.getKey(), 
+					getSourceAssocs(nodeReference, entry.getKey(), entry.getValue()));
+		}
+
+		for (RepositoryPermission permission : details.getUserPermissions()) {
+			if (permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED) {
+				node.getUserPermissions().add(permission);
+			}
+		}
+		return node;
+	}
+	
 	@Override
 	public NodeReference create(RepositoryNode node, Resource content) throws DuplicateChildNameException {
 		if (node.getNodeReference() != null) {
@@ -70,12 +184,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				nodeService.addAspect(nodeRef, conversionService.convert(aspectName), null);
 			}
 	
-			for (Entry<NameReference, Serializable> property : node.getProperties().entrySet()) {
-				Serializable value = property.getValue();
-				if (value instanceof RepositoryContentData) {
-					setContent(nodeRef, property.getKey(), (RepositoryContentData) value, content);
-				}
-			}
+			setContents(nodeRef, node, content);
 	
 			return conversionService.convert(nodeRef);
 		} catch (DuplicateChildNodeNameException e) {
@@ -116,22 +225,42 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		
-		for (Entry<NameReference, Serializable> property : node.getProperties().entrySet()) {
-			Serializable value = property.getValue();
+		setContents(nodeRef, node, content);
+	}
+
+	private void setContents(NodeRef nodeRef, RepositoryNode node, Resource contentResource) {
+		for (Entry<NameReference, String> entry : node.getContentStrings().entrySet()) {
+			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().remove(entry.getKey());
+			setContent(nodeRef, entry.getKey(), 
+					(contentData != null) ? contentData : new RepositoryContentData(), 
+					null, entry.getValue());
+		}
+		
+		for (Entry<NameReference, Serializable> entry : node.getProperties().entrySet()) {
+			Serializable value = entry.getValue();
 			if (value instanceof RepositoryContentData) {
-				setContent(nodeRef, property.getKey(), (RepositoryContentData) value, content);
+				if (contentResource == null) {
+					throw new IllegalArgumentException("Une resource n'a pas été fourni : " + entry.getKey());
+				}
+				setContent(nodeRef, entry.getKey(), (RepositoryContentData) value, contentResource, null);
 			}
 		}
 	}
-
-	private void setContent(NodeRef nodeRef, NameReference propertyName, RepositoryContentData contentData, Resource content) {
+	
+	private void setContent(NodeRef nodeRef, NameReference propertyName, RepositoryContentData contentData, 
+			Resource contentResource, String contentString) {
 		ContentWriter writer = contentService.getWriter(nodeRef, 
 				conversionService.convert(propertyName), 
 				false);
-		try {
-			writer.putContent(content.getInputStream());
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
+		
+		if (contentString != null) {
+			writer.putContent(contentString);
+		} else {
+			try {
+				writer.putContent(contentResource.getInputStream());
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
 		}
 		
 		if (contentData.getMimetype() != null) {
@@ -161,6 +290,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	public void setContentService(ContentService contentService) {
 		this.contentService = contentService;
+	}
+	public void setPermissionService(PermissionService permissionService) {
+		this.permissionService = permissionService;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

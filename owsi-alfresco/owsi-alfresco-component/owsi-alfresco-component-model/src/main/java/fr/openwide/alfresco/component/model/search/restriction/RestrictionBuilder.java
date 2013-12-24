@@ -2,6 +2,8 @@ package fr.openwide.alfresco.component.model.search.restriction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -85,6 +87,18 @@ public class RestrictionBuilder extends Restriction {
 
 	public MatchAllRestriction matchAll(String value) {
 		return add(new MatchAllRestriction(this, value));
+	}
+
+	public <C extends Serializable>  RestrictionBuilder in(PropertyModel<C> property, @SuppressWarnings("unchecked") C ... values) {
+		return in(property, Arrays.asList(values));
+	}
+	
+	public <C extends Serializable>  RestrictionBuilder in(PropertyModel<C> property, Collection<C> values) {
+		RestrictionBuilder or = or();
+		for (C value : values) {
+			or.eq(property, value).of();
+		}
+		return or;
 	}
 
 	public <C extends Serializable> BetweenRestriction<C> between(PropertyModel<C> property, C from, C to) {
