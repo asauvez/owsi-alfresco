@@ -70,6 +70,13 @@ public class BusinessNode {
 	public String getContentString(ContentPropertyModel propertyModel) {
 		return node.getContentStrings().get(propertyModel);
 	}
+	public BusinessNode contentString(String content) {
+		return contentString(CmModel.content.content, content);
+	}
+	public BusinessNode contentString(ContentPropertyModel property, String content) {
+		node.getContentStrings().put(property.getNameReference(), content);
+		return this;
+	}
 	
 	public String getName() {
 		return getProperty(CmModel.object.name);
