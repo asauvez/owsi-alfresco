@@ -205,6 +205,19 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			nodeService.setType(nodeRef, conversionService.convert(node.getType()));
 		}
 		
+		if (details.getPrimaryParent() != null) {
+			NodeReference parentRef = node.getPrimaryParent().getNodeReference();
+			if (parentRef == null) {
+				throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent.");
+			}
+			String cmName = (String) node.getProperties().get(conversionService.convert(ContentModel.PROP_NAME));
+			if (cmName == null) {
+				throw new IllegalArgumentException("Vous devez fournir un cm:name.");
+			}			
+			nodeService.moveNode(nodeRef, conversionService.convert(parentRef), ContentModel.ASSOC_CONTAINS, 
+					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
+		}
+		
 		for (NameReference propertyName : details.getProperties()) {
 			Serializable value = node.getProperties().get(propertyName);
 			if (value != null) {
@@ -227,9 +240,28 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
+			for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
+				childNode.setPrimaryParent(node);
+				saveOrUpdate(childNode, entry.getValue());
+			}
+		}
+		
 		setContents(nodeRef, node, content);
 	}
 
+	private void saveOrUpdate(RepositoryNode node, NodeFetchDetails details) {
+		if (node.getNodeReference() == null) {
+			try {
+				create(node, null);
+			} catch (DuplicateChildNameException e) {
+				throw new IllegalArgumentException(e);
+			}
+		} else {
+			update(node, details, null);
+		}
+	}
+	
 	private void setContents(NodeRef nodeRef, RepositoryNode node, Resource contentResource) {
 		for (Entry<NameReference, String> entry : node.getContentStrings().entrySet()) {
 			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().remove(entry.getKey());

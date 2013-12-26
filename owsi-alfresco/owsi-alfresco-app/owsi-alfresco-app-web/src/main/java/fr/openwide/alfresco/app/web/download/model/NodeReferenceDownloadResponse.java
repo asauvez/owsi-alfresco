@@ -8,17 +8,23 @@ public class NodeReferenceDownloadResponse extends DownloadResponse {
 	private NodeReference nodeReference;
 	private NameReference property;
 
+	public NodeReferenceDownloadResponse(NodeReference nodeReference) {
+		this.nodeReference = nodeReference;
+	}
+	
 	public NodeReference getNodeReference() {
 		return nodeReference;
 	}
-	public void setNodeReference(NodeReference nodeReference) {
+	public NodeReferenceDownloadResponse nodeReference(NodeReference nodeReference) {
 		this.nodeReference = nodeReference;
+		return this;
 	}
 
 	public NameReference getProperty() {
 		return property;
 	}
-	public void setProperty(NameReference property) {
+	public NodeReferenceDownloadResponse property(NameReference property) {
 		this.property = property;
+		return this;
 	}
 }

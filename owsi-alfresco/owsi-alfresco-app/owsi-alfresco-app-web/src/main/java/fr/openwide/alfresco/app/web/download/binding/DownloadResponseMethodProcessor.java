@@ -77,7 +77,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			request.setAttribute(getClass().getName(), outputStream);
 			return new FileDownloadResponse(tempFile, outputStream);
 		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
-			return new NodeReferenceDownloadResponse();
+			return new NodeReferenceDownloadResponse(null);
 		} else {
 			throw new IllegalArgumentException("Invalid type: " + parameterType);
 		}
@@ -95,14 +95,14 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			
 			// get filename
 			String fileName;
-			if (download.getContentName() == null) {
+			if (download.getAttachementContentName() == null) {
 				fileName = FilenameUtils.getName(request.getRequestURI());
 			} else {
-				String extension = FilenameUtils.getExtension(download.getContentName());
+				String extension = FilenameUtils.getExtension(download.getAttachementContentName());
 				if (StringUtils.hasText(extension)) {
-					fileName = StringUtils.urlize(FilenameUtils.getBaseName(download.getContentName())) + "." + StringUtils.urlize(extension);
+					fileName = StringUtils.urlize(FilenameUtils.getBaseName(download.getAttachementContentName())) + "." + StringUtils.urlize(extension);
 				} else {
-					fileName = StringUtils.urlize(FilenameUtils.getName(download.getContentName()));
+					fileName = StringUtils.urlize(FilenameUtils.getName(download.getAttachementContentName()));
 				}
 			}
 			

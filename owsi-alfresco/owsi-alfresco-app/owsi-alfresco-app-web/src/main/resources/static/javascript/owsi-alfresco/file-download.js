@@ -22,11 +22,17 @@
 						path = path.substring(0, slashIndex);
 					}
 					
-					var form = $('<form action="' + url + '" method="GET">' +
+					var formS = '<form action="' + url + '" method="GET">' +
 							'<input type="hidden" name="fileDownloadToken" value="' + salt + '"/>' +
-							'<input type="hidden" name="fileDownloadPath" value="' + path + '"/>' +
-							'</form>'
-					);
+							'<input type="hidden" name="fileDownloadPath" value="' + path + '"/>';
+					
+					var hashes = url.slice(url.indexOf('?') + 1).split('&');
+					for(var i = 0; i < hashes.length; i++) {
+						var hash = hashes[i].split('=');
+						formS += '<input type="hidden" name="' + hash[0] + '" value="' + hash[1] + '"/>'
+					}
+					formS += '</form>';
+					var form = $(formS);
 					$("body").append(form);
 					form.submit();
 					

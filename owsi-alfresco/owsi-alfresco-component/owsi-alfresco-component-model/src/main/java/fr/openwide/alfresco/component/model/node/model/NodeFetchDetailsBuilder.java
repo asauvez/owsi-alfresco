@@ -29,6 +29,9 @@ public class NodeFetchDetailsBuilder {
 		return this;
 	}
 
+	public NodeFetchDetailsBuilder name() {
+		return property(CmModel.object.name);
+	}
 	public NodeFetchDetailsBuilder property(PropertyModel<?> propertyModel) {
 		details.getProperties().add(propertyModel.getNameReference());
 		return this;
