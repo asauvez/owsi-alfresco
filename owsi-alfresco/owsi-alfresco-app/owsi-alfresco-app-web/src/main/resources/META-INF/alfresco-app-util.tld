@@ -59,8 +59,8 @@
 	</tag>
 
 	<tag>
-		<name>webjarVersion</name>
-		<tag-class>fr.openwide.alfresco.app.web.framework.tag.WebjarVersionTag</tag-class>
+		<name>webjarPath</name>
+		<tag-class>fr.openwide.alfresco.app.web.framework.tag.WebjarPathTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute>
 			<description>Le nom du webjar dont on souhaite obtenir la version</description>

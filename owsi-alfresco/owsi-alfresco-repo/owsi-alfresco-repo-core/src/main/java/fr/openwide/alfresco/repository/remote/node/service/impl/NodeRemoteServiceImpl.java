@@ -113,8 +113,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 		for (NameReference property : details.getContentStrings()) {
 			ContentReader reader = contentService.getReader(nodeRef, conversionService.convert(property));
-			String content = reader.getContentString();
-			node.getContentStrings().put(property, content);
+			if (reader != null) {
+				String content = reader.getContentString();
+				node.getContentStrings().put(property, content);
+			}
 		}
 		for (NameReference aspect : details.getAspects()) {
 			if (nodeService.hasAspect(nodeRef, conversionService.convert(aspect))) {

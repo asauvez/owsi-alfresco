@@ -10,7 +10,7 @@ import javax.servlet.jsp.PageContext;
 import org.apache.taglibs.standard.tag.common.core.Util;
 import org.springframework.web.util.TagUtils;
 
-public class WebjarVersionTag extends ApplicationContextAwareTag {
+public class WebjarPathTag extends ApplicationContextAwareTag {
 
 	private String webjar;
 
@@ -33,7 +33,7 @@ public class WebjarVersionTag extends ApplicationContextAwareTag {
 		}
 		// store or print the output
 		if (var != null) {
-			pageContext.setAttribute(var, version, TagUtils.getScope(scope));
+			pageContext.setAttribute(var, webjar + "/" + version, TagUtils.getScope(scope));
 		} else {
 			pageContext.getOut().print(version);
 		}

@@ -99,7 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
 		try {
 			HttpHeaders headers = payloadParameterHandler.handlePayload(ticket);
-			requiringExplicitTicketRemoteBinding.exchange(LOGOUT_SERVICE.URL, LOGOUT_SERVICE.METHOD, ticket, Void.class, headers, ticket);
+			requiringExplicitTicketRemoteBinding.exchange(LOGOUT_SERVICE.URL, LOGOUT_SERVICE.METHOD, (Object) null, Void.class, headers, ticket);
 		} catch (AccessDeniedRemoteException e) {
 			throw e;
 		} catch (RepositoryRemoteException e) {
