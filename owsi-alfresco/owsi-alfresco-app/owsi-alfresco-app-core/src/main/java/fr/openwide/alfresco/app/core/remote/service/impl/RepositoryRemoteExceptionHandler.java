@@ -33,8 +33,8 @@ public class RepositoryRemoteExceptionHandler extends DefaultResponseErrorHandle
 					@SuppressWarnings("unchecked")
 					Class<? extends RepositoryRemoteException> exceptionClass = (Class<? extends RepositoryRemoteException>) clazz;
 					
-					RepositoryRemoteException cryptoRemoteException = (RepositoryRemoteException) messageConverter.read(exceptionClass, response);
-					throw new RepositoryIOException(cryptoRemoteException);
+					RepositoryRemoteException remoteException = (RepositoryRemoteException) messageConverter.read(exceptionClass, response);
+					throw new RepositoryIOException(remoteException);
 				}
 			} catch (ClassNotFoundException e) {
 				throw new IllegalStateException(e);
