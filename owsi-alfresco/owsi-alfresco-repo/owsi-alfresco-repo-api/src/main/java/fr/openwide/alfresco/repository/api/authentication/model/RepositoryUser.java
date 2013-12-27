@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
+
 public class RepositoryUser implements Serializable {
 
 	private static final long serialVersionUID = 945185331538453155L;
@@ -18,7 +20,7 @@ public class RepositoryUser implements Serializable {
 	private RepositoryTicket ticket;
 
 	private boolean admin = false;
-	private List<String> groups = new ArrayList<>();
+	private List<RepositoryAuthority> authorities = new ArrayList<>();
 
 	public UserReference getUserReference() {
 		return userReference;
@@ -48,11 +50,11 @@ public class RepositoryUser implements Serializable {
 		this.email = email;
 	}
 
-	public List<String> getGroups() {
-		return groups;
+	public List<RepositoryAuthority> getAuthorities() {
+		return authorities;
 	}
-	public void setGroups(List<String> groups) {
-		this.groups = groups;
+	public void setAuthorities(List<RepositoryAuthority> authorities) {
+		this.authorities = authorities;
 	}
 
 	public RepositoryTicket getTicket() {

@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.remote.authentication.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,10 +17,14 @@ import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 
 public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteService {
@@ -77,6 +82,8 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 				return authorityService.getAuthoritiesForUser(userTicket);
 			}
 		}, AuthenticationUtil.getSystemUserName());
+		
+		
 		// get user is admin
 		boolean userAdmin = authorityService.isAdminAuthority(userReference.getUsername());
 		// build user
@@ -86,7 +93,12 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 		user.setFirstName((String) userProps.get(ContentModel.PROP_FIRSTNAME));
 		user.setLastName((String) userProps.get(ContentModel.PROP_LASTNAME));
 		user.setEmail((String) userProps.get(ContentModel.PROP_EMAIL));
-		user.getGroups().addAll(userAuthorities);
+		user.getAuthorities().addAll(Lists.transform(new ArrayList<>(userAuthorities), new Function<String, RepositoryAuthority>() {
+			@Override
+			public RepositoryAuthority apply(String autority) {
+				return new RepositoryAuthority(autority);
+			}
+		}));
 		user.setAdmin(userAdmin);
 		return user;
 	}

@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.security.model.BusinessUser;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
 
@@ -68,8 +69,8 @@ public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthent
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		// Add default Authenticated role
 		authorities.add(new SimpleGrantedAuthority(CoreAuthorityConstants.ROLE_AUTHENTICATED));
-		for (String group : repositoryUser.getGroups()) {
-			authorities.add(new SimpleGrantedAuthority(group));
+		for (RepositoryAuthority autority : repositoryUser.getAuthorities()) {
+			authorities.add(new SimpleGrantedAuthority(autority.getName()));
 		}
 		// Build user
 		return new BusinessUser(repositoryUser, credentials, authorities);
