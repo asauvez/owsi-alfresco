@@ -42,11 +42,8 @@ public interface NodeModelService {
 	NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNameException, IOException;
 
 	NodeReference create(BusinessNode node) throws DuplicateChildNameException;
-	NodeReference create(BusinessNode node, Resource content) throws DuplicateChildNameException;
-
+	void update(BusinessNode node);
 	void update(BusinessNode node, NodeFetchDetailsBuilder details);
-	void update(BusinessNode node, NodeFetchDetailsBuilder details, Resource content);
-
 	void delete(NodeReference nodeReference);
 
 }

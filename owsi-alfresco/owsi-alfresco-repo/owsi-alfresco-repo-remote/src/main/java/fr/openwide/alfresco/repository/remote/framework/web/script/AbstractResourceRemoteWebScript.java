@@ -19,7 +19,7 @@ public abstract class AbstractResourceRemoteWebScript<R, P> extends AbstractPara
 		P payload = extractPayload(req);
 		
 		Resource resource = new InputStreamResource(req.getContent().getInputStream());
-		return executeImpl(resource, payload, status, cache);
+		return executeImpl(resource, payload, req, status, cache);
 	}
 
 	@Override
@@ -28,6 +28,6 @@ public abstract class AbstractResourceRemoteWebScript<R, P> extends AbstractPara
 		return null;
 	}
 
-	protected abstract R executeImpl(Resource content, P payload, Status status, Cache cache) throws RepositoryRemoteException;
+	protected abstract R executeImpl(Resource content, P payload, WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException;
 
 }

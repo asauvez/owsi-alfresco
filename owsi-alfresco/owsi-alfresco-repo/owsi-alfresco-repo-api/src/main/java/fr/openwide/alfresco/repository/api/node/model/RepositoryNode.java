@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.core.io.Resource;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -35,6 +38,7 @@ public class RepositoryNode implements Serializable {
 	})
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Map<NameReference, String> contentStrings = new LinkedHashMap<>();
+	private final Map<NameReference, Resource> contentResources = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 	
 	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
@@ -42,6 +46,7 @@ public class RepositoryNode implements Serializable {
 	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new HashMap<>();
 
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
+	private Set<RepositoryAuthorityPermission> accessPermissions = new LinkedHashSet<>();
 
 	public RepositoryNode() {
 	}
@@ -74,6 +79,10 @@ public class RepositoryNode implements Serializable {
 	public Map<NameReference, String> getContentStrings() {
 		return contentStrings;
 	}
+	@JsonIgnore
+	public Map<NameReference, Resource> getContentResources() {
+		return contentResources;
+	}
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}
@@ -91,5 +100,7 @@ public class RepositoryNode implements Serializable {
 	public Set<RepositoryPermission> getUserPermissions() {
 		return userPermissions;
 	}
-
+	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
+		return accessPermissions;
+	}
 }

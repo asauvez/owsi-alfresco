@@ -6,7 +6,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class RepositoryPermission implements Serializable {
-
+	
 	public static final RepositoryPermission ADD_CHILDREN = new RepositoryPermission("AddChildren");
 
 	public static final RepositoryPermission READ_PROPERTIES = new RepositoryPermission("ReadProperties");
@@ -19,6 +19,17 @@ public class RepositoryPermission implements Serializable {
 
 	public static final RepositoryPermission READ_CONTENT = new RepositoryPermission("ReadContent");
 	public static final RepositoryPermission WRITE_CONTENT = new RepositoryPermission("WriteContent");
+	
+	public static final RepositoryPermission COORDINATOR = new RepositoryPermission("Coordinator");
+	public static final RepositoryPermission COLLABORATOR = new RepositoryPermission("Collaborator");
+	public static final RepositoryPermission CONTRIBUTOR = new RepositoryPermission("Contributor");
+	public static final RepositoryPermission EDITOR = new RepositoryPermission("Editor");
+	public static final RepositoryPermission CONSUMER = new RepositoryPermission("Consumer");
+	
+	
+	
+	
+
 
 	private String name;
 	
@@ -54,5 +65,4 @@ public class RepositoryPermission implements Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getName());
-	}
-}
+	}}

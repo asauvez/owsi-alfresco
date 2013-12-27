@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -72,40 +71,32 @@ public class NodeModelServiceImpl implements NodeModelService {
 	@Override
 	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Resource content) throws DuplicateChildNameException {
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
-				.property(CmModel.content.content, new RepositoryContentData(mimeType, encoding)),
-			content);
+				.property(CmModel.content.content, new RepositoryContentData(mimeType, encoding))
+				.contentResource(content));
 	}
 
 	@Override
-	public NodeReference createContent(NodeReference parent, final MultipartFile file) throws DuplicateChildNameException, IOException {
-		Resource resource = new InputStreamResource(file.getInputStream()) {
-			@Override
-			public long contentLength() throws IOException {
-				return file.getSize();
-			}
-		};
-		String filename = FilenameUtils.getName(file.getOriginalFilename());
-		return createContent(parent, filename, file.getContentType(), null, resource);
+	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNameException, IOException {
+		String fileName = FilenameUtils.getName(file.getOriginalFilename());
+		return create(new BusinessNode(parentRef, CmModel.content, fileName)
+			.property(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
+			.contentResource(file.getInputStream(), file.getSize()));
 	}
 
 	@Override
 	public NodeReference create(BusinessNode node) throws DuplicateChildNameException {
-		return create(node, null);
+		return nodeService.create(node.getRepositoryNode());
 	}
-	
+
 	@Override
-	public NodeReference create(BusinessNode node, Resource content) throws DuplicateChildNameException {
-		return nodeService.create(node.getRepositoryNode(), content);
+	public void update(BusinessNode node) {
+		update(node, new NodeFetchDetailsBuilder()
+				.fromNode(node));
 	}
 
 	@Override
 	public void update(BusinessNode node, NodeFetchDetailsBuilder details) {
-		update(node, details, null);
-	}
-
-	@Override
-	public void update(BusinessNode node, NodeFetchDetailsBuilder details, Resource content) {
-		nodeService.update(node.getRepositoryNode(), details.getDetails(), content);
+		nodeService.update(node.getRepositoryNode(), details.getDetails());
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptRequest;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
@@ -16,7 +17,7 @@ import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.TARGET
 public class TargetAssocNodeWebScript extends AbstractNodeWebScript<List<RepositoryNode>, TARGET_ASSOC_NODE_SERVICE> {
 
 	@Override
-	protected List<RepositoryNode> executeImpl(Resource content, TARGET_ASSOC_NODE_SERVICE parameter, Status status, Cache cache) throws RepositoryRemoteException {
+	protected List<RepositoryNode> executeImpl(Resource content, TARGET_ASSOC_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
 		return nodeService.getTargetAssocs(parameter.nodeReference, parameter.assocName, parameter.nodeFetchDetails);
 	}
 

@@ -1,12 +1,22 @@
 package fr.openwide.alfresco.component.model.node.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 
 import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
@@ -75,7 +85,7 @@ public class BusinessNode {
 		return getContentString(CmModel.content.content);
 	}
 	public String getContentString(ContentPropertyModel propertyModel) {
-		return node.getContentStrings().get(propertyModel);
+		return node.getContentStrings().get(propertyModel.getNameReference());
 	}
 	public BusinessNode contentString(String content) {
 		return contentString(CmModel.content.content, content);
@@ -85,6 +95,26 @@ public class BusinessNode {
 		return this;
 	}
 	
+
+	public BusinessNode contentResource(File file) {
+		return contentResource(new FileSystemResource(file));
+	}
+	public BusinessNode contentResource(InputStream input, final long contentLength) {
+		return contentResource(new InputStreamResource(input) {
+			@Override
+			public long contentLength() throws IOException {
+				return contentLength;
+			}
+		});
+	}
+	public BusinessNode contentResource(Resource content) {
+		return contentResource(CmModel.content.content, content);
+	}
+	public BusinessNode contentResource(ContentPropertyModel property, Resource content) {
+		node.getContentResources().put(property.getNameReference(), content);
+		return this;
+	}
+
 	public String getName() {
 		return getProperty(CmModel.object.name);
 	}
@@ -98,6 +128,13 @@ public class BusinessNode {
 	}
 	public BusinessNode userPermission(RepositoryPermission permission) {
 		node.getUserPermissions().add(permission);
+		return this;
+	}
+	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
+		return node.getAccessPermissions();
+	}
+	public BusinessNode addAccessPermission(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
+		node.getAccessPermissions().add(new RepositoryAuthorityPermission(authority, permission, allowed));
 		return this;
 	}
 

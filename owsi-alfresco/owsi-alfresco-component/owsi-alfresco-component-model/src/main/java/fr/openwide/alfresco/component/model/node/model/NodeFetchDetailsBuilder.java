@@ -4,6 +4,7 @@ import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyM
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 
 /**
@@ -19,6 +20,16 @@ public class NodeFetchDetailsBuilder {
 		return details;
 	}
 
+	public NodeFetchDetailsBuilder fromNode(BusinessNode node) {
+		RepositoryNode repositoryNode = node.getRepositoryNode();
+		if (repositoryNode.getType() != null) type();
+		if (node.getPrimaryParent() != null) primaryParent();
+		
+		details.getProperties().addAll(repositoryNode.getProperties().keySet());
+		details.getContentStrings().addAll(repositoryNode.getContentStrings().keySet());
+		return this;
+	}
+	
 	public NodeFetchDetailsBuilder nodeReference() {
 		details.setNodeReference(true);
 		return this;
@@ -60,6 +71,11 @@ public class NodeFetchDetailsBuilder {
 		details.getUserPermissions().add(permission);
 		return this;
 	}
+	public NodeFetchDetailsBuilder accessPermissions() {
+		details.setAccessPermissions(true);
+		return this;
+	}
+	
 
 	public NodeFetchDetailsBuilder primaryParent() {
 		NodeFetchDetailsBuilder primaryParent = new NodeFetchDetailsBuilder();

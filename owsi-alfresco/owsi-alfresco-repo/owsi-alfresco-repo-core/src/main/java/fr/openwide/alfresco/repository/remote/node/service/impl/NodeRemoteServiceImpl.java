@@ -3,12 +3,16 @@ package fr.openwide.alfresco.repository.remote.node.service.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -18,7 +22,10 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -27,6 +34,8 @@ import org.springframework.core.io.Resource;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
@@ -40,6 +49,8 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private NodeService nodeService;
 	private ContentService contentService;
 	private PermissionService permissionService;
+	private AuthenticationService authenticationService;
+	private AuthorityService authorityService;
 
 	private ConversionService conversionService;
 
@@ -145,28 +156,36 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				node.getUserPermissions().add(permission);
 			}
 		}
+		if (details.isAccessPermissions()) {
+			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
+				node.getAccessPermissions().add(new RepositoryAuthorityPermission(
+						new RepositoryAuthority(accessPermission.getAuthority()),
+						new RepositoryPermission(accessPermission.getPermission()),
+						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
+			}
+		}
 		return node;
 	}
 	
 	@Override
-	public NodeReference create(RepositoryNode node, Resource content) throws DuplicateChildNameException {
+	public NodeReference create(RepositoryNode node) throws DuplicateChildNameException {
 		if (node.getNodeReference() != null) {
-			throw new IllegalArgumentException("La node est déjà persistée.");
+			throw new IllegalArgumentException("La node est déjà persistée");
 		}
 		
 		String cmName = (String) node.getProperties().get(conversionService.convert(ContentModel.PROP_NAME));
 		if (cmName == null) {
-			throw new IllegalArgumentException("Vous devez fournir un cm:name.");
+			throw new IllegalArgumentException("Vous devez fournir un cm:name");
 		}
 		
 		NodeReference parentRef = node.getPrimaryParent().getNodeReference();
 		if (parentRef == null) {
-			throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent.");
+			throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent");
 		}
 
 		NameReference type = node.getType();
 		if (type == null) {
-			throw new IllegalArgumentException("Vous devez fournir le type du noeud.");
+			throw new IllegalArgumentException("Vous devez fournir le type du noeud");
 		}
 		
 		Map<QName, Serializable> properties = new LinkedHashMap<QName, Serializable>();
@@ -191,7 +210,8 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				nodeService.addAspect(nodeRef, conversionService.convert(aspectName), null);
 			}
 	
-			setContents(nodeRef, node, content);
+			setContents(nodeRef, node);
+			setPermissions(nodeRef, node);
 	
 			return conversionService.convert(nodeRef);
 		} catch (DuplicateChildNodeNameException e) {
@@ -200,7 +220,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details, Resource content) {
+	public void update(RepositoryNode node, NodeFetchDetails details) {
 		if (node.getNodeReference() == null) {
 			throw new IllegalArgumentException("La node n'est pas persistée.");
 		}
@@ -213,13 +233,14 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (details.getPrimaryParent() != null) {
 			NodeReference parentRef = node.getPrimaryParent().getNodeReference();
 			if (parentRef == null) {
-				throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent.");
+				throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent");
 			}
 			String cmName = (String) node.getProperties().get(conversionService.convert(ContentModel.PROP_NAME));
 			if (cmName == null) {
-				throw new IllegalArgumentException("Vous devez fournir un cm:name.");
-			}			
-			nodeService.moveNode(nodeRef, conversionService.convert(parentRef), ContentModel.ASSOC_CONTAINS, 
+				throw new IllegalArgumentException("Vous devez fournir un cm:name");
+			}
+			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
+			nodeService.moveNode(nodeRef, conversionService.convert(parentRef), primaryParent.getTypeQName(), 
 					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
 		}
 		
@@ -252,37 +273,103 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		
-		setContents(nodeRef, node, content);
+		setContents(nodeRef, node);
+		if (details.isAccessPermissions()) {
+			setPermissions(nodeRef, node);
+		}
 	}
 
 	private void saveOrUpdate(RepositoryNode node, NodeFetchDetails details) {
 		if (node.getNodeReference() == null) {
 			try {
-				create(node, null);
+				create(node);
 			} catch (DuplicateChildNameException e) {
 				throw new IllegalArgumentException(e);
 			}
 		} else {
-			update(node, details, null);
+			update(node, details);
 		}
 	}
 	
-	private void setContents(NodeRef nodeRef, RepositoryNode node, Resource contentResource) {
+	private void setPermissions(NodeRef nodeRef, RepositoryNode node) {
+		Set<RepositoryAuthorityPermission> newPermissions = node.getAccessPermissions();
+		Set<RepositoryAuthorityPermission> oldPermissions = new HashSet<RepositoryAuthorityPermission>();
+		for (AccessPermission oldPermission : permissionService.getAllSetPermissions(nodeRef)) {
+			if (oldPermission.isSetDirectly()) {
+				oldPermissions.add(new RepositoryAuthorityPermission(
+						new RepositoryAuthority(oldPermission.getAuthority()),
+						new RepositoryPermission(oldPermission.getPermission()),
+						oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
+			}
+		}
+		
+		final String userName = authenticationService.getCurrentUserName();
+		Set<String> userAuthorities = AuthenticationUtil.runAs(new RunAsWork<Set<String>>() {
+			@Override
+			public Set<String> doWork() throws Exception {
+				return authorityService.getAuthoritiesForUser(userName);
+			}
+		}, AuthenticationUtil.getSystemUserName());
+		
+		// ajout des nouvelles permissions
+		for (RepositoryAuthorityPermission newPermission : newPermissions) {
+			if (! oldPermissions.contains(newPermission)) {
+				permissionService.setPermission(nodeRef, 
+						newPermission.getAuthority().getName(), 
+						newPermission.getPermission().getName(), 
+						newPermission.isAllowed());
+			}
+		}
+		
+		// parcours des anciennes permissions à enlever qui ne concerne pas l'utilisateur connecté
+		List<RepositoryAuthorityPermission> remainingPermissions = new ArrayList<RepositoryAuthorityPermission>();
+		for (RepositoryAuthorityPermission oldPermission : oldPermissions) {
+			if (! newPermissions.contains(oldPermission)) {
+				if (! userAuthorities.contains(oldPermission.getAuthority())) {
+					permissionService.deletePermission(nodeRef, oldPermission.getAuthority().getName(), oldPermission.getPermission().getName());
+				} else {
+					// stocke temporairement
+					remainingPermissions.add(oldPermission);
+				}
+			}
+		}
+		
+		// suppression des anciennes permissions en trop pour l'utilisateur connecté
+		// En premier permissions non admin, histoire que l'on est encore les droits de supprimer les autres
+		for (RepositoryAuthorityPermission oldPermission : remainingPermissions) {
+			if (! isPermissionControl(oldPermission.getPermission().getName())) {
+				permissionService.deletePermission(nodeRef, oldPermission.getAuthority().getName(), oldPermission.getPermission().getName());
+			}
+		}
+		// En deuxième, permissions admin
+		for (RepositoryAuthorityPermission oldPermission : remainingPermissions) {
+			if (isPermissionControl(oldPermission.getPermission().getName())) {
+				permissionService.deletePermission(nodeRef, oldPermission.getAuthority().getName(), oldPermission.getPermission().getName());
+			}
+		}
+	}
+	
+	private boolean isPermissionControl(String permission) {
+		return PermissionService.COORDINATOR.equals(permission)
+				|| PermissionService.CHANGE_PERMISSIONS.equals(permission)
+				|| PermissionService.FULL_CONTROL.equals(permission)
+				|| PermissionService.ALL_PERMISSIONS.equals(permission);
+	}
+
+	
+	private void setContents(NodeRef nodeRef, RepositoryNode node) {
 		for (Entry<NameReference, String> entry : node.getContentStrings().entrySet()) {
-			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().remove(entry.getKey());
+			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(entry.getKey());
 			setContent(nodeRef, entry.getKey(), 
 					(contentData != null) ? contentData : new RepositoryContentData(), 
 					null, entry.getValue());
 		}
 		
-		for (Entry<NameReference, Serializable> entry : node.getProperties().entrySet()) {
-			Serializable value = entry.getValue();
-			if (value instanceof RepositoryContentData) {
-				if (contentResource == null) {
-					throw new IllegalArgumentException("Une resource n'a pas été fourni : " + entry.getKey());
-				}
-				setContent(nodeRef, entry.getKey(), (RepositoryContentData) value, contentResource, null);
-			}
+		for (Entry<NameReference, Resource> entry : node.getContentResources().entrySet()) {
+			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(entry.getKey());
+			setContent(nodeRef, entry.getKey(), 
+					(contentData != null) ? contentData : new RepositoryContentData(), 
+					entry.getValue(), null);
 		}
 	}
 	
@@ -319,6 +406,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			if (contentData.getEncoding() == null) {
 				writer.guessEncoding();
 			}
+			// Nécessaire, car non mis à jour après putContent.
 			nodeService.setProperty(nodeRef, qname, writer.getContentData());
 		}
 	}
@@ -340,5 +428,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
+	}
+	public void setAuthenticationService(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
+	public void setAuthorityService(AuthorityService authorityService) {
+		this.authorityService = authorityService;
 	}
 }

@@ -25,6 +25,7 @@ public class NodeFetchDetails implements Serializable {
 	private Map<NameReference, NodeFetchDetails> sourceAssocs = new HashMap<>();
 	
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
+	private boolean accessPermissions;
 
 	public boolean isNodeReference() {
 		return nodeReference;
@@ -67,5 +68,11 @@ public class NodeFetchDetails implements Serializable {
 	public Set<RepositoryPermission> getUserPermissions() {
 		return userPermissions;
 	}
-
+	public boolean isAccessPermissions() {
+		return accessPermissions;
+	}
+	public void setAccessPermissions(boolean accessPermissions) {
+		this.accessPermissions = accessPermissions;
+	}
+	
 }
