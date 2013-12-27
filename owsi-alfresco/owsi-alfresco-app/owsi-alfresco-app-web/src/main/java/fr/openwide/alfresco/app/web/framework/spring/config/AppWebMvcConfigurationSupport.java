@@ -141,11 +141,19 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		return new StandardServletMultipartResolver();
 	}
 
+	public void addMessageSourcePath(List<String> paths) {
+		paths.add("i18n/messages");
+		paths.add("i18n/pdf-viewer");
+	}
+
 	@Bean
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 		messageSource.setDefaultEncoding("UTF-8");
-		messageSource.setBasenames("i18n/messages");
+		
+		List<String> paths = new ArrayList<>();
+		addMessageSourcePath(paths);
+		messageSource.setBasenames(paths.toArray(new String[paths.size()]));
 		return messageSource;
 	}
 

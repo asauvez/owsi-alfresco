@@ -83,4 +83,9 @@
 		</attribute>
 	</tag>
 
+	<tag-file>
+		<name>pdfView</name>
+		<path>/META-INF/tags/pdfView.tag</path>
+	</tag-file>
+
 </taglib>
