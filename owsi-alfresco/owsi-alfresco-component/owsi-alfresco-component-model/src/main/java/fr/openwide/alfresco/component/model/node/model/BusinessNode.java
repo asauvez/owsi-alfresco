@@ -27,6 +27,13 @@ public class BusinessNode {
 		this.node = node;
 	}
 
+	public BusinessNode(NodeReference parentRef, TypeModel type, String name) {
+		this();
+		primaryParentRef(parentRef);
+		type(type);
+		name(name);
+	}
+
 	public RepositoryNode getRepositoryNode() {
 		return node;
 	}

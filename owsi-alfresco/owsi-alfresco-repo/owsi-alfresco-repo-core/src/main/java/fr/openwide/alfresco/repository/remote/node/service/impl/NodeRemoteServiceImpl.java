@@ -163,6 +163,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (parentRef == null) {
 			throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent.");
 		}
+
+		NameReference type = node.getType();
+		if (type == null) {
+			throw new IllegalArgumentException("Vous devez fournir le type du noeud.");
+		}
 		
 		Map<QName, Serializable> properties = new LinkedHashMap<QName, Serializable>();
 		for (Entry<NameReference, Serializable> property : node.getProperties().entrySet()) {
@@ -179,7 +184,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					 conversionService.convert(parentRef), 
 					ContentModel.ASSOC_CONTAINS, 
 					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()), 
-					conversionService.convert(node.getType()), 
+					conversionService.convert(type), 
 					properties).getChildRef();
 			
 			for (NameReference aspectName : node.getAspects()) {
@@ -283,10 +288,19 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	
 	private void setContent(NodeRef nodeRef, NameReference propertyName, RepositoryContentData contentData, 
 			Resource contentResource, String contentString) {
-		ContentWriter writer = contentService.getWriter(nodeRef, 
-				conversionService.convert(propertyName), 
-				false);
-		
+		QName qname = conversionService.convert(propertyName);
+		ContentWriter writer = contentService.getWriter(nodeRef, qname, true);
+
+		if (contentData.getMimetype() != null) {
+			writer.setMimetype(contentData.getMimetype());
+		}
+		if (contentData.getEncoding() != null) {
+			writer.setEncoding(contentData.getEncoding());
+		}
+		if (contentData.getLocale() != null) {
+			writer.setLocale(contentData.getLocale());
+		}
+
 		if (contentString != null) {
 			writer.putContent(contentString);
 		} else {
@@ -297,19 +311,15 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		
-		if (contentData.getMimetype() != null) {
-			writer.setMimetype(contentData.getMimetype());
-		} else {
-			String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-			writer.guessMimetype(cmName);
-		}
-		if (contentData.getEncoding() != null) {
-			writer.setEncoding(contentData.getEncoding());
-		} else {
-			writer.guessEncoding();
-		}
-		if (contentData.getLocale() != null) {
-			writer.setLocale(contentData.getLocale());
+		if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
+			if (contentData.getMimetype() == null) {
+				String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+				writer.guessMimetype(cmName);
+			}
+			if (contentData.getEncoding() == null) {
+				writer.guessEncoding();
+			}
+			nodeService.setProperty(nodeRef, qname, writer.getContentData());
 		}
 	}
 

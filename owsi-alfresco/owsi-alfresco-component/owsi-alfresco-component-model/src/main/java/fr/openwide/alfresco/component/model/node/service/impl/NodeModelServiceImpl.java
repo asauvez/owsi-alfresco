@@ -66,18 +66,12 @@ public class NodeModelServiceImpl implements NodeModelService {
 	
 	@Override
 	public NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNameException {
-		return create(new BusinessNode()
-			.primaryParentRef(parentRef)
-			.type(CmModel.folder)
-			.name(folderName));
+		return create(new BusinessNode(parentRef, CmModel.folder, folderName));
 	}
 
 	@Override
 	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Resource content) throws DuplicateChildNameException {
-		return create(new BusinessNode()
-				.primaryParentRef(parentRef)
-				.type(CmModel.content)
-				.name(fileName)
+		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 				.property(CmModel.content.content, new RepositoryContentData(mimeType, encoding)),
 			content);
 	}
