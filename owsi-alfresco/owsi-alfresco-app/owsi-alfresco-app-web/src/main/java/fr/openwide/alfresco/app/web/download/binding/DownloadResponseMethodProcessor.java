@@ -95,14 +95,14 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			
 			// get filename
 			String fileName;
-			if (download.getAttachementContentName() == null) {
+			if (download.getAttachementName() == null) {
 				fileName = FilenameUtils.getName(request.getRequestURI());
 			} else {
-				String extension = FilenameUtils.getExtension(download.getAttachementContentName());
+				String extension = FilenameUtils.getExtension(download.getAttachementName());
 				if (StringUtils.hasText(extension)) {
-					fileName = StringUtils.urlize(FilenameUtils.getBaseName(download.getAttachementContentName())) + "." + StringUtils.urlize(extension);
+					fileName = StringUtils.urlize(FilenameUtils.getBaseName(download.getAttachementName())) + "." + StringUtils.urlize(extension);
 				} else {
-					fileName = StringUtils.urlize(FilenameUtils.getName(download.getAttachementContentName()));
+					fileName = StringUtils.urlize(FilenameUtils.getName(download.getAttachementName()));
 				}
 			}
 			

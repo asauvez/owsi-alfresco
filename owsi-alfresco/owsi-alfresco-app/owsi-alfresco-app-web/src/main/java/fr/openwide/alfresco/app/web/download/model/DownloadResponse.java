@@ -6,7 +6,7 @@ import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
 public abstract class DownloadResponse {
 
 	private boolean attachement = true;
-	private String attachementContentName;
+	private String attachementName;
 	
 	private AlertContainer alertContainer = new AlertContainer();
 	
@@ -28,11 +28,11 @@ public abstract class DownloadResponse {
 		return this;
 	}
 
-	public String getAttachementContentName() {
-		return attachementContentName;
+	public String getAttachementName() {
+		return attachementName;
 	}
-	public DownloadResponse attachementContentName(String attachementContentName) {
-		this.attachementContentName = attachementContentName;
+	public DownloadResponse attachementName(String attachementName) {
+		this.attachementName = attachementName;
 		return this;
 	}
 }
