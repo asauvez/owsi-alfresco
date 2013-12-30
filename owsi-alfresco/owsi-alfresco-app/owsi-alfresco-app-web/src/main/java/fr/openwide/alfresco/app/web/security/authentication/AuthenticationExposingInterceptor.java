@@ -22,15 +22,17 @@ public class AuthenticationExposingInterceptor extends HandlerInterceptorAdapter
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
-		// add authentication
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		modelAndView.addObject(AUTHENTICATION_ATTRIBUTE_NAME, authentication);
-		// add user
-		BusinessUser user = (authentication != null) ? userService.getCurrentUser() : null;
-		modelAndView.addObject(USER_ATTRIBUTE_NAME, user);
-		// add can logout
-		boolean canLogout = (authentication != null) ? (authentication instanceof UsernamePasswordAuthenticationToken) : false;
-		modelAndView.addObject(CAN_LOGOUT_ATTRIBUTE_NAME, canLogout);
+		if (modelAndView != null) {
+			// add authentication
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			modelAndView.addObject(AUTHENTICATION_ATTRIBUTE_NAME, authentication);
+			// add user
+			BusinessUser user = (authentication != null) ? userService.getCurrentUser() : null;
+			modelAndView.addObject(USER_ATTRIBUTE_NAME, user);
+			// add can logout
+			boolean canLogout = (authentication != null) ? (authentication instanceof UsernamePasswordAuthenticationToken) : false;
+			modelAndView.addObject(CAN_LOGOUT_ATTRIBUTE_NAME, canLogout);
+		}
 	}
 
 	public void setUserService(UserService userService) {
