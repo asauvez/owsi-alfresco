@@ -34,8 +34,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.web.download.binding.DownloadResponseMethodProcessor;
-import fr.openwide.alfresco.app.web.framework.spring.converter.NameReferenceConverter;
-import fr.openwide.alfresco.app.web.framework.spring.converter.NodeReferenceConverter;
+import fr.openwide.alfresco.app.web.framework.spring.binding.NameReferenceFormatter;
+import fr.openwide.alfresco.app.web.framework.spring.binding.NodeReferenceFormatter;
 import fr.openwide.alfresco.app.web.framework.spring.interceptor.ExceptionLoggerHandlerInterceptor;
 import fr.openwide.alfresco.app.web.security.authentication.AuthenticationExposingInterceptor;
 import fr.openwide.alfresco.app.web.validation.binding.AlertContainerMethodArgumentResolver;
@@ -75,8 +75,8 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	@Override
 	protected void addFormatters(FormatterRegistry registry) {
 		super.addFormatters(registry);
-		registry.addConverter(new NodeReferenceConverter());
-		registry.addConverter(new NameReferenceConverter());
+		registry.addFormatter(new NameReferenceFormatter());
+		registry.addFormatter(new NodeReferenceFormatter());
 	}
 	
 	@Bean
