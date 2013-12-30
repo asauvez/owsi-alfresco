@@ -5,9 +5,10 @@ import java.util.Locale;
 
 import org.springframework.format.Formatter;
 
+import fr.openwide.alfresco.app.core.node.model.NodeReferenceAware;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-public abstract class NodeReferenceBasedFormatter<T> implements Formatter<T> {
+public abstract class NodeReferenceAwareFormatter<T extends NodeReferenceAware> implements Formatter<T> {
 
 	private NodeReferenceFormatter nodeReferenceFormatter = new NodeReferenceFormatter();
 
@@ -17,14 +18,11 @@ public abstract class NodeReferenceBasedFormatter<T> implements Formatter<T> {
 		return parse(nodeReference);
 	}
 
-	protected abstract T parse(NodeReference source);
+	protected abstract T parse(NodeReference source) throws ParseException;
 
 	@Override
 	public String print(T object, Locale locale) {
-		NodeReference nodeReference = format(object);
-		return nodeReferenceFormatter.print(nodeReference, locale);
+		return nodeReferenceFormatter.print(object.getNodeReference(), locale);
 	}
-
-	protected abstract NodeReference format(T source);
 
 }
