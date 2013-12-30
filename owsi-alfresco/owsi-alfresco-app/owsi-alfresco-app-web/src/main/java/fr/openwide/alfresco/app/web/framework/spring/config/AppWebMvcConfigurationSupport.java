@@ -32,10 +32,12 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.web.download.binding.DownloadResponseMethodProcessor;
 import fr.openwide.alfresco.app.web.framework.spring.converter.NameReferenceConverter;
 import fr.openwide.alfresco.app.web.framework.spring.converter.NodeReferenceConverter;
 import fr.openwide.alfresco.app.web.framework.spring.interceptor.ExceptionLoggerHandlerInterceptor;
+import fr.openwide.alfresco.app.web.security.authentication.AuthenticationExposingInterceptor;
 import fr.openwide.alfresco.app.web.validation.binding.AlertContainerMethodArgumentResolver;
 import fr.openwide.alfresco.app.web.validation.binding.ValidationResponseMethodProcessor;
 
@@ -45,6 +47,8 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	private Environment environment;
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
+	@Autowired
+	private UserService userService;
 
 	@Override
 	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -62,6 +66,10 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		registry.addWebRequestInterceptor(openEntityManagerInView);
 		// add exception logger
 		registry.addInterceptor(new ExceptionLoggerHandlerInterceptor());
+		// add authentication details
+		AuthenticationExposingInterceptor authenticationExposing = new AuthenticationExposingInterceptor();
+		authenticationExposing.setUserService(userService);
+		registry.addInterceptor(authenticationExposing);
 	}
 
 	@Override
