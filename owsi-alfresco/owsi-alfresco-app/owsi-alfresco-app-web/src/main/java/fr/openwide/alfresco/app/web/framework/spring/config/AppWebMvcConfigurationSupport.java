@@ -15,7 +15,6 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.web.method.annotation.ModelMethodProcessor;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.multipart.MultipartResolver;
@@ -34,6 +33,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.web.download.binding.DownloadResponseMethodProcessor;
+import fr.openwide.alfresco.app.web.framework.spring.binding.HandlerInterceptorAwareModelMethodProcessor;
 import fr.openwide.alfresco.app.web.framework.spring.binding.NameReferenceFormatter;
 import fr.openwide.alfresco.app.web.framework.spring.binding.NodeReferenceFormatter;
 import fr.openwide.alfresco.app.web.framework.spring.interceptor.ExceptionLoggerHandlerInterceptor;
@@ -109,7 +109,7 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		exceptionHandlerExceptionResolver.setMessageConverters(getMessageConverters());
 		// add custom argument resolvers
 		List<HandlerMethodArgumentResolver> argumentResolvers = new ArrayList<HandlerMethodArgumentResolver>();
-		argumentResolvers.add(new ModelMethodProcessor());
+		argumentResolvers.add(new HandlerInterceptorAwareModelMethodProcessor(getInterceptors()));
 		argumentResolvers.add(validationResponseMethodProcessor());
 		argumentResolvers.add(new AlertContainerMethodArgumentResolver());
 		exceptionHandlerExceptionResolver.setCustomArgumentResolvers(argumentResolvers);
