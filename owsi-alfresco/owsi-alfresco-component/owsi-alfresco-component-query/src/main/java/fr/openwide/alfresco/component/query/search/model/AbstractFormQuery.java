@@ -28,7 +28,7 @@ public abstract class AbstractFormQuery<I> {
 		}
 	}
 
-	public void initFields(@SuppressWarnings("unused") InputFieldBuilder builder) {
+	public void initFields(InputFieldBuilder builder) {
 		// to override
 	}
 
@@ -40,16 +40,16 @@ public abstract class AbstractFormQuery<I> {
 		return pagination;
 	}
 
-	public boolean filterResult(@SuppressWarnings("unused") I item) {
+	public boolean filterResult(I item) {
 		// to override
 		return true;
 	}
 
-	public void initResult(@SuppressWarnings("unused") FormQueryResult<I> result) {
+	public void initResult(FormQueryResult<I> result) {
 		// to override
 	}
 
-	public void validate(@SuppressWarnings("unused") Errors errors) {
+	public void validate(Errors errors) {
 		// to override
 	}
 }

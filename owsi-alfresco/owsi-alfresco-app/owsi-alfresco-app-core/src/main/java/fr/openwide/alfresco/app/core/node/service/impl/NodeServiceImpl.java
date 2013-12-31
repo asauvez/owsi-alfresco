@@ -78,11 +78,11 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocName, NodeFetchDetails nodeFetchDetails) {
+	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails nodeFetchDetails) {
 		try {
 			CHILDREN_NODE_SERVICE request = new CHILDREN_NODE_SERVICE();
 			request.nodeReference = nodeReference;
-			request.childAssocName = childAssocName;
+			request.childAssocTypeName = childAssocTypeName;
 			request.nodeFetchDetails = nodeFetchDetails;
 			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			return repositoryRemoteBinding.exchangeCollection(CHILDREN_NODE_SERVICE.URL, 
@@ -92,7 +92,7 @@ public class NodeServiceImpl implements NodeService {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	@Override
 	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails) {
 		try {
@@ -168,7 +168,7 @@ public class NodeServiceImpl implements NodeService {
 		headers.add(CREATE_NODE_SERVICE.CONTENT_PROPERTY_HEADER, entry.getKey().getFullName());
 		Resource content = entry.getValue();
 		if (itResources.hasNext()) {
-			throw new IllegalArgumentException("Don't support more than one contentResource upload at a time");
+			throw new IllegalArgumentException("Service does not support more than one contentResource upload at a time");
 		}
 		return content;
 	}

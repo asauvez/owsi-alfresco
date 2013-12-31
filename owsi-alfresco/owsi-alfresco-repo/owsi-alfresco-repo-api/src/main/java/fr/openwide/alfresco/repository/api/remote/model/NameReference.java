@@ -2,10 +2,10 @@ package fr.openwide.alfresco.repository.api.remote.model;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
 public class NameReference implements Serializable {
@@ -20,7 +20,7 @@ public class NameReference implements Serializable {
 		namespace = it.next();
 		name = it.next();
 	}
-	
+
 	private NameReference(String namespace, String name) {
 		this.namespace = namespace;
 		this.name = name;
@@ -45,23 +45,31 @@ public class NameReference implements Serializable {
 	public String getFullName() {
 		return Joiner.on(":").join(namespace, name); 
 	}
-	
+
 	@Override
 	public String toString() {
 		return getFullName();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-        if (obj instanceof NameReference) {
-            return Objects.equal(getNamespace(), ((NameReference) obj).getNamespace())
-            	&& Objects.equal(getName(),      ((NameReference) obj).getName());
-        }
-        return false;
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		if (object == this) {
+			return true;
+		}
+		if (object instanceof NameReference) {
+			NameReference other = (NameReference) object;
+			return Objects.equals(getNamespace(), other.getNamespace())
+				&& Objects.equals(getName(), other.getName());
+		}
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getNamespace(), getName());
+		return Objects.hash(getNamespace(), getName());
 	}
+
 }

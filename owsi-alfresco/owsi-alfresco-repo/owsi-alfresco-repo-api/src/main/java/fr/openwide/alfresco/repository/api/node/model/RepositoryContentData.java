@@ -5,29 +5,29 @@ import java.util.Locale;
 
 public class RepositoryContentData implements Serializable {
 
+	private static final long serialVersionUID = 7234820018007664746L;
+
 	private String mimetype;
 	private String mimetypeDisplay;
 	private Long size;
 	private String encoding;
 	private Locale locale;
 
-	public RepositoryContentData() {
-	}
+	public RepositoryContentData() {}
 
 	public RepositoryContentData(String mimetype) {
 		this.mimetype = mimetype;
 	}
 
 	public RepositoryContentData(String mimetype, String encoding) {
-		this.mimetype = mimetype;
+		this(mimetype);
 		this.encoding = encoding;
 	}
 
 	public RepositoryContentData(String mimetype, String mimetypeDisplay, Long size, String encoding, Locale locale) {
-		this.mimetype = mimetype;
+		this(mimetype, encoding);
 		this.mimetypeDisplay = mimetypeDisplay;
 		this.size = size;
-		this.encoding = encoding;
 		this.locale = locale;
 	}
 
@@ -65,4 +65,5 @@ public class RepositoryContentData implements Serializable {
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
+
 }

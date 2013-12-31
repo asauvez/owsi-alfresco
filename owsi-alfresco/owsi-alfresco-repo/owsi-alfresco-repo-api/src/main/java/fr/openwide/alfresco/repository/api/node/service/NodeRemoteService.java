@@ -24,10 +24,10 @@ public interface NodeRemoteService {
 		public static final String URL = "/owsi/node/children";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public NodeReference nodeReference;
-		public NameReference childAssocName; 
+		public NameReference childAssocTypeName; 
 		public NodeFetchDetails nodeFetchDetails;
 	}
-	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocName, NodeFetchDetails nodeFetchDetails);
+	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails nodeFetchDetails);
 
 	class TARGET_ASSOC_NODE_SERVICE {
 		public static final String URL = "/owsi/node/targetassoc";

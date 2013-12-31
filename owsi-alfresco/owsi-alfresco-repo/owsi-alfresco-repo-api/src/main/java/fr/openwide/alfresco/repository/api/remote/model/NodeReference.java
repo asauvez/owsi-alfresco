@@ -1,30 +1,23 @@
 package fr.openwide.alfresco.repository.api.remote.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.base.Objects;
 
-/**
- * Reference vers un noeud.
- * 
- * Peut être stocké sous forme de chaîne et reconstruit.
- * 
- * @author asauvez
- */
 public class NodeReference implements Serializable {
 
 	private static final long serialVersionUID = -1502875087111354789L;
 
 	public static final Pattern PATTERN = Pattern.compile("(.+)://(.+)/(.+)");
-	
+
 	private final String reference;
 
 	private NodeReference(String reference) {
 		this.reference = reference;
 	}
-	
+
 	public static NodeReference create(String reference) {
 		return new NodeReference(reference);
 	}
@@ -40,15 +33,23 @@ public class NodeReference implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-        if (obj instanceof NodeReference) {
-            return Objects.equal(getReference(), ((NodeReference) obj).getReference());
-        }
-        return false;
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		if (object == this) {
+			return true;
+		}
+		if (object instanceof NodeReference) {
+			NodeReference other = (NodeReference) object;
+			return Objects.equals(getReference(), other.getReference());
+		}
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getReference());
+		return Objects.hash(getReference());
 	}
+
 }

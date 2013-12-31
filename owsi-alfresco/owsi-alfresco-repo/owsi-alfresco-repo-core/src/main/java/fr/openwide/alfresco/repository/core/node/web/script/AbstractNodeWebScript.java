@@ -1,5 +1,4 @@
-package fr.openwide.alfresco.repository.remote.node.web.script;
-
+package fr.openwide.alfresco.repository.core.node.web.script;
 
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractResourceRemoteWebScript;

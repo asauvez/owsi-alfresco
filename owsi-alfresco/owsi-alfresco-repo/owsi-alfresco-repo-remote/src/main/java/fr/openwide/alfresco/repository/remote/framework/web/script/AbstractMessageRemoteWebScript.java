@@ -9,14 +9,14 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.JavaType;
 
-import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 /**
  * Base class for web services that provide automatic one argument handling. Payload must be a unique object in message body,
  * serialized with Jackson and of type « P »
  */
-public abstract class AbstractPayloadRemoteWebScript<R, P> extends AbstractRemoteWebScript<R> {
+public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemoteWebScript<R> {
 
 	@Override
 	protected R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws RepositoryRemoteException {
@@ -35,7 +35,7 @@ public abstract class AbstractPayloadRemoteWebScript<R, P> extends AbstractRemot
 			
 			return parameter;
 		} catch (IOException e) {
-			throw new InvalidPayloadRemoteException("Failed to parse argument of type " + getParameterType(), e);
+			throw new InvalidMessageRemoteException("Failed to parse argument of type " + getParameterType(), e);
 		}
 	}
 
@@ -47,10 +47,7 @@ public abstract class AbstractPayloadRemoteWebScript<R, P> extends AbstractRemot
 
 	/**
 	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and null is passed
-	 * as the payload to
-	 * {@link AbstractRemoteWebScript#executeImpl(WebScriptRequest, WebScriptResponse, Status, Cache)}
-	 * 
-	 * @return
+	 * as the payload to {@link AbstractRemoteWebScript#executeImpl(WebScriptRequest, WebScriptResponse, Status, Cache)}
 	 */
 	protected abstract JavaType getParameterType();
 

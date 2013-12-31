@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.remote.framework.web.script;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.UserTransaction;
@@ -22,8 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.IllegalStateRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 /**
  * Base class which handle web-service returning one object of type R and Serializable.
@@ -47,7 +49,7 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 	protected ObjectMapper objectMapper;
 
 	@Override
-	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
+	public final void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		// retrieve requested format
 		String format = req.getFormat();
 		if (! WebScriptResponse.JSON_FORMAT.equals(format)) {
@@ -63,43 +65,47 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		Cache cache = new Cache(getDescription().getRequiredCache());
 		Object model;
 		int statusCode;
-		// may be null
-		UserTransaction txn = RetryingTransactionHelper.getActiveUserTransaction();
 		try {
 			model = executeImpl(req, res, status, cache);
 			if (model == null && status.getCode() == HttpServletResponse.SC_OK) {
 				status.setCode(Status.STATUS_NO_CONTENT);
 			}
 			statusCode = status.getCode();
-		} catch (AccessDeniedRemoteException | AccessDeniedException  e) {
-			model = e;
+		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
+			setActiveUserTransactionRollbackOnly(e);
 			logger.warn("Could not get access", e);
+			model = e;
 			statusCode = Status.STATUS_FORBIDDEN;
-			res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, e.getClass().getName());
-			setRollbackOnly(txn, e);
-		} catch (InvalidPayloadRemoteException e) {
-			model = e;
-			logger.warn("Could not extract payload: " + e.getMessage(), e);
+			setExceptionHeader(res, model);
+		} catch (InvalidPayloadException e) {
+			setActiveUserTransactionRollbackOnly(e);
+			String message = buildExceptionMessage("Could not use payload", e);
+			logger.warn(message, e);
+			// any invalid payload exception is encapsulated inside InvalidMessageRemoteException which can be serialized
+			model = new InvalidMessageRemoteException(message, e);
 			statusCode = Status.STATUS_BAD_REQUEST;
-			res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, e.getClass().getName());
-			setRollbackOnly(txn, e);
-		} catch (RepositoryRemoteException e) {
+			setExceptionHeader(res, model);
+		} catch (InvalidMessageRemoteException e) {
+			setActiveUserTransactionRollbackOnly(e);
+			logger.warn("Could not parse message", e);
 			model = e;
-			logger.warn("Could not execute request: " + e.getMessage(), e);
+			statusCode = Status.STATUS_BAD_REQUEST;
+			setExceptionHeader(res, model);
+		} catch (RepositoryRemoteException e) {
+			setActiveUserTransactionRollbackOnly(e);
+			logger.warn("Could not execute request", e);
+			model = e;
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
-			res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, e.getClass().getName());
-			setRollbackOnly(txn, e);
+			setExceptionHeader(res, model);
 		} catch (Throwable e) {
-			// any unexpected exception is encapsulated inside RemoteUnknownException which can be serialized
-			// concatenate cause message because cause is not serialized
-			String message = "Unexpected error occured: " + e.getMessage();
+			setActiveUserTransactionRollbackOnly(e);
+			// any unexpected exception is encapsulated inside IllegalStateRemoteException which can be serialized
+			String message = buildExceptionMessage("Unexpected error occured", e);
 			logger.error(message, e);
 			model = new IllegalStateRemoteException(message, e);
-			res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, model.getClass().getName());
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
-			setRollbackOnly(txn, (Throwable) model);
+			setExceptionHeader(res, model);
 		}
-		
 		// is a redirect to a status specific template required?
 		if (status.getRedirect()) {
 			throw new WebScriptException("Web Script redirection is not supported");
@@ -134,12 +140,27 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		}
 	}
 
-	protected void setRollbackOnly(UserTransaction txn, Throwable e) {
+	protected static void setExceptionHeader(WebScriptResponse res, Object model) {
+		res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, model.getClass().getName());
+	}
+
+	protected static String buildExceptionMessage(String prefix, Throwable e) {
+		StringBuilder message = new StringBuilder(prefix).append(": ").append(e.getMessage());
+		if (e.getSuppressed() != null) {
+			message.append("; Suppressed: ").append(Arrays.toString(e.getSuppressed()));
+		}
+		if (e.getCause() != null) {
+			message.append("; Caused by: ").append(e.getCause());
+		}
+		return message.toString();
+	}
+
+	protected static void setActiveUserTransactionRollbackOnly(Throwable e) {
+		UserTransaction txn = RetryingTransactionHelper.getActiveUserTransaction();
 		if (txn != null) {
 			try {
 				txn.setRollbackOnly();
 			} catch (Throwable se) {
-				logger.error("Could not rollback transaction", se);
 				e.addSuppressed(se);
 			}
 		}
@@ -147,16 +168,16 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	protected String getParameter(WebScriptRequest req, String name, String defaultValue) {
 		String value = req.getParameter(name);
-		if (!StringUtils.hasText(value)) {
+		if (! StringUtils.hasText(value)) {
 			value = defaultValue;
 		}
 		return value;
 	}
 
-	protected String getRequiredParameter(WebScriptRequest req, String name) throws InvalidPayloadRemoteException {
+	protected String getRequiredParameter(WebScriptRequest req, String name) throws InvalidMessageRemoteException {
 		String value = req.getParameter(name);
-		if (!StringUtils.hasText(value)) {
-			throw new InvalidPayloadRemoteException("Could not :" + name);
+		if (! StringUtils.hasText(value)) {
+			throw new InvalidMessageRemoteException("Could not get required parameter: " + name);
 		}
 		return value;
 	}

@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.remote.node.web.script;
+package fr.openwide.alfresco.repository.core.node.web.script;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class ChildrenNodeWebScript extends AbstractNodeWebScript<List<Repository
 
 	@Override
 	protected List<RepositoryNode> executeImpl(Resource content, CHILDREN_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
-		return nodeService.getChildren(parameter.nodeReference, parameter.childAssocName, parameter.nodeFetchDetails);
+		return nodeService.getChildren(parameter.nodeReference, parameter.childAssocTypeName, parameter.nodeFetchDetails);
 	}
 
 	@Override

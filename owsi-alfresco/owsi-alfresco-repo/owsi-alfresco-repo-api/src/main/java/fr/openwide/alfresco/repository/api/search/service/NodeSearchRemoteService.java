@@ -18,4 +18,3 @@ public interface NodeSearchRemoteService {
 	List<RepositoryNode> search(String query, NodeFetchDetails nodeFetchDetails);
 
 }
-

@@ -10,7 +10,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 /**
- * Base class for web-service which provides automatic two argument handling. First argument must be of type File 
+ * Base class for web-service which provides automatic two argument handling. First argument must be of type Resource
  */
 public abstract class AbstractResourceRemoteWebScript<R, P> extends AbstractParameterRemoteWebScript<R, P> {
 
@@ -25,7 +25,7 @@ public abstract class AbstractResourceRemoteWebScript<R, P> extends AbstractPara
 	@Override
 	protected R executeImpl(P payload, Status status, Cache cache) throws RepositoryRemoteException {
 		// Pas utilisé : On surcharge l'autre implémentation
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	protected abstract R executeImpl(Resource content, P payload, WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException;

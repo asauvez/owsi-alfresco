@@ -8,13 +8,12 @@ import java.util.Set;
 
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-
 public class NodeFetchDetails implements Serializable {
 
 	private static final long serialVersionUID = 6930653481257487738L;
 
-	private boolean nodeReference;
-	private boolean type;
+	private boolean nodeReference = true;
+	private boolean type = false;
 	private Set<NameReference> properties = new HashSet<>();
 	private Set<NameReference> contentStrings = new HashSet<>();
 	private Set<NameReference> aspects = new HashSet<>();
@@ -23,9 +22,9 @@ public class NodeFetchDetails implements Serializable {
 	private Map<NameReference, NodeFetchDetails> childAssociations = new HashMap<>();
 	private Map<NameReference, NodeFetchDetails> targetAssocs = new HashMap<>();
 	private Map<NameReference, NodeFetchDetails> sourceAssocs = new HashMap<>();
-	
+
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
-	private boolean accessPermissions;
+	private boolean accessPermissions = false;
 
 	public boolean isNodeReference() {
 		return nodeReference;
@@ -74,5 +73,5 @@ public class NodeFetchDetails implements Serializable {
 	public void setAccessPermissions(boolean accessPermissions) {
 		this.accessPermissions = accessPermissions;
 	}
-	
+
 }

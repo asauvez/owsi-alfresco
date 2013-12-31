@@ -42,8 +42,7 @@ public class UserReference implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(username);
-
+		return Objects.hash(username);
 	}
 
 }

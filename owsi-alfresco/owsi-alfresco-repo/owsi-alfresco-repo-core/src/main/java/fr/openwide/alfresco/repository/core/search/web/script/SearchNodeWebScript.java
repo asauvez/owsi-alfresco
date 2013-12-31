@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.remote.search.web.script;
+package fr.openwide.alfresco.repository.core.search.web.script;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService.SEARCH_NODE_SERVICE;
-import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractPayloadRemoteWebScript;
+import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
 
-public class SearchNodeWebScript extends AbstractPayloadRemoteWebScript<List<RepositoryNode>, SEARCH_NODE_SERVICE> {
+public class SearchNodeWebScript extends AbstractMessageRemoteWebScript<List<RepositoryNode>, SEARCH_NODE_SERVICE> {
 
 	protected NodeSearchRemoteService nodeSearchService;
 

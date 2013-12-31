@@ -29,10 +29,8 @@ public class RepositoryRemoteExceptionHandler extends DefaultResponseErrorHandle
 			try {
 				Class<?> clazz = Class.forName(exceptionClassName);
 				if (RepositoryRemoteException.class.isAssignableFrom(clazz)) {
-					// cast is safe because of test
-					@SuppressWarnings("unchecked")
+					@SuppressWarnings("unchecked") // cast is safe because of test
 					Class<? extends RepositoryRemoteException> exceptionClass = (Class<? extends RepositoryRemoteException>) clazz;
-					
 					RepositoryRemoteException remoteException = (RepositoryRemoteException) messageConverter.read(exceptionClass, response);
 					throw new RepositoryIOException(remoteException);
 				}

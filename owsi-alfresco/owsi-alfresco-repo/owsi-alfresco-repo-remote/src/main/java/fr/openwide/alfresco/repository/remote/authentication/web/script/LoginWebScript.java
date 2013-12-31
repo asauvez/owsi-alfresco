@@ -10,9 +10,9 @@ import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService.LOGIN_REQUEST_SERVICE;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
-import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractPayloadRemoteWebScript;
+import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
 
-public class LoginWebScript extends AbstractPayloadRemoteWebScript<RepositoryUser, LOGIN_REQUEST_SERVICE> {
+public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUser, LOGIN_REQUEST_SERVICE> {
 
 	private AuthenticationRemoteService authenticationRemoteService;
 

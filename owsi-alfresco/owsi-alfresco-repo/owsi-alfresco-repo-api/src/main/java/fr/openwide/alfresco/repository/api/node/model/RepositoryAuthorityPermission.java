@@ -1,13 +1,13 @@
 package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class RepositoryAuthorityPermission implements Serializable {
+
+	private static final long serialVersionUID = 1391171626983929282L;
 
 	private RepositoryAuthority authority;
 	private RepositoryPermission permission;
@@ -41,24 +41,32 @@ public class RepositoryAuthorityPermission implements Serializable {
 	public void setAllowed(boolean allowed) {
 		this.allowed = allowed;
 	}
-	
+
 	@Override
 	public String toString() {
-		return Joiner.on(":").join(authority, permission, allowed); 
+		return Joiner.on(":").join(authority, permission, allowed);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof NameReference) {
-			return Objects.equal(getAuthority(), ((RepositoryAuthorityPermission) obj).getAuthority())
-				&& Objects.equal(getPermission(), ((RepositoryAuthorityPermission) obj).getPermission())
-				&& Objects.equal(isAllowed(), ((RepositoryAuthorityPermission) obj).isAllowed());
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		if (object == this) {
+			return true;
+		}
+		if (object instanceof RepositoryAuthorityPermission) {
+			RepositoryAuthorityPermission other = (RepositoryAuthorityPermission) object;
+			return Objects.equals(authority, other.getAuthority())
+				&& Objects.equals(permission, other.getPermission())
+				&& Objects.equals(allowed, other.isAllowed());
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getAuthority(), getPermission(), isAllowed());
+		return Objects.hash(authority, permission, allowed);
 	}
+
 }

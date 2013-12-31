@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.remote.conversion.service.impl;
+package fr.openwide.alfresco.repository.core.remote.service.impl;
 
 import java.io.Serializable;
 
@@ -11,7 +11,8 @@ import org.alfresco.service.namespace.QName;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class ConversionServiceImpl implements ConversionService {
 
@@ -19,32 +20,48 @@ public class ConversionServiceImpl implements ConversionService {
 	private MimetypeService mimetypeService;
 
 	@Override
-	public NodeReference convert(NodeRef nodeRef) {
+	public NodeReference get(NodeRef nodeRef) {
 		return NodeReference.create(nodeRef.toString());
 	}
+
 	@Override
-	public NodeRef convert(NodeReference nodeReference) {
+	public NodeRef getRequired(NodeReference nodeReference) {
+		if (nodeReference == null) {
+			throw new InvalidPayloadException("Node reference is required");
+		}
+		return get(nodeReference);
+	}
+
+	private NodeRef get(NodeReference nodeReference) {
 		return new NodeRef(nodeReference.getReference());
 	}
+
 	@Override
-	public QName convert(NameReference nameReference) {
-		return QName.createQName(nameReference.toString(), namespacePrefixResolver);
-	}
-	@Override
-	public NameReference convert(QName qname) {
+	public NameReference get(QName qname) {
 		String prefix = namespacePrefixResolver.getPrefixes(qname.getNamespaceURI()).iterator().next();
 		return NameReference.create(prefix, qname.getLocalName());
 	}
-	
+
 	@Override
-	public Serializable convertToApp(Serializable value) {
+	public QName getRequired(NameReference nameReference) {
+		if (nameReference == null) {
+			throw new InvalidPayloadException("Name reference is required");
+		}
+		return get(nameReference);
+	}
+
+	private QName get(NameReference nameReference) {
+		return QName.createQName(nameReference.toString(), namespacePrefixResolver);
+	}
+
+	@Override
+	public Serializable getForApplication(Serializable value) {
 		if (value instanceof NodeRef) {
-			return convert((NodeRef) value);
+			return get((NodeRef) value);
 		} else if (value instanceof QName) {
-			return convert((QName) value);
+			return get((QName) value);
 		} else if (value instanceof ContentData) {
 			ContentData repoContent = (ContentData) value;
-
 			String mimetypeDisplay = mimetypeService.getDisplaysByMimetype().get(repoContent.getMimetype());
 			RepositoryContentData appContent = new RepositoryContentData(
 					repoContent.getMimetype(), 
@@ -52,29 +69,29 @@ public class ConversionServiceImpl implements ConversionService {
 					repoContent.getSize(), 
 					repoContent.getEncoding(), 
 					repoContent.getLocale());
-			
 			return appContent;
 		}
 		return value;
 	}
 
 	@Override
-	public Serializable convertToGed(Serializable value) {
+	public Serializable getForRepository(Serializable value) {
 		if (value instanceof NodeReference) {
-			return convert((NodeReference) value);
+			return get((NodeReference) value);
 		} else if (value instanceof NameReference) {
-			return convert((NameReference) value);
+			return get((NameReference) value);
 		} else if (value instanceof RepositoryContentData) {
-			// Sera traité de manière particulière directement.
+			// Sera traité ultérieurement
 			return value;
 		}
 		return value;
 	}
-	
+
 	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
 		this.namespacePrefixResolver = namespacePrefixResolver;
 	}
 	public void setMimetypeService(MimetypeService mimetypeService) {
 		this.mimetypeService = mimetypeService;
 	}
+
 }

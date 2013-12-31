@@ -6,16 +6,13 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class RepositoryAuthority implements Serializable {
-	
-	public static final RepositoryAuthority ROLE_GUEST = new RepositoryAuthority("ROLE_GUEST");
-	public static final RepositoryAuthority ROLE_EVERYONE = new RepositoryAuthority("GROUP_EVERYONE");
-	public static final RepositoryAuthority ROLE_ADMINISTRATOR = new RepositoryAuthority("ROLE_ADMINISTRATOR");
 
-	public static final RepositoryAuthority ROLE_OWNER = new RepositoryAuthority("ROLE_OWNER");
-	public static final RepositoryAuthority ROLE_LOCK_OWNER = new RepositoryAuthority("ROLE_LOCK_OWNER");
+	private static final long serialVersionUID = -5556589719655849321L;
+
+	public static final RepositoryAuthority GROUP_EVERYONE = new RepositoryAuthority("GROUP_EVERYONE");
 
 	private String name;
-	
+
 	public RepositoryAuthority(String name) {
 		this.name = name;
 	}
@@ -40,12 +37,14 @@ public class RepositoryAuthority implements Serializable {
 		}
 		if (object instanceof RepositoryAuthority) {
 			RepositoryAuthority other = (RepositoryAuthority) object;
-			return Objects.equals(getName(), other.getName());
+			return Objects.equals(name, other.getName());
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(getName());
-	}}
+		return Objects.hash(name);
+	}
+
+}

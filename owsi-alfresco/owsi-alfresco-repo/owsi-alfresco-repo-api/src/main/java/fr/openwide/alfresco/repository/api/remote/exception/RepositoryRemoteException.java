@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(value = { "cause", "stackTrace", "suppressed", "localizedMessage" })
 public class RepositoryRemoteException extends Exception {
 
-	public static final String HEADER_EXCEPTION_CLASS_NAME = "X-Exception-ClassName";
+	public static final String HEADER_EXCEPTION_CLASS_NAME = "X-Remote-Exception-ClassName";
 
 	private static final long serialVersionUID = 3755181707213263899L;
 

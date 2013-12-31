@@ -5,21 +5,21 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import fr.openwide.alfresco.repository.api.remote.exception.InvalidPayloadRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
 
 public class RepositoryPayloadParameterHandler {
 
 	private MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
 
-	public HttpHeaders handlePayload(Object payload) throws InvalidPayloadRemoteException {
+	public HttpHeaders handlePayload(Object payload) throws InvalidMessageRemoteException {
 		HttpHeaders headers = new HttpHeaders();
 		String value;
 		try {
 			value = messageConverter.getObjectMapper().writeValueAsString(payload);
 		} catch (JsonProcessingException e) {
-			throw new InvalidPayloadRemoteException(e);
+			throw new InvalidMessageRemoteException(e);
 		}
-		headers.add(InvalidPayloadRemoteException.HEADER_PAYLOAD, value);
+		headers.add(InvalidMessageRemoteException.HEADER_MESSAGE_CONTENT, value);
 		return headers;
 	}
 

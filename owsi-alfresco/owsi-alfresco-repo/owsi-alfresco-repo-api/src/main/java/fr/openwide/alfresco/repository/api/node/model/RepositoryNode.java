@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
@@ -21,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-
 public class RepositoryNode implements Serializable {
 
 	private static final long serialVersionUID = 6930653481257487738L;
@@ -29,7 +29,7 @@ public class RepositoryNode implements Serializable {
 	private NodeReference nodeReference;
 	private NameReference type;
 	private RepositoryNode primaryParent;
-	
+
 	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
 	@JsonSubTypes({
 		@JsonSubTypes.Type(value=Date.class, name = "date"),
@@ -40,7 +40,7 @@ public class RepositoryNode implements Serializable {
 	private final Map<NameReference, String> contentStrings = new LinkedHashMap<>();
 	private final Map<NameReference, Resource> contentResources = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
-	
+
 	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
 	private Map<NameReference, List<RepositoryNode>> targetAssocs = new HashMap<>();
 	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new HashMap<>();
@@ -48,8 +48,7 @@ public class RepositoryNode implements Serializable {
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 	private Set<RepositoryAuthorityPermission> accessPermissions = new LinkedHashSet<>();
 
-	public RepositoryNode() {
-	}
+	public RepositoryNode() {}
 
 	public RepositoryNode(NodeReference nodeReference) {
 		this.nodeReference = nodeReference;
@@ -103,4 +102,25 @@ public class RepositoryNode implements Serializable {
 	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
 		return accessPermissions;
 	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		if (object == this) {
+			return true;
+		}
+		if (object instanceof RepositoryNode) {
+			RepositoryNode other = (RepositoryNode) object;
+			return Objects.equals(nodeReference, other.getNodeReference());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(nodeReference);
+	}
+
 }

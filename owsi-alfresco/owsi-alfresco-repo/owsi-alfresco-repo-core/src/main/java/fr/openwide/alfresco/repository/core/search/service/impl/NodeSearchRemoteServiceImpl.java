@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.remote.search.service.impl;
+package fr.openwide.alfresco.repository.core.search.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,24 +10,26 @@ import org.alfresco.service.cmr.search.SearchService;
 
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
-import fr.openwide.alfresco.repository.remote.node.service.impl.NodeRemoteServiceImpl;
+import fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl;
+import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
-	private NodeRemoteServiceImpl nodeRemoteService;
+	private NodeRemoteService nodeRemoteService;
 	private SearchService searchService;
-	
+	private ConversionService conversionService;
+
 	@Override
 	public List<RepositoryNode> search(String luceneQuery, NodeFetchDetails details) {
 		ResultSet resultSet = searchService.query(
 				StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, 
 				SearchService.LANGUAGE_FTS_ALFRESCO, 
 				luceneQuery);
-		
 		List<RepositoryNode> res = new ArrayList<>();
 		for (NodeRef nodeRef : resultSet.getNodeRefs()) {
-			res.add(nodeRemoteService.getRepositoryNode(nodeRef, details));
+			res.add(nodeRemoteService.get(conversionService.get(nodeRef), details));
 		}
 		return res;
 	}
@@ -38,4 +40,8 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	public void setSearchService(SearchService searchService) {
 		this.searchService = searchService;
 	}
+	public void setConversionService(ConversionService conversionService) {
+		this.conversionService = conversionService;
+	}
+
 }

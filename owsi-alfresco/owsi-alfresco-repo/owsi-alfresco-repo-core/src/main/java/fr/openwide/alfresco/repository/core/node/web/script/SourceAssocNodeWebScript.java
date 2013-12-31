@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.remote.node.web.script;
+package fr.openwide.alfresco.repository.core.node.web.script;
 
 import java.util.List;
 

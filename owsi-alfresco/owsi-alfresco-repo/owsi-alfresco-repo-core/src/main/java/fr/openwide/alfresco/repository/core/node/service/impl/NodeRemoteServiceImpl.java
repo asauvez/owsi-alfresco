@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.remote.node.service.impl;
+package fr.openwide.alfresco.repository.core.node.service.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -42,7 +42,8 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class NodeRemoteServiceImpl implements NodeRemoteService {
 
@@ -56,17 +57,16 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails details) {
-		return getRepositoryNode(conversionService.convert(nodeReference), details);
+		return getRepositoryNode(conversionService.getRequired(nodeReference), details);
 	}
 
 	@Override
 	public List<RepositoryNode> getChildren(
-			NodeReference nodeReference, NameReference childAssocName, NodeFetchDetails details) {
+			NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails details) {
 		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
-				conversionService.convert(nodeReference), 
-				conversionService.convert(childAssocName), 
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(childAssocTypeName), 
 				RegexQNamePattern.MATCH_ALL, true);
-		
 		List<RepositoryNode> res = new ArrayList<>();
 		for (ChildAssociationRef assoc : assocs) {
 			res.add(getRepositoryNode(assoc.getChildRef(), details));
@@ -78,9 +78,8 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	public List<RepositoryNode> getTargetAssocs(
 			NodeReference nodeReference, NameReference assocName, NodeFetchDetails details) {
 		List<AssociationRef> assocs = nodeService.getTargetAssocs(
-				conversionService.convert(nodeReference), 
-				conversionService.convert(assocName));
-		
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(assocName));
 		List<RepositoryNode> res = new ArrayList<>();
 		for (AssociationRef assoc : assocs) {
 			res.add(getRepositoryNode(assoc.getTargetRef(), details));
@@ -92,9 +91,8 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	public List<RepositoryNode> getSourceAssocs(
 			NodeReference nodeReference, NameReference assocName, NodeFetchDetails details) {
 		List<AssociationRef> assocs = nodeService.getSourceAssocs(
-				conversionService.convert(nodeReference), 
-				conversionService.convert(assocName));
-		
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(assocName));
 		List<RepositoryNode> res = new ArrayList<>();
 		for (AssociationRef assoc : assocs) {
 			res.add(getRepositoryNode(assoc.getSourceRef(), details));
@@ -103,38 +101,37 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 
 	public RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) {
-		NodeReference nodeReference = conversionService.convert(nodeRef);
-		
+		NodeReference nodeReference = conversionService.get(nodeRef);
 		RepositoryNode node = new RepositoryNode();
 		if (details.isNodeReference()) {
-			node.setNodeReference(conversionService.convert(nodeRef));
+			node.setNodeReference(conversionService.get(nodeRef));
 		}
 		if (details.isType()) {
-			node.setType(conversionService.convert(nodeService.getType(nodeRef)));
+			node.setType(conversionService.get(nodeService.getType(nodeRef)));
 		}
 		if (details.getPrimaryParent() != null) {
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 			node.setPrimaryParent(getRepositoryNode(primaryParent.getParentRef(), details.getPrimaryParent()));
 		}
 		for (NameReference property : details.getProperties()) {
-			Serializable value = nodeService.getProperty(nodeRef, conversionService.convert(property));
+			Serializable value = nodeService.getProperty(nodeRef, conversionService.getRequired(property));
 			if (value != null) {
-				node.getProperties().put(property, conversionService.convertToApp(value));
+				node.getProperties().put(property, conversionService.getForApplication(value));
 			}
 		}
 		for (NameReference property : details.getContentStrings()) {
-			ContentReader reader = contentService.getReader(nodeRef, conversionService.convert(property));
+			ContentReader reader = contentService.getReader(nodeRef, conversionService.getRequired(property));
 			if (reader != null) {
 				String content = reader.getContentString();
 				node.getContentStrings().put(property, content);
 			}
 		}
 		for (NameReference aspect : details.getAspects()) {
-			if (nodeService.hasAspect(nodeRef, conversionService.convert(aspect))) {
+			if (nodeService.hasAspect(nodeRef, conversionService.getRequired(aspect))) {
 				node.getAspects().add(aspect);
 			}
 		}
-		
+		// get associations
 		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
 			node.getChildAssociations().put(
 					entry.getKey(), 
@@ -150,7 +147,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					entry.getKey(), 
 					getSourceAssocs(nodeReference, entry.getKey(), entry.getValue()));
 		}
-
+		// get premissions
 		for (RepositoryPermission permission : details.getUserPermissions()) {
 			if (permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED) {
 				node.getUserPermissions().add(permission);
@@ -166,54 +163,39 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 		return node;
 	}
-	
+
 	@Override
 	public NodeReference create(RepositoryNode node) throws DuplicateChildNameException {
 		if (node.getNodeReference() != null) {
-			throw new IllegalArgumentException("La node est déjà persistée");
+			throw new InvalidPayloadException("Node already has a reference");
 		}
-		
-		String cmName = (String) node.getProperties().get(conversionService.convert(ContentModel.PROP_NAME));
+		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
 		if (cmName == null) {
-			throw new IllegalArgumentException("Vous devez fournir un cm:name");
+			throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
 		}
-		
-		NodeReference parentRef = node.getPrimaryParent().getNodeReference();
-		if (parentRef == null) {
-			throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent");
-		}
-
-		NameReference type = node.getType();
-		if (type == null) {
-			throw new IllegalArgumentException("Vous devez fournir le type du noeud");
-		}
-		
 		Map<QName, Serializable> properties = new LinkedHashMap<QName, Serializable>();
 		for (Entry<NameReference, Serializable> property : node.getProperties().entrySet()) {
 			Serializable value = property.getValue();
 			if (! (value instanceof RepositoryContentData)) {
 				properties.put(
-					conversionService.convert(property.getKey()), 
-					conversionService.convertToGed(value));
+					conversionService.getRequired(property.getKey()), 
+					conversionService.getForRepository(value));
 			}
 		}
-		
 		try {
 			NodeRef nodeRef = nodeService.createNode(
-					 conversionService.convert(parentRef), 
+					conversionService.getRequired(node.getPrimaryParent().getNodeReference()), 
 					ContentModel.ASSOC_CONTAINS, 
 					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()), 
-					conversionService.convert(type), 
+					conversionService.getRequired(node.getType()), 
 					properties).getChildRef();
 			
 			for (NameReference aspectName : node.getAspects()) {
-				nodeService.addAspect(nodeRef, conversionService.convert(aspectName), null);
+				nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
 			}
-	
 			setContents(nodeRef, node);
 			setPermissions(nodeRef, node);
-	
-			return conversionService.convert(nodeRef);
+			return conversionService.get(nodeRef);
 		} catch (DuplicateChildNodeNameException e) {
 			throw new DuplicateChildNameException(e);
 		}
@@ -221,76 +203,64 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 	@Override
 	public void update(RepositoryNode node, NodeFetchDetails details) {
-		if (node.getNodeReference() == null) {
-			throw new IllegalArgumentException("La node n'est pas persistée.");
-		}
-		NodeRef nodeRef = conversionService.convert(node.getNodeReference());
-		
+		NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
 		if (details.isType()) {
-			nodeService.setType(nodeRef, conversionService.convert(node.getType()));
+			nodeService.setType(nodeRef, conversionService.getRequired(node.getType()));
 		}
-		
 		if (details.getPrimaryParent() != null) {
-			NodeReference parentRef = node.getPrimaryParent().getNodeReference();
-			if (parentRef == null) {
-				throw new IllegalArgumentException("Vous devez fournir le nodeRef du noeud parent");
-			}
-			String cmName = (String) node.getProperties().get(conversionService.convert(ContentModel.PROP_NAME));
+			String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
 			if (cmName == null) {
-				throw new IllegalArgumentException("Vous devez fournir un cm:name");
+				throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
 			}
+			NodeReference parentRef = node.getPrimaryParent().getNodeReference();
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
-			nodeService.moveNode(nodeRef, conversionService.convert(parentRef), primaryParent.getTypeQName(), 
+			nodeService.moveNode(nodeRef, conversionService.getRequired(parentRef), primaryParent.getTypeQName(), 
 					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
 		}
-		
 		for (NameReference propertyName : details.getProperties()) {
 			Serializable value = node.getProperties().get(propertyName);
 			if (value != null) {
 				if (! (value instanceof ContentData)) {
 					nodeService.setProperty(nodeRef, 
-						conversionService.convert(propertyName), 
-						conversionService.convertToGed(value));
+						conversionService.getRequired(propertyName), 
+						conversionService.getForRepository(value));
 				}
 			} else {
 				nodeService.removeProperty(nodeRef, 
-					conversionService.convert(propertyName)); 
+					conversionService.getRequired(propertyName)); 
 			}
 		}
-		
 		for (NameReference aspectName : details.getAspects()) {
 			if (node.getAspects().contains(aspectName)) {
-				nodeService.addAspect(nodeRef, conversionService.convert(aspectName), null);
+				nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
 			} else {
-				nodeService.removeAspect(nodeRef, conversionService.convert(aspectName));
+				nodeService.removeAspect(nodeRef, conversionService.getRequired(aspectName));
 			}
 		}
-		
 		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
 			for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
 				childNode.setPrimaryParent(node);
-				saveOrUpdate(childNode, entry.getValue());
+				try {
+					saveOrUpdate(childNode, entry.getValue());
+				} catch (DuplicateChildNameException e) {
+					throw new InvalidPayloadException(e);
+				}
 			}
 		}
-		
 		setContents(nodeRef, node);
 		if (details.isAccessPermissions()) {
 			setPermissions(nodeRef, node);
 		}
 	}
 
-	private void saveOrUpdate(RepositoryNode node, NodeFetchDetails details) {
+	private void saveOrUpdate(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
 		if (node.getNodeReference() == null) {
-			try {
-				create(node);
-			} catch (DuplicateChildNameException e) {
-				throw new IllegalArgumentException(e);
-			}
+			create(node);
 		} else {
 			update(node, details);
 		}
 	}
-	
+
 	private void setPermissions(NodeRef nodeRef, RepositoryNode node) {
 		Set<RepositoryAuthorityPermission> newPermissions = node.getAccessPermissions();
 		Set<RepositoryAuthorityPermission> oldPermissions = new HashSet<RepositoryAuthorityPermission>();
@@ -348,7 +318,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 	}
-	
+
 	private boolean isPermissionControl(String permission) {
 		return PermissionService.COORDINATOR.equals(permission)
 				|| PermissionService.CHANGE_PERMISSIONS.equals(permission)
@@ -356,7 +326,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				|| PermissionService.ALL_PERMISSIONS.equals(permission);
 	}
 
-	
 	private void setContents(NodeRef nodeRef, RepositoryNode node) {
 		for (Entry<NameReference, String> entry : node.getContentStrings().entrySet()) {
 			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(entry.getKey());
@@ -364,7 +333,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					(contentData != null) ? contentData : new RepositoryContentData(), 
 					null, entry.getValue());
 		}
-		
 		for (Entry<NameReference, Resource> entry : node.getContentResources().entrySet()) {
 			RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(entry.getKey());
 			setContent(nodeRef, entry.getKey(), 
@@ -372,12 +340,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					entry.getValue(), null);
 		}
 	}
-	
+
 	private void setContent(NodeRef nodeRef, NameReference propertyName, RepositoryContentData contentData, 
 			Resource contentResource, String contentString) {
-		QName qname = conversionService.convert(propertyName);
+		QName qname = conversionService.getRequired(propertyName);
 		ContentWriter writer = contentService.getWriter(nodeRef, qname, true);
-
 		if (contentData.getMimetype() != null) {
 			writer.setMimetype(contentData.getMimetype());
 		}
@@ -387,7 +354,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (contentData.getLocale() != null) {
 			writer.setLocale(contentData.getLocale());
 		}
-
 		if (contentString != null) {
 			writer.putContent(contentString);
 		} else {
@@ -397,7 +363,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				throw new IllegalStateException(e);
 			}
 		}
-		
 		if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
 			if (contentData.getMimetype() == null) {
 				String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
@@ -406,15 +371,14 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			if (contentData.getEncoding() == null) {
 				writer.guessEncoding();
 			}
-			// Nécessaire, car non mis à jour après putContent.
+			// Nécessaire, car non mis à jour après putContent
 			nodeService.setProperty(nodeRef, qname, writer.getContentData());
 		}
 	}
 
-
 	@Override
 	public void delete(NodeReference nodeReference) {
-		nodeService.deleteNode(conversionService.convert(nodeReference));
+		nodeService.deleteNode(conversionService.getRequired(nodeReference));
 	}
 
 	public void setNodeService(NodeService nodeService) {
@@ -435,4 +399,5 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	public void setAuthorityService(AuthorityService authorityService) {
 		this.authorityService = authorityService;
 	}
+
 }

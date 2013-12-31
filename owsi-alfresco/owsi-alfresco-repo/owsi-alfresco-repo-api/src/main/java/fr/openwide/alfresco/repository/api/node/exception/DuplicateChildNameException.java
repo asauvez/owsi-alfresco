@@ -4,6 +4,8 @@ import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteExce
 
 public class DuplicateChildNameException extends RepositoryRemoteException {
 
+	private static final long serialVersionUID = 6160581340364681804L;
+
 	public DuplicateChildNameException(Throwable cause) {
 		super(cause);
 	}

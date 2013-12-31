@@ -88,8 +88,7 @@ public class RepositoryUser implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(userReference);
-
+		return Objects.hash(userReference);
 	}
 
 }
