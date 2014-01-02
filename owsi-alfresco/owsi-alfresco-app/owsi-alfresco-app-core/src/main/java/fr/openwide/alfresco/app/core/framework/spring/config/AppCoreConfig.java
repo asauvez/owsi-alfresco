@@ -36,6 +36,14 @@ public class AppCoreConfig {
 	private Environment environment;
 
 	@Bean
+	public ConfigurationLogger configurationLogger() {
+		ConfigurationLogger configurationLogger = new ConfigurationLogger();
+		configurationLogger.setPropertyNamesForInfoLogLevel(environment.getRequiredProperty("application.propertyNamesForInfoLogLevel"));
+		configurationLogger.setLogRootApplicationContext(false);
+		return configurationLogger;
+	}
+
+	@Bean
 	public RestTemplate remoteRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new RepositoryRemoteExceptionHandler());
