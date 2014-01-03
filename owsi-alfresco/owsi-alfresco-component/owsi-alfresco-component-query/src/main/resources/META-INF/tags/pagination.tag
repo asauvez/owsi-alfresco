@@ -6,10 +6,9 @@
 		<ul class="pagination">
 			<li class="${pagination.hasPreviousPage ? 'pageable' : 'disabled'}"><a href="#" data-page="${pagination.previousPage}">&laquo;</a></li>
 			<c:forEach var="page" items="${pagination.pages}">
-				<li class="${page eq pagination.currentPage ? 'active' : 'pageable'}"><a href="#" data-page="${page}">${page}</a></li>							
+				<li class="${page eq pagination.currentPage ? 'active' : 'pageable'}"><a href="#" data-page="${page}">${page}</a></li>
 			</c:forEach>
 			<li class="${pagination.hasNextPage ? 'pageable' : 'disabled'}"><a href="#" data-page="${pagination.nextPage}">&raquo;</a></li>
 		</ul>
 	</div>
 </c:if>
-				

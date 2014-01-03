@@ -2,14 +2,11 @@ package fr.openwide.alfresco.component.query.search.service.impl;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import fr.openwide.alfresco.component.query.form.projection.bean.BeanProjectionBuilder;
 import fr.openwide.alfresco.component.query.form.result.FormQueryResult;
 import fr.openwide.alfresco.component.query.search.model.BeanFormQuery;
 import fr.openwide.alfresco.component.query.search.service.BeanFormQueryService;
 
-@Service
 public class BeanFormQueryServiceImpl extends AbstractFormQueryService implements BeanFormQueryService {
 
 	@Override

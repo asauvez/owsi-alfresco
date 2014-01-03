@@ -20,10 +20,10 @@
 									<span class="sort-column glyphicon glyphicon-sort" data-sort-column="${column.id}" data-sort-direction="ASC"></span>
 								</c:when>
 								<c:when test="${column.sortDirection eq 'ASC'}">
-									<span class="sort-column glyphicon glyphicon-sort-by-attributes" data-sort-column="${column.id}" data-sort-direction="DESC"></span>									
+									<span class="sort-column glyphicon glyphicon-sort-by-attributes" data-sort-column="${column.id}" data-sort-direction="DESC"></span>
 								</c:when>
 								<c:when test="${column.sortDirection eq 'DESC'}">
-									<span class="sort-column glyphicon glyphicon-sort-by-attributes-alt" data-sort-column="${column.id}" data-sort-direction="ASC"></span>									
+									<span class="sort-column glyphicon glyphicon-sort-by-attributes-alt" data-sort-column="${column.id}" data-sort-direction="ASC"></span>
 								</c:when>
 							</c:choose>
 						</c:if>

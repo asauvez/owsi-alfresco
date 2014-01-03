@@ -23,7 +23,8 @@ public abstract class Restriction {
 	}
 
 	public final String toLuceneQuery() {
-		return (not) ? "NOT (" + toLuceneQueryInternal() + ")" : toLuceneQueryInternal();
+		String query = toLuceneQueryInternal();
+		return (query.length() > 0) ? ((not) ? "NOT (" + query + ")" : query) : "";
 	}
 
 	protected abstract String toLuceneQueryInternal();
