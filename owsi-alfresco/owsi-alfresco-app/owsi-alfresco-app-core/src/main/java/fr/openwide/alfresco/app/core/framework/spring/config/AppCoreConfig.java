@@ -8,11 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import fr.openwide.alfresco.app.core.AlfrescoAppCorePackage;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryPayloadParameterHandler;
@@ -49,13 +45,6 @@ public class AppCoreConfig {
 		restTemplate.setErrorHandler(new RepositoryRemoteExceptionHandler());
 		// do not buffer request objects (not to run out of memory on file upload...)
 		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setBufferRequestBody(false);
-		// do not send empty JSON arrays
-		for (HttpMessageConverter<?> converter : restTemplate.getMessageConverters()) {
-			if (converter instanceof MappingJackson2HttpMessageConverter) {
-				((MappingJackson2HttpMessageConverter) converter).getObjectMapper().configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false);
-				break;
-			}
-		}
 		return restTemplate;
 	}
 

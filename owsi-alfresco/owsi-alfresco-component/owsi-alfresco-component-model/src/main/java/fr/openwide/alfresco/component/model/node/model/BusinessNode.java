@@ -90,10 +90,7 @@ public class BusinessNode {
 		return (List<C>) node.getProperties().get(propertyModel.getNameReference());
 	}
 	public <C extends Serializable> BusinessNode property(MultiPropertyModel<C> propertyModel, Collection<C> value) {
-		// On ne peut serialiser que des ArrayList dans JSon.
-		node.getProperties().put(
-				propertyModel.getNameReference(), 
-				(value instanceof ArrayList) ? (ArrayList<C>) value : new ArrayList<C>(value));
+		node.getProperties().put(propertyModel.getNameReference(), (Serializable) value); 
 		return this;
 	}
 	public <C extends Serializable> BusinessNode property(MultiPropertyModel<C> propertyModel, @SuppressWarnings("unchecked") C ... values) {

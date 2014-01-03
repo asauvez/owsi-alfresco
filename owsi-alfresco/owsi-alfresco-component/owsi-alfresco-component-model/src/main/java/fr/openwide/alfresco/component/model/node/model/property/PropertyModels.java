@@ -9,7 +9,7 @@ import fr.openwide.alfresco.component.model.node.model.property.multi.MultiFloat
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiIntegerPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiLongPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNameReferencePropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.multi.MultiRefPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
@@ -20,7 +20,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.FloatProp
 import fr.openwide.alfresco.component.model.node.model.property.single.IntegerPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.single.RefPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
@@ -82,11 +82,11 @@ public final class PropertyModels {
 		return new ContentPropertyModel(type, NameReference.create(namespace, name));
 	}
 
-	public static RefPropertyModel newRef(ContainerModel type, String namespace, String name) {
-		return new RefPropertyModel(type, NameReference.create(namespace, name));
+	public static NodeReferencePropertyModel newNodeReference(ContainerModel type, String namespace, String name) {
+		return new NodeReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiRefPropertyModel newMultiRef(ContainerModel type, String namespace, String name) {
-		return new MultiRefPropertyModel(type, NameReference.create(namespace, name));
+	public static MultiNodeReferencePropertyModel newMultiNodeReference(ContainerModel type, String namespace, String name) {
+		return new MultiNodeReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
 	public static NameReferencePropertyModel newNameReference(ContainerModel type, String namespace, String name) {
 		return new NameReferencePropertyModel(type, NameReference.create(namespace, name));

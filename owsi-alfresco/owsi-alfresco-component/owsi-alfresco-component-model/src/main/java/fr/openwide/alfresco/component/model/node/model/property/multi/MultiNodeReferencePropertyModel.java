@@ -1,12 +1,12 @@
-package fr.openwide.alfresco.component.model.node.model.property.single;
+package fr.openwide.alfresco.component.model.node.model.property.multi;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-public class RefPropertyModel extends SinglePropertyModel<NodeReference> {
+public class MultiNodeReferencePropertyModel extends MultiPropertyModel<NodeReference> {
 
-	public RefPropertyModel(ContainerModel type, NameReference nameReference) {
+	public MultiNodeReferencePropertyModel(ContainerModel type, NameReference nameReference) {
 		super(type, nameReference);
 	}
 

@@ -2,19 +2,25 @@ package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -33,13 +39,6 @@ public class RepositoryNode implements Serializable {
 	private NameReference type;
 	private RepositoryChildAssociation primaryParentAssociation;
 	
-	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
-	@JsonSubTypes({
-		@JsonSubTypes.Type(value=Date.class, name = "date"),
-		@JsonSubTypes.Type(value=Long.class, name = "long"),
-		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content"),
-		@JsonSubTypes.Type(value=ArrayList.class, name = "list")
-	})
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Map<NameReference, String> contentStrings = new LinkedHashMap<>();
 	private final Map<NameReference, Resource> contentResources = new LinkedHashMap<>();
@@ -58,6 +57,76 @@ public class RepositoryNode implements Serializable {
 
 	public RepositoryNode(NodeReference nodeReference) {
 		this.nodeReference = nodeReference;
+	}
+
+	@JsonIgnore
+	public Map<NameReference, Serializable> getProperties() {
+		return properties;
+	}
+	@JsonProperty("properties")
+	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
+	@JsonSubTypes({
+		@JsonSubTypes.Type(value=Date.class, name = "date"),
+		@JsonSubTypes.Type(value=Date[].class, name = "dateList"),
+		@JsonSubTypes.Type(value=Long.class, name = "long"),
+		@JsonSubTypes.Type(value=Long[].class, name = "longList"),
+		@JsonSubTypes.Type(value=Float.class, name = "float"),
+		@JsonSubTypes.Type(value=Float[].class, name = "floatList"),
+		@JsonSubTypes.Type(value=NameReference.class, name = "nameReference"),
+		@JsonSubTypes.Type(value=NameReference[].class, name = "nameReferenceList"),
+		@JsonSubTypes.Type(value=NodeReference.class, name = "nodeReference"),
+		@JsonSubTypes.Type(value=NodeReference[].class, name = "nodeReferenceList"),
+		
+		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content"),
+		@JsonSubTypes.Type(value=ArrayList.class, name = "list"),
+	})
+	private Map<NameReference, Serializable> getPropertiesJson() {
+		Map<NameReference, Serializable> propertiesJson = new LinkedHashMap<NameReference, Serializable>();
+		for (Entry<NameReference, Serializable> property : properties.entrySet()) {
+			if (property.getValue() instanceof Collection) {
+				Collection<?> collection = (Collection<?>) property.getValue();
+				Iterator<?> it = collection.iterator();
+				if (it.hasNext()) {
+					Object firstValue = it.next();
+					if (firstValue instanceof Date) {
+						propertiesJson.put(property.getKey(), collection.toArray(new Date[collection.size()]));
+					} else if (firstValue instanceof Long) {
+						propertiesJson.put(property.getKey(), collection.toArray(new Long[collection.size()]));
+					} else if (firstValue instanceof Float) {
+						propertiesJson.put(property.getKey(), collection.toArray(new Float[collection.size()]));
+					} else if (firstValue instanceof NameReference) {
+						propertiesJson.put(property.getKey(), collection.toArray(new NameReference[collection.size()]));
+					} else if (firstValue instanceof NodeReference) {
+						propertiesJson.put(property.getKey(), collection.toArray(new NodeReference[collection.size()]));
+					} else if (collection instanceof ArrayList) {
+						propertiesJson.put(property.getKey(), (ArrayList<?>) collection);
+					} else {
+						propertiesJson.put(property.getKey(), new ArrayList<Object>(collection));
+					}
+				}
+			} else {
+				propertiesJson.put(property.getKey(), property.getValue());
+			}
+		}
+		return propertiesJson;
+	}
+	@SuppressWarnings("unused")
+	private void setPropertiesJson(Map<NameReference, Serializable> propertiesJSon) {
+		for (Entry<NameReference, Serializable> property : propertiesJSon.entrySet()) {
+			if (property.getValue() instanceof Date[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((Date[]) property.getValue()));
+			} else if (property.getValue() instanceof Long[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((Long[]) property.getValue()));
+			} else if (property.getValue() instanceof Float[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((Float[]) property.getValue()));
+			} else if (property.getValue() instanceof NameReference[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((NameReference[]) property.getValue()));
+			} else if (property.getValue() instanceof NodeReference[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((NodeReference[]) property.getValue()));
+			} else {
+				properties.put(property.getKey(), property.getValue());
+			}
+		}
 	}
 
 	public NodeReference getNodeReference() {
@@ -80,9 +149,6 @@ public class RepositoryNode implements Serializable {
 		this.primaryParentAssociation = primaryParentAssociation;
 	}
 
-	public Map<NameReference, Serializable> getProperties() {
-		return properties;
-	}
 	public Map<NameReference, String> getContentStrings() {
 		return contentStrings;
 	}
@@ -115,6 +181,26 @@ public class RepositoryNode implements Serializable {
 	}
 	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
 		return accessPermissions;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+		if (object == this) {
+			return true;
+		}
+		if (object instanceof RepositoryNode) {
+			RepositoryNode other = (RepositoryNode) object;
+			return Objects.equals(nodeReference, other.getNodeReference());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(nodeReference);
 	}
 
 }

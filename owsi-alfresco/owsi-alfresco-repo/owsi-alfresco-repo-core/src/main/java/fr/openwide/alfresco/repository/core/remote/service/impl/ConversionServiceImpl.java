@@ -42,6 +42,9 @@ public class ConversionServiceImpl implements ConversionService {
 
 	@Override
 	public StoreRef getRequired(StoreReference storeReference) {
+		if (storeReference == null) {
+			throw new InvalidPayloadException("Store reference is required");
+		}
 		return new StoreRef(storeReference.getReference());
 	}
 

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class ObjectMapperProvider implements FactoryBean<ObjectMapper>, InitializingBean {
 
@@ -14,7 +13,6 @@ public class ObjectMapperProvider implements FactoryBean<ObjectMapper>, Initiali
 	public void afterPropertiesSet() {
 		objectMapper = new ObjectMapper();
 		//objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-		objectMapper.configure(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS, false);
 	}
 
 	@Override
