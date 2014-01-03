@@ -20,7 +20,7 @@ public class SearchNodeWebScript extends AbstractMessageRemoteWebScript<List<Rep
 
 	@Override
 	protected List<RepositoryNode> executeImpl(SEARCH_NODE_SERVICE parameter, Status status, Cache cache) throws RepositoryRemoteException {
-		return nodeSearchService.search(parameter.query, parameter.nodeFetchDetails);
+		return nodeSearchService.search(parameter.query, parameter.storeReference, parameter.nodeFetchDetails);
 	}
 
 	@Override

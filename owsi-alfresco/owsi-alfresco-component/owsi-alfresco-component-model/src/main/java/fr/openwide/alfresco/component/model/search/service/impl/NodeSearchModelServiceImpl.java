@@ -10,6 +10,7 @@ import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 
 public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 
@@ -18,7 +19,16 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeSearchService.search(builder.toLuceneQuery(), nodeFetchDetails.getDetails()));
+		return search(builder, StoreReference.STORE_REF_WORKSPACE_SPACESSTORE, nodeFetchDetails);
+	}
+
+	@Override
+	public List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference,
+			NodeFetchDetailsBuilder nodeFetchDetails) {
+		return BusinessNode.wrapList(nodeSearchService.search(
+				builder.toLuceneQuery(),
+				storeReference,
+				nodeFetchDetails.getDetails()));
 	}
 
 	@Override

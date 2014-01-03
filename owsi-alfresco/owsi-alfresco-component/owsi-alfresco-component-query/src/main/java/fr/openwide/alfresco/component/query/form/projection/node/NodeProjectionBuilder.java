@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.query.form.projection.node;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
@@ -8,6 +9,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.query.form.projection.Projection;
 import fr.openwide.alfresco.component.query.form.projection.Projection.Align;
@@ -30,8 +33,11 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 		return add(new NodeTypeProjectionImpl(this));
 	}
 
-	public <P extends Serializable> Projection<RepositoryNode, NodeProjectionBuilder, P> prop(PropertyModel<P> property) {
+	public <P extends Serializable> Projection<RepositoryNode, NodeProjectionBuilder, P> prop(SinglePropertyModel<P> property) {
 		return add(new NodePropertyProjectionImpl<P>(this, property));
+	}
+	public <P extends Serializable> Projection<RepositoryNode, NodeProjectionBuilder, List<P>> prop(MultiPropertyModel<P> property) {
+		return add(new NodeMultiPropertyProjectionImpl<P>(this, property));
 	}
 
 	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryNode> node() {
@@ -50,7 +56,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 						if (CmModel.folder.getNameReference().equals(node.getType())) {
 							return new IconOutputFieldView("glyphicon glyphicon-folder-close", "mimetype.folder");
 						} else if (CmModel.content.getNameReference().equals(node.getType())) {
-							RepositoryContentData content = (RepositoryContentData) node.getProperties().get(CmModel.content.content);
+							RepositoryContentData content = (RepositoryContentData) node.getProperties().get(CmModel.content.content.getNameReference());
 							if (content.getMimetype().startsWith("text/")
 								|| content.getMimetype().equals("application/vnd.oasis.opendocument.text")
 								|| content.getMimetype().equals("application/msword")
@@ -88,7 +94,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentSize() {
 		return contentSize(CmModel.content.content);
 	}
-	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentSize(PropertyModel<RepositoryContentData> property) {
+	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentSize(SinglePropertyModel<RepositoryContentData> property) {
 		return prop(property)
 			.label("contentSize")
 			.align(Align.RIGHT)
@@ -109,7 +115,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentMimeType() {
 		return contentMimeType(CmModel.content.content);
 	}
-	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentMimeType(PropertyModel<RepositoryContentData> property) {
+	public Projection<RepositoryNode, NodeProjectionBuilder, RepositoryContentData> contentMimeType(SinglePropertyModel<RepositoryContentData> property) {
 		return prop(property)
 			.label("contentMimeType")
 			.transform(new Function<RepositoryContentData, Object>() {

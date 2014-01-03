@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,12 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -22,33 +24,37 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
+@JsonInclude(Include.NON_EMPTY)
 public class RepositoryNode implements Serializable {
 
 	private static final long serialVersionUID = 6930653481257487738L;
 
 	private NodeReference nodeReference;
 	private NameReference type;
-	private RepositoryNode primaryParent;
-
+	private RepositoryChildAssociation primaryParentAssociation;
+	
 	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
 	@JsonSubTypes({
 		@JsonSubTypes.Type(value=Date.class, name = "date"),
 		@JsonSubTypes.Type(value=Long.class, name = "long"),
-		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content")
+		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content"),
+		@JsonSubTypes.Type(value=ArrayList.class, name = "list")
 	})
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Map<NameReference, String> contentStrings = new LinkedHashMap<>();
 	private final Map<NameReference, Resource> contentResources = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
-
+	
 	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
 	private Map<NameReference, List<RepositoryNode>> targetAssocs = new HashMap<>();
 	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new HashMap<>();
 
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
+	private Boolean inheritParentPermissions;
 	private Set<RepositoryAuthorityPermission> accessPermissions = new LinkedHashSet<>();
 
-	public RepositoryNode() {}
+	public RepositoryNode() {
+	}
 
 	public RepositoryNode(NodeReference nodeReference) {
 		this.nodeReference = nodeReference;
@@ -66,12 +72,14 @@ public class RepositoryNode implements Serializable {
 	public void setType(NameReference type) {
 		this.type = type;
 	}
-	public RepositoryNode getPrimaryParent() {
-		return primaryParent;
+
+	public RepositoryChildAssociation getPrimaryParentAssociation() {
+		return primaryParentAssociation;
 	}
-	public void setPrimaryParent(RepositoryNode primaryParent) {
-		this.primaryParent = primaryParent;
+	public void setPrimaryParentAssociation(RepositoryChildAssociation primaryParentAssociation) {
+		this.primaryParentAssociation = primaryParentAssociation;
 	}
+
 	public Map<NameReference, Serializable> getProperties() {
 		return properties;
 	}
@@ -99,28 +107,14 @@ public class RepositoryNode implements Serializable {
 	public Set<RepositoryPermission> getUserPermissions() {
 		return userPermissions;
 	}
+	public Boolean getInheritParentPermissions() {
+		return inheritParentPermissions;
+	}
+	public void setInheritParentPermissions(Boolean inheritParentPermissions) {
+		this.inheritParentPermissions = inheritParentPermissions;
+	}
 	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
 		return accessPermissions;
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (object == null) {
-			return false;
-		}
-		if (object == this) {
-			return true;
-		}
-		if (object instanceof RepositoryNode) {
-			RepositoryNode other = (RepositoryNode) object;
-			return Objects.equals(nodeReference, other.getNodeReference());
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(nodeReference);
 	}
 
 }

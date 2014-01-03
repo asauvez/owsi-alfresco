@@ -1,11 +1,11 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.component.model.node.model.property.BooleanPropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.DateTimePropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.LongPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
-import fr.openwide.alfresco.component.model.node.model.property.RefPropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.TextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.RefPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 

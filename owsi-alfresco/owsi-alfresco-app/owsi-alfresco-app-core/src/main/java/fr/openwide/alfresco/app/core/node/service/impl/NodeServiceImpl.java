@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
 import org.apache.commons.io.IOUtils;
@@ -128,10 +127,13 @@ public class NodeServiceImpl implements NodeService {
 	@Override
 	public NodeReference create(RepositoryNode node) throws DuplicateChildNameException {
 		try {
-			HttpHeaders headers = payloadParameterHandler.handlePayload(node);
+			CREATE_NODE_SERVICE request = new CREATE_NODE_SERVICE();
+			request.node = node;
+			request.contentBodyProperty = getContentBodyProperty(node);
+			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			return repositoryRemoteBinding.exchange(CREATE_NODE_SERVICE.URL, 
 					CREATE_NODE_SERVICE.METHOD, 
-					getContent(node, headers),
+					getContent(node),
 					NodeReference.class, headers);
 		} catch (DuplicateChildNameException e) {
 			throw e;
@@ -142,35 +144,40 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details) {
+	public void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
 		try {
 			UPDATE_NODE_SERVICE request = new UPDATE_NODE_SERVICE();
 			request.node = node;
 			request.details = details;
+			request.contentBodyProperty = getContentBodyProperty(node);
 			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			
 			repositoryRemoteBinding.exchange(UPDATE_NODE_SERVICE.URL, 
 					UPDATE_NODE_SERVICE.METHOD, 
-					getContent(node, headers), 
+					getContent(node), 
 					Void.class, headers);
+		} catch (DuplicateChildNameException e) {
+			throw e;
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private Resource getContent(RepositoryNode node, HttpHeaders headers) {
-		Iterator<Entry<NameReference, Resource>> itResources = node.getContentResources().entrySet().iterator();
+	private String getContentBodyProperty(RepositoryNode node) {
+		Iterator<NameReference> itResources = node.getContentResources().keySet().iterator();
 		if (! itResources.hasNext()) {
 			return null;
 		}
-		Entry<NameReference, Resource> entry = itResources.next();
-		headers.add(CREATE_NODE_SERVICE.CONTENT_PROPERTY_HEADER, entry.getKey().getFullName());
-		Resource content = entry.getValue();
+		NameReference property = itResources.next();
 		if (itResources.hasNext()) {
 			throw new IllegalArgumentException("Service does not support more than one contentResource upload at a time");
 		}
-		return content;
+		return property.getFullName();
+	}
+	private Resource getContent(RepositoryNode node) {
+		Iterator<Resource> itResources = node.getContentResources().values().iterator();
+		return (itResources.hasNext()) ? itResources.next() : null;
 	}
 
 	@Override

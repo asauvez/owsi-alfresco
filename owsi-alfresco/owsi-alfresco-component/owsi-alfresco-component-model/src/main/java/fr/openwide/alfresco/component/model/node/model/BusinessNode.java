@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -12,11 +14,13 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
-import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
@@ -73,14 +77,29 @@ public class BusinessNode {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(PropertyModel<C> propertyModel) {
+	public <C extends Serializable> C getProperty(SinglePropertyModel<C> propertyModel) {
 		return (C) node.getProperties().get(propertyModel.getNameReference());
 	}
-	public <C extends Serializable> BusinessNode property(PropertyModel<C> propertyModel, C value) {
+	public <C extends Serializable> BusinessNode property(SinglePropertyModel<C> propertyModel, C value) {
 		node.getProperties().put(propertyModel.getNameReference(), value);
 		return this;
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public <C extends Serializable> List<C> getProperty(MultiPropertyModel<C> propertyModel) {
+		return (List<C>) node.getProperties().get(propertyModel.getNameReference());
+	}
+	public <C extends Serializable> BusinessNode property(MultiPropertyModel<C> propertyModel, Collection<C> value) {
+		// On ne peut serialiser que des ArrayList dans JSon.
+		node.getProperties().put(
+				propertyModel.getNameReference(), 
+				(value instanceof ArrayList) ? (ArrayList<C>) value : new ArrayList<C>(value));
+		return this;
+	}
+	public <C extends Serializable> BusinessNode property(MultiPropertyModel<C> propertyModel, @SuppressWarnings("unchecked") C ... values) {
+		return property(propertyModel, Arrays.asList(values));
+	}
+
 	public String getContentString() {
 		return getContentString(CmModel.content.content);
 	}
@@ -130,6 +149,15 @@ public class BusinessNode {
 		node.getUserPermissions().add(permission);
 		return this;
 	}
+	
+	public Boolean getInheritParentPermissions() {
+		return node.getInheritParentPermissions();
+	}
+	public BusinessNode inheritParentPermissions(Boolean inheritParentPermissions) {
+		node.setInheritParentPermissions(inheritParentPermissions);
+		return this;
+	}
+	
 	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
 		return node.getAccessPermissions();
 	}
@@ -139,16 +167,24 @@ public class BusinessNode {
 	}
 
 	public BusinessNode getPrimaryParent() {
-		return new BusinessNode(node.getPrimaryParent());
+		return new BusinessNode(node.getPrimaryParentAssociation().getParentNode());
 	}
 	public BusinessNode primaryParentRef(NodeReference parentRef) {
 		primaryParent().nodeReference(parentRef);
 		return this;
 	}
 	public BusinessNode primaryParent() {
+		return primaryParent(CmModel.folder.contains);
+	}
+	public BusinessNode primaryParent(ChildAssociationModel childAssociationModel) {
 		BusinessNode primaryParent = new BusinessNode();
-		node.setPrimaryParent(primaryParent.node);
+		node.setPrimaryParentAssociation(new RepositoryChildAssociation(
+				primaryParent.getRepositoryNode(), 
+				childAssociationModel.getNameReference()));
 		return primaryParent;
+	}
+	public boolean isPrimaryParentAssociation(ChildAssociationModel childAssociationModel) {
+		return childAssociationModel.getNameReference().equals(node.getPrimaryParentAssociation().getType());
 	}
 
 	public List<BusinessNode> getChildAssociationContains() {

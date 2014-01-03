@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
+import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
@@ -22,9 +22,9 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public List<RepositoryNode> search(String luceneQuery, NodeFetchDetails details) {
+	public List<RepositoryNode> search(String luceneQuery, StoreReference storeReference, NodeFetchDetails details) {
 		ResultSet resultSet = searchService.query(
-				StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, 
+				conversionService.getRequired(storeReference), 
 				SearchService.LANGUAGE_FTS_ALFRESCO, 
 				luceneQuery);
 		List<RepositoryNode> res = new ArrayList<>();

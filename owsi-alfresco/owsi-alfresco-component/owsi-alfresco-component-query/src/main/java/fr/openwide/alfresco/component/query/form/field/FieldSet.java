@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.springframework.context.MessageSourceResolvable;
 
-import fr.openwide.alfresco.component.model.node.model.property.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.TextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.query.form.util.MessageUtils;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 

@@ -6,6 +6,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 
 /**
  * Permet de faire des recherches de noeuds.
@@ -15,6 +16,8 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 public interface NodeSearchModelService {
 
 	List<BusinessNode> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails);
+	
+	List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference, NodeFetchDetailsBuilder nodeFetchDetails);
 
 	BusinessNode searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails);
 

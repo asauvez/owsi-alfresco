@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 
 public interface NodeSearchRemoteService {
 
@@ -13,8 +14,9 @@ public interface NodeSearchRemoteService {
 		public static final String URL = "/owsi/search/node/search";
 		public static final HttpMethod METHOD = HttpMethod.POST;
 		public String query;
+		public StoreReference storeReference;
 		public NodeFetchDetails nodeFetchDetails;
 	}
-	List<RepositoryNode> search(String query, NodeFetchDetails nodeFetchDetails);
+	List<RepositoryNode> search(String query, StoreReference storeReference, NodeFetchDetails nodeFetchDetails);
 
 }

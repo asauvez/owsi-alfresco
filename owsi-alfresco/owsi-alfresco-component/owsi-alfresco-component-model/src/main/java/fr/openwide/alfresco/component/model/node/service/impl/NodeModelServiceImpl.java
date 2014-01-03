@@ -14,7 +14,7 @@ import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
-import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
@@ -89,13 +89,13 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 
 	@Override
-	public void update(BusinessNode node) {
+	public void update(BusinessNode node) throws DuplicateChildNameException {
 		update(node, new NodeFetchDetailsBuilder()
 				.fromNode(node));
 	}
 
 	@Override
-	public void update(BusinessNode node, NodeFetchDetailsBuilder details) {
+	public void update(BusinessNode node, NodeFetchDetailsBuilder details) throws DuplicateChildNameException {
 		nodeService.update(node.getRepositoryNode(), details.getDetails());
 	}
 

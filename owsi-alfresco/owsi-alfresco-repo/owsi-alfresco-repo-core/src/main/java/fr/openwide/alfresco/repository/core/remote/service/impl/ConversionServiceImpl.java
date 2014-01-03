@@ -1,16 +1,20 @@
 package fr.openwide.alfresco.repository.core.remote.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
@@ -34,6 +38,11 @@ public class ConversionServiceImpl implements ConversionService {
 
 	private NodeRef get(NodeReference nodeReference) {
 		return new NodeRef(nodeReference.getReference());
+	}
+
+	@Override
+	public StoreRef getRequired(StoreReference storeReference) {
+		return new StoreRef(storeReference.getReference());
 	}
 
 	@Override
@@ -70,6 +79,12 @@ public class ConversionServiceImpl implements ConversionService {
 					repoContent.getEncoding(), 
 					repoContent.getLocale());
 			return appContent;
+		} else if (value instanceof List) {
+			ArrayList<Serializable> res = new ArrayList<Serializable>();
+			for (Object o : (List<?>) value) {
+				res.add(getForApplication((Serializable) o));
+			}
+			return res;
 		}
 		return value;
 	}
@@ -83,6 +98,12 @@ public class ConversionServiceImpl implements ConversionService {
 		} else if (value instanceof RepositoryContentData) {
 			// Sera traité ultérieurement
 			return value;
+		} else if (value instanceof List) {
+			ArrayList<Serializable> res = new ArrayList<Serializable>();
+			for (Object o : (List<?>) value) {
+				res.add(getForRepository((Serializable) o));
+			}
+			return res;
 		}
 		return value;
 	}

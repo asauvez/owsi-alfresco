@@ -3,6 +3,10 @@ package fr.openwide.alfresco.repository.api.node.model;
 import java.io.Serializable;
 import java.util.Locale;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_EMPTY)
 public class RepositoryContentData implements Serializable {
 
 	private static final long serialVersionUID = 7234820018007664746L;

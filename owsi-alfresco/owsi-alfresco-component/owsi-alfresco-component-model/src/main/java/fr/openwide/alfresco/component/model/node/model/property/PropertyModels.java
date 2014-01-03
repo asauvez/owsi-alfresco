@@ -1,6 +1,27 @@
 package fr.openwide.alfresco.component.model.node.model.property;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiBooleanPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDatePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDateTimePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDoublePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiFloatPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiIntegerPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiLongPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNameReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiRefPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.DoublePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.FloatPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.IntegerPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.RefPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public final class PropertyModels {
@@ -8,29 +29,53 @@ public final class PropertyModels {
 	public static TextPropertyModel newText(ContainerModel type, String namespace, String name) {
 		return new TextPropertyModel(type, NameReference.create(namespace, name));
 	}
+	public static MultiTextPropertyModel newMultiText(ContainerModel type, String namespace, String name) {
+		return new MultiTextPropertyModel(type, NameReference.create(namespace, name));
+	}
 
 	public static DatePropertyModel newDate(ContainerModel type, String namespace, String name) {
 		return new DatePropertyModel(type, NameReference.create(namespace, name));
 	}
+	public static MultiDatePropertyModel newMultiDate(ContainerModel type, String namespace, String name) {
+		return new MultiDatePropertyModel(type, NameReference.create(namespace, name));
+	}
 	public static DateTimePropertyModel newDateTime(ContainerModel type, String namespace, String name) {
 		return new DateTimePropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static MultiDateTimePropertyModel newMultiDateTime(ContainerModel type, String namespace, String name) {
+		return new MultiDateTimePropertyModel(type, NameReference.create(namespace, name));
 	}
 
 	public static IntegerPropertyModel newInteger(ContainerModel type, String namespace, String name) {
 		return new IntegerPropertyModel(type, NameReference.create(namespace, name));
 	}
+	public static MultiIntegerPropertyModel newMultiInteger(ContainerModel type, String namespace, String name) {
+		return new MultiIntegerPropertyModel(type, NameReference.create(namespace, name));
+	}
 	public static LongPropertyModel newLong(ContainerModel type, String namespace, String name) {
 		return new LongPropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static MultiLongPropertyModel newMultiLong(ContainerModel type, String namespace, String name) {
+		return new MultiLongPropertyModel(type, NameReference.create(namespace, name));
 	}
 	public static FloatPropertyModel newFloat(ContainerModel type, String namespace, String name) {
 		return new FloatPropertyModel(type, NameReference.create(namespace, name));
 	}
+	public static MultiFloatPropertyModel newMultiFloat(ContainerModel type, String namespace, String name) {
+		return new MultiFloatPropertyModel(type, NameReference.create(namespace, name));
+	}
 	public static DoublePropertyModel newDouble(ContainerModel type, String namespace, String name) {
 		return new DoublePropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static MultiDoublePropertyModel newMultiDouble(ContainerModel type, String namespace, String name) {
+		return new MultiDoublePropertyModel(type, NameReference.create(namespace, name));
 	}
 
 	public static BooleanPropertyModel newBoolean(ContainerModel type, String namespace, String name) {
 		return new BooleanPropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static MultiBooleanPropertyModel newMultiBoolean(ContainerModel type, String namespace, String name) {
+		return new MultiBooleanPropertyModel(type, NameReference.create(namespace, name));
 	}
 
 	public static ContentPropertyModel newContent(ContainerModel type, String namespace, String name) {
@@ -40,8 +85,14 @@ public final class PropertyModels {
 	public static RefPropertyModel newRef(ContainerModel type, String namespace, String name) {
 		return new RefPropertyModel(type, NameReference.create(namespace, name));
 	}
+	public static MultiRefPropertyModel newMultiRef(ContainerModel type, String namespace, String name) {
+		return new MultiRefPropertyModel(type, NameReference.create(namespace, name));
+	}
 	public static NameReferencePropertyModel newNameReference(ContainerModel type, String namespace, String name) {
 		return new NameReferencePropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static MultiNameReferencePropertyModel newMultiNameReference(ContainerModel type, String namespace, String name) {
+		return new MultiNameReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
 
 }

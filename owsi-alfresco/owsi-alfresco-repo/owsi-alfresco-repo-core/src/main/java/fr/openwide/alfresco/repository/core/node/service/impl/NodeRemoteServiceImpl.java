@@ -13,6 +13,7 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -24,8 +25,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -36,6 +35,7 @@ import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameExce
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
@@ -50,8 +50,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private NodeService nodeService;
 	private ContentService contentService;
 	private PermissionService permissionService;
-	private AuthenticationService authenticationService;
-	private AuthorityService authorityService;
 
 	private ConversionService conversionService;
 
@@ -100,7 +98,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return res;
 	}
 
-	public RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) {
+	private RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		RepositoryNode node = new RepositoryNode();
 		if (details.isNodeReference()) {
@@ -111,7 +109,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 		if (details.getPrimaryParent() != null) {
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
-			node.setPrimaryParent(getRepositoryNode(primaryParent.getParentRef(), details.getPrimaryParent()));
+			if (primaryParent.getParentRef() != null) {
+				node.setPrimaryParentAssociation(new RepositoryChildAssociation(
+						getRepositoryNode(primaryParent.getParentRef(), details.getPrimaryParent()),
+						conversionService.get(primaryParent.getTypeQName())));
+			}
 		}
 		for (NameReference property : details.getProperties()) {
 			Serializable value = nodeService.getProperty(nodeRef, conversionService.getRequired(property));
@@ -154,6 +156,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		if (details.isAccessPermissions()) {
+			node.setInheritParentPermissions(permissionService.getInheritParentPermissions(nodeRef));
 			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
 				node.getAccessPermissions().add(new RepositoryAuthorityPermission(
 						new RepositoryAuthority(accessPermission.getAuthority()),
@@ -183,9 +186,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		try {
+			RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
 			NodeRef nodeRef = nodeService.createNode(
-					conversionService.getRequired(node.getPrimaryParent().getNodeReference()), 
-					ContentModel.ASSOC_CONTAINS, 
+					conversionService.getRequired(primaryParent.getParentNode().getNodeReference()), 
+					conversionService.getRequired(primaryParent.getType()), 
 					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()), 
 					conversionService.getRequired(node.getType()), 
 					properties).getChildRef();
@@ -202,54 +206,55 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details) {
-		NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
-		if (details.isType()) {
-			nodeService.setType(nodeRef, conversionService.getRequired(node.getType()));
-		}
-		if (details.getPrimaryParent() != null) {
-			String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
-			if (cmName == null) {
-				throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
+	public void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
+		try {
+			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
+			if (details.isType()) {
+				nodeService.setType(nodeRef, conversionService.getRequired(node.getType()));
 			}
-			NodeReference parentRef = node.getPrimaryParent().getNodeReference();
-			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
-			nodeService.moveNode(nodeRef, conversionService.getRequired(parentRef), primaryParent.getTypeQName(), 
-					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
-		}
-		for (NameReference propertyName : details.getProperties()) {
-			Serializable value = node.getProperties().get(propertyName);
-			if (value != null) {
-				if (! (value instanceof ContentData)) {
-					nodeService.setProperty(nodeRef, 
-						conversionService.getRequired(propertyName), 
-						conversionService.getForRepository(value));
+			if (details.getPrimaryParent() != null) {
+				String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
+				if (cmName == null) {
+					throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
 				}
-			} else {
-				nodeService.removeProperty(nodeRef, 
-					conversionService.getRequired(propertyName)); 
+				RepositoryChildAssociation repoPrimaryParent = node.getPrimaryParentAssociation();
+				nodeService.moveNode(nodeRef, 
+						conversionService.getRequired(repoPrimaryParent.getParentNode().getNodeReference()), 
+						conversionService.getRequired(repoPrimaryParent.getType()), 
+						QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
 			}
-		}
-		for (NameReference aspectName : details.getAspects()) {
-			if (node.getAspects().contains(aspectName)) {
-				nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
-			} else {
-				nodeService.removeAspect(nodeRef, conversionService.getRequired(aspectName));
+			for (NameReference propertyName : details.getProperties()) {
+				Serializable value = node.getProperties().get(propertyName);
+				if (value != null) {
+					if (! (value instanceof ContentData)) {
+						nodeService.setProperty(nodeRef, 
+							conversionService.getRequired(propertyName), 
+							conversionService.getForRepository(value));
+					}
+				} else {
+					nodeService.removeProperty(nodeRef, 
+						conversionService.getRequired(propertyName)); 
+				}
 			}
-		}
-		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
-			for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
-				childNode.setPrimaryParent(node);
-				try {
+			for (NameReference aspectName : details.getAspects()) {
+				if (node.getAspects().contains(aspectName)) {
+					nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
+				} else {
+					nodeService.removeAspect(nodeRef, conversionService.getRequired(aspectName));
+				}
+			}
+			for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
+				for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
+					childNode.setPrimaryParentAssociation(new RepositoryChildAssociation(node, entry.getKey()));
 					saveOrUpdate(childNode, entry.getValue());
-				} catch (DuplicateChildNameException e) {
-					throw new InvalidPayloadException(e);
 				}
 			}
-		}
-		setContents(nodeRef, node);
-		if (details.isAccessPermissions()) {
-			setPermissions(nodeRef, node);
+			setContents(nodeRef, node);
+			if (details.isAccessPermissions()) {
+				setPermissions(nodeRef, node);
+			}
+		} catch (DuplicateChildNodeNameException e) {
+			throw new DuplicateChildNameException(e);
 		}
 	}
 
@@ -260,30 +265,39 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			update(node, details);
 		}
 	}
-
-	private void setPermissions(NodeRef nodeRef, RepositoryNode node) {
-		Set<RepositoryAuthorityPermission> newPermissions = node.getAccessPermissions();
+	
+	private void setPermissions(final NodeRef nodeRef, final RepositoryNode node) {
+		// Check si on a les droits
+		if (permissionService.hasPermission(nodeRef, PermissionService.CHANGE_PERMISSIONS) != AccessStatus.ALLOWED) {
+			throw new AccessDeniedException("You don't have the permission to change the permissions on " + nodeRef);
+		}
+		
+		AuthenticationUtil.runAs(new RunAsWork<Void>() {
+			@Override
+			public Void doWork() throws Exception {
+				setPermissionsAsAdmin(nodeRef, node);
+				return null;
+			}
+		}, AuthenticationUtil.getSystemUserName());
+	}
+	
+	private void setPermissionsAsAdmin(NodeRef nodeRef, RepositoryNode node) {
+		if (node.getInheritParentPermissions() != null) {
+			permissionService.setInheritParentPermissions(nodeRef, node.getInheritParentPermissions());
+		}
+		
 		Set<RepositoryAuthorityPermission> oldPermissions = new HashSet<RepositoryAuthorityPermission>();
 		for (AccessPermission oldPermission : permissionService.getAllSetPermissions(nodeRef)) {
 			if (oldPermission.isSetDirectly()) {
 				oldPermissions.add(new RepositoryAuthorityPermission(
-						new RepositoryAuthority(oldPermission.getAuthority()),
-						new RepositoryPermission(oldPermission.getPermission()),
-						oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
+					new RepositoryAuthority(oldPermission.getAuthority()),
+					new RepositoryPermission(oldPermission.getPermission()),
+					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
 		}
 		
-		final String userName = authenticationService.getCurrentUserName();
-		Set<String> userAuthorities = AuthenticationUtil.runAs(new RunAsWork<Set<String>>() {
-			@Override
-			public Set<String> doWork() throws Exception {
-				return authorityService.getAuthoritiesForUser(userName);
-			}
-		}, AuthenticationUtil.getSystemUserName());
-		
-		// ajout des nouvelles permissions
-		for (RepositoryAuthorityPermission newPermission : newPermissions) {
-			if (! oldPermissions.contains(newPermission)) {
+		for (RepositoryAuthorityPermission newPermission : node.getAccessPermissions()) {
+			if (! oldPermissions.remove(newPermission)) {
 				permissionService.setPermission(nodeRef, 
 						newPermission.getAuthority().getName(), 
 						newPermission.getPermission().getName(), 
@@ -291,39 +305,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		
-		// parcours des anciennes permissions à enlever qui ne concerne pas l'utilisateur connecté
-		List<RepositoryAuthorityPermission> remainingPermissions = new ArrayList<RepositoryAuthorityPermission>();
 		for (RepositoryAuthorityPermission oldPermission : oldPermissions) {
-			if (! newPermissions.contains(oldPermission)) {
-				if (! userAuthorities.contains(oldPermission.getAuthority())) {
-					permissionService.deletePermission(nodeRef, oldPermission.getAuthority().getName(), oldPermission.getPermission().getName());
-				} else {
-					// stocke temporairement
-					remainingPermissions.add(oldPermission);
-				}
-			}
+			permissionService.deletePermission(nodeRef, 
+					oldPermission.getAuthority().getName(), 
+					oldPermission.getPermission().getName());
 		}
-		
-		// suppression des anciennes permissions en trop pour l'utilisateur connecté
-		// En premier permissions non admin, histoire que l'on est encore les droits de supprimer les autres
-		for (RepositoryAuthorityPermission oldPermission : remainingPermissions) {
-			if (! isPermissionControl(oldPermission.getPermission().getName())) {
-				permissionService.deletePermission(nodeRef, oldPermission.getAuthority().getName(), oldPermission.getPermission().getName());
-			}
-		}
-		// En deuxième, permissions admin
-		for (RepositoryAuthorityPermission oldPermission : remainingPermissions) {
-			if (isPermissionControl(oldPermission.getPermission().getName())) {
-				permissionService.deletePermission(nodeRef, oldPermission.getAuthority().getName(), oldPermission.getPermission().getName());
-			}
-		}
-	}
-
-	private boolean isPermissionControl(String permission) {
-		return PermissionService.COORDINATOR.equals(permission)
-				|| PermissionService.CHANGE_PERMISSIONS.equals(permission)
-				|| PermissionService.FULL_CONTROL.equals(permission)
-				|| PermissionService.ALL_PERMISSIONS.equals(permission);
 	}
 
 	private void setContents(NodeRef nodeRef, RepositoryNode node) {
@@ -393,11 +379,4 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}
-	public void setAuthenticationService(AuthenticationService authenticationService) {
-		this.authenticationService = authenticationService;
-	}
-	public void setAuthorityService(AuthorityService authorityService) {
-		this.authorityService = authorityService;
-	}
-
 }

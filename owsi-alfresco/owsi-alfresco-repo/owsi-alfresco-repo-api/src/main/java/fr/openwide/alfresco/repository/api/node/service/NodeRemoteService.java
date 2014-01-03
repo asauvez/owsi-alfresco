@@ -47,10 +47,11 @@ public interface NodeRemoteService {
 	}
 	List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails);
 
-	interface CREATE_NODE_SERVICE {
-		String URL = "/owsi/node";
-		HttpMethod METHOD = HttpMethod.POST;
-		String CONTENT_PROPERTY_HEADER = "contentProperty";
+	class CREATE_NODE_SERVICE {
+		public static final String URL = "/owsi/node";
+		public static final HttpMethod METHOD = HttpMethod.POST;
+		public RepositoryNode node;
+		public String contentBodyProperty;
 	}
 	NodeReference create(RepositoryNode node) throws DuplicateChildNameException;
 
@@ -59,8 +60,9 @@ public interface NodeRemoteService {
 		public static final HttpMethod METHOD = HttpMethod.PUT;
 		public RepositoryNode node;
 		public NodeFetchDetails details;
+		public String contentBodyProperty;
 	}
-	void update(RepositoryNode node, NodeFetchDetails details);
+	void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException;
 
 	interface DELETE_NODE_SERVICE {
 		String URL = "/owsi/node";

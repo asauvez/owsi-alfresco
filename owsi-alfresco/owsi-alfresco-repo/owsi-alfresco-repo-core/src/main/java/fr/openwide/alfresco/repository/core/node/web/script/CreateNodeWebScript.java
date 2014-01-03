@@ -8,27 +8,25 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.CREATE_NODE_SERVICE;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-public class CreateNodeWebScript extends AbstractNodeWebScript<NodeReference, RepositoryNode> {
+public class CreateNodeWebScript extends AbstractNodeWebScript<NodeReference, CREATE_NODE_SERVICE> {
 
 	@Override
-	protected NodeReference executeImpl(Resource content, RepositoryNode node, WebScriptRequest req, Status status, Cache cache)
+	protected NodeReference executeImpl(Resource content, CREATE_NODE_SERVICE request, WebScriptRequest req, Status status, Cache cache)
 			throws RepositoryRemoteException {
-		String contentProperty = req.getHeader(CREATE_NODE_SERVICE.CONTENT_PROPERTY_HEADER);
-		if (contentProperty != null) {
-			node.getContentResources().put(NameReference.create(contentProperty), content);
+		if (request.contentBodyProperty != null) {
+			request.node.getContentResources().put(NameReference.create(request.contentBodyProperty), content);
 		}
-		return nodeService.create(node);
+		return nodeService.create(request.node);
 	}
 
 	@Override
 	protected JavaType getParameterType() {
-		return SimpleType.construct(RepositoryNode.class);
+		return SimpleType.construct(CREATE_NODE_SERVICE.class);
 	}
 
 }

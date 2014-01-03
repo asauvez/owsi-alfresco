@@ -9,7 +9,6 @@ import java.util.List;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.TextPropertyModel;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 /**
@@ -77,8 +76,8 @@ public class RestrictionBuilder extends Restriction {
 	/**
 	 * Si la paramètre est null ou chaîne vide, on ne tient pas compte de la restriction.
 	 */
-	public TextMatchRestriction match(TextPropertyModel property, String value) {
-		return add(new TextMatchRestriction(this, property, value));
+	public MatchRestriction<String> match(PropertyModel<String> property, String value) {
+		return add(new MatchRestriction<String>(this, property, value));
 	}
 
 	public <C extends Serializable> MatchRestriction<C> eq(PropertyModel<C> property, C value) {

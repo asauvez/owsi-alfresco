@@ -1,11 +1,11 @@
-package fr.openwide.alfresco.component.model.node.model.property;
+package fr.openwide.alfresco.component.model.node.model.property.single;
 
 import java.util.Date;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class DatePropertyModel extends PropertyModel<Date> {
+public class DatePropertyModel extends SinglePropertyModel<Date> {
 
 	public DatePropertyModel(ContainerModel type, NameReference nameReference) {
 		super(type, nameReference);

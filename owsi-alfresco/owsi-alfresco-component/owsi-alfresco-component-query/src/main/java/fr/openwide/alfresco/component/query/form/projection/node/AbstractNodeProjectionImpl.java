@@ -7,7 +7,7 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 public abstract class AbstractNodeProjectionImpl<P> extends ProjectionImpl<RepositoryNode, NodeProjectionBuilder, P>
 	implements NodeFetchDetailsInitializer {
 
-	public AbstractNodeProjectionImpl(NodeProjectionBuilder builder, Class<P> mappedClass) {
+	public AbstractNodeProjectionImpl(NodeProjectionBuilder builder, Class<? super P> mappedClass) {
 		super(builder, mappedClass);
 	}
 

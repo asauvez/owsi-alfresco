@@ -6,8 +6,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
+@JsonInclude(Include.NON_EMPTY)
 public class NodeFetchDetails implements Serializable {
 
 	private static final long serialVersionUID = 6930653481257487738L;

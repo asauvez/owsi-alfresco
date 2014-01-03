@@ -2,16 +2,16 @@ package fr.openwide.alfresco.component.query.form.projection.node;
 
 import java.io.Serializable;
 
-import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class NodePropertyProjectionImpl<P extends Serializable> extends AbstractNodeProjectionImpl<P> {
 
-	private final PropertyModel<P> property;
+	private final SinglePropertyModel<P> property;
 
-	public NodePropertyProjectionImpl(NodeProjectionBuilder builder, PropertyModel<P> property) {
+	public NodePropertyProjectionImpl(NodeProjectionBuilder builder, SinglePropertyModel<P> property) {
 		super(builder, property.getValueClass());
 		this.property = property;
 	}

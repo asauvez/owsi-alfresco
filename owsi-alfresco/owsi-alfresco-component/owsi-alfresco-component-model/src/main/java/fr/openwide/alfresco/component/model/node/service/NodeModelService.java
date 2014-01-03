@@ -11,7 +11,7 @@ import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
-import fr.openwide.alfresco.component.model.node.model.property.ContentPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
@@ -42,8 +42,8 @@ public interface NodeModelService {
 	NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNameException, IOException;
 
 	NodeReference create(BusinessNode node) throws DuplicateChildNameException;
-	void update(BusinessNode node);
-	void update(BusinessNode node, NodeFetchDetailsBuilder details);
+	void update(BusinessNode node) throws DuplicateChildNameException;
+	void update(BusinessNode node, NodeFetchDetailsBuilder details) throws DuplicateChildNameException;
 	void delete(NodeReference nodeReference);
 
 }
