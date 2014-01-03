@@ -13,7 +13,7 @@
 	<description>Définitions des dépendances pour le développement d'une application spécifique sur Alfresco</description>
 
 	<properties>
-		<owsi-alfresco.owsi-core.version>0.8.6-SNAPSHOT</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.owsi-core.version>0.8.7</owsi-alfresco.owsi-core.version>
 		
 		<owsi-alfresco.hibernate-validator.version>5.0.1.Final</owsi-alfresco.hibernate-validator.version>
 		

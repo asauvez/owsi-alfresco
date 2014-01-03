@@ -13,8 +13,6 @@ public class CheckMultipartFileValidator implements ConstraintValidator<CheckMul
 	private long minSize;
 	private long maxSize;
 
-	// TODO message par défaut + verif size ????
-
 	@Override
 	public void initialize(CheckMultipartFile constraintAnnotation) {
 		extension = constraintAnnotation.extension();
