@@ -36,6 +36,7 @@ import fr.openwide.alfresco.app.web.download.binding.DownloadResponseMethodProce
 import fr.openwide.alfresco.app.web.framework.spring.binding.HandlerInterceptorAwareModelMethodProcessor;
 import fr.openwide.alfresco.app.web.framework.spring.binding.NameReferenceFormatter;
 import fr.openwide.alfresco.app.web.framework.spring.binding.NodeReferenceFormatter;
+import fr.openwide.alfresco.app.web.framework.spring.binding.StoreReferenceFormatter;
 import fr.openwide.alfresco.app.web.framework.spring.interceptor.ExceptionLoggerHandlerInterceptor;
 import fr.openwide.alfresco.app.web.security.authentication.AuthenticationExposingInterceptor;
 import fr.openwide.alfresco.app.web.validation.binding.AlertContainerMethodArgumentResolver;
@@ -75,8 +76,9 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	@Override
 	protected void addFormatters(FormatterRegistry registry) {
 		super.addFormatters(registry);
-		registry.addFormatter(new NameReferenceFormatter());
 		registry.addFormatter(new NodeReferenceFormatter());
+		registry.addFormatter(new StoreReferenceFormatter());
+		registry.addFormatter(new NameReferenceFormatter());
 	}
 	
 	@Bean
@@ -93,6 +95,7 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		super.addArgumentResolvers(argumentResolvers);
 		argumentResolvers.add(validationResponseMethodProcessor());
 		argumentResolvers.add(downloadResponseMethodProcessor());
+		argumentResolvers.add(new AlertContainerMethodArgumentResolver());
 	}
 
 	@Override

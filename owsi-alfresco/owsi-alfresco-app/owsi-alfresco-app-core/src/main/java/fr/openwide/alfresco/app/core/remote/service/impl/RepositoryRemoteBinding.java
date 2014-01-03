@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.app.core.remote.service.impl;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
 
@@ -21,6 +22,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketAware;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
@@ -153,6 +155,9 @@ public class RepositoryRemoteBinding {
 	}
 
 	protected RepositoryRemoteException mapResourceAccessException(ResourceAccessException e) {
+		if (e.getCause() instanceof ConnectException) {
+			throw new RepositoryConnectException(e);
+		}
 		if (e.getCause() instanceof RepositoryIOException) {
 			return (RepositoryRemoteException) e.getCause().getCause();
 		}

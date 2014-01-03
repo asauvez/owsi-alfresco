@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.security.model.BusinessUser;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
@@ -41,6 +42,8 @@ public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthent
 		try {
 			RepositoryUser repositoryUser = authenticationService.authenticate(username, credentials);
 			return buildUserDetails(repositoryUser, credentials);
+		} catch (RepositoryConnectException e) {
+			throw new AuthenticationServiceException("Repository not responding", e);
 		} catch (AccessDeniedRemoteException e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Could not authenticate user: " + username, e);
