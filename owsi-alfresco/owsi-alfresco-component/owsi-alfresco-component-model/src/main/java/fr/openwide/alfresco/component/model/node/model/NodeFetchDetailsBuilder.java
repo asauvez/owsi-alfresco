@@ -23,7 +23,7 @@ public class NodeFetchDetailsBuilder {
 	public NodeFetchDetailsBuilder fromNode(BusinessNode node) {
 		RepositoryNode repositoryNode = node.getRepositoryNode();
 		if (repositoryNode.getType() != null) type();
-		if (node.getPrimaryParent() != null) primaryParent();
+		if (node.getRepositoryNode().getPrimaryParentAssociation() != null) primaryParent();
 		
 		details.getProperties().addAll(repositoryNode.getProperties().keySet());
 		details.getContentStrings().addAll(repositoryNode.getContentStrings().keySet());
@@ -89,6 +89,11 @@ public class NodeFetchDetailsBuilder {
 	public NodeFetchDetailsBuilder childAssociation(ChildAssociationModel childAssociation) {
 		NodeFetchDetailsBuilder other = new NodeFetchDetailsBuilder();
 		details.getChildAssociations().put(childAssociation.getNameReference(), other.getDetails());
+		return other;
+	}
+	public NodeFetchDetailsBuilder parentAssociation(ChildAssociationModel childAssociation) {
+		NodeFetchDetailsBuilder other = new NodeFetchDetailsBuilder();
+		details.getParentAssociations().put(childAssociation.getNameReference(), other.getDetails());
 		return other;
 	}
 	public NodeFetchDetailsBuilder targetAssociation(AssociationModel association) {

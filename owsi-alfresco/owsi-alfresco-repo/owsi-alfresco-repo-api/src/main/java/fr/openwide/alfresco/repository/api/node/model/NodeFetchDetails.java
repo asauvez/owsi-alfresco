@@ -24,6 +24,7 @@ public class NodeFetchDetails implements Serializable {
 
 	private NodeFetchDetails primaryParent;
 	private Map<NameReference, NodeFetchDetails> childAssociations = new HashMap<>();
+	private Map<NameReference, NodeFetchDetails> parentAssociations = new HashMap<>();
 	private Map<NameReference, NodeFetchDetails> targetAssocs = new HashMap<>();
 	private Map<NameReference, NodeFetchDetails> sourceAssocs = new HashMap<>();
 
@@ -60,6 +61,9 @@ public class NodeFetchDetails implements Serializable {
 
 	public Map<NameReference, NodeFetchDetails> getChildAssociations() {
 		return childAssociations;
+	}
+	public Map<NameReference, NodeFetchDetails> getParentAssociations() {
+		return parentAssociations;
 	}
 	public Map<NameReference, NodeFetchDetails> getTargetAssocs() {
 		return targetAssocs;

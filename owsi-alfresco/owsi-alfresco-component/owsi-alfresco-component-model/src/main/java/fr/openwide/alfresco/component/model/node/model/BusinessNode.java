@@ -209,6 +209,9 @@ public class BusinessNode {
 	public List<BusinessNode> getChildAssociation(ChildAssociationModel childAssociation) {
 		return wrapList(node.getChildAssociations().get(childAssociation.getNameReference()));
 	}
+	public List<BusinessNode> getParentAssociation(ChildAssociationModel childAssociation) {
+		return wrapList(node.getParentAssociations().get(childAssociation.getNameReference()));
+	}
 	public List<BusinessNode> getTargetAssociation(AssociationModel association) {
 		return wrapList(node.getTargetAssocs().get(association.getNameReference()));
 	}

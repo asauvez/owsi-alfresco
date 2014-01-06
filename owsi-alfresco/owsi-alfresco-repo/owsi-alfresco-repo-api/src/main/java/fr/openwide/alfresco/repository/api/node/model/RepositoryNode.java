@@ -45,6 +45,7 @@ public class RepositoryNode implements Serializable {
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 	
 	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
+	private Map<NameReference, List<RepositoryNode>> parentAssociations = new HashMap<>();
 	private Map<NameReference, List<RepositoryNode>> targetAssocs = new HashMap<>();
 	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new HashMap<>();
 
@@ -162,6 +163,9 @@ public class RepositoryNode implements Serializable {
 
 	public Map<NameReference, List<RepositoryNode>> getChildAssociations() {
 		return childAssociations;
+	}
+	public Map<NameReference, List<RepositoryNode>> getParentAssociations() {
+		return parentAssociations;
 	}
 	public Map<NameReference, List<RepositoryNode>> getTargetAssocs() {
 		return targetAssocs;

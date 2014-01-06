@@ -72,6 +72,18 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 		return res;
 	}
+	private List<RepositoryNode> getParent(
+			NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails details) {
+		List<ChildAssociationRef> assocs = nodeService.getParentAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(childAssocTypeName), 
+				RegexQNamePattern.MATCH_ALL);
+		List<RepositoryNode> res = new ArrayList<>();
+		for (ChildAssociationRef assoc : assocs) {
+			res.add(getRepositoryNode(assoc.getParentRef(), details));
+		}
+		return res;
+	}
 
 	@Override
 	public List<RepositoryNode> getTargetAssocs(
@@ -142,6 +154,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			node.getChildAssociations().put(
 					entry.getKey(), 
 					getChildren(nodeReference, entry.getKey(), entry.getValue()));
+		}
+		for (Entry<NameReference, NodeFetchDetails> entry : details.getParentAssociations().entrySet()) {
+			node.getParentAssociations().put(
+					entry.getKey(), 
+					getParent(nodeReference, entry.getKey(), entry.getValue()));
 		}
 		for (Entry<NameReference, NodeFetchDetails> entry : details.getTargetAssocs().entrySet()) {
 			node.getTargetAssocs().put(
@@ -250,6 +267,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
 				for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
 					childNode.setPrimaryParentAssociation(new RepositoryChildAssociation(node, entry.getKey()));
+					saveOrUpdate(childNode, entry.getValue());
+				}
+			}
+			for (Entry<NameReference, NodeFetchDetails> entry : details.getParentAssociations().entrySet()) {
+				for (RepositoryNode childNode : node.getParentAssociations().get(entry.getKey())) {
 					saveOrUpdate(childNode, entry.getValue());
 				}
 			}
