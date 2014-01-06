@@ -14,5 +14,5 @@ public class CmFolder extends CmObject {
 		super(nameReference);
 	}
 
-	public ChildAssociationModel contains = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "contains"));
+	public final ChildAssociationModel contains = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "contains"));
 }

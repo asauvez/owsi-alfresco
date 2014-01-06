@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
+import java.util.Objects;
+
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
@@ -21,7 +23,8 @@ public class CreateNodeWebScript extends AbstractNodeWebScript<NodeReference, CR
 		if (request.contentBodyProperty != null) {
 			request.node.getContentResources().put(NameReference.create(request.contentBodyProperty), content);
 		}
-		return nodeService.create(request.node);
+		return nodeService.create(
+				Objects.requireNonNull(request.node, "Node"));
 	}
 
 	@Override

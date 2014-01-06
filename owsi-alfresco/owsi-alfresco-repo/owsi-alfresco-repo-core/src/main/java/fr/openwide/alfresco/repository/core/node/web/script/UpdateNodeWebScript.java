@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
+import java.util.Objects;
+
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
@@ -19,7 +21,9 @@ public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE
 		if (request.contentBodyProperty != null) {
 			request.node.getContentResources().put(NameReference.create(request.contentBodyProperty), content);
 		}
-		nodeService.update(request.node, request.details);
+		nodeService.update(
+				Objects.requireNonNull(request.node, "RepositoryNode"), 
+				Objects.requireNonNull(request.details, "NodeFetchDetails"));
 		return null;
 	}
 

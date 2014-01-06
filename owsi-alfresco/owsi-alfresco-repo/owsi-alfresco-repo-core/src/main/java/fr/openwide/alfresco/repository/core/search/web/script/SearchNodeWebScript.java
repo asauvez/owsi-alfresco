@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.core.search.web.script;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
@@ -20,7 +21,10 @@ public class SearchNodeWebScript extends AbstractMessageRemoteWebScript<List<Rep
 
 	@Override
 	protected List<RepositoryNode> executeImpl(SEARCH_NODE_SERVICE parameter, Status status, Cache cache) throws RepositoryRemoteException {
-		return nodeSearchService.search(parameter.query, parameter.storeReference, parameter.nodeFetchDetails);
+		return nodeSearchService.search(
+				Objects.requireNonNull(parameter.query, "Query"), 
+				Objects.requireNonNull(parameter.storeReference, "StoreReference"), 
+				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
 	}
 
 	@Override

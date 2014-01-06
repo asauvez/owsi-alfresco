@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
@@ -18,7 +19,10 @@ public class TargetAssocNodeWebScript extends AbstractNodeWebScript<List<Reposit
 
 	@Override
 	protected List<RepositoryNode> executeImpl(Resource content, TARGET_ASSOC_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
-		return nodeService.getTargetAssocs(parameter.nodeReference, parameter.assocName, parameter.nodeFetchDetails);
+		return nodeService.getTargetAssocs(
+				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
+				Objects.requireNonNull(parameter.assocName, "AssocName"), 
+				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package fr.openwide.alfresco.component.model.repository.model;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthorityContainer;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
@@ -25,6 +26,8 @@ public interface CmModel {
 
 	CmAuthority authority = new CmAuthority();
 
+	CmAuthorityContainer authorityContainer = new CmAuthorityContainer();
+	
 	CmPerson person = new CmPerson();
 
 	// ---- Aspects

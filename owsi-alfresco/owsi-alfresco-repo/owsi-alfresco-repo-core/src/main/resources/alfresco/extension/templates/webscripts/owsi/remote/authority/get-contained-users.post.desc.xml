@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>get-contained-users</shortname>
+	<description>Get users contained in an authority</description>
+	<url>/owsi/authority/get-contained-users</url>
+	<format default="json" />
+	<authentication>user</authentication>
+	<transaction allow="readonly">required</transaction>
+	<family>OWSI</family>
+</webscript>

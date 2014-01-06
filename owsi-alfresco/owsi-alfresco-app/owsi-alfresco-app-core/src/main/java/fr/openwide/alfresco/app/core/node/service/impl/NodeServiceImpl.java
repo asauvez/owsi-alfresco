@@ -43,7 +43,7 @@ public class NodeServiceImpl implements NodeService {
 			request.nodeFetchDetails = nodeFetchDetails;
 			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
-					GET_NODE_SERVICE.METHOD, request, RepositoryNode.class, headers);
+					GET_NODE_SERVICE.METHOD, (Object) null, RepositoryNode.class, headers);
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);
@@ -85,7 +85,7 @@ public class NodeServiceImpl implements NodeService {
 			request.nodeFetchDetails = nodeFetchDetails;
 			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			return repositoryRemoteBinding.exchangeCollection(CHILDREN_NODE_SERVICE.URL, 
-					CHILDREN_NODE_SERVICE.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
+					CHILDREN_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);
@@ -101,7 +101,7 @@ public class NodeServiceImpl implements NodeService {
 			request.nodeFetchDetails = nodeFetchDetails;
 			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			return repositoryRemoteBinding.exchangeCollection(TARGET_ASSOC_NODE_SERVICE.URL, 
-					TARGET_ASSOC_NODE_SERVICE.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
+					TARGET_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);
@@ -117,7 +117,7 @@ public class NodeServiceImpl implements NodeService {
 			request.nodeFetchDetails = nodeFetchDetails;
 			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 			return repositoryRemoteBinding.exchangeCollection(SOURCE_ASSOC_NODE_SERVICE.URL, 
-					SOURCE_ASSOC_NODE_SERVICE.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
+					SOURCE_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
 		} catch (RepositoryRemoteException e) {
 			// do not deal with other types of remote exception
 			throw new IllegalStateException(e);

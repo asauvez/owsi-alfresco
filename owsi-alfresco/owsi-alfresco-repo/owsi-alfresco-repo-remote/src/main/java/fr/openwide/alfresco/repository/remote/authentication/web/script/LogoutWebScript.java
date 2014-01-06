@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repository.remote.authentication.web.script;
 
+import java.util.Objects;
+
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 
@@ -17,7 +19,8 @@ public class LogoutWebScript extends AbstractParameterRemoteWebScript<Void, Repo
 
 	@Override
 	protected Void executeImpl(RepositoryTicket ticket, Status status, Cache cache) throws RepositoryRemoteException {
-		authenticationRemoteService.logout(ticket);
+		authenticationRemoteService.logout(
+				Objects.requireNonNull(ticket, "RepositoryTicket"));
 		return null;
 	}
 

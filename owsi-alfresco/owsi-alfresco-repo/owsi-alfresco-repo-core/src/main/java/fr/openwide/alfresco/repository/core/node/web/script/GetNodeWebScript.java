@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
+import java.util.Objects;
+
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
@@ -16,7 +18,9 @@ public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_
 
 	@Override
 	protected RepositoryNode executeImpl(Resource content, GET_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
-		return nodeService.get(parameter.nodeReference, parameter.nodeFetchDetails);
+		return nodeService.get(
+				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
+				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
 	}
 
 	@Override

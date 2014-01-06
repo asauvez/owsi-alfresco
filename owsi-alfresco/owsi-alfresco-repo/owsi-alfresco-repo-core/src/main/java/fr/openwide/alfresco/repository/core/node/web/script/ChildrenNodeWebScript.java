@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.webscripts.Cache;
@@ -18,7 +19,10 @@ public class ChildrenNodeWebScript extends AbstractNodeWebScript<List<Repository
 
 	@Override
 	protected List<RepositoryNode> executeImpl(Resource content, CHILDREN_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
-		return nodeService.getChildren(parameter.nodeReference, parameter.childAssocTypeName, parameter.nodeFetchDetails);
+		return nodeService.getChildren(
+				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
+				Objects.requireNonNull(parameter.childAssocTypeName, "ChildAssocTypeName"), 
+				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
 	}
 
 	@Override

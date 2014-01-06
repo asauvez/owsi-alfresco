@@ -6,6 +6,7 @@ import java.util.List;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.apache.commons.lang.StringUtils;
 
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
@@ -14,6 +15,7 @@ import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
@@ -23,6 +25,9 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
 	@Override
 	public List<RepositoryNode> search(String luceneQuery, StoreReference storeReference, NodeFetchDetails details) {
+		if (StringUtils.isBlank(luceneQuery)) {
+			throw new InvalidPayloadException("The query should not be an empty string.");
+		}
 		ResultSet resultSet = searchService.query(
 				conversionService.getRequired(storeReference), 
 				SearchService.LANGUAGE_FTS_ALFRESCO, 

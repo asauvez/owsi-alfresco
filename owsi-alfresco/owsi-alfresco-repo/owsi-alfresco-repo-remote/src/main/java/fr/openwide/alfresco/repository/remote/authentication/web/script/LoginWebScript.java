@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repository.remote.authentication.web.script;
 
+import java.util.Objects;
+
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 
@@ -18,7 +20,9 @@ public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUse
 
 	@Override
 	protected RepositoryUser executeImpl(LOGIN_REQUEST_SERVICE request, Status status, Cache cache) throws RepositoryRemoteException {
-		return authenticationRemoteService.authenticate(request.username, request.password);
+		return authenticationRemoteService.authenticate(
+				Objects.requireNonNull(request.username, "Username"), 
+				Objects.requireNonNull(request.password, "Password"));
 	}
 
 	@Override
