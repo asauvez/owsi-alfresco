@@ -9,7 +9,7 @@ public class DuplicateChildNameException extends RepositoryRemoteException {
 	public DuplicateChildNameException() {}
 	
 	public DuplicateChildNameException(String name, Throwable cause) {
-		super(cause);
+		super(name, cause);
 	}
 
 }

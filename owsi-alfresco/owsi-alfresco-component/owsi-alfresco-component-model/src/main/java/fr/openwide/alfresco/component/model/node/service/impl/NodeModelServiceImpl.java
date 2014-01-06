@@ -79,7 +79,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 		String fileName = FilenameUtils.getName(file.getOriginalFilename());
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 			.property(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
-			.contentResource(file.getInputStream(), file.getSize()));
+			.contentResource(file));
 	}
 
 	@Override

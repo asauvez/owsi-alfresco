@@ -219,7 +219,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 			if (details.getPrimaryParent() != null) {
 				if (cmName == null) {
-					throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
+					cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 				}
 				RepositoryChildAssociation repoPrimaryParent = node.getPrimaryParentAssociation();
 				nodeService.moveNode(nodeRef, 

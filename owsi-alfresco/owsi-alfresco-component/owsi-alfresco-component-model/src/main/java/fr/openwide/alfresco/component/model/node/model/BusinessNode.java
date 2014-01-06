@@ -42,6 +42,13 @@ public class BusinessNode {
 		this.node = node;
 	}
 
+	/** Constructeur pour faciliter la modification de node. */
+	public BusinessNode(NodeReference nodeReference) {
+		this();
+		nodeReference(nodeReference);
+	}
+
+	/** Constructeur pour faciliter la création de node. */
 	public BusinessNode(NodeReference parentRef, TypeModel type, String name) {
 		this();
 		primaryParentRef(parentRef);
