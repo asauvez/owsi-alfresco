@@ -121,6 +121,10 @@ public class BusinessNode {
 			public long contentLength() throws IOException {
 				return contentLength;
 			}
+			@Override
+			public String getFilename() {
+				return BusinessNode.this.getName();
+			}
 		});
 	}
 	public BusinessNode contentResource(Resource content) {
