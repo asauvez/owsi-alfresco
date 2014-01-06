@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import fr.openwide.alfresco.app.core.framework.spring.config.AppCoreConfig;
+import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
+import fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
@@ -15,12 +17,17 @@ import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelS
 public class ComponentModelConfig {
 
 	@Bean
+	public NodeModelService getNodeServiceImpl() {
+		return new NodeModelServiceImpl();
+	}
+
+	@Bean
 	public NodeSearchModelService getNodeSearchServiceImpl() {
 		return new NodeSearchModelServiceImpl();
 	}
 
 	@Bean
-	public NodeModelService getNodeServiceImpl() {
-		return new NodeModelServiceImpl();
+	public AuthorityModelService getAuthorityService() {
+		return new AuthorityModelServiceImpl();
 	}
 }

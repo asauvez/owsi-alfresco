@@ -54,4 +54,23 @@
 		<property name="nodeSearchService" ref="owsi.service.nodeSearchService" />
 	</bean>
 
+	<!-- Authority service -->
+	
+	<bean id="owsi.service.authorityService" class="fr.openwide.alfresco.repository.core.authority.service.impl.AuthorityRemoteServiceImpl">
+		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
+		<property name="conversionService" ref="owsi.service.conversionService" />
+		<property name="authorityService" ref="AuthorityService" />
+	</bean>
+
+	<!-- Authority webscripts -->
+
+	<bean id="webscript.owsi.authority" parent="webscript.owsi.remote" abstract="true">
+		<property name="authorityRemoteService" ref="owsi.service.authorityService" />
+	</bean>
+
+	<bean id="webscript.owsi.remote.authority.get-contained-users.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedUsersWebScript" />
+	<bean id="webscript.owsi.remote.authority.get-contained-groups.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedGroupsWebScript" />
+
 </beans>

@@ -10,6 +10,7 @@ public class RepositoryAuthority implements Serializable {
 	private static final long serialVersionUID = -5556589719655849321L;
 
 	public static final RepositoryAuthority GROUP_EVERYONE = new RepositoryAuthority("GROUP_EVERYONE");
+	public static final RepositoryAuthority GROUP_ADMINISTRATORS = new RepositoryAuthority("GROUP_ALFRESCO_ADMINISTRATORS");
 
 	private String name;
 
