@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractParameterRemoteWebScript;
 
 public class LogoutWebScript extends AbstractParameterRemoteWebScript<Void, RepositoryTicket> {
@@ -18,7 +17,7 @@ public class LogoutWebScript extends AbstractParameterRemoteWebScript<Void, Repo
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected Void executeImpl(RepositoryTicket ticket, Status status, Cache cache) throws RepositoryRemoteException {
+	protected Void executeImpl(RepositoryTicket ticket, Status status, Cache cache) {
 		authenticationRemoteService.logout(
 				Objects.requireNonNull(ticket, "RepositoryTicket"));
 		return null;

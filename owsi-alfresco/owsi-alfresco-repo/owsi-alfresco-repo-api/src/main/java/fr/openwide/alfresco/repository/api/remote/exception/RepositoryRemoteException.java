@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * main transaction and display a user-friendly message
  */
 @JsonIgnoreProperties(value = { "cause", "stackTrace", "suppressed", "localizedMessage" })
-public class RepositoryRemoteException extends Exception {
+public class RepositoryRemoteException extends RuntimeException {
 
 	public static final String HEADER_EXCEPTION_CLASS_NAME = "X-Remote-Exception-ClassName";
 

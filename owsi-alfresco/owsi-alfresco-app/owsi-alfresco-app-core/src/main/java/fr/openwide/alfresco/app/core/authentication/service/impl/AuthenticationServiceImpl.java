@@ -15,7 +15,6 @@ import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -50,28 +49,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		UserReference userReference = new UserReference(username);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(authenticationHeader, userReference.getUsername());
-		try {
-			return authenticationRemoteBinding.exchange(AUTHENTICATED_USER_SERVICE.URL, 
-					AUTHENTICATED_USER_SERVICE.METHOD, userReference, RepositoryUser.class, headers);
-		} catch (AccessDeniedRemoteException e) {
-			throw e;
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		return authenticationRemoteBinding.exchange(AUTHENTICATED_USER_SERVICE.URL, 
+				AUTHENTICATED_USER_SERVICE.METHOD, userReference, RepositoryUser.class, headers);
 	}
 
 	@Override
 	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		try {
-			return requiringExplicitTicketRemoteBinding.exchange(AUTHENTICATED_USER_SERVICE.URL, 
-					AUTHENTICATED_USER_SERVICE.METHOD, RepositoryUser.class, ticket);
-		} catch (AccessDeniedRemoteException e) {
-			throw e;
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		return requiringExplicitTicketRemoteBinding.exchange(AUTHENTICATED_USER_SERVICE.URL, 
+				AUTHENTICATED_USER_SERVICE.METHOD, RepositoryUser.class, ticket);
 	}
 
 	@Override
@@ -79,15 +64,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		LOGIN_REQUEST_SERVICE request = new LOGIN_REQUEST_SERVICE();
 		request.username = username;
 		request.password = password;
-		try {
-			return unauthenticatedRepositoryRemoteBinding.exchange(LOGIN_REQUEST_SERVICE.URL, 
-					LOGIN_REQUEST_SERVICE.METHOD, request, RepositoryUser.class);
-		} catch (AccessDeniedRemoteException e) {
-			throw e;
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		return unauthenticatedRepositoryRemoteBinding.exchange(LOGIN_REQUEST_SERVICE.URL, 
+				LOGIN_REQUEST_SERVICE.METHOD, request, RepositoryUser.class);
 	}
 
 	@Override
@@ -97,15 +75,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		try {
-			HttpHeaders headers = payloadParameterHandler.handlePayload(ticket);
-			requiringExplicitTicketRemoteBinding.exchange(LOGOUT_SERVICE.URL, LOGOUT_SERVICE.METHOD, (Object) null, Void.class, headers, ticket);
-		} catch (AccessDeniedRemoteException e) {
-			throw e;
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		HttpHeaders headers = payloadParameterHandler.handlePayload(ticket);
+		requiringExplicitTicketRemoteBinding.exchange(LOGOUT_SERVICE.URL, LOGOUT_SERVICE.METHOD, (Object) null, Void.class, headers, ticket);
 	}
 
 }

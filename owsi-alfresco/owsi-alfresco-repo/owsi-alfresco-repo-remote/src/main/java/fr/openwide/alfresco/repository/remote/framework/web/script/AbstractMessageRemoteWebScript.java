@@ -10,7 +10,6 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import com.fasterxml.jackson.databind.JavaType;
 
 import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 /**
  * Base class for web services that provide automatic one argument handling. Payload must be a unique object in message body,
@@ -19,12 +18,12 @@ import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteExce
 public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemoteWebScript<R> {
 
 	@Override
-	protected R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws RepositoryRemoteException {
+	protected R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) {
 		P payload = extractPayload(req);
 		return executeImpl(payload, status, cache);
 	}
 
-	protected P extractPayload(WebScriptRequest req) throws RepositoryRemoteException {
+	protected P extractPayload(WebScriptRequest req) {
 		P parameter;
 		try {
 			if (getParameterType() == null) {
@@ -43,7 +42,7 @@ public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemot
 		return req.getContent().getContent();
 	}
 
-	protected abstract R executeImpl(P payload, Status status, Cache cache) throws RepositoryRemoteException;
+	protected abstract R executeImpl(P payload, Status status, Cache cache);
 
 	/**
 	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and null is passed

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpMethod;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -18,7 +19,7 @@ public interface NodeRemoteService {
 		public NodeReference nodeReference;
 		public NodeFetchDetails nodeFetchDetails;
 	}
-	RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails);
+	RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) throws NoSuchNodeException;
 
 	class CHILDREN_NODE_SERVICE {
 		public static final String URL = "/owsi/node/children";

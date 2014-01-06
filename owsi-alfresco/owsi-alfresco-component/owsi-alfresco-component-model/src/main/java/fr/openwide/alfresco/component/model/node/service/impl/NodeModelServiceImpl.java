@@ -18,8 +18,8 @@ import fr.openwide.alfresco.component.model.node.model.property.single.ContentPr
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 public class NodeModelServiceImpl implements NodeModelService {
@@ -28,9 +28,8 @@ public class NodeModelServiceImpl implements NodeModelService {
 	private NodeService nodeService;
 
 	@Override
-	public BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
-		RepositoryNode node = nodeService.get(nodeReference, nodeFetchDetails.getDetails());
-		return (node != null) ? new BusinessNode(node) : null;
+	public BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) throws NoSuchNodeException {
+		return new BusinessNode(nodeService.get(nodeReference, nodeFetchDetails.getDetails()));
 	}
 
 	@Override

@@ -1,5 +1,8 @@
 package fr.openwide.alfresco.repository.api.remote.exception;
 
+/**
+ * Lancée quand une erreur inconnue est lancé par un service.
+ */
 public class IllegalStateRemoteException extends RepositoryRemoteException {
 
 	private static final long serialVersionUID = -2439683842480984283L;

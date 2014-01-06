@@ -13,12 +13,11 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.CHILDREN_NODE_SERVICE;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 public class ChildrenNodeWebScript extends AbstractNodeWebScript<List<RepositoryNode>, CHILDREN_NODE_SERVICE> {
 
 	@Override
-	protected List<RepositoryNode> executeImpl(Resource content, CHILDREN_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
+	protected List<RepositoryNode> executeImpl(Resource content, CHILDREN_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) {
 		return nodeService.getChildren(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
 				Objects.requireNonNull(parameter.childAssocTypeName, "ChildAssocTypeName"), 

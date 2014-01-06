@@ -13,6 +13,7 @@ import java.util.Set;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
@@ -114,6 +115,13 @@ public class BusinessNode {
 
 	public BusinessNode contentResource(File file) {
 		return contentResource(new FileSystemResource(file));
+	}
+	public BusinessNode contentResource(MultipartFile file) {
+		try {
+			return contentResource(file.getInputStream(), file.getSize());
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 	public BusinessNode contentResource(InputStream input, final long contentLength) {
 		return contentResource(new InputStreamResource(input) {

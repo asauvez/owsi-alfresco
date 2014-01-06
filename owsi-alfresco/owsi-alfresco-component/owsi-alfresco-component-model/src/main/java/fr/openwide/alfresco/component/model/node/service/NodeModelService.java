@@ -13,6 +13,7 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
@@ -23,7 +24,7 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
  */
 public interface NodeModelService {
 
-	BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails);
+	BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) throws NoSuchNodeException;
 
 	RepositoryContentData getNodeContent(NodeReference nodeReference, OutputStream out);
 	RepositoryContentData getNodeContent(NodeReference nodeReference, ContentPropertyModel property, OutputStream out);

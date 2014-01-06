@@ -11,12 +11,11 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService.GET_CONTAINED_USERS;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<List<RepositoryNode>, GET_CONTAINED_USERS> {
 
 	@Override
-	protected List<RepositoryNode> executeImpl(GET_CONTAINED_USERS payload, Status status, Cache cache) throws RepositoryRemoteException {
+	protected List<RepositoryNode> executeImpl(GET_CONTAINED_USERS payload, Status status, Cache cache) {
 		return authorityRemoteService.getContainedUsers(
 				Objects.requireNonNull(payload.authority, "Authority"), 
 				payload.immediate, 

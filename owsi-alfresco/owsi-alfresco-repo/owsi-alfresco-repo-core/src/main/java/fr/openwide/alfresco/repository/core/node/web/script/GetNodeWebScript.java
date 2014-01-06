@@ -12,12 +12,11 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.GET_NODE_SERVICE;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_NODE_SERVICE> {
 
 	@Override
-	protected RepositoryNode executeImpl(Resource content, GET_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) throws RepositoryRemoteException {
+	protected RepositoryNode executeImpl(Resource content, GET_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) {
 		return nodeService.get(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
 				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));

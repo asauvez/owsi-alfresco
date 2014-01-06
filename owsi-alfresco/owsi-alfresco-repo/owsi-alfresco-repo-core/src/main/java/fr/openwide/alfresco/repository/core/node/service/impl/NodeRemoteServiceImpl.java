@@ -32,6 +32,7 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.springframework.core.io.Resource;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
@@ -54,7 +55,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails details) {
+	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails details) throws NoSuchNodeException {
 		return getRepositoryNode(conversionService.getRequired(nodeReference), details);
 	}
 
@@ -98,8 +99,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return res;
 	}
 
-	private RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) {
+	private RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) throws NoSuchNodeException {
 		NodeReference nodeReference = conversionService.get(nodeRef);
+		if (! nodeService.exists(nodeRef)) {
+			throw new NoSuchNodeException(nodeReference.getReference());
+		}
 		RepositoryNode node = new RepositoryNode();
 		if (details.isNodeReference()) {
 			node.setNodeReference(conversionService.get(nodeRef));
@@ -201,19 +205,19 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			setPermissions(nodeRef, node);
 			return conversionService.get(nodeRef);
 		} catch (DuplicateChildNodeNameException e) {
-			throw new DuplicateChildNameException(e);
+			throw new DuplicateChildNameException(cmName, e);
 		}
 	}
 
 	@Override
 	public void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
+		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
 		try {
 			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
 			if (details.isType()) {
 				nodeService.setType(nodeRef, conversionService.getRequired(node.getType()));
 			}
 			if (details.getPrimaryParent() != null) {
-				String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
 				if (cmName == null) {
 					throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
 				}
@@ -254,7 +258,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				setPermissions(nodeRef, node);
 			}
 		} catch (DuplicateChildNodeNameException e) {
-			throw new DuplicateChildNameException(e);
+			throw new DuplicateChildNameException(cmName, e);
 		}
 	}
 

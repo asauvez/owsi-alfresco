@@ -11,12 +11,11 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService.GET_CONTAINED_GROUPS;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 
 public class GetContainedGroupsWebScript extends AbstractAuthorityWebScript<List<RepositoryNode>, GET_CONTAINED_GROUPS> {
 
 	@Override
-	protected List<RepositoryNode> executeImpl(GET_CONTAINED_GROUPS payload, Status status, Cache cache) throws RepositoryRemoteException {
+	protected List<RepositoryNode> executeImpl(GET_CONTAINED_GROUPS payload, Status status, Cache cache) {
 		return authorityRemoteService.getContainedGroups(
 				Objects.requireNonNull(payload.authority, "Authority"), 
 				payload.immediate, 

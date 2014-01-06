@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService.LOGIN_REQUEST_SERVICE;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
 
 public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUser, LOGIN_REQUEST_SERVICE> {
@@ -19,7 +18,7 @@ public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUse
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected RepositoryUser executeImpl(LOGIN_REQUEST_SERVICE request, Status status, Cache cache) throws RepositoryRemoteException {
+	protected RepositoryUser executeImpl(LOGIN_REQUEST_SERVICE request, Status status, Cache cache) {
 		return authenticationRemoteService.authenticate(
 				Objects.requireNonNull(request.username, "Username"), 
 				Objects.requireNonNull(request.password, "Password"));

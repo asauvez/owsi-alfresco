@@ -9,6 +9,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 
@@ -32,16 +33,18 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	}
 
 	@Override
-	public BusinessNode searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
+	public BusinessNode searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) throws NoSuchNodeException {
 		List<BusinessNode> list = search(builder, nodeFetchDetails);
 		if (list.size() > 1) {
 			throw new IllegalStateException("More than one result for " + builder.toLuceneQuery());
+		} else if (list.isEmpty()) {
+			throw new NoSuchNodeException(builder.toLuceneQuery());
 		}
-		return (list.isEmpty()) ? null : list.get(0);
+		return list.get(0);
 	}
 
 	@Override
-	public NodeReference searchUniqueRef(RestrictionBuilder builder) {
+	public NodeReference searchUniqueRef(RestrictionBuilder builder) throws NoSuchNodeException {
 		BusinessNode node = searchUnique(builder, new NodeFetchDetailsBuilder()
 				.nodeReference());
 		return (node != null) ? node.getNodeReference() : null;

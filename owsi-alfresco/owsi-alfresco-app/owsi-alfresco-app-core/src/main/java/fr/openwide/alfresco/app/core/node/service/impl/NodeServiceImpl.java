@@ -22,7 +22,6 @@ import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameExce
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
@@ -37,17 +36,12 @@ public class NodeServiceImpl implements NodeService {
 
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) {
-		try {
-			GET_NODE_SERVICE request = new GET_NODE_SERVICE();
-			request.nodeReference = nodeReference;
-			request.nodeFetchDetails = nodeFetchDetails;
-			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-			return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
-					GET_NODE_SERVICE.METHOD, (Object) null, RepositoryNode.class, headers);
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		GET_NODE_SERVICE request = new GET_NODE_SERVICE();
+		request.nodeReference = nodeReference;
+		request.nodeFetchDetails = nodeFetchDetails;
+		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
+		return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
+				GET_NODE_SERVICE.METHOD, (Object) null, RepositoryNode.class, headers);
 	}
 
 	@Override
@@ -78,90 +72,61 @@ public class NodeServiceImpl implements NodeService {
 
 	@Override
 	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails nodeFetchDetails) {
-		try {
-			CHILDREN_NODE_SERVICE request = new CHILDREN_NODE_SERVICE();
-			request.nodeReference = nodeReference;
-			request.childAssocTypeName = childAssocTypeName;
-			request.nodeFetchDetails = nodeFetchDetails;
-			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-			return repositoryRemoteBinding.exchangeCollection(CHILDREN_NODE_SERVICE.URL, 
-					CHILDREN_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		CHILDREN_NODE_SERVICE request = new CHILDREN_NODE_SERVICE();
+		request.nodeReference = nodeReference;
+		request.childAssocTypeName = childAssocTypeName;
+		request.nodeFetchDetails = nodeFetchDetails;
+		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
+		return repositoryRemoteBinding.exchangeCollection(CHILDREN_NODE_SERVICE.URL, 
+				CHILDREN_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
 	}
 
 	@Override
 	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails) {
-		try {
-			TARGET_ASSOC_NODE_SERVICE request = new TARGET_ASSOC_NODE_SERVICE();
-			request.nodeReference = nodeReference;
-			request.assocName = assocName;
-			request.nodeFetchDetails = nodeFetchDetails;
-			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-			return repositoryRemoteBinding.exchangeCollection(TARGET_ASSOC_NODE_SERVICE.URL, 
-					TARGET_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		TARGET_ASSOC_NODE_SERVICE request = new TARGET_ASSOC_NODE_SERVICE();
+		request.nodeReference = nodeReference;
+		request.assocName = assocName;
+		request.nodeFetchDetails = nodeFetchDetails;
+		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
+		return repositoryRemoteBinding.exchangeCollection(TARGET_ASSOC_NODE_SERVICE.URL, 
+				TARGET_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
 	}
 
 	@Override
 	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails) {
-		try {
-			SOURCE_ASSOC_NODE_SERVICE request = new SOURCE_ASSOC_NODE_SERVICE();
-			request.nodeReference = nodeReference;
-			request.assocName = assocName;
-			request.nodeFetchDetails = nodeFetchDetails;
-			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-			return repositoryRemoteBinding.exchangeCollection(SOURCE_ASSOC_NODE_SERVICE.URL, 
-					SOURCE_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		SOURCE_ASSOC_NODE_SERVICE request = new SOURCE_ASSOC_NODE_SERVICE();
+		request.nodeReference = nodeReference;
+		request.assocName = assocName;
+		request.nodeFetchDetails = nodeFetchDetails;
+		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
+		return repositoryRemoteBinding.exchangeCollection(SOURCE_ASSOC_NODE_SERVICE.URL, 
+				SOURCE_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
 	}
 
 	@Override
 	public NodeReference create(RepositoryNode node) throws DuplicateChildNameException {
-		try {
-			CREATE_NODE_SERVICE request = new CREATE_NODE_SERVICE();
-			request.node = node;
-			request.contentBodyProperty = getContentBodyProperty(node);
-			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-			return repositoryRemoteBinding.exchange(CREATE_NODE_SERVICE.URL, 
-					CREATE_NODE_SERVICE.METHOD, 
-					getContent(node),
-					NodeReference.class, headers);
-		} catch (DuplicateChildNameException e) {
-			throw e;
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		CREATE_NODE_SERVICE request = new CREATE_NODE_SERVICE();
+		request.node = node;
+		request.contentBodyProperty = getContentBodyProperty(node);
+		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
+		return repositoryRemoteBinding.exchange(CREATE_NODE_SERVICE.URL, 
+				CREATE_NODE_SERVICE.METHOD, 
+				getContent(node),
+				NodeReference.class, headers);
 	}
 
 	@Override
 	public void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
-		try {
-			UPDATE_NODE_SERVICE request = new UPDATE_NODE_SERVICE();
-			request.node = node;
-			request.details = details;
-			request.contentBodyProperty = getContentBodyProperty(node);
-			HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-			
-			repositoryRemoteBinding.exchange(UPDATE_NODE_SERVICE.URL, 
-					UPDATE_NODE_SERVICE.METHOD, 
-					getContent(node), 
-					Void.class, headers);
-		} catch (DuplicateChildNameException e) {
-			throw e;
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		UPDATE_NODE_SERVICE request = new UPDATE_NODE_SERVICE();
+		request.node = node;
+		request.details = details;
+		request.contentBodyProperty = getContentBodyProperty(node);
+		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
+		
+		repositoryRemoteBinding.exchange(UPDATE_NODE_SERVICE.URL, 
+				UPDATE_NODE_SERVICE.METHOD, 
+				getContent(node), 
+				Void.class, headers);
 	}
 
 	private String getContentBodyProperty(RepositoryNode node) {
@@ -182,14 +147,9 @@ public class NodeServiceImpl implements NodeService {
 
 	@Override
 	public void delete(NodeReference nodeReference) {
-		try {
-			HttpHeaders headers = payloadParameterHandler.handlePayload(nodeReference);
-			repositoryRemoteBinding.exchange(DELETE_NODE_SERVICE.URL, 
-					DELETE_NODE_SERVICE.METHOD, (Object) null, Void.class, headers);
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		HttpHeaders headers = payloadParameterHandler.handlePayload(nodeReference);
+		repositoryRemoteBinding.exchange(DELETE_NODE_SERVICE.URL, 
+				DELETE_NODE_SERVICE.METHOD, (Object) null, Void.class, headers);
 	}
 
 }

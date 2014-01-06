@@ -21,17 +21,12 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 
 	@Override
 	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeFetchDetails nodeFetchDetails) {
-		try {
-			SEARCH_NODE_SERVICE request = new SEARCH_NODE_SERVICE();
-			request.query = query;
-			request.storeReference = storeReference;
-			request.nodeFetchDetails = nodeFetchDetails;
-			return repositoryRemoteBinding.exchangeCollection(SEARCH_NODE_SERVICE.URL, 
-					SEARCH_NODE_SERVICE.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {});
-		} catch (RepositoryRemoteException e) {
-			// do not deal with other types of remote exception
-			throw new IllegalStateException(e);
-		}
+		SEARCH_NODE_SERVICE request = new SEARCH_NODE_SERVICE();
+		request.query = query;
+		request.storeReference = storeReference;
+		request.nodeFetchDetails = nodeFetchDetails;
+		return repositoryRemoteBinding.exchangeCollection(SEARCH_NODE_SERVICE.URL, 
+				SEARCH_NODE_SERVICE.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {});
 	}
 
 }
