@@ -19,4 +19,6 @@ public interface AuthorityModelService {
 	Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(RepositoryAuthority authority, boolean immediate);
 	List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeFetchDetailsBuilder nodeFetchDetailsBuilder);
 
+	NodeFetchDetailsBuilder fetchNodeParentAuthorities(NodeFetchDetailsBuilder builder);
+	Map<RepositoryAuthority, String> getNodeParentAuthorities(BusinessNode node);
 }

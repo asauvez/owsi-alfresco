@@ -40,6 +40,27 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	@Override
 	public Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(RepositoryAuthority authority, boolean immediate) {
 		List<BusinessNode> groups = getContainedGroups(authority, immediate);
+		return getAsAuthority(groups);
+	}
+
+	@Override
+	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeFetchDetailsBuilder nodeFetchDetailsBuilder) {
+		return BusinessNode.wrapList(authorityService.getContainedGroups(authority, immediate, nodeFetchDetailsBuilder.getDetails()));
+	}
+
+	@Override
+	public NodeFetchDetailsBuilder fetchNodeParentAuthorities(NodeFetchDetailsBuilder builder) {
+		builder.parentAssociation(CmModel.authorityContainer.member)
+			.properties(CmModel.authorityContainer);
+		return builder;
+	}
+	@Override
+	public Map<RepositoryAuthority, String> getNodeParentAuthorities(BusinessNode node) {
+		List<BusinessNode> groups = node.getParentAssociation(CmModel.authorityContainer.member);
+		return getAsAuthority(groups);
+	}
+	
+	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {
 		Map<RepositoryAuthority, String> authorities = new LinkedHashMap<RepositoryAuthority, String>();
 		for (BusinessNode node : groups) {
 			String authorityName = node.getProperty(CmModel.authorityContainer.authorityName);
@@ -48,10 +69,4 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		}
 		return authorities;
 	}
-
-	@Override
-	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeFetchDetailsBuilder nodeFetchDetailsBuilder) {
-		return BusinessNode.wrapList(authorityService.getContainedGroups(authority, immediate, nodeFetchDetailsBuilder.getDetails()));
-	}
-
 }
