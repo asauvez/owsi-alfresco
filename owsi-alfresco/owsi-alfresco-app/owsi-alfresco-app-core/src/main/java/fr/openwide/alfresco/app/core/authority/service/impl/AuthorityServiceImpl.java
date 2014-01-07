@@ -3,7 +3,6 @@ package fr.openwide.alfresco.app.core.authority.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
@@ -24,8 +23,10 @@ public class AuthorityServiceImpl implements AuthorityService {
 		request.authority = authority;
 		request.immediate = immediate;
 		request.nodeFetchDetails = nodeFetchDetails;
-		return repositoryRemoteBinding.exchangeCollection(GET_CONTAINED_USERS.URL, 
-				GET_CONTAINED_USERS.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {});
+		
+		return repositoryRemoteBinding.builder(GET_CONTAINED_USERS.ENDPOINT)
+				.headerPayload(request)
+				.call();
 	}
 	
 	@Override
@@ -34,8 +35,10 @@ public class AuthorityServiceImpl implements AuthorityService {
 		request.authority = authority;
 		request.immediate = immediate;
 		request.nodeFetchDetails = nodeFetchDetails;
-		return repositoryRemoteBinding.exchangeCollection(GET_CONTAINED_GROUPS.URL, 
-				GET_CONTAINED_GROUPS.METHOD, request, new ParameterizedTypeReference<List<RepositoryNode>>() {});
+		
+		return repositoryRemoteBinding.builder(GET_CONTAINED_GROUPS.ENDPOINT)
+				.headerPayload(request)
+				.call();
 	}
 
 }

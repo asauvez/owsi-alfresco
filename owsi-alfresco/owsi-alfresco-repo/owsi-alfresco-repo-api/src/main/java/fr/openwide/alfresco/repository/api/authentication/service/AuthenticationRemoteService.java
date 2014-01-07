@@ -1,10 +1,11 @@
 package fr.openwide.alfresco.repository.api.authentication.service;
 
-import org.springframework.http.HttpMethod;
-
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.DeleteMethodEndpoint;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.GetMethodEndpoint;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.PostMethodEndpoint;
 
 public interface AuthenticationRemoteService {
 
@@ -12,8 +13,7 @@ public interface AuthenticationRemoteService {
 	 * Authenticate an unknown user
 	 */
 	class LOGIN_REQUEST_SERVICE {
-		public static final String URL = "/owsi/authentication/request";
-		public static final HttpMethod METHOD = HttpMethod.POST;
+		public static PostMethodEndpoint<RepositoryUser> ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/request") {};
 		public String username;
 		public String password;
 	}
@@ -22,19 +22,13 @@ public interface AuthenticationRemoteService {
 	/**
 	 * Retrieve user information from a pre-authenticated user
 	 */
-	interface AUTHENTICATED_USER_SERVICE {
-		String URL = "/owsi/authentication/user";
-		HttpMethod METHOD = HttpMethod.GET;
-	}
+	GetMethodEndpoint<RepositoryUser> AUTHENTICATED_USER_SERVICE_ENDPOINT = new GetMethodEndpoint<RepositoryUser>("/owsi/authentication/user") {};
 	RepositoryUser getAuthenticatedUser();
 
 	/**
 	 * Log out an authenticated user
 	 */
-	interface LOGOUT_SERVICE {
-		String URL = "/owsi/authentication/ticket";
-		HttpMethod METHOD = HttpMethod.DELETE;
-	}
+	DeleteMethodEndpoint<RepositoryUser> LOGOUT_SERVICE_ENDPOINT = new DeleteMethodEndpoint<RepositoryUser>("/owsi/authentication/ticket") {};
 	void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException;
 
 }

@@ -11,7 +11,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import fr.openwide.alfresco.app.core.AlfrescoAppCorePackage;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryPayloadParameterHandler;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
 import fr.openwide.alfresco.app.core.security.service.UserService;
@@ -46,11 +45,6 @@ public class AppCoreConfig {
 		// do not buffer request objects (not to run out of memory on file upload...)
 		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setBufferRequestBody(false);
 		return restTemplate;
-	}
-
-	@Bean
-	public RepositoryPayloadParameterHandler RepositoryPayloadParameterHandler() {
-		return new RepositoryPayloadParameterHandler();
 	}
 
 	@Bean

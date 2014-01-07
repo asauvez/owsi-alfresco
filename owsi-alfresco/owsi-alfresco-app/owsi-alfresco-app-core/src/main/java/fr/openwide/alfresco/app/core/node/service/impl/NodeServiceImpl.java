@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpResponse;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResponseExtractor;
 
 import fr.openwide.alfresco.app.core.node.service.NodeService;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryPayloadParameterHandler;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
@@ -31,27 +28,23 @@ public class NodeServiceImpl implements NodeService {
 	@Autowired
 	private RepositoryRemoteBinding repositoryRemoteBinding;
 
-	@Autowired
-	private RepositoryPayloadParameterHandler payloadParameterHandler;
-
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) {
 		GET_NODE_SERVICE request = new GET_NODE_SERVICE();
 		request.nodeReference = nodeReference;
 		request.nodeFetchDetails = nodeFetchDetails;
-		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-		return repositoryRemoteBinding.exchange(GET_NODE_SERVICE.URL, 
-				GET_NODE_SERVICE.METHOD, (Object) null, RepositoryNode.class, headers);
+		
+		return repositoryRemoteBinding.builder(GET_NODE_SERVICE.ENDPOINT)
+				.headerPayload(request)
+				.call();
 	}
 
 	@Override
 	public void getNodeContent(NodeReference nodeReference, NameReference property, ResponseExtractor<?> responseExtractor) {
-		Matcher matcher = NodeReference.PATTERN.matcher(nodeReference.getReference());
-		matcher.matches();
-		repositoryRemoteBinding.getRequestContent(GET_NODE_CONTENT_SERVICE.URL, GET_NODE_CONTENT_SERVICE.METHOD, 
-				responseExtractor, 
-				(property != null) ? ";" + property.getFullName() : "",
-				matcher.group(1), matcher.group(2), matcher.group(3));
+		repositoryRemoteBinding.builder(GET_NODE_CONTENT_ENDPOINT)
+			.urlVariable((property != null) ? ";" + property.getFullName() : "")
+			.urlVariable(nodeReference)
+			.call(responseExtractor);
 	}
 
 	@Override
@@ -76,9 +69,10 @@ public class NodeServiceImpl implements NodeService {
 		request.nodeReference = nodeReference;
 		request.childAssocTypeName = childAssocTypeName;
 		request.nodeFetchDetails = nodeFetchDetails;
-		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-		return repositoryRemoteBinding.exchangeCollection(CHILDREN_NODE_SERVICE.URL, 
-				CHILDREN_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
+		
+		return repositoryRemoteBinding.builder(CHILDREN_NODE_SERVICE.ENDPOINT)
+				.headerPayload(request)
+				.call();
 	}
 
 	@Override
@@ -87,9 +81,10 @@ public class NodeServiceImpl implements NodeService {
 		request.nodeReference = nodeReference;
 		request.assocName = assocName;
 		request.nodeFetchDetails = nodeFetchDetails;
-		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-		return repositoryRemoteBinding.exchangeCollection(TARGET_ASSOC_NODE_SERVICE.URL, 
-				TARGET_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
+		
+		return repositoryRemoteBinding.builder(TARGET_ASSOC_NODE_SERVICE.ENDPOINT)
+				.headerPayload(request)
+				.call();
 	}
 
 	@Override
@@ -98,9 +93,10 @@ public class NodeServiceImpl implements NodeService {
 		request.nodeReference = nodeReference;
 		request.assocName = assocName;
 		request.nodeFetchDetails = nodeFetchDetails;
-		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-		return repositoryRemoteBinding.exchangeCollection(SOURCE_ASSOC_NODE_SERVICE.URL, 
-				SOURCE_ASSOC_NODE_SERVICE.METHOD, (Object) null, new ParameterizedTypeReference<List<RepositoryNode>>() {}, headers);
+
+		return repositoryRemoteBinding.builder(SOURCE_ASSOC_NODE_SERVICE.ENDPOINT)
+				.headerPayload(request)
+				.call();
 	}
 
 	@Override
@@ -108,11 +104,10 @@ public class NodeServiceImpl implements NodeService {
 		CREATE_NODE_SERVICE request = new CREATE_NODE_SERVICE();
 		request.node = node;
 		request.contentBodyProperty = getContentBodyProperty(node);
-		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
-		return repositoryRemoteBinding.exchange(CREATE_NODE_SERVICE.URL, 
-				CREATE_NODE_SERVICE.METHOD, 
-				getContent(node),
-				NodeReference.class, headers);
+		
+		return repositoryRemoteBinding.builder(CREATE_NODE_SERVICE.ENDPOINT, getContent(node))
+				.headerPayload(request)
+				.call();
 	}
 
 	@Override
@@ -121,12 +116,10 @@ public class NodeServiceImpl implements NodeService {
 		request.node = node;
 		request.details = details;
 		request.contentBodyProperty = getContentBodyProperty(node);
-		HttpHeaders headers = payloadParameterHandler.handlePayload(request);
 		
-		repositoryRemoteBinding.exchange(UPDATE_NODE_SERVICE.URL, 
-				UPDATE_NODE_SERVICE.METHOD, 
-				getContent(node), 
-				Void.class, headers);
+		repositoryRemoteBinding.builder(UPDATE_NODE_SERVICE.ENDPOINT, getContent(node))
+				.headerPayload(request)
+				.call();
 	}
 
 	private String getContentBodyProperty(RepositoryNode node) {
@@ -147,9 +140,9 @@ public class NodeServiceImpl implements NodeService {
 
 	@Override
 	public void delete(NodeReference nodeReference) {
-		HttpHeaders headers = payloadParameterHandler.handlePayload(nodeReference);
-		repositoryRemoteBinding.exchange(DELETE_NODE_SERVICE.URL, 
-				DELETE_NODE_SERVICE.METHOD, (Object) null, Void.class, headers);
+		repositoryRemoteBinding.builder(DELETE_NODE_SERVICE_ENDPOINT)
+			.headerPayload(nodeReference)
+			.call();
 	}
 
 }

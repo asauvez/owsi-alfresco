@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
-import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
 /**
  * Base class for web services that provide automatic one parameter handling. 
@@ -14,7 +14,7 @@ public abstract class AbstractParameterRemoteWebScript<R, P> extends AbstractMes
 
 	@Override
 	protected String getRawPayload(WebScriptRequest req) throws IOException {
-		return req.getHeader(InvalidMessageRemoteException.HEADER_MESSAGE_CONTENT);
+		return req.getHeader(RestEndpoint.HEADER_MESSAGE_CONTENT);
 	}
 
 }

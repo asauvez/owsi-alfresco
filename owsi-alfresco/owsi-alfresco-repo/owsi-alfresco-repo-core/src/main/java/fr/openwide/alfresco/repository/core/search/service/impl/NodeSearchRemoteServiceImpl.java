@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repository.core.search.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
@@ -29,19 +30,23 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 		if (StringUtils.isBlank(luceneQuery)) {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
-		ResultSet resultSet = searchService.query(
-				conversionService.getRequired(storeReference), 
-				SearchService.LANGUAGE_FTS_ALFRESCO, 
-				luceneQuery);
-		List<RepositoryNode> res = new ArrayList<>();
-		for (NodeRef nodeRef : resultSet.getNodeRefs()) {
-			try {
-				res.add(nodeRemoteService.get(conversionService.get(nodeRef), details));
-			} catch (NoSuchNodeException e) {
-				// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
+		try {
+			ResultSet resultSet = searchService.query(
+					conversionService.getRequired(storeReference), 
+					SearchService.LANGUAGE_FTS_ALFRESCO, 
+					luceneQuery);
+			List<RepositoryNode> res = new ArrayList<>();
+			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+				try {
+					res.add(nodeRemoteService.get(conversionService.get(nodeRef), details));
+				} catch (NoSuchNodeException e) {
+					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
+				}
 			}
+			return res;
+		} catch (FTSQueryException ex) {
+			throw new InvalidPayloadException(luceneQuery, ex);
 		}
-		return res;
 	}
 
 	public void setNodeRemoteService(NodeRemoteServiceImpl nodeRemoteService) {

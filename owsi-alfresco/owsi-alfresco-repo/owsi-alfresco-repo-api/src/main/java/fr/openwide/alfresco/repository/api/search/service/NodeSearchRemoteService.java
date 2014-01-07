@@ -2,17 +2,15 @@ package fr.openwide.alfresco.repository.api.search.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpMethod;
-
 import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.GetMethodEndpoint;
 
 public interface NodeSearchRemoteService {
 
 	class SEARCH_NODE_SERVICE {
-		public static final String URL = "/owsi/search/node/search";
-		public static final HttpMethod METHOD = HttpMethod.POST;
+		public static GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/search/node/search") {};
 		public String query;
 		public StoreReference storeReference;
 		public NodeFetchDetails nodeFetchDetails;

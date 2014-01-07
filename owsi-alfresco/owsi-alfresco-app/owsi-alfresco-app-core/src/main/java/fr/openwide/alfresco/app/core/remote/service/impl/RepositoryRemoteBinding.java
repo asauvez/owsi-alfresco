@@ -24,9 +24,12 @@ import com.google.common.collect.ObjectArrays;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketAware;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
+import fr.openwide.alfresco.app.core.remote.model.RestCallBuilder;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
 public class RepositoryRemoteBinding {
 
@@ -52,56 +55,14 @@ public class RepositoryRemoteBinding {
 		this.userService = userService;
 	}
 
-	/**
-	 * Correspond à l'utilisation générique de {@link RestTemplate#getForObject(String, Class, Object...)} ou
-	 * {@link RestTemplate#put(String, Object, Object...)}
-	 */
-	public <T> T exchange(String path, HttpMethod method, Class<T> responseType, Object... urlVariables) throws RepositoryRemoteException {
-		return exchange(path, method, null, responseType, urlVariables);
+	public <R> RestCallBuilder<R> builder(RestEndpoint<R> restCall) {
+		return new RestCallBuilder<R>(this, restCall);
+	}
+	public <R> RestCallBuilder<R> builder(EntityEnclosingRestEndpoint<R> restCall, Object content) {
+		return new RestCallBuilder<R>(this, restCall, content);
 	}
 
-	/**
-	 * Correspond à l'utilisation générique de {@link RestTemplate#delete(String, Object...)}
-	 */
-	public void exchange(String path, HttpMethod method,  Object... urlVariables) throws RepositoryRemoteException {
-		exchange(path, method, null, null, urlVariables);
-	}
-
-	/**
-	 * Correspond à l'utilisation générique de {@link RestTemplate#postForObject(String, Object, Class, Object...)}
-	 */
-	public <T> T exchange(String path, HttpMethod method, Object request, Class<T> responseType, Object... urlVariables) throws RepositoryRemoteException {
-		return exchange(path, method, request, responseType, null, urlVariables);
-	}
-
-	public <T> T exchange(String path, HttpMethod method, Object request, Class<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
-		URI uri = getURI(path, urlVariables);
-		if (logger.isDebugEnabled()) {
-			logger.debug("Executing " + method + " method to uri: " + uri);
-		}
-		try {
-			ResponseEntity<T> exchange = restTemplate.exchange(uri, method, new HttpEntity<Object>(request, headers), responseType);
-			return exchange.getBody();
-		} catch (ResourceAccessException e) {
-			// log to debug, target exception should be logged by the caller/framework
-			if (logger.isDebugEnabled()) {
-				logger.debug("Exception on " + method + " method to uri: " + uri, e);
-			}
-			throw mapResourceAccessException(e);
-		} catch (Exception e) {
-			// log to debug, target exception should be logged by the caller/framework
-			if (logger.isDebugEnabled()) {
-				logger.debug("Unexpected exception on " + method + " method to uri: " + uri, e);
-			}
-			throw new IllegalStateException(e);
-		}
-	}
-
-	public <T> T exchangeCollection(String path, HttpMethod method,  Object request, ParameterizedTypeReference<T> responseType, Object... urlVariables) throws RepositoryRemoteException {
-		return exchangeCollection(path, method, request, responseType, null, urlVariables);
-	}
-
-	public <T> T exchangeCollection(String path, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
+	public <T> T exchange(String path, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
 		URI uri = getURI(path, urlVariables);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing " + method + " method to uri: " + uri);

@@ -12,9 +12,9 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService.SEARCH_NODE_SERVICE;
-import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
+import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractParameterRemoteWebScript;
 
-public class SearchNodeWebScript extends AbstractMessageRemoteWebScript<List<RepositoryNode>, SEARCH_NODE_SERVICE> {
+public class SearchNodeWebScript extends AbstractParameterRemoteWebScript<List<RepositoryNode>, SEARCH_NODE_SERVICE> {
 
 	protected NodeSearchRemoteService nodeSearchService;
 

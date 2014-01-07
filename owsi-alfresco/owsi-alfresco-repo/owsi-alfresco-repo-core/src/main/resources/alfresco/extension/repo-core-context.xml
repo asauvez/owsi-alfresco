@@ -23,13 +23,13 @@
 		<property name="nodeService" ref="owsi.service.nodeService" />
 	</bean>
 
-	<bean id="webscript.owsi.remote.node.node-get.post" parent="webscript.owsi.node"
+	<bean id="webscript.owsi.remote.node.node-get.get" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.GetNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-children.post" parent="webscript.owsi.node"
+	<bean id="webscript.owsi.remote.node.node-children.get" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.ChildrenNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-sourceAssoc.post" parent="webscript.owsi.node"
+	<bean id="webscript.owsi.remote.node.node-sourceAssoc.get" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.SourceAssocNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-targetAssoc.post" parent="webscript.owsi.node"
+	<bean id="webscript.owsi.remote.node.node-targetAssoc.get" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.TargetAssocNodeWebScript" />
 
 	<bean id="webscript.owsi.remote.node.node-create.post" parent="webscript.owsi.node"
@@ -49,7 +49,7 @@
 
 	<!-- Node search webscripts -->
 
-	<bean id="webscript.owsi.remote.search.search.post" parent="webscript.owsi.remote"
+	<bean id="webscript.owsi.remote.search.search.get" parent="webscript.owsi.remote"
 			class="fr.openwide.alfresco.repository.core.search.web.script.SearchNodeWebScript">
 		<property name="nodeSearchService" ref="owsi.service.nodeSearchService" />
 	</bean>
@@ -68,9 +68,9 @@
 		<property name="authorityRemoteService" ref="owsi.service.authorityService" />
 	</bean>
 
-	<bean id="webscript.owsi.remote.authority.get-contained-users.post" parent="webscript.owsi.authority"
+	<bean id="webscript.owsi.remote.authority.get-contained-users.get" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedUsersWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-contained-groups.post" parent="webscript.owsi.authority"
+	<bean id="webscript.owsi.remote.authority.get-contained-groups.get" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedGroupsWebScript" />
 
 </beans>
