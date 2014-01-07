@@ -39,11 +39,11 @@ public class BetweenRestriction<C extends Serializable> extends Restriction {
 			+ (minInclusive ? "[" : "{")
 			+ ((min == null)
 					? ((max instanceof String) ? "\\\\u0000" : "MIN")
-					: toLuceneValue(min))
+					: toLuceneValue(property, min))
 			+ " TO "
 			+ ((max == null)
 					? ((min instanceof String) ? "\\\\uFFFF" : "MAX")
-					: toLuceneValue(max))
+					: toLuceneValue(property, max))
 			+ (maxInclusive ? "]" : "}");
 	}
 

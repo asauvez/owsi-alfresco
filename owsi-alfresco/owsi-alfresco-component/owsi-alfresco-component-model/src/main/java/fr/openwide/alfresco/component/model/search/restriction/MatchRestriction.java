@@ -22,7 +22,7 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 		if (value instanceof String && StringUtils.isEmpty((String) value)) {
 			value = null;
 		}
-		return (value != null) ? property.toLucene() + ":" + toLuceneValue(value) : "";
+		return (value != null) ? property.toLucene() + ":" + toLuceneValue(property, value) : "";
 	}
 
 }
