@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.component.model.node.service;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -36,11 +35,10 @@ public interface NodeModelService {
 	List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails);
 	List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails);
 
-	
 	NodeReference createFolder(NodeReference parent, String folderName) throws DuplicateChildNameException;
 	NodeReference createContent(NodeReference parent, String fileName, String mimeType, String encoding, Resource content) throws DuplicateChildNameException;
 
-	NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNameException, IOException;
+	NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNameException;
 
 	NodeReference create(BusinessNode node) throws DuplicateChildNameException;
 	void update(BusinessNode node) throws DuplicateChildNameException;

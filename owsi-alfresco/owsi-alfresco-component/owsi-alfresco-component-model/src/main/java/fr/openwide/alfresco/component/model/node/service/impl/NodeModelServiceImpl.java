@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.component.model.node.service.impl;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -75,7 +74,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 
 	@Override
-	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNameException, IOException {
+	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNameException {
 		String fileName = FilenameUtils.getName(file.getOriginalFilename());
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 			.property(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
