@@ -17,17 +17,17 @@ import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelS
 public class ComponentModelConfig {
 
 	@Bean
-	public NodeModelService getNodeServiceImpl() {
+	public NodeModelService nodeModelService() {
 		return new NodeModelServiceImpl();
 	}
 
 	@Bean
-	public NodeSearchModelService getNodeSearchServiceImpl() {
+	public NodeSearchModelService nodeSearchModelService() {
 		return new NodeSearchModelServiceImpl();
 	}
 
 	@Bean
-	public AuthorityModelService getAuthorityService() {
+	public AuthorityModelService authorityModelService() {
 		return new AuthorityModelServiceImpl();
 	}
 }
