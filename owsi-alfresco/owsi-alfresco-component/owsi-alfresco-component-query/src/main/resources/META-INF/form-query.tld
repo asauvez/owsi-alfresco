@@ -16,6 +16,11 @@
 	</tag-file>
 
 	<tag-file>
+		<name>query</name>
+		<path>/META-INF/tags/query.tag</path>
+	</tag-file>
+
+	<tag-file>
 		<name>form</name>
 		<path>/META-INF/tags/form.tag</path>
 	</tag-file>

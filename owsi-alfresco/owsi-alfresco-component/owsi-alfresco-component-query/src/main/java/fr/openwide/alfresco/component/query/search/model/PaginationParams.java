@@ -6,27 +6,19 @@ import java.util.List;
 
 public class PaginationParams implements Serializable {
 
-	public enum SortDirection { NONE, ASC, DESC }
-
-	private String sortColumn = null;
-	private SortDirection sortDirection = SortDirection.NONE;
+	private SortParams sort = new SortParams();
 
 	private int currentPage = 1;
 	private int nbItemsPerPage = Integer.MAX_VALUE;
 	private Integer nbItemsTotal = null;
 
-	public String getSortColumn() {
-		return sortColumn;
+	public SortParams getSort() {
+		return sort;
 	}
-	public void setSortColumn(String sortColumn) {
-		this.sortColumn = sortColumn;
+	public void setSort(SortParams sort) {
+		this.sort = sort;
 	}
-	public SortDirection getSortDirection() {
-		return sortDirection;
-	}
-	public void setSortDirection(SortDirection sortDirection) {
-		this.sortDirection = sortDirection;
-	}
+
 	public int getCurrentPage() {
 		return currentPage;
 	}

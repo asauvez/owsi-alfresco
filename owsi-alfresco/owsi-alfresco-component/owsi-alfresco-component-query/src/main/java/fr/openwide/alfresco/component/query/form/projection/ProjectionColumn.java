@@ -7,7 +7,7 @@ import org.springframework.context.MessageSourceResolvable;
 import com.google.common.base.Function;
 
 import fr.openwide.alfresco.component.query.form.view.output.OutputFieldView;
-import fr.openwide.alfresco.component.query.search.model.PaginationParams.SortDirection;
+import fr.openwide.alfresco.component.query.search.model.SortParams.SortDirection;
 
 
 public interface ProjectionColumn<I> {

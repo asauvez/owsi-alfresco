@@ -18,7 +18,7 @@ import fr.openwide.alfresco.component.query.form.result.FormQueryResult;
 import fr.openwide.alfresco.component.query.form.util.MessageUtils;
 import fr.openwide.alfresco.component.query.search.model.AbstractFormQuery;
 import fr.openwide.alfresco.component.query.search.model.PaginationParams;
-import fr.openwide.alfresco.component.query.search.model.PaginationParams.SortDirection;
+import fr.openwide.alfresco.component.query.search.model.SortParams.SortDirection;
 
 public class AbstractFormQueryService {
 
@@ -60,10 +60,10 @@ public class AbstractFormQueryService {
 		result.setPagination(pagination);
 
 		// Tri
-		if (pagination.getSortColumn() != null) {
+		if (pagination.getSort().getColumn() != null) {
 			for (ProjectionColumn<I> column : result.getColumns()) {
-				if (pagination.getSortColumn().equals(column.getId())) {
-					column.sort(pagination.getSortDirection(), Integer.MAX_VALUE);
+				if (pagination.getSort().getColumn().equals(column.getId())) {
+					column.sort(pagination.getSort().getDirection(), Integer.MAX_VALUE);
 				}
 			}
 		}

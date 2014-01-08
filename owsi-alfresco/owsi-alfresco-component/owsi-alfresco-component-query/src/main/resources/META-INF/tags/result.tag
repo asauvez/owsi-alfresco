@@ -1,32 +1,32 @@
 <%@ attribute name="result" required="true" rtexprvalue="true" type="fr.openwide.alfresco.component.query.form.result.FormQueryResult" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="formQuery" uri="http://app.alfresco.openwide.fr/tags/formQuery" %>
 
 <c:if test="${not empty result}">
 	<table class="table table-striped table-bordered table-hover form-query-result">
 		<thead>
 			<c:forEach var="column" items="${result.columns}">
 				<c:if test="${column.visible}">
-					<th>
+					<c:set var="sortDirection" value="ASC"/>
+					<c:set var="columnClass" value=""/>
+					<c:set var="iconClass" value=""/>
+					<c:if test="${not empty column.itemComparator}">
+						<c:set var="columnClass" value="sort-column"/>
+						<c:choose>
+							<c:when test="${column.sortDirection eq 'ASC'}">
+								<c:set var="sortDirection" value="DESC"/>
+								<c:set var="iconClass" value="glyphicon glyphicon-sort-by-attributes"/>
+							</c:when>
+							<c:when test="${column.sortDirection eq 'DESC'}">
+								<c:set var="iconClass" value="glyphicon glyphicon-sort-by-attributes-alt"/>
+							</c:when>
+						</c:choose>
+					</c:if>
+					<th class="${columnClass}" data-sort-column="${column.id}" data-sort-direction="${sortDirection}">
 						<spring:message message="${column.label}"/>
-						<c:if test="${not empty column.itemComparator}">
-							<c:choose>
-								<c:when test="${column.sortDirection eq 'NONE'}">
-									<span class="sort-column glyphicon glyphicon-sort" data-sort-column="${column.id}" data-sort-direction="ASC"></span>
-								</c:when>
-								<c:when test="${column.sortDirection eq 'ASC'}">
-									<span class="sort-column glyphicon glyphicon-sort-by-attributes" data-sort-column="${column.id}" data-sort-direction="DESC"></span>
-								</c:when>
-								<c:when test="${column.sortDirection eq 'DESC'}">
-									<span class="sort-column glyphicon glyphicon-sort-by-attributes-alt" data-sort-column="${column.id}" data-sort-direction="ASC"></span>
-								</c:when>
-							</c:choose>
-						</c:if>
+						<span class="${iconClass}"></span>
 					</th>
 				</c:if>
 			</c:forEach>

@@ -2,11 +2,8 @@
 <%@ attribute name="name" required="true" rtexprvalue="true" type="java.lang.String" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="formQuery" uri="http://app.alfresco.openwide.fr/tags/formQuery" %>
 
 <form:form modelAttribute="${name}" method="get" role="form" class="form-query">
 	<form:errors element="div" cssClass="alert alert-error" />
@@ -80,8 +77,8 @@
 		</c:if>
 	</c:forEach>
 	
-	<input type="hidden" class="pagination-sortColumn" name="pagination.sortColumn" value="${query.pagination.sortColumn}">
-	<input type="hidden" class="pagination-sortDirection" name="pagination.sortDirection" value="${query.pagination.sortDirection}">
+	<input type="hidden" class="pagination-sort-column" name="pagination.sort.column" value="${query.pagination.sort.column}">
+	<input type="hidden" class="pagination-sort-direction" name="pagination.sort.direction" value="${query.pagination.sort.direction}">
 	<input type="hidden" class="pagination-currentPage" name="pagination.currentPage" value="${query.pagination.currentPage}">
 	
 	<c:if test="${not empty query.inputFieldBuilder.fieldSets}">

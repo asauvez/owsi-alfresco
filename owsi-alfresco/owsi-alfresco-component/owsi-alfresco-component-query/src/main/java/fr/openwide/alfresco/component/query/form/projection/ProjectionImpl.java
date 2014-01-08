@@ -16,7 +16,7 @@ import fr.openwide.alfresco.component.query.form.projection.button.TopButtonBuil
 import fr.openwide.alfresco.component.query.form.util.MessageUtils;
 import fr.openwide.alfresco.component.query.form.view.output.IconOutputFieldView;
 import fr.openwide.alfresco.component.query.form.view.output.OutputFieldView;
-import fr.openwide.alfresco.component.query.search.model.PaginationParams.SortDirection;
+import fr.openwide.alfresco.component.query.search.model.SortParams.SortDirection;
 
 public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	implements 
