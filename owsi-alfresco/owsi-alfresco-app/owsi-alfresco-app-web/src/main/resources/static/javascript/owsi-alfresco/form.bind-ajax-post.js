@@ -16,16 +16,17 @@
 		},
 		
 		formBindAjaxPost: function(options) {
-			// Par defaut, on recharge la page en cas de succes
-			var onSuccess = function() {
-				location.reload();
+			var defaultTargetRequestPath = function() {
+				return location.pathname + location.search + location.hash;
 			};
+			options = $.extend({
+					onSuccess : function() {
+						// Par defaut, on recharge la page en cas de succes
+						location.reload();
+					},
+					targetRequestPath : defaultTargetRequestPath
+				}, options);
 			
-			if (options) {
-				if (options.onSuccess) {
-					onSuccess = options.onSuccess;
-				}
-			}
 			this.each(function() {
 				var form = $(this);
 				form.submitOnce();
@@ -52,13 +53,20 @@
 				
 				form.ajaxForm({
 					dataType: 'json',
-					headers: { 'targetRequestPath' : location.pathname + location.search + location.hash },
+					beforeSend: function (request) {
+						// le set du header est fait ici car sa valeur peut dependre de valeurs modifiees dans le formulaire
+						targetRequestPath = options.targetRequestPath;
+						if (typeof targetRequestPath == "function") {
+							targetRequestPath = options.targetRequestPath(defaultTargetRequestPath());
+						}
+						request.setRequestHeader("targetRequestPath", targetRequestPath);
+					},
 					beforeSubmit: function(data) {
 						// $(window).trigger("showloading");
 					},
 					success: function(data) {
 						form.trigger("aftersubmit");
-						onSuccess(form);
+						options.onSuccess(form);
 					},
 					error: function(xhr) {
 						// $(window).trigger("hideloading");
