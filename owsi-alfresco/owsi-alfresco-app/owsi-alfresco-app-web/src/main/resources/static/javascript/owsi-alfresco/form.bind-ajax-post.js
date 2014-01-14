@@ -109,7 +109,9 @@
 				var form = $(this);
 				form.submitOnce();
 				
-				form.on("aftersubmit.formBindAjaxPost", formBindClearErrors);
+				form.on("aftersubmit.formBindAjaxPost", function() {
+					form.formBindClearErrors();
+				});
 				
 				form.ajaxForm({
 					beforeSend: function (request) {
