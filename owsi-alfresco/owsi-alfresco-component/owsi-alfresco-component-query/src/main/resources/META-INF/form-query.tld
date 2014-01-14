@@ -11,11 +11,6 @@
 	<uri>http://app.alfresco.openwide.fr/tags/formQuery</uri>
 
 	<tag-file>
-		<name>pagination</name>
-		<path>/META-INF/tags/pagination.tag</path>
-	</tag-file>
-
-	<tag-file>
 		<name>query</name>
 		<path>/META-INF/tags/query.tag</path>
 	</tag-file>

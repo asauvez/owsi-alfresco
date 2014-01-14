@@ -11,12 +11,12 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.collect.Ordering;
 
+import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
 import fr.openwide.alfresco.component.query.form.projection.button.ButtonBuilderImpl;
 import fr.openwide.alfresco.component.query.form.projection.button.TopButtonBuilder;
 import fr.openwide.alfresco.component.query.form.util.MessageUtils;
 import fr.openwide.alfresco.component.query.form.view.output.IconOutputFieldView;
 import fr.openwide.alfresco.component.query.form.view.output.OutputFieldView;
-import fr.openwide.alfresco.component.query.search.model.SortParams.SortDirection;
 
 public abstract class ProjectionImpl<I, PB extends ProjectionBuilder<I, PB>, P>
 	implements 

@@ -23,6 +23,8 @@ public class ValidationResponse {
 	private AlertContainer alertContainer = new AlertContainer();
 	private MessageSource messageSource;
 
+	private String viewName;
+
 	public void addGlobalAlerts(BindingResult bindingResult) {
 		addErrors(bindingResult, false);
 	}
@@ -55,7 +57,7 @@ public class ValidationResponse {
 			}
 		}
 		
-		if (addFieldErrors) {
+		if (addFieldErrors && bindingResult.hasFieldErrors()) {
 			globalAlerts.add(Alert.newWarning(messageSource.getMessage(FIELD_ERRORS_MESSAGE_KEY, null, null), null));
 		}
 	}
@@ -156,4 +158,10 @@ public class ValidationResponse {
 		this.messageSource = messageSource;
 	}
 
+	public String getViewName() {
+		return viewName;
+	}
+	public void setViewName(String viewName) {
+		this.viewName = viewName;
+	}
 }

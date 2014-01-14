@@ -13,7 +13,6 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -41,6 +40,7 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
+import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
@@ -295,7 +295,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private void setPermissions(final NodeRef nodeRef, final RepositoryNode node) {
 		// Check si on a les droits
 		if (permissionService.hasPermission(nodeRef, PermissionService.CHANGE_PERMISSIONS) != AccessStatus.ALLOWED) {
-			throw new AccessDeniedException("You don't have the permission to change the permissions on " + nodeRef);
+			throw new AccessDeniedRemoteException("You don't have the permission to change the permissions on " + nodeRef);
 		}
 		
 		AuthenticationUtil.runAs(new RunAsWork<Void>() {

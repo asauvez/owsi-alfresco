@@ -34,15 +34,15 @@
 					widgetState["sort.property"] = columnId;
 					var a = $(document.createElement("a"));
 					if (columnId == sortedBy) {
-						if (sortedOrder == "asc") {
+						if (sortedOrder == "ASC") {
 							column.append(' <i class="glyphicon glyphicon-sort-by-attributes"></i>');
-							widgetState["sort.direction"] = "desc";
+							widgetState["sort.direction"] = "DESC";
 						} else {
 							column.append(' <i class="glyphicon glyphicon-sort-by-attributes-alt"></i>');
-							widgetState["sort.direction"] = "asc";
+							widgetState["sort.direction"] = "ASC";
 						}
 					} else {
-						widgetState["sort.direction"] = "asc";
+						widgetState["sort.direction"] = "ASC";
 					}
 					a.attr("href", "#" + $.param(newState));
 					a.html(column.html());

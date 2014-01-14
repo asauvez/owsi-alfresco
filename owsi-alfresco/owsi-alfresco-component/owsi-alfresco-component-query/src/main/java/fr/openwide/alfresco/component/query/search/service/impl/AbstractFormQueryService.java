@@ -9,16 +9,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import com.google.common.collect.Ordering;
 
+import fr.openwide.alfresco.app.web.pagination.Pagination;
+import fr.openwide.alfresco.app.web.pagination.PaginationParams;
+import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionBuilder;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionColumn;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionImpl;
 import fr.openwide.alfresco.component.query.form.result.FormQueryResult;
 import fr.openwide.alfresco.component.query.form.util.MessageUtils;
 import fr.openwide.alfresco.component.query.search.model.AbstractFormQuery;
-import fr.openwide.alfresco.component.query.search.model.PaginationParams;
-import fr.openwide.alfresco.component.query.search.model.SortParams.SortDirection;
 
 public class AbstractFormQueryService {
 
@@ -56,14 +62,13 @@ public class AbstractFormQueryService {
 			}
 		}
 
-		PaginationParams pagination = formQuery.getPagination();
-		result.setPagination(pagination);
+		PaginationParams paginationParams = formQuery.getPagination();
 
 		// Tri
-		if (pagination.getSort().getColumn() != null) {
+		if (paginationParams.getSort().getColumn() != null) {
 			for (ProjectionColumn<I> column : result.getColumns()) {
-				if (pagination.getSort().getColumn().equals(column.getId())) {
-					column.sort(pagination.getSort().getDirection(), Integer.MAX_VALUE);
+				if (paginationParams.getSort().getColumn().equals(column.getId())) {
+					column.sort(paginationParams.getSort().getDirection(), Integer.MAX_VALUE);
 				}
 			}
 		}
@@ -104,8 +109,10 @@ public class AbstractFormQueryService {
 		}
 
 		// Pagination
-		rows = pagination.filterList(rows);
-		result.setRows(rows);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		Pagination pagination = new Pagination(paginationParams, request);
+		result.setPagination(pagination);
+		result.setRows(pagination.filterList(rows));
 
 		return result;
 	}

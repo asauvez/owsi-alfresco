@@ -2,6 +2,7 @@ package fr.openwide.alfresco.component.query.search.model;
 
 import org.springframework.validation.Errors;
 
+import fr.openwide.alfresco.app.web.pagination.PaginationParams;
 import fr.openwide.alfresco.component.query.form.field.FieldSet;
 import fr.openwide.alfresco.component.query.form.field.InputField;
 import fr.openwide.alfresco.component.query.form.field.InputFieldBuilder;

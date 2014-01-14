@@ -8,6 +8,10 @@ public class AccessDeniedRemoteException extends RepositoryRemoteException {
 		super();
 	}
 
+	public AccessDeniedRemoteException(String msg) {
+		super(msg);
+	}
+
 	public AccessDeniedRemoteException(Throwable cause) {
 		super(cause);
 	}

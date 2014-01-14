@@ -88,4 +88,9 @@
 		<path>/META-INF/tags/pdfView.tag</path>
 	</tag-file>
 
+	<tag-file>
+		<name>pagination</name>
+		<path>/META-INF/tags/pagination.tag</path>
+	</tag-file>
+
 </taglib>

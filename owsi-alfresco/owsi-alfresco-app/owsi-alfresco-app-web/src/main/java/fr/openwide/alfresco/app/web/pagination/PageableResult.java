@@ -2,33 +2,21 @@ package fr.openwide.alfresco.app.web.pagination;
 
 import java.util.List;
 
-public class PageableResult<T> extends PageableForm {
+public class PageableResult<T> {
 
+	private Pagination pagination;
 	private List<T> items;
 
-	private int total;
-
-	private int lastPageNumber;
-
-	public List<T> getItems() {
-		return items;
-	}
-	public void setItems(List<T> items) {
+	public PageableResult(Pagination pagination, List<T> items) {
+		this.pagination = pagination;
 		this.items = items;
 	}
-
-	public int getTotal() {
-		return total;
+	
+	public Pagination getPagination() {
+		return pagination;
 	}
-	public void setTotal(int total) {
-		this.total = total;
-	}
-
-	public int getLastPageNumber() {
-		return lastPageNumber;
-	}
-	public void setLastPageNumber(int lastPageNumber) {
-		this.lastPageNumber = lastPageNumber;
+	public List<T> getItems() {
+		return items;
 	}
 
 }

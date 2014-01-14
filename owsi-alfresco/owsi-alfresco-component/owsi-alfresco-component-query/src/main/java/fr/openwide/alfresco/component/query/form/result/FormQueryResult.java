@@ -7,14 +7,14 @@ import java.util.List;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 
+import fr.openwide.alfresco.app.web.pagination.Pagination;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionColumn;
-import fr.openwide.alfresco.component.query.search.model.PaginationParams;
 
 public class FormQueryResult<T> {
 
 	private final List<ProjectionColumn<T>> columns = new ArrayList<>();
 	private List<T> rows = new ArrayList<>();
-	private PaginationParams pagination = null;
+	private Pagination pagination = null;
 
 	public List<ProjectionColumn<T>> getColumns() {
 		return columns;
@@ -37,10 +37,10 @@ public class FormQueryResult<T> {
 		});
 	}
 
-	public PaginationParams getPagination() {
+	public Pagination getPagination() {
 		return pagination;
 	}
-	public void setPagination(PaginationParams pagination) {
+	public void setPagination(Pagination pagination) {
 		this.pagination = pagination;
 	}
 }

@@ -10,7 +10,6 @@
 				
 				// Options par defaut
 				var contextualized = false; // permet d'avoir plusieurs formulaires de ce type sur une meme page
-				var onUpdate = function() {};
 				var url = element.data("url");
 				var method = element.data("method");
 				
@@ -24,13 +23,28 @@
 						contextWidgetName = options.contextWidgetName;
 						contextualized = true;
 					}
-					if (options.onUpdate) {
-						onUpdate = options.onUpdate;
-					}
+				}
+				
+				options = $.extend({
+					form: null,
+					onUpdate : function() {}
+				}, options);
+				
+				if (options.form) {
+					options.form.formBindState();
+					options.form.submit(function( event ) {
+						$(this).formPushState();
+						event.preventDefault();
+					})
 				}
 				
 				var submitState = function(state) {
 					$(window).trigger("showloading");
+					
+					if (options.form) {
+						options.form.formBindClearErrors();
+					}
+					
 					$.ajax({
 						url: url,
 						method: method,
@@ -38,9 +52,14 @@
 						data: state
 					}).done(function(html) {
 						element.html($(html).find("#" + element.attr("id")).html());
-						onUpdate(element);
+						options.onUpdate(element);
 					}).error(function(xhr) {
-						alert(xhr.responseText); // TODO améliorer la gestion des erreurs
+						if (options.form) {
+							element.html('');
+							options.form.formBindManageJsonErrors(xhr);
+						} else {
+							alert(xhr.responseText);
+						}
 					}).always(function() {
 						$(window).trigger("hideloading");
 					});

@@ -1,0 +1,114 @@
+package fr.openwide.alfresco.app.web.pagination;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+public class Pagination implements Serializable {
+
+	private PaginationParams params;
+	private int nbItemsTotal;
+	private UriComponents uriComponents;
+
+	public Pagination(PaginationParams params, HttpServletRequest request) {
+		this.params = params;
+
+		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
+		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+			uriComponentsBuilder.queryParam(entry.getKey(), (Object[]) entry.getValue());
+		}		
+		this.uriComponents = uriComponentsBuilder
+				.replaceQueryParam("pagination.currentPage", "{page}")
+				.build();
+	}
+	
+	public void setNbItemsTotal(int nbItemsTotal) {
+		this.nbItemsTotal = nbItemsTotal;
+	}
+	
+	public <T> List<T> filterList(List<T> list) {
+		setNbItemsTotal(list.size());
+		this.params.setCurrentPage(Math.min(getCurrentPage(), getLastPage()));
+		return isHasPagination() ? list.subList(params.getFirstResult(), Math.min(list.size(), getCurrentPage()*getNbItemsPerPage()))
+				                 : list;
+	}
+
+	public String getPageUri(int page) {
+		return "#" + StringUtils.substringAfter(uriComponents.expand(page).toUriString(), "?");
+	}
+	
+	public int getCurrentPage() {
+		return params.getCurrentPage();
+	}
+	public int getNbItemsPerPage() {
+		return params.getNbItemsPerPage();
+	}
+	public Integer getNbItemsTotal() {
+		return nbItemsTotal;
+	}
+	public boolean isHasPagination() {
+		return nbItemsTotal > getNbItemsPerPage();
+	}
+	public boolean isHasPreviousPage() {
+		return getCurrentPage() > 1;
+	}
+	public int getPreviousPage() {
+		return getCurrentPage() - 1;
+	}
+	public String getPreviousPageUri() {
+		return getPageUri(getPreviousPage());
+	}
+	public int getFirstPage() {
+		return 1;
+	}
+	public String getFirstPageUri() {
+		return getPageUri(getFirstPage());
+	}
+	public int getLastPage() {
+		return nbItemsTotal / getNbItemsPerPage() + ((nbItemsTotal % getNbItemsPerPage() != 0) ? 1 : 0);
+	}
+	public String getLastPageUri() {
+		return getPageUri(getLastPage());
+	}
+	
+	public static class PageLink {
+		private String label;
+		private String link;
+		public PageLink(String label, String link) {
+			this.label = label;
+			this.link = link;
+		}
+		public String getLabel() {
+			return label;
+		}
+		public String getLink() {
+			return link;
+		}
+	}
+	public List<PageLink> getPageLinks() {
+		List<PageLink> pages = new ArrayList<Pagination.PageLink>();
+		for (int page=getFirstPage(); page<=getLastPage(); page++) {
+			pages.add(new PageLink(
+					Integer.toString(page), 
+					(page != getCurrentPage()) ? getPageUri(page) : null));
+		}
+		return pages;
+	}
+	public boolean isHasNextPage() {
+		return getCurrentPage() < getLastPage();
+	}
+	public int getNextPage() {
+		return getCurrentPage() + 1;
+	}
+	public String getNextPageUri() {
+		return getPageUri(getNextPage());
+	}
+
+}

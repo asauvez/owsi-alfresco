@@ -4,6 +4,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="formQuery" uri="http://app.alfresco.openwide.fr/tags/formQuery" %>
+<%@ taglib prefix="alfapp"		uri="http://app.alfresco.openwide.fr/tags/util" %>
 
 <div class="form-query-container">
 	<c:choose>
@@ -17,10 +18,14 @@
 		</c:otherwise>
 	</c:choose>
 	<div class="pull-left">
-		<formQuery:pagination pagination="${result.pagination}"/>
+		<div class="pull-right">
+			<alfapp:pagination pagination="${result.pagination}"/>
+		</div>
 		<formQuery:result result="${result}">
 			<jsp:doBody/>
 		</formQuery:result>
-		<formQuery:pagination pagination="${result.pagination}"/>
+		<div class="pull-right">
+			<alfapp:pagination pagination="${result.pagination}"/>
+		</div>
 	</div>
 </div>

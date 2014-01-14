@@ -73,8 +73,13 @@ public class ValidationResponseMethodProcessor extends AbstractMessageConverterM
 		if (returnValue == null) {
 			return;
 		} else if (returnValue instanceof ValidationResponse) {
-			mavContainer.setRequestHandled(true);
 			ValidationResponse validation = (ValidationResponse) returnValue;
+			if (validation.getViewName() != null) {
+				mavContainer.setViewName(validation.getViewName());
+				return;
+			}
+			
+			mavContainer.setRequestHandled(true);
 			HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 			// get xRequestedWith : vérifie si le contenu provient d'une requete ajax ou d'une iframe
 			String xRequestedWith = webRequest.getHeader(X_REQUESTED_WITH_HEADER_NAME);

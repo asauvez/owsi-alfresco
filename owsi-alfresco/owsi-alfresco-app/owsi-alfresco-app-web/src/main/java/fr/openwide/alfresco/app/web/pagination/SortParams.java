@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.component.query.search.model;
+package fr.openwide.alfresco.app.web.pagination;
 
 import java.io.Serializable;
 
