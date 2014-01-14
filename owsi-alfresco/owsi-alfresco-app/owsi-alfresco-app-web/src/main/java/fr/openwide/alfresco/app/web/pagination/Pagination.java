@@ -35,7 +35,7 @@ public class Pagination implements Serializable {
 	
 	public <T> List<T> filterList(List<T> list) {
 		setNbItemsTotal(list.size());
-		this.params.setCurrentPage(Math.min(getCurrentPage(), getLastPage()));
+		this.params.setCurrentPage(Math.max(Math.min(getCurrentPage(), getLastPage()), getFirstPage()));
 		return isHasPagination() ? list.subList(params.getFirstResult(), Math.min(list.size(), getCurrentPage()*getNbItemsPerPage()))
 				                 : list;
 	}
@@ -46,6 +46,9 @@ public class Pagination implements Serializable {
 	
 	public int getCurrentPage() {
 		return params.getCurrentPage();
+	}
+	public String getCurrentPageUrl() {
+		return getPageUri(params.getCurrentPage());
 	}
 	public int getNbItemsPerPage() {
 		return params.getNbItemsPerPage();
@@ -60,7 +63,7 @@ public class Pagination implements Serializable {
 		return getCurrentPage() > 1;
 	}
 	public int getPreviousPage() {
-		return getCurrentPage() - 1;
+		return Math.max(getCurrentPage() - 1, getFirstPage());
 	}
 	public String getPreviousPageUri() {
 		return getPageUri(getPreviousPage());
@@ -79,9 +82,11 @@ public class Pagination implements Serializable {
 	}
 	
 	public static class PageLink {
+		private Integer number;
 		private String label;
 		private String link;
-		public PageLink(String label, String link) {
+		public PageLink(Integer number, String label, String link) {
+			this.number = number;
 			this.label = label;
 			this.link = link;
 		}
@@ -91,13 +96,23 @@ public class Pagination implements Serializable {
 		public String getLink() {
 			return link;
 		}
+		public Integer getNumber() {
+			return number;
+		}
 	}
 	public List<PageLink> getPageLinks() {
-		List<PageLink> pages = new ArrayList<Pagination.PageLink>();
-		for (int page=getFirstPage(); page<=getLastPage(); page++) {
-			pages.add(new PageLink(
-					Integer.toString(page), 
-					(page != getCurrentPage()) ? getPageUri(page) : null));
+		int currentPage = getCurrentPage();
+		int lastPage = getLastPage();
+		int nbPagesToDisplay = params.getNbPagesToDisplay();
+		
+		List<PageLink> pages = new ArrayList<PageLink>();
+		for (int page=getFirstPage(); page<=lastPage; page++) {
+			if (page == 1 || page == lastPage || Math.abs(page - currentPage) < nbPagesToDisplay) {
+				pages.add(new PageLink(page, Integer.toString(page), 
+						(page != currentPage) ? getPageUri(page) : null));
+			} else if (pages.get(pages.size()-1).getNumber() != null) {
+				pages.add(new PageLink(null, "&#133;", null));
+			}
 		}
 		return pages;
 	}
@@ -105,7 +120,7 @@ public class Pagination implements Serializable {
 		return getCurrentPage() < getLastPage();
 	}
 	public int getNextPage() {
-		return getCurrentPage() + 1;
+		return Math.min(getCurrentPage() + 1, getLastPage());
 	}
 	public String getNextPageUri() {
 		return getPageUri(getNextPage());

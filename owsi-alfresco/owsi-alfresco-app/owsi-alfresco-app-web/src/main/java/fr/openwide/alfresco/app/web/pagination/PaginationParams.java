@@ -8,6 +8,7 @@ public class PaginationParams implements Serializable {
 
 	private int currentPage = 1;
 	private int nbItemsPerPage = Integer.MAX_VALUE;
+	private int nbPagesToDisplay = 5;
 
 	public SortParams getSort() {
 		return sort;
@@ -27,6 +28,12 @@ public class PaginationParams implements Serializable {
 	}
 	public void setNbItemsPerPage(int nbItemsPerPage) {
 		this.nbItemsPerPage = nbItemsPerPage;
+	}
+	public int getNbPagesToDisplay() {
+		return nbPagesToDisplay;
+	}
+	public void setNbPagesToDisplay(int nbPagesToDisplay) {
+		this.nbPagesToDisplay = nbPagesToDisplay;
 	}
 
 	// Pour hibernate

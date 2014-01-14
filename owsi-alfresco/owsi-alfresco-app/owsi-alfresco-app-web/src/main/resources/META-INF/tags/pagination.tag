@@ -8,8 +8,8 @@
 			<a href="${pagination.previousPageUri}" data-page="${pagination.previousPage}">&laquo;</a>
 		</li>
 		<c:forEach var="pageLink" items="${pagination.pageLinks}">
-			<li class="${(pageLink.link eq null) ? 'active' : 'pageable'}">
-				<a href="${pageLink.link}" data-page="${pageLink.label}">${pageLink.label}</a>
+			<li class="${(pageLink.number eq null) ? 'disabled' : ((pageLink.link eq null) ? 'active' : 'pageable')}">
+				<a href="${(pageLink.link ne null) ? pageLink.link : pagination.currentPageUrl}" data-page="${pageLink.number}">${pageLink.label}</a>
 			</li>
 		</c:forEach>
 		<li class="${pagination.hasNextPage ? 'pageable' : 'disabled'}">
