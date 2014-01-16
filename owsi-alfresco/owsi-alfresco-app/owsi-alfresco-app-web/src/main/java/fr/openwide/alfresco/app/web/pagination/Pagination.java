@@ -3,11 +3,11 @@ package fr.openwide.alfresco.app.web.pagination;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,10 +20,11 @@ public class Pagination implements Serializable {
 	public Pagination(PaginationParams params, HttpServletRequest request) {
 		this.params = params;
 
-		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
-		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-			uriComponentsBuilder.queryParam(entry.getKey(), (Object[]) entry.getValue());
-		}		
+		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
+//		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
+//		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+//			uriComponentsBuilder.queryParam(entry.getKey(), (Object[]) entry.getValue());
+//		}		
 		this.uriComponents = uriComponentsBuilder
 				.replaceQueryParam("pagination.currentPage", "{page}")
 				.build();
@@ -41,7 +42,7 @@ public class Pagination implements Serializable {
 	}
 
 	public String getPageUri(int page) {
-		return "#" + StringUtils.substringAfter(uriComponents.expand(page).toUriString(), "?");
+		return "#!" + StringUtils.substringAfter(uriComponents.expand(page).toUriString(), "?");
 	}
 	
 	public int getCurrentPage() {
