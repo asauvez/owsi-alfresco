@@ -2,31 +2,32 @@ package fr.openwide.alfresco.app.web.pagination;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
+
 public class Pagination implements Serializable {
 
-	private PaginationParams params;
+	private final PaginationParams params;
 	private int nbItemsTotal;
-	private UriComponents uriComponents;
+	private final UriComponents uriComponentsPage;
+	private final UriComponents uriComponentsSort;
 
-	public Pagination(PaginationParams params, HttpServletRequest request) {
+	public Pagination(PaginationParams params, UriComponentsBuilder uriComponentsBuilder) {
 		this.params = params;
-
-		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
-//		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
-//		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-//			uriComponentsBuilder.queryParam(entry.getKey(), (Object[]) entry.getValue());
-//		}		
-		this.uriComponents = uriComponentsBuilder
+		this.uriComponentsPage = uriComponentsBuilder
 				.replaceQueryParam("pagination.currentPage", "{page}")
+				.build();
+		this.uriComponentsSort = uriComponentsBuilder
+				.replaceQueryParam("pagination.currentPage")
+				.replaceQueryParam("pagination.sort.column", "{column}")
+				.replaceQueryParam("pagination.sort.direction", "{direction}")
 				.build();
 	}
 	
@@ -42,7 +43,7 @@ public class Pagination implements Serializable {
 	}
 
 	public String getPageUri(int page) {
-		return "#!" + StringUtils.substringAfter(uriComponents.expand(page).toUriString(), "?");
+		return "#!" + StringUtils.substringAfter(uriComponentsPage.expand(page).toUriString(), "?");
 	}
 	
 	public int getCurrentPage() {
@@ -127,4 +128,19 @@ public class Pagination implements Serializable {
 		return getPageUri(getNextPage());
 	}
 
+	public SortParams getSort() {
+		return params.getSort();
+	}
+	public Map<String, String> getSortUri() {
+		return new HashMap<String, String>() {
+			@Override
+			public String get(Object column) {
+				SortDirection direction = 
+						(   column.equals(params.getSort().getColumn()) 
+						 && params.getSort().getDirection() == SortDirection.ASC) 
+						? SortDirection.DESC : SortDirection.ASC;
+				return "#!" + StringUtils.substringAfter(uriComponentsSort.expand(column, direction).toUriString(), "?");
+			}
+		};
+	}
 }

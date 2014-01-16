@@ -29,13 +29,16 @@
 				state = {};
 			}
 			
-			form.find("input,select,textarea").each(function() {
+			form.find("input:not([type=submit]),select,textarea").each(function() {
 				var field = $(this);
 				var name = field.attr("name");
-				if (contextualized) {
-					state[contextWidgetName][name] = field.val();
-				} else {
-					state[name] = field.val();
+				var value = field.val();
+				if (value != '') {
+					if (contextualized) {
+						state[contextWidgetName][name] = value;
+					} else {
+						state[name] = value;
+					}
 				}
 			});
 			
@@ -50,11 +53,11 @@
 				var form = $(this);
 				var dirty = false;
 				
-				form.find("input,select,textarea").on("keydown.formBindState", function() {
+				form.find("input:not([type=submit]),select,textarea").on("keydown.formBindState", function() {
 					dirty = true;
 				});
 				
-				form.find("input,select,textarea").on("change.formBindState", function() {
+				form.find("input:not([type=submit]),select,textarea").on("change.formBindState", function() {
 					dirty = true;
 				});
 				
@@ -85,7 +88,7 @@
 					}
 					if (state) {
 						var submitNeeded = false;
-						form.find("input,select,textarea").each(function() {
+						form.find("input:not([type=submit]),select,textarea").each(function() {
 							var field = $(this);
 							var name = field.attr("name");
 							var fromState = state[name]?state[name]:"";

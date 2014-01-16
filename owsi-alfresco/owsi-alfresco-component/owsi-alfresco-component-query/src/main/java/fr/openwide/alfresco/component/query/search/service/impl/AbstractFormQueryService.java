@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.google.common.collect.Ordering;
 
@@ -110,7 +111,7 @@ public class AbstractFormQueryService {
 
 		// Pagination
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		Pagination pagination = new Pagination(paginationParams, request);
+		Pagination pagination = new Pagination(paginationParams, ServletUriComponentsBuilder.fromRequest(request));
 		result.setPagination(pagination);
 		result.setRows(pagination.filterList(rows));
 

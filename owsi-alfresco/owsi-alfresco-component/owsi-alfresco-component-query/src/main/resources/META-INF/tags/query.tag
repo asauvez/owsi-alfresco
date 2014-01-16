@@ -6,26 +6,35 @@
 <%@ taglib prefix="formQuery" uri="http://app.alfresco.openwide.fr/tags/formQuery" %>
 <%@ taglib prefix="alfapp"		uri="http://app.alfresco.openwide.fr/tags/util" %>
 
-<div class="form-query-container">
-	<c:choose>
-		<c:when test="${not empty query.inputFieldBuilder.fieldSets}">
-			<div class="pull-left well">
-				<formQuery:form name="${name}" query="${query}"/>
-			</div>
-		</c:when>
-		<c:otherwise>
-			<formQuery:form name="${name}" query="${query}"/>
-		</c:otherwise>
-	</c:choose>
+<div class="form-query-container clearfix">
 	<div class="pull-left">
-		<div class="pull-right">
-			<alfapp:pagination pagination="${result.pagination}"/>
-		</div>
-		<formQuery:result result="${result}">
-			<jsp:doBody/>
-		</formQuery:result>
-		<div class="pull-right">
-			<alfapp:pagination pagination="${result.pagination}"/>
-		</div>
+		<formQuery:form name="${name}" query="${query}"/>
+	</div>
+	
+	<div id="${name}-result" class="pull-left panel panel-default form-query-result">
+		<c:if test="${result ne null}">
+		 	<div class="panel-heading clearfix">
+				<div class="pull-right">
+					<alfapp:pagination pagination="${result.pagination}"/>
+				</div>
+	
+		 		<c:set var="queryLayout" value="result-header" scope="request"/>
+		 		<jsp:doBody/>
+			</div>
+			 <div class="panel-body">
+			 	<c:set var="queryLayout" value="result-body" scope="request"/>
+				<formQuery:result result="${result}">
+					<jsp:doBody/>
+				</formQuery:result>
+			</div>
+			<div class="panel-footer clearfix">
+				<div class="pull-right">
+					<alfapp:pagination pagination="${result.pagination}"/>
+				</div>
+	
+		 		<c:set var="queryLayout" value="result-footer" scope="request"/>
+		 		<jsp:doBody/>
+			</div>
+		</c:if>
 	</div>
 </div>

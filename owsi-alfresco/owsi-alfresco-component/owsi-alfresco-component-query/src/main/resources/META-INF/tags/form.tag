@@ -6,86 +6,85 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <form:form modelAttribute="${name}" method="get" role="form" class="form-query">
-	<form:errors element="div" cssClass="alert alert-error" />
-
-	<c:forEach var="fieldSet" items="${query.inputFieldBuilder.fieldSets}">
-		<c:if test="${fieldSet.visible}">
-			<fieldset class="${fieldSet.inRow ? 'row' : ''}">
-			 	<c:if test="${not empty fieldSet.label}">
-					<legend><spring:message message="${fieldSet.label}"/></legend>
-			 	</c:if>
-				<c:forEach var="inputField" items="${fieldSet.inputFields}">
-					<c:if test="${inputField.visible}">
-						<div class="${fieldSet.inRow ? inputField.rowSpan : ''}${fieldSet.inRow ? inputField.rowOffset : ''}">
-							<c:set var="fieldError">
-								<form:errors cssClass="help-block" path="${inputField.name}" />
-							</c:set>
-							<div class="form-group ${not empty fieldError ? 'has-error' : ''}">
-							
-								<label for="${inputField.name}" class="control-label">
-									<spring:message message="${inputField.label}"/>
-								</label>
-								<c:choose>
-									<c:when test="${inputField.view eq 'TEXT'}">
-										<c:set var="placeholder">
-											<c:if test="${not empty inputField.placeholder}">
-												<spring:message message="${inputField.placeholder}"/>
-											</c:if>
-										</c:set>
-										<form:input path="${inputField.name}" placeholder="${placeholder}" cssClass="form-control"/>
-									</c:when>
-									<c:when test="${inputField.view eq 'DATE'}">
-										<form:input path="${inputField.name}" cssClass="form-control datepicker"/>
-									</c:when>
-									<c:when test="${inputField.view eq 'SELECT'}">
-										<form:select path="${inputField.name}" cssClass="form-control">
-											<c:forEach var="item" items="${inputField.items}">
-												<form:option value="${item.key}">
-													<spring:message message="${item.label}"/>
-												</form:option>
-											</c:forEach>
-										</form:select>
-									</c:when>
-									<c:when test="${inputField.view eq 'RADIO'}">
-										<c:forEach var="item" items="${inputField.items}">
-											<label class="radio-inline">
-												<form:radiobutton path="${inputField.name}" value="${item.key}" />
-												<spring:message message="${item.label}"/>
-											</label>
-										</c:forEach>
-									</c:when>
-									<c:when test="${inputField.view eq 'CUSTOM'}">
-										<c:set var="inputField" value="${inputField}" scope="request"/>
-										<jsp:doBody/>
-										<c:set var="inputField" value="" scope="request"/>
-									</c:when>
-									<c:otherwise>
-										<c:out value="Unknown view '${inputField.view}' !"/>
-									</c:otherwise>
-								</c:choose>
-								<c:out value="${fieldError}" escapeXml="false"/>											
-								<c:if test="${not empty inputField.description}">
-									<p class="help-block">
-										<spring:message message="${inputField.description}"/>
-									</p>
-								</c:if>
-							</div>
-						</div>
-					</c:if>
-				</c:forEach>
-			</fieldset>
-		</c:if>
-	</c:forEach>
-	
-	<input type="hidden" class="pagination-sort-column" name="pagination.sort.column" value="${query.pagination.sort.column}">
-	<input type="hidden" class="pagination-sort-direction" name="pagination.sort.direction" value="${query.pagination.sort.direction}">
-	<input type="hidden" class="pagination-currentPage" name="pagination.currentPage" value="${query.pagination.currentPage}">
-	
-	<c:if test="${not empty query.inputFieldBuilder.fieldSets}">
-		<div>
-			<input type="submit" value="Recherche" class="btn btn-primary"/>
-			<button type="reset" class="btn btn-link">Annuler</button>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<form:errors element="div" cssClass="alert alert-error" />
+		
+			<c:forEach var="fieldSet" items="${query.inputFieldBuilder.fieldSets}">
+				<c:if test="${fieldSet.visible}">
+					<fieldset class="${fieldSet.inRow ? 'row' : ''}">
+					 	<c:if test="${not empty fieldSet.label}">
+							<legend><spring:message message="${fieldSet.label}"/></legend>
+					 	</c:if>
+						<c:forEach var="inputField" items="${fieldSet.inputFields}">
+							<c:if test="${inputField.visible}">
+								<div class="${fieldSet.inRow ? inputField.rowSpan : ''}${fieldSet.inRow ? inputField.rowOffset : ''}">
+									<c:set var="fieldError">
+										<form:errors cssClass="help-block" path="${inputField.name}" />
+									</c:set>
+									<div class="form-group ${not empty fieldError ? 'has-error' : ''}">
+									
+										<label for="${inputField.name}" class="control-label">
+											<spring:message message="${inputField.label}"/>
+										</label>
+										<c:choose>
+											<c:when test="${inputField.view eq 'TEXT'}">
+												<c:set var="placeholder">
+													<c:if test="${not empty inputField.placeholder}">
+														<spring:message message="${inputField.placeholder}"/>
+													</c:if>
+												</c:set>
+												<form:input path="${inputField.name}" placeholder="${placeholder}" cssClass="form-control"/>
+											</c:when>
+											<c:when test="${inputField.view eq 'DATE'}">
+												<form:input path="${inputField.name}" cssClass="form-control datepicker"/>
+											</c:when>
+											<c:when test="${inputField.view eq 'SELECT'}">
+												<form:select path="${inputField.name}" cssClass="form-control">
+													<c:forEach var="item" items="${inputField.items}">
+														<form:option value="${item.key}">
+															<spring:message message="${item.label}"/>
+														</form:option>
+													</c:forEach>
+												</form:select>
+											</c:when>
+											<c:when test="${inputField.view eq 'RADIO'}">
+												<c:forEach var="item" items="${inputField.items}">
+													<label class="radio-inline">
+														<form:radiobutton path="${inputField.name}" value="${item.key}" />
+														<spring:message message="${item.label}"/>
+													</label>
+												</c:forEach>
+											</c:when>
+											<c:when test="${inputField.view eq 'CUSTOM'}">
+												<c:set var="inputField" value="${inputField}" scope="request"/>
+												<jsp:doBody/>
+												<c:set var="inputField" value="" scope="request"/>
+											</c:when>
+											<c:otherwise>
+												<c:out value="Unknown view '${inputField.view}' !"/>
+											</c:otherwise>
+										</c:choose>
+										<c:out value="${fieldError}" escapeXml="false"/>											
+										<c:if test="${not empty inputField.description}">
+											<p class="help-block">
+												<spring:message message="${inputField.description}"/>
+											</p>
+										</c:if>
+									</div>
+								</div>
+							</c:if>
+						</c:forEach>
+					</fieldset>
+				</c:if>
+			</c:forEach>
 		</div>
-	</c:if>
+		<c:if test="${not empty query.inputFieldBuilder.fieldSets}">
+			<div class="panel-footer">
+				<input type="submit" value="Recherche" class="btn btn-primary"/>
+				<button type="reset" class="btn btn-link">Annuler</button>
+			</div>
+		</c:if>
+	</div>
 </form:form>
 			

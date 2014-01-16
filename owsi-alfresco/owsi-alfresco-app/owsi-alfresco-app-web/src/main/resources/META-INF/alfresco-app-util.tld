@@ -92,5 +92,9 @@
 		<name>pagination</name>
 		<path>/META-INF/tags/pagination.tag</path>
 	</tag-file>
+	<tag-file>
+		<name>thSort</name>
+		<path>/META-INF/tags/th-sort.tag</path>
+	</tag-file>
 
 </taglib>

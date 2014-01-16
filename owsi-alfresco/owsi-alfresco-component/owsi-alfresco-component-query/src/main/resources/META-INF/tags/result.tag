@@ -3,31 +3,21 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="alfapp" uri="http://app.alfresco.openwide.fr/tags/util" %>
 
 <c:if test="${not empty result}">
-	<table class="table table-striped table-bordered table-hover form-query-result">
+	<table class="table table-striped table-bordered table-hover">
 		<thead>
 			<c:forEach var="column" items="${result.columns}">
 				<c:if test="${column.visible}">
-					<c:set var="sortDirection" value="ASC"/>
-					<c:set var="columnClass" value=""/>
-					<c:set var="iconClass" value=""/>
-					<c:if test="${not empty column.itemComparator}">
-						<c:set var="columnClass" value="sort-column"/>
-						<c:choose>
-							<c:when test="${column.sortDirection eq 'ASC'}">
-								<c:set var="sortDirection" value="DESC"/>
-								<c:set var="iconClass" value="glyphicon glyphicon-sort-by-attributes"/>
-							</c:when>
-							<c:when test="${column.sortDirection eq 'DESC'}">
-								<c:set var="iconClass" value="glyphicon glyphicon-sort-by-attributes-alt"/>
-							</c:when>
-						</c:choose>
-					</c:if>
-					<th class="${columnClass}" data-sort-column="${column.id}" data-sort-direction="${sortDirection}">
-						<spring:message message="${column.label}"/>
-						<span class="${iconClass}"></span>
-					</th>
+					<c:choose>
+						<c:when test="${not empty column.itemComparator}">
+							<alfapp:thSort id="${column.id}" message="${column.label}" pagination="${result.pagination}"/>
+						</c:when>
+						<c:otherwise>
+							<th><spring:message message="${column.label}"/></th>
+						</c:otherwise>
+					</c:choose>
 				</c:if>
 			</c:forEach>
 		</thead>

@@ -13,7 +13,8 @@ public abstract class AbstractFormQuery<I> {
 
 	private PaginationParams pagination = new PaginationParams();
 	private InputFieldBuilder inputFieldBuilder = new InputFieldBuilder();
-
+	private boolean doQuery;
+	
 	public AbstractFormQuery() {
 		initFields(inputFieldBuilder);
 
@@ -52,5 +53,12 @@ public abstract class AbstractFormQuery<I> {
 
 	public void validate(Errors errors) {
 		// to override
+	}
+	
+	public boolean isDoQuery() {
+		return doQuery;
+	}
+	public void setDoQuery(boolean doQuery) {
+		this.doQuery = doQuery;
 	}
 }

@@ -5,15 +5,15 @@
 <c:if test="${pagination.hasPagination}">
 	<ul class="pagination">
 		<li class="${pagination.hasPreviousPage ? 'pageable' : 'disabled'}">
-			<a href="${pagination.previousPageUri}" data-page="${pagination.previousPage}">&laquo;</a>
+			<a href="${pagination.previousPageUri}">&laquo;</a>
 		</li>
 		<c:forEach var="pageLink" items="${pagination.pageLinks}">
 			<li class="${(pageLink.number eq null) ? 'disabled' : ((pageLink.link eq null) ? 'active' : 'pageable')}">
-				<a href="${(pageLink.link ne null) ? pageLink.link : pagination.currentPageUrl}" data-page="${pageLink.number}">${pageLink.label}</a>
+				<a href="${(pageLink.link ne null) ? pageLink.link : pagination.currentPageUrl}">${pageLink.label}</a>
 			</li>
 		</c:forEach>
 		<li class="${pagination.hasNextPage ? 'pageable' : 'disabled'}">
-			<a href="${pagination.nextPageUri}" data-page="${pagination.nextPage}">&raquo;</a>
+			<a href="${pagination.nextPageUri}">&raquo;</a>
 		</li>
 	</ul>
 </c:if>

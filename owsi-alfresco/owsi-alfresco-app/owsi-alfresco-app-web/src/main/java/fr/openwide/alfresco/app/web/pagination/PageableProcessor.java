@@ -10,6 +10,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import com.google.common.collect.Ordering;
 
 import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
@@ -43,7 +45,7 @@ public class PageableProcessor<T> {
 		}
 		
 		// Pagination
-		Pagination pagination = new Pagination(paginationParams, request);
+		Pagination pagination = new Pagination(paginationParams, ServletUriComponentsBuilder.fromRequest(request));
 		return new PageableResult<T>(
 				pagination, 
 				pagination.filterList(allItems));

@@ -10,9 +10,7 @@
 				
 				// Options par defaut
 				var contextualized = false; // permet d'avoir plusieurs formulaires de ce type sur une meme page
-				var url = element.data("url");
-				var method = element.data("method");
-				
+
 				if (element.data("widget")) {
 					contextWidgetName = element.data("widget");
 					contextualized = true;
@@ -27,13 +25,18 @@
 				
 				options = $.extend({
 					form: null,
-					onUpdate : function() {}
+					onUpdate : function() {},
+					url: document.location.href,
+					method: 'GET'
+				}, {
+					url: element.data("url"),
+					method : element.data("method")
 				}, options);
 				
 				if (options.form) {
 					options.form.formBindState();
 					options.form.submit(function( event ) {
-						$(this).formPushState();
+						options.form.formPushState();
 						event.preventDefault();
 					})
 				}
@@ -46,10 +49,10 @@
 					}
 					
 					$.ajax({
-						url: url,
-						method: method,
+						url: options.url,
+						method: options.method,
 						dataType: "html",
-						data: state
+						data: $.extend(state, { doQuery: true })
 					}).done(function(html) {
 						element.html($(html).find("#" + element.attr("id")).html());
 						options.onUpdate(element);
@@ -95,6 +98,9 @@
 						}
 					}
 				});
+				if (location.hash != "" && location.hash != "#!") {
+					$(window).trigger("hashchange");
+				}
 			});
 			// pour chainage jquery
 			return this;
