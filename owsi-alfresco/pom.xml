@@ -50,7 +50,7 @@
 	</ciManagement>
 
 	<scm>
-		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools/owsi-alfresco</developerConnection>
+		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools</developerConnection>
 		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/browser/owsi-alfresco</url>
 	</scm>
 
