@@ -19,7 +19,7 @@
 	<properties>
 		<jdk.version>1.7</jdk.version>
 		
-		<owsi-alfresco.alfresco.version>4.2.0</owsi-alfresco.alfresco.version>
+		<owsi-alfresco.alfresco.version>4.2.1</owsi-alfresco.alfresco.version>
 	</properties>
 
 	<modules>

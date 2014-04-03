@@ -52,8 +52,8 @@
 	<scm>
 		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools</developerConnection>
 		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/browser/owsi-alfresco</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<build>
 		<pluginManagement>
