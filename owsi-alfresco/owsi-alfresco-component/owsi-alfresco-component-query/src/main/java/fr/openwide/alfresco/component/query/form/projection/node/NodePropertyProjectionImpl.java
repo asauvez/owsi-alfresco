@@ -3,7 +3,7 @@ package fr.openwide.alfresco.component.query.form.projection.node;
 import java.io.Serializable;
 
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
@@ -29,9 +29,9 @@ public class NodePropertyProjectionImpl<P extends Serializable> extends Abstract
 	}
 
 	@Override
-	public void initNodeFetchDetails(NodeFetchDetails nodeFetchDetails) {
-		super.initNodeFetchDetails(nodeFetchDetails);
+	public void initNodeScope(NodeScope nodeScope) {
+		super.initNodeScope(nodeScope);
 
-		nodeFetchDetails.getProperties().add(property.getNameReference());
+		nodeScope.getProperties().add(property.getNameReference());
 	}
 }

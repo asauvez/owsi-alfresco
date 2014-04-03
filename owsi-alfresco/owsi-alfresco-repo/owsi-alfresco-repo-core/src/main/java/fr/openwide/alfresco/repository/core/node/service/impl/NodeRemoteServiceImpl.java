@@ -32,7 +32,7 @@ import org.springframework.core.io.Resource;
 
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryChildAssociation;
@@ -55,128 +55,128 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails details) throws NoSuchNodeException {
-		return getRepositoryNode(conversionService.getRequired(nodeReference), details);
+	public RepositoryNode get(NodeReference nodeReference, NodeScope scope) throws NoSuchNodeException {
+		return getRepositoryNode(conversionService.getRequired(nodeReference), scope);
 	}
 
 	@Override
 	public List<RepositoryNode> getChildren(
-			NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails details) {
+			NodeReference nodeReference, NameReference childAssocTypeName, NodeScope scope) {
 		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(childAssocTypeName), 
 				RegexQNamePattern.MATCH_ALL, true);
 		List<RepositoryNode> res = new ArrayList<>();
 		for (ChildAssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getChildRef(), details));
+			res.add(getRepositoryNode(assoc.getChildRef(), scope));
 		}
 		return res;
 	}
 	private List<RepositoryNode> getParent(
-			NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails details) {
+			NodeReference nodeReference, NameReference childAssocTypeName, NodeScope scope) {
 		List<ChildAssociationRef> assocs = nodeService.getParentAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(childAssocTypeName), 
 				RegexQNamePattern.MATCH_ALL);
 		List<RepositoryNode> res = new ArrayList<>();
 		for (ChildAssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getParentRef(), details));
+			res.add(getRepositoryNode(assoc.getParentRef(), scope));
 		}
 		return res;
 	}
 
 	@Override
 	public List<RepositoryNode> getTargetAssocs(
-			NodeReference nodeReference, NameReference assocName, NodeFetchDetails details) {
+			NodeReference nodeReference, NameReference assocName, NodeScope scope) {
 		List<AssociationRef> assocs = nodeService.getTargetAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(assocName));
 		List<RepositoryNode> res = new ArrayList<>();
 		for (AssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getTargetRef(), details));
+			res.add(getRepositoryNode(assoc.getTargetRef(), scope));
 		}
 		return res;
 	}
 
 	@Override
 	public List<RepositoryNode> getSourceAssocs(
-			NodeReference nodeReference, NameReference assocName, NodeFetchDetails details) {
+			NodeReference nodeReference, NameReference assocName, NodeScope scope) {
 		List<AssociationRef> assocs = nodeService.getSourceAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(assocName));
 		List<RepositoryNode> res = new ArrayList<>();
 		for (AssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getSourceRef(), details));
+			res.add(getRepositoryNode(assoc.getSourceRef(), scope));
 		}
 		return res;
 	}
 
-	private RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeFetchDetails details) throws NoSuchNodeException {
+	private RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeScope scope) throws NoSuchNodeException {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
 			throw new NoSuchNodeException(nodeReference.getReference());
 		}
 		RepositoryNode node = new RepositoryNode();
-		if (details.isNodeReference()) {
+		if (scope.isNodeReference()) {
 			node.setNodeReference(conversionService.get(nodeRef));
 		}
-		if (details.isType()) {
+		if (scope.isType()) {
 			node.setType(conversionService.get(nodeService.getType(nodeRef)));
 		}
-		if (details.getPrimaryParent() != null) {
+		if (scope.getPrimaryParent() != null) {
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 			if (primaryParent.getParentRef() != null) {
 				node.setPrimaryParentAssociation(new RepositoryChildAssociation(
-						getRepositoryNode(primaryParent.getParentRef(), details.getPrimaryParent()),
+						getRepositoryNode(primaryParent.getParentRef(), scope.getPrimaryParent()),
 						conversionService.get(primaryParent.getTypeQName())));
 			}
 		}
-		for (NameReference property : details.getProperties()) {
+		for (NameReference property : scope.getProperties()) {
 			Serializable value = nodeService.getProperty(nodeRef, conversionService.getRequired(property));
 			if (value != null) {
 				node.getProperties().put(property, conversionService.getForApplication(value));
 			}
 		}
-		for (NameReference property : details.getContentStrings()) {
+		for (NameReference property : scope.getContentStrings()) {
 			ContentReader reader = contentService.getReader(nodeRef, conversionService.getRequired(property));
 			if (reader != null) {
 				String content = reader.getContentString();
 				node.getContentStrings().put(property, content);
 			}
 		}
-		for (NameReference aspect : details.getAspects()) {
+		for (NameReference aspect : scope.getAspects()) {
 			if (nodeService.hasAspect(nodeRef, conversionService.getRequired(aspect))) {
 				node.getAspects().add(aspect);
 			}
 		}
 		// get associations
-		for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
+		for (Entry<NameReference, NodeScope> entry : scope.getChildAssociations().entrySet()) {
 			node.getChildAssociations().put(
 					entry.getKey(), 
 					getChildren(nodeReference, entry.getKey(), entry.getValue()));
 		}
-		for (Entry<NameReference, NodeFetchDetails> entry : details.getParentAssociations().entrySet()) {
+		for (Entry<NameReference, NodeScope> entry : scope.getParentAssociations().entrySet()) {
 			node.getParentAssociations().put(
 					entry.getKey(), 
 					getParent(nodeReference, entry.getKey(), entry.getValue()));
 		}
-		for (Entry<NameReference, NodeFetchDetails> entry : details.getTargetAssocs().entrySet()) {
+		for (Entry<NameReference, NodeScope> entry : scope.getTargetAssocs().entrySet()) {
 			node.getTargetAssocs().put(
 					entry.getKey(), 
 					getTargetAssocs(nodeReference, entry.getKey(), entry.getValue()));
 		}
-		for (Entry<NameReference, NodeFetchDetails> entry : details.getSourceAssocs().entrySet()) {
+		for (Entry<NameReference, NodeScope> entry : scope.getSourceAssocs().entrySet()) {
 			node.getSourceAssocs().put(
 					entry.getKey(), 
 					getSourceAssocs(nodeReference, entry.getKey(), entry.getValue()));
 		}
 		// get premissions
-		for (RepositoryPermission permission : details.getUserPermissions()) {
+		for (RepositoryPermission permission : scope.getUserPermissions()) {
 			if (permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED) {
 				node.getUserPermissions().add(permission);
 			}
 		}
-		if (details.isAccessPermissions()) {
+		if (scope.isAccessPermissions()) {
 			node.setInheritParentPermissions(permissionService.getInheritParentPermissions(nodeRef));
 			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
 				node.getAccessPermissions().add(new RepositoryAuthorityPermission(
@@ -227,14 +227,14 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
+	public void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNameException {
 		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
 		try {
 			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
-			if (details.isType()) {
+			if (nodeScope.isType()) {
 				nodeService.setType(nodeRef, conversionService.getRequired(node.getType()));
 			}
-			if (details.getPrimaryParent() != null) {
+			if (nodeScope.getPrimaryParent() != null) {
 				if (cmName == null) {
 					cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 				}
@@ -244,7 +244,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 						conversionService.getRequired(repoPrimaryParent.getType()), 
 						QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
 			}
-			for (NameReference propertyName : details.getProperties()) {
+			for (NameReference propertyName : nodeScope.getProperties()) {
 				Serializable value = node.getProperties().get(propertyName);
 				if (value != null) {
 					if (! (value instanceof ContentData)) {
@@ -257,26 +257,26 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 						conversionService.getRequired(propertyName)); 
 				}
 			}
-			for (NameReference aspectName : details.getAspects()) {
+			for (NameReference aspectName : nodeScope.getAspects()) {
 				if (node.getAspects().contains(aspectName)) {
 					nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
 				} else {
 					nodeService.removeAspect(nodeRef, conversionService.getRequired(aspectName));
 				}
 			}
-			for (Entry<NameReference, NodeFetchDetails> entry : details.getChildAssociations().entrySet()) {
+			for (Entry<NameReference, NodeScope> entry : nodeScope.getChildAssociations().entrySet()) {
 				for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
 					childNode.setPrimaryParentAssociation(new RepositoryChildAssociation(node, entry.getKey()));
 					saveOrUpdate(childNode, entry.getValue());
 				}
 			}
-			for (Entry<NameReference, NodeFetchDetails> entry : details.getParentAssociations().entrySet()) {
+			for (Entry<NameReference, NodeScope> entry : nodeScope.getParentAssociations().entrySet()) {
 				for (RepositoryNode childNode : node.getParentAssociations().get(entry.getKey())) {
 					saveOrUpdate(childNode, entry.getValue());
 				}
 			}
 			setContents(nodeRef, node);
-			if (details.isAccessPermissions()) {
+			if (nodeScope.isAccessPermissions()) {
 				setPermissions(nodeRef, node);
 			}
 		} catch (DuplicateChildNodeNameException e) {
@@ -284,11 +284,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 	}
 
-	private void saveOrUpdate(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
+	private void saveOrUpdate(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNameException {
 		if (node.getNodeReference() == null) {
 			create(node);
 		} else {
-			update(node, details);
+			update(node, nodeScope);
 		}
 	}
 	

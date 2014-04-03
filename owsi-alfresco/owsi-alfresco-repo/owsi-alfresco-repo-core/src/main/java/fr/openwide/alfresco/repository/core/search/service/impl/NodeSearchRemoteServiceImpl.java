@@ -10,7 +10,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.lang.StringUtils;
 
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
@@ -26,7 +26,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public List<RepositoryNode> search(String luceneQuery, StoreReference storeReference, NodeFetchDetails details) {
+	public List<RepositoryNode> search(String luceneQuery, StoreReference storeReference, NodeScope scope) {
 		if (StringUtils.isBlank(luceneQuery)) {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
@@ -38,7 +38,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			List<RepositoryNode> res = new ArrayList<>();
 			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 				try {
-					res.add(nodeRemoteService.get(conversionService.get(nodeRef), details));
+					res.add(nodeRemoteService.get(conversionService.get(nodeRef), scope));
 				} catch (NoSuchNodeException e) {
 					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
 				}

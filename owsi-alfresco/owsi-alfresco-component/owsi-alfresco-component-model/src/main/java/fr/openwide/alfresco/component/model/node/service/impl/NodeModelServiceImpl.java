@@ -12,7 +12,7 @@ import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -27,8 +27,8 @@ public class NodeModelServiceImpl implements NodeModelService {
 	private NodeService nodeService;
 
 	@Override
-	public BusinessNode get(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) throws NoSuchNodeException {
-		return new BusinessNode(nodeService.get(nodeReference, nodeFetchDetails.getDetails()));
+	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeException {
+		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope()));
 	}
 
 	@Override
@@ -42,23 +42,23 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 
 	@Override
-	public List<BusinessNode> getChildren(NodeReference nodeReference, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return getChildren(nodeReference, CmModel.folder.contains, nodeFetchDetails);
+	public List<BusinessNode> getChildren(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) {
+		return getChildren(nodeReference, CmModel.folder.contains, nodeScopeBuilder);
 	}
 	
 	@Override
-	public List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeService.getChildren(nodeReference, childAssoc.getNameReference(), nodeFetchDetails.getDetails()));
+	public List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeScopeBuilder nodeScopeBuilder) {
+		return BusinessNode.wrapList(nodeService.getChildren(nodeReference, childAssoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 
 	@Override
-	public List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
+	public List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
+		return BusinessNode.wrapList(nodeService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 
 	@Override
-	public List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return BusinessNode.wrapList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeFetchDetails.getDetails()));
+	public List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
+		return BusinessNode.wrapList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 	
 	@Override
@@ -88,13 +88,13 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public void update(BusinessNode node) throws DuplicateChildNameException {
-		update(node, new NodeFetchDetailsBuilder()
+		update(node, new NodeScopeBuilder()
 				.fromNode(node));
 	}
 
 	@Override
-	public void update(BusinessNode node, NodeFetchDetailsBuilder details) throws DuplicateChildNameException {
-		nodeService.update(node.getRepositoryNode(), details.getDetails());
+	public void update(BusinessNode node, NodeScopeBuilder scope) throws DuplicateChildNameException {
+		nodeService.update(node.getRepositoryNode(), scope.getScope());
 	}
 
 	@Override

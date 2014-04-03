@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 
@@ -18,11 +18,11 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 	private RepositoryRemoteBinding repositoryRemoteBinding;
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeFetchDetails nodeFetchDetails) {
+	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope) {
 		SEARCH_NODE_SERVICE request = new SEARCH_NODE_SERVICE();
 		request.query = query;
 		request.storeReference = storeReference;
-		request.nodeFetchDetails = nodeFetchDetails;
+		request.nodeScope = nodeScope;
 		
 		return repositoryRemoteBinding.builder(SEARCH_NODE_SERVICE.ENDPOINT)
 				.headerPayload(request)

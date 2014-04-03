@@ -22,7 +22,7 @@ public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE
 		}
 		nodeService.update(
 				Objects.requireNonNull(request.node, "RepositoryNode"), 
-				Objects.requireNonNull(request.details, "NodeFetchDetails"));
+				Objects.requireNonNull(request.nodeScope, "NodeScope"));
 		return null;
 	}
 

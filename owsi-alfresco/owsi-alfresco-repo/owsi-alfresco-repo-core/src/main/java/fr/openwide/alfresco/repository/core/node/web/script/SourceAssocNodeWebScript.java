@@ -21,7 +21,7 @@ public class SourceAssocNodeWebScript extends AbstractNodeWebScript<List<Reposit
 		return nodeService.getTargetAssocs(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
 				Objects.requireNonNull(parameter.assocName, "AssocName"), 
-				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 @JsonInclude(Include.NON_EMPTY)
-public class NodeFetchDetails implements Serializable {
+public class NodeScope implements Serializable {
 
 	private static final long serialVersionUID = 6930653481257487738L;
 
@@ -22,11 +22,11 @@ public class NodeFetchDetails implements Serializable {
 	private Set<NameReference> contentStrings = new HashSet<>();
 	private Set<NameReference> aspects = new HashSet<>();
 
-	private NodeFetchDetails primaryParent;
-	private Map<NameReference, NodeFetchDetails> childAssociations = new HashMap<>();
-	private Map<NameReference, NodeFetchDetails> parentAssociations = new HashMap<>();
-	private Map<NameReference, NodeFetchDetails> targetAssocs = new HashMap<>();
-	private Map<NameReference, NodeFetchDetails> sourceAssocs = new HashMap<>();
+	private NodeScope primaryParent;
+	private Map<NameReference, NodeScope> childAssociations = new HashMap<>();
+	private Map<NameReference, NodeScope> parentAssociations = new HashMap<>();
+	private Map<NameReference, NodeScope> targetAssocs = new HashMap<>();
+	private Map<NameReference, NodeScope> sourceAssocs = new HashMap<>();
 
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 	private boolean accessPermissions = false;
@@ -43,10 +43,10 @@ public class NodeFetchDetails implements Serializable {
 	public void setType(boolean type) {
 		this.type = type;
 	}
-	public NodeFetchDetails getPrimaryParent() {
+	public NodeScope getPrimaryParent() {
 		return primaryParent;
 	}
-	public void setPrimaryParent(NodeFetchDetails primaryParent) {
+	public void setPrimaryParent(NodeScope primaryParent) {
 		this.primaryParent = primaryParent;
 	}
 	public Set<NameReference> getProperties() {
@@ -59,16 +59,16 @@ public class NodeFetchDetails implements Serializable {
 		return aspects;
 	}
 
-	public Map<NameReference, NodeFetchDetails> getChildAssociations() {
+	public Map<NameReference, NodeScope> getChildAssociations() {
 		return childAssociations;
 	}
-	public Map<NameReference, NodeFetchDetails> getParentAssociations() {
+	public Map<NameReference, NodeScope> getParentAssociations() {
 		return parentAssociations;
 	}
-	public Map<NameReference, NodeFetchDetails> getTargetAssocs() {
+	public Map<NameReference, NodeScope> getTargetAssocs() {
 		return targetAssocs;
 	}
-	public Map<NameReference, NodeFetchDetails> getSourceAssocs() {
+	public Map<NameReference, NodeScope> getSourceAssocs() {
 		return sourceAssocs;
 	}
 

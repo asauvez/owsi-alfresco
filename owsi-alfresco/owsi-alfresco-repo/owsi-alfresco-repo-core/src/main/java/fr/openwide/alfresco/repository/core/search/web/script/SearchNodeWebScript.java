@@ -23,7 +23,7 @@ public class SearchNodeWebScript extends AbstractParameterRemoteWebScript<List<R
 		return nodeSearchService.search(
 				Objects.requireNonNull(parameter.query, "Query"), 
 				Objects.requireNonNull(parameter.storeReference, "StoreReference"), 
-				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override

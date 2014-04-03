@@ -2,11 +2,11 @@ package fr.openwide.alfresco.component.query.form.projection.node;
 
 import com.google.common.base.Predicate;
 
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 
-public class UserPermissionPredicate implements Predicate<RepositoryNode>, NodeFetchDetailsInitializer {
+public class UserPermissionPredicate implements Predicate<RepositoryNode>, NodeScopeInitializer {
 
 	private final RepositoryPermission permission;
 
@@ -20,7 +20,7 @@ public class UserPermissionPredicate implements Predicate<RepositoryNode>, NodeF
 	}
 
 	@Override
-	public void initNodeFetchDetails(NodeFetchDetails nodeFetchDetails) {
-		nodeFetchDetails.getUserPermissions().add(permission);
+	public void initNodeScope(NodeScope nodeScope) {
+		nodeScope.getUserPermissions().add(permission);
 	}
 }

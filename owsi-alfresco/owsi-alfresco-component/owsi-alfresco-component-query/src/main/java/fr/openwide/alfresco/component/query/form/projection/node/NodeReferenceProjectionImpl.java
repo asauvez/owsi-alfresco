@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.component.query.form.projection.node;
 
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
@@ -21,9 +21,9 @@ public class NodeReferenceProjectionImpl extends AbstractNodeProjectionImpl<Node
 	}
 	
 	@Override
-	public void initNodeFetchDetails(NodeFetchDetails nodeFetchDetails) {
-		super.initNodeFetchDetails(nodeFetchDetails);
+	public void initNodeScope(NodeScope nodeScope) {
+		super.initNodeScope(nodeScope);
 		
-		nodeFetchDetails.setNodeReference(true);
+		nodeScope.setNodeReference(true);
 	}
 }

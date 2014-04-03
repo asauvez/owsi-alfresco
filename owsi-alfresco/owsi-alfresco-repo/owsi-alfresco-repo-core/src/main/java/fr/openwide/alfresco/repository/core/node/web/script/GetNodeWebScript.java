@@ -19,7 +19,7 @@ public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_
 	protected RepositoryNode executeImpl(Resource content, GET_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) {
 		return nodeService.get(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
-				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override

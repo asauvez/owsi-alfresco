@@ -19,7 +19,7 @@ public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<List<
 		return authorityRemoteService.getContainedUsers(
 				Objects.requireNonNull(payload.authority, "Authority"), 
 				payload.immediate, 
-				Objects.requireNonNull(payload.nodeFetchDetails, "NodeFetchDetails"));
+				Objects.requireNonNull(payload.nodeScope, "NodeScope"));
 	}
 
 	@Override

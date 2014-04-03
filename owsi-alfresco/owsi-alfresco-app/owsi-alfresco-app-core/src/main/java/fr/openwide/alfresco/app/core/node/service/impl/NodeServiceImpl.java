@@ -16,7 +16,7 @@ import org.springframework.web.client.ResponseExtractor;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
-import fr.openwide.alfresco.repository.api.node.model.NodeFetchDetails;
+import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -29,10 +29,10 @@ public class NodeServiceImpl implements NodeService {
 	private RepositoryRemoteBinding repositoryRemoteBinding;
 
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, NodeFetchDetails nodeFetchDetails) {
+	public RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope) {
 		GET_NODE_SERVICE request = new GET_NODE_SERVICE();
 		request.nodeReference = nodeReference;
-		request.nodeFetchDetails = nodeFetchDetails;
+		request.nodeScope = nodeScope;
 		
 		return repositoryRemoteBinding.builder(GET_NODE_SERVICE.ENDPOINT)
 				.headerPayload(request)
@@ -64,11 +64,11 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeFetchDetails nodeFetchDetails) {
+	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope) {
 		CHILDREN_NODE_SERVICE request = new CHILDREN_NODE_SERVICE();
 		request.nodeReference = nodeReference;
 		request.childAssocTypeName = childAssocTypeName;
-		request.nodeFetchDetails = nodeFetchDetails;
+		request.nodeScope = nodeScope;
 		
 		return repositoryRemoteBinding.builder(CHILDREN_NODE_SERVICE.ENDPOINT)
 				.headerPayload(request)
@@ -76,11 +76,11 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails) {
+	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope) {
 		TARGET_ASSOC_NODE_SERVICE request = new TARGET_ASSOC_NODE_SERVICE();
 		request.nodeReference = nodeReference;
 		request.assocName = assocName;
-		request.nodeFetchDetails = nodeFetchDetails;
+		request.nodeScope = nodeScope;
 		
 		return repositoryRemoteBinding.builder(TARGET_ASSOC_NODE_SERVICE.ENDPOINT)
 				.headerPayload(request)
@@ -88,11 +88,11 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeFetchDetails nodeFetchDetails) {
+	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope) {
 		SOURCE_ASSOC_NODE_SERVICE request = new SOURCE_ASSOC_NODE_SERVICE();
 		request.nodeReference = nodeReference;
 		request.assocName = assocName;
-		request.nodeFetchDetails = nodeFetchDetails;
+		request.nodeScope = nodeScope;
 
 		return repositoryRemoteBinding.builder(SOURCE_ASSOC_NODE_SERVICE.ENDPOINT)
 				.headerPayload(request)
@@ -111,10 +111,10 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public void update(RepositoryNode node, NodeFetchDetails details) throws DuplicateChildNameException {
+	public void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNameException {
 		UPDATE_NODE_SERVICE request = new UPDATE_NODE_SERVICE();
 		request.node = node;
-		request.details = details;
+		request.nodeScope = nodeScope;
 		request.contentBodyProperty = getContentBodyProperty(node);
 		
 		repositoryRemoteBinding.builder(UPDATE_NODE_SERVICE.ENDPOINT, getContent(node))

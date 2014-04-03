@@ -21,7 +21,7 @@ public class ChildrenNodeWebScript extends AbstractNodeWebScript<List<Repository
 		return nodeService.getChildren(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
 				Objects.requireNonNull(parameter.childAssocTypeName, "ChildAssocTypeName"), 
-				Objects.requireNonNull(parameter.nodeFetchDetails, "NodeFetchDetails"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override

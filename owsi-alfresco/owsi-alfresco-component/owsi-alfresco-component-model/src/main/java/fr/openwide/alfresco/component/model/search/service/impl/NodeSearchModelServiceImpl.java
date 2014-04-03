@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
-import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
@@ -19,22 +19,22 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	private NodeSearchService nodeSearchService;
 
 	@Override
-	public List<BusinessNode> search(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) {
-		return search(builder, StoreReference.STORE_REF_WORKSPACE_SPACESSTORE, nodeFetchDetails);
+	public List<BusinessNode> search(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) {
+		return search(builder, StoreReference.STORE_REF_WORKSPACE_SPACESSTORE, nodeScopeBuilder);
 	}
 
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference,
-			NodeFetchDetailsBuilder nodeFetchDetails) {
+			NodeScopeBuilder nodeScopeBuilder) {
 		return BusinessNode.wrapList(nodeSearchService.search(
 				builder.toLuceneQuery(),
 				storeReference,
-				nodeFetchDetails.getDetails()));
+				nodeScopeBuilder.getScope()));
 	}
 
 	@Override
-	public BusinessNode searchUnique(RestrictionBuilder builder, NodeFetchDetailsBuilder nodeFetchDetails) throws NoSuchNodeException {
-		List<BusinessNode> list = search(builder, nodeFetchDetails);
+	public BusinessNode searchUnique(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeException {
+		List<BusinessNode> list = search(builder, nodeScopeBuilder);
 		if (list.size() > 1) {
 			throw new IllegalStateException("More than one result for " + builder.toLuceneQuery());
 		} else if (list.isEmpty()) {
@@ -45,7 +45,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 
 	@Override
 	public NodeReference searchUniqueRef(RestrictionBuilder builder) throws NoSuchNodeException {
-		BusinessNode node = searchUnique(builder, new NodeFetchDetailsBuilder()
+		BusinessNode node = searchUnique(builder, new NodeScopeBuilder()
 				.nodeReference());
 		return (node != null) ? node.getNodeReference() : null;
 	}

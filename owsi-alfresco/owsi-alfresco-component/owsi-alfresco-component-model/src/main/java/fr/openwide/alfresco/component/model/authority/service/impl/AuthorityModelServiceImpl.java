@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
-import fr.openwide.alfresco.component.model.node.model.NodeFetchDetailsBuilder;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 
@@ -20,19 +20,19 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate) {
-		return getContainedUsers(authority, immediate, new NodeFetchDetailsBuilder()
+		return getContainedUsers(authority, immediate, new NodeScopeBuilder()
 				.nodeReference()
 				.properties(CmModel.person));
 	}
 
 	@Override
-	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeFetchDetailsBuilder nodeFetchDetailsBuilder) {
-		return BusinessNode.wrapList(authorityService.getContainedUsers(authority, immediate, nodeFetchDetailsBuilder.getDetails()));
+	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
+		return BusinessNode.wrapList(authorityService.getContainedUsers(authority, immediate, nodeScopeBuilder.getScope()));
 	}
 
 	@Override
 	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate) {
-		return getContainedGroups(authority, immediate, new NodeFetchDetailsBuilder()
+		return getContainedGroups(authority, immediate, new NodeScopeBuilder()
 				.nodeReference()
 				.properties(CmModel.authorityContainer));
 	}
@@ -44,8 +44,8 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	}
 
 	@Override
-	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeFetchDetailsBuilder nodeFetchDetailsBuilder) {
-		return BusinessNode.wrapList(authorityService.getContainedGroups(authority, immediate, nodeFetchDetailsBuilder.getDetails()));
+	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
+		return BusinessNode.wrapList(authorityService.getContainedGroups(authority, immediate, nodeScopeBuilder.getScope()));
 	}
 	
 	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {
