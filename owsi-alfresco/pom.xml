@@ -9,7 +9,7 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.1</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco</name>
@@ -52,7 +52,7 @@
 	<scm>
 		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools</developerConnection>
 		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/browser/owsi-alfresco</url>
-		<tag>HEAD</tag>
+		<tag>owsi-alfresco-0.1.1</tag>
 	</scm>
 
 	<build>
