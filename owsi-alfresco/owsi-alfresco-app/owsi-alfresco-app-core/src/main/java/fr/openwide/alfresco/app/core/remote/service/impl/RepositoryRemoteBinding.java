@@ -39,19 +39,21 @@ public class RepositoryRemoteBinding {
 	private final UserService userService;
 	private final String rootUri;
 	private final String ticketParam;
+	private final String ticketHeader;
 
 	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri) {
 		this(restTemplate, rootUri, null);
 	}
 
 	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri, String ticketParam) {
-		this(restTemplate, rootUri, ticketParam, null);
+		this(restTemplate, rootUri, ticketParam, null, null);
 	}
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri, String ticketParam, UserService userService) {
+	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri, String ticketParam, String ticketHeader, UserService userService) {
 		this.restTemplate = restTemplate;
 		this.rootUri = rootUri;
 		this.ticketParam = ticketParam;
+		this.ticketHeader = ticketHeader;
 		this.userService = userService;
 	}
 
@@ -64,6 +66,15 @@ public class RepositoryRemoteBinding {
 
 	public <T> T exchange(String path, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
 		URI uri = getURI(path, urlVariables);
+		if (ticketHeader != null && userService != null) {
+			// get ticket
+			RepositoryTicketAware user = userService.getCurrentUser();
+			headers.add(ticketHeader, user.getTicket().getTicket());
+		}
+		return exchange(uri, method, request, responseType, headers, urlVariables);
+	}
+
+	protected <T> T exchange(URI uri, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing " + method + " method to uri: " + uri);
 		}

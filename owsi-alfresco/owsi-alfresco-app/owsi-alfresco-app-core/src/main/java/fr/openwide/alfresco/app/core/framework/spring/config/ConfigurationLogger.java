@@ -32,7 +32,7 @@ public class ConfigurationLogger implements ApplicationListener<ContextRefreshed
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationLogger.class);
 
 	private List<String> propertyNamesForInfoLogLevel = new ArrayList<>();
-	private String logPattern = "%1$30s : %2$s";
+	private String logPattern = "%1$35s : %2$s";
 	private Boolean logRootApplicationContext;
 
 	@Override

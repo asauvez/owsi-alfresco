@@ -34,7 +34,7 @@ public class AppCoreConfig {
 	public ConfigurationLogger configurationLogger() {
 		ConfigurationLogger configurationLogger = new ConfigurationLogger();
 		configurationLogger.setPropertyNamesForInfoLogLevel(environment.getRequiredProperty("application.propertyNamesForInfoLogLevel"));
-		configurationLogger.setLogRootApplicationContext(false);
+		configurationLogger.setLogRootApplicationContext(environment.getProperty("application.logRootApplicationContext", Boolean.class, false));
 		return configurationLogger;
 	}
 
@@ -52,7 +52,7 @@ public class AppCoreConfig {
 	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RestTemplate restTemplate, UserService userService) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
-		return new RepositoryRemoteBinding(restTemplate, repositoryUri, ticketName, userService);
+		return new RepositoryRemoteBinding(restTemplate, repositoryUri, ticketName, null, userService);
 	}
 
 	@Bean
