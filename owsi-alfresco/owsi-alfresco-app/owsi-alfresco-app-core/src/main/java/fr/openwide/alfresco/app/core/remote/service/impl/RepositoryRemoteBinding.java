@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.app.core.remote.service.impl;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequest;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -64,40 +67,59 @@ public class RepositoryRemoteBinding {
 		return new RestCallBuilder<R>(this, restCall, content);
 	}
 
-	public <T> T exchange(String path, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
+	public <T> T exchange(String path, HttpMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
 		URI uri = getURI(path, urlVariables);
+		addTicketHeader(headers);
+		HttpEntity<Object> requestEntity = new HttpEntity<Object>(request, headers);
+		return execute(uri, method, requestEntity, null, responseType, null);
+	}
+
+	public void exchange(String path, HttpMethod method, final HttpHeaders headers, ResponseExtractor<?> responseExtractor, Object... urlVariables) {
+		URI uri = getURI(path, urlVariables);
+		addTicketHeader(headers);
+		RequestCallback requestCallback = new RequestCallback() {
+			@Override
+			public void doWithRequest(ClientHttpRequest request) throws IOException {
+				request.getHeaders().putAll(headers);
+			}
+		};
+		execute(uri, method, null, requestCallback, null, responseExtractor);
+	}
+
+	protected void addTicketHeader(HttpHeaders headers) {
 		if (ticketHeader != null && userService != null) {
 			// get ticket
 			RepositoryTicketAware user = userService.getCurrentUser();
 			headers.add(ticketHeader, user.getTicket().getTicket());
 		}
-		return exchange(uri, method, request, responseType, headers, urlVariables);
 	}
 
-	protected <T> T exchange(URI uri, HttpMethod method, Object request, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object... urlVariables) throws RepositoryRemoteException {
+	protected <T> T execute(URI uri, HttpMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
+			ParameterizedTypeReference<T> responseType, ResponseExtractor<?> responseExtractor) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Executing " + method + " method to uri: " + uri);
+			logger.debug("Executing " + method + " method with uri: " + uri);
 		}
 		try {
-			ResponseEntity<T> exchange = restTemplate.exchange(uri, method, new HttpEntity<Object>(request, headers), responseType);
-			return exchange.getBody();
+			if (responseExtractor != null) {
+				restTemplate.execute(uri, method, requestCallback, responseExtractor);
+				return null;
+			} else {
+				ResponseEntity<T> exchange = restTemplate.exchange(uri, method, requestEntity, responseType);
+				return exchange.getBody();
+			}
 		} catch (ResourceAccessException e) {
 			// log to debug, target exception should be logged by the caller/framework
 			if (logger.isDebugEnabled()) {
-				logger.debug("Exception on " + method + " method to uri: " + uri, e);
+				logger.debug("Exception on " + method + " method with uri: " + uri, e);
 			}
 			throw mapResourceAccessException(e);
 		} catch (Exception e) {
 			// log to debug, target exception should be logged by the caller/framework
 			if (logger.isDebugEnabled()) {
-				logger.debug("Unexpected exception on " + method + " method to uri: " + uri, e);
+				logger.debug("Unexpected exception on " + method + " method with uri: " + uri, e);
 			}
 			throw new IllegalStateException(e);
 		}
-	}
-
-	public void getRequestContent(String path, HttpMethod method, ResponseExtractor<?> responseExtractor, Object... urlVariables) {
-		restTemplate.execute(getURI(path, urlVariables), method, null, responseExtractor);
 	}
 
 	protected URI getURI(String path, Object... uriVars) {
