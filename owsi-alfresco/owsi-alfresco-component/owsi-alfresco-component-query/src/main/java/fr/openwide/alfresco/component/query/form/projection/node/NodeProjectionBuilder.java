@@ -29,6 +29,10 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 		return add(new NodeReferenceProjectionImpl(this));
 	}
 
+	public Projection<RepositoryNode, NodeProjectionBuilder, String> path() {
+		return add(new NodePathProjectionImpl(this));
+	}
+
 	public Projection<RepositoryNode, NodeProjectionBuilder, NameReference> type() {
 		return add(new NodeTypeProjectionImpl(this));
 	}

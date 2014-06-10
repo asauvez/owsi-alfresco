@@ -36,6 +36,7 @@ public class RepositoryNode implements Serializable {
 	private static final long serialVersionUID = 6930653481257487738L;
 
 	private NodeReference nodeReference;
+	private String path;
 	private NameReference type;
 	private RepositoryChildAssociation primaryParentAssociation;
 	
@@ -135,6 +136,12 @@ public class RepositoryNode implements Serializable {
 	}
 	public void setNodeReference(NodeReference nodeReference) {
 		this.nodeReference = nodeReference;
+	}
+	public String getPath() {
+		return path;
+	}
+	public void setPath(String path) {
+		this.path = path;
 	}
 	public NameReference getType() {
 		return type;

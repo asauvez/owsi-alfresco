@@ -35,6 +35,11 @@ public class NodeScopeBuilder {
 		return this;
 	}
 
+	public NodeScopeBuilder path() {
+		scope.setPath(true);
+		return this;
+	}
+
 	public NodeScopeBuilder type() {
 		scope.setType(true);
 		return this;

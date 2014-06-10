@@ -62,6 +62,10 @@ public class RestrictionBuilder extends Restriction {
 		return add(new TypeRestriction(this, type));
 	}
 
+	public PathRestriction path(String path) {
+		return add(new PathRestriction(this, path));
+	}
+
 	public AspectRestriction hasAspect(AspectModel aspect) {
 		return add(new AspectRestriction(this, aspect));
 	}

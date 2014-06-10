@@ -120,6 +120,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (scope.isNodeReference()) {
 			node.setNodeReference(conversionService.get(nodeRef));
 		}
+		if (scope.isPath()) {
+			node.setPath(nodeService.getPath(nodeRef).toString());
+		}
 		if (scope.isType()) {
 			node.setType(conversionService.get(nodeService.getType(nodeRef)));
 		}

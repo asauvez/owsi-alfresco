@@ -68,6 +68,10 @@ public class BusinessNode {
 		return this;
 	}
 	
+	public String getPath() {
+		return node.getPath();
+	}
+	
 	public boolean isType(TypeModel typeModel) {
 		return typeModel.getNameReference().equals(node.getType());
 	}

@@ -17,6 +17,7 @@ public class NodeScope implements Serializable {
 	private static final long serialVersionUID = 6930653481257487738L;
 
 	private boolean nodeReference = true;
+	private boolean path = false;
 	private boolean type = false;
 	private Set<NameReference> properties = new HashSet<>();
 	private Set<NameReference> contentStrings = new HashSet<>();
@@ -36,6 +37,12 @@ public class NodeScope implements Serializable {
 	}
 	public void setNodeReference(boolean nodeReference) {
 		this.nodeReference = nodeReference;
+	}
+	public boolean isPath() {
+		return path;
+	}
+	public void setPath(boolean path) {
+		this.path = path;
 	}
 	public boolean isType() {
 		return type;
