@@ -182,7 +182,7 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		return value;
 	}
 
-	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws RepositoryRemoteException;
+	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache);
 
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;

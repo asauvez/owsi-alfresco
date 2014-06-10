@@ -20,14 +20,13 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
-
 public class RestCallBuilder<R> {
 
 	private static MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-	
+
 	private final RepositoryRemoteBinding repositoryRemoteBinding;
 	private final RestEndpoint<R> restCall;
-	
+
 	private HttpHeaders headers = new HttpHeaders();
 	private List<Object> urlVariables = new ArrayList<Object>();
 	private Object content;
@@ -51,6 +50,7 @@ public class RestCallBuilder<R> {
 		urlVariables.add(value);
 		return this;
 	}
+
 	public RestCallBuilder<R> urlVariable(NodeReference nodeReference) {
 		Matcher matcher = NodeReference.PATTERN.matcher(nodeReference.getReference());
 		matcher.matches();
@@ -80,15 +80,16 @@ public class RestCallBuilder<R> {
 				restCall.getPath(), 
 				restCall.getMethod(), 
 				content, 
-				responseType, 
 				headers, 
+				responseType, 
 				urlVariables.toArray());
 	}
 
 	public void call(ResponseExtractor<?> responseExtractor) {
-		repositoryRemoteBinding.getRequestContent(
+		repositoryRemoteBinding.exchange(
 				restCall.getPath(), 
-				restCall.getMethod(),  
+				restCall.getMethod(), 
+				headers, 
 				responseExtractor, 
 				urlVariables.toArray());
 	}

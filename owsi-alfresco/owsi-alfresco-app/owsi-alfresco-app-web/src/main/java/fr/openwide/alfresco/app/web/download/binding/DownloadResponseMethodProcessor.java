@@ -163,16 +163,16 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		
 		nodeService.getNodeContent(download.getNodeReference(), download.getProperty(), new ResponseExtractor<Void>() {
 			@Override
-			public Void extractData(ClientHttpResponse repoReponse) throws IOException {
+			public Void extractData(ClientHttpResponse repositoryResponse) throws IOException {
 				// set cookie (do this before header content-length so that client can deal with it early !)
 				setCookie(webRequest);
 
-				for (Entry<String, List<String>> entry : repoReponse.getHeaders().entrySet()) {
+				for (Entry<String, List<String>> entry : repositoryResponse.getHeaders().entrySet()) {
 					for (String value : entry.getValue()) {
 						response.addHeader(entry.getKey(), value);
 					}
 				}
-				InputStream body = repoReponse.getBody();
+				InputStream body = repositoryResponse.getBody();
 				try {
 					streamCommon(download, fileName, response, body);
 				} finally {
