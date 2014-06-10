@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.app.core.remote.model;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -61,8 +63,8 @@ public class RestCallBuilder<R> {
 	public RestCallBuilder<R> headerPayload(Object payload) {
 		try {
 			String value = messageConverter.getObjectMapper().writeValueAsString(payload);
-			return header(RestEndpoint.HEADER_MESSAGE_CONTENT, value);
-		} catch (JsonProcessingException e) {
+			return header(RestEndpoint.HEADER_MESSAGE_CONTENT, URLEncoder.encode(value, "UTF-8"));
+		} catch (JsonProcessingException | UnsupportedEncodingException e) {
 			throw new InvalidMessageRemoteException(e);
 		}
 	}
