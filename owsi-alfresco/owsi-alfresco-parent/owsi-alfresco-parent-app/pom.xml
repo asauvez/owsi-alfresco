@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.1.2-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-app</artifactId>
 	<packaging>pom</packaging>
@@ -13,7 +13,9 @@
 	<description>Définitions des dépendances pour le développement d'une application spécifique sur Alfresco</description>
 
 	<properties>
-		<owsi-alfresco.owsi-core.version>0.8.7</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.owsi-core.version>0.9-SNAPSHOT</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.app.hibernate-jpamodelgen.version>4.3.6.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
+		<owsi-alfresco.app.querydsl.version>3.4.3</owsi-alfresco.app.querydsl.version>
 		
 		<owsi-alfresco.hibernate-validator.version>5.0.1.Final</owsi-alfresco.hibernate-validator.version>
 		
@@ -31,7 +33,14 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.1.2-SNAPSHOT</version>
+				<version>0.2.0-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.core.parents</groupId>
+				<artifactId>owsi-core-parent-maven-configuration-core</artifactId>
+				<version>${owsi-alfresco.owsi-core.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -134,5 +143,112 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${owsi-core.maven-enforcer-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>enforce</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<DependencyConvergence />
+								<bannedDependencies>
+									<excludes>
+										<exclude>org.springframework:spring</exclude>
+										<exclude>org.springframework:spring-ldap</exclude>
+										<exclude>commons-logging:commons-logging</exclude>
+										<exclude>cglib:cglib</exclude>
+										<exclude>rhino:rhino</exclude>
+										<exclude>rhino:js</exclude>
+										<exclude>javassist:javassist</exclude>
+										<exclude>xml-apis:xml-apis</exclude>
+										<exclude>apache-xerces:xml-apis</exclude>
+										<exclude>javax.servlet:servlet-api</exclude>
+										<exclude>net.sf.ehcache:ehcache-core</exclude>
+										<exclude>postgresql:postgresql</exclude>
+									</excludes>
+								</bannedDependencies>
+								<requireMavenVersion>
+									<version>[${minimal.maven.version},)</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>${jdk.version}</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.bsc.maven</groupId>
+					<artifactId>maven-processor-plugin</artifactId>
+					<dependencies>
+						<dependency>
+							<groupId>org.hibernate</groupId>
+							<artifactId>hibernate-jpamodelgen</artifactId>
+							<version>${owsi-alfresco.app.hibernate-jpamodelgen.version}</version>
+						</dependency>
+						<dependency>
+							<groupId>com.mysema.querydsl</groupId>
+							<artifactId>querydsl-apt</artifactId>
+							<version>${owsi-alfresco.app.querydsl.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<outputDirectory>${generated-sources.directory}</outputDirectory>
+						<options>
+							<fullyAnnotationConfigured>true</fullyAnnotationConfigured>
+							<addSuppressWarningsAnnotation>true</addSuppressWarningsAnnotation>
+						</options>
+						<processors>
+							<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+							<processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
+						</processors>
+					</configuration>
+					<executions>
+						<execution>
+							<id>maven-processor-plugin-default</id>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>process</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>maven-processor-plugin-default-test</id>
+							<phase>generate-test-sources</phase>
+							<goals>
+								<goal>process-test</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${generated-sources-test.directory}</outputDirectory>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>wagon-maven-plugin</artifactId>
+					<version>${owsi-core.wagon-maven-plugin.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.wagon</groupId>
+							<artifactId>wagon-ssh-external</artifactId>
+							<version>${owsi-core.wagon-ssh-external-plugin.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 </project>
