@@ -17,6 +17,7 @@
 		
 		<owsi-alfresco.repo.guava.version>18.0</owsi-alfresco.repo.guava.version>
 		<owsi-alfresco.repo.jackson.version>2.4.2</owsi-alfresco.repo.jackson.version>
+		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.junit.version>4.11</owsi-alfresco.repo.junit.version>
 		
 		<owsi-alfresco.repo.spring.version>3.0.5.RELEASE</owsi-alfresco.repo.spring.version>
@@ -71,6 +72,12 @@
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
 				<version>${owsi-alfresco.repo.jackson.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>${owsi-alfresco.repo.postgresql.version}</version>
 			</dependency>
 			
 			<dependency>
