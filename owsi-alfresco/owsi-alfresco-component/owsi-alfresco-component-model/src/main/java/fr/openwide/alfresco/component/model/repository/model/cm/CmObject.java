@@ -18,5 +18,5 @@ public class CmObject extends SysBase {
 
 	public final TextPropertyModel name = PropertyModels.newText(this, CmModel.NAMESPACE, "name");
 
-	public final CmAuditable auditable = new CmAuditable();
+	public final CmAuditable auditable = addMandatoryAspect(CmModel.auditable);
 }
