@@ -13,7 +13,7 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 	public PropertyModel(ContainerModel type, NameReference nameReference) {
 		super(nameReference);
 		this.type = type;
-		type.getProperties().add(this);
+		type.addProperty(this);
 	}
 
 	@Override

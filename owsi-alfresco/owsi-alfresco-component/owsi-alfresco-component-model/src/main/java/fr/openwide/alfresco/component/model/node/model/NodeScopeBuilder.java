@@ -53,7 +53,7 @@ public class NodeScopeBuilder {
 		return this;
 	}
 	public NodeScopeBuilder properties(ContainerModel type) {
-		for (PropertyModel<?> property : type.getProperties()) {
+		for (PropertyModel<?> property : type.getProperties().values()) {
 			property(property);
 		}
 		return this;
