@@ -25,8 +25,8 @@ public abstract class ContainerModel extends Model {
 	}
 
 	public Map<NameReference, AspectModel> getMandatoryAspects() {
-	    return Collections.unmodifiableMap(mandatoryAspects);
-    }
+		return Collections.unmodifiableMap(mandatoryAspects);
+	}
 	public <A extends AspectModel> A addMandatoryAspect(A aspect) {
 		mandatoryAspects.put(aspect.getNameReference(), aspect);
 		for (PropertyModel<?> property : aspect.getProperties().values()) {
@@ -37,10 +37,8 @@ public abstract class ContainerModel extends Model {
 	
 	/**
 	 * Adds all properties and aspects from the source model to the destination.
-	 * @param source
-	 * @param destination
 	 */
-	protected <T extends ContainerModel> void copy(T source, T destination) {
+	protected static <T extends ContainerModel> void copy(T source, T destination) {
 		for (PropertyModel<?> property : source.getProperties().values()) {
 			destination.addProperty(property);
 		}

@@ -7,11 +7,10 @@ public class TypeModel extends ContainerModel {
 	public TypeModel(NameReference nameReference) {
 		super(nameReference);
 	}
-	
-	public TypeModel clone(NameReference newNameReference) {
-		TypeModel clone = new TypeModel(newNameReference);
-		copy(this, clone);
-		return clone;
+
+	public TypeModel(TypeModel typeModel, NameReference nameReference) {
+		this(nameReference);
+		copy(typeModel, this);
 	}
 	
 }

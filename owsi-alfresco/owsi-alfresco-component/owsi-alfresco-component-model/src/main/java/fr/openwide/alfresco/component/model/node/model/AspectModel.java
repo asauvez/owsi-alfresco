@@ -8,10 +8,9 @@ public class AspectModel extends ContainerModel {
 		super(nameReference);
 	}
 
-	public AspectModel clone(NameReference newNameReference) {
-		AspectModel clone = new AspectModel(newNameReference);
-		copy(this, clone);
-		return clone;
+	public AspectModel(AspectModel aspectModel, NameReference nameReference) {
+		this(nameReference);
+		copy(aspectModel, this);
 	}
 	
 }
