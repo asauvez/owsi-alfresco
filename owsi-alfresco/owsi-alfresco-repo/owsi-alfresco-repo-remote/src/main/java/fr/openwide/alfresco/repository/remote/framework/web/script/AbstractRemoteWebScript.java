@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.repository.remote.framework.web.script;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.transaction.UserTransaction;
 
@@ -67,18 +69,20 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		super.init(container, description);
 		// Retrieve transaction parameters
 		if (description instanceof DescriptionImpl) {
-			//DescriptionImpl descriptionImpl = (DescriptionImpl) description;
+			DescriptionImpl descriptionImpl = (DescriptionImpl) description;
+			HashMap<String, Serializable> extensions = new HashMap<>();
+			descriptionImpl.setExtensions(extensions);
 			// Remove transaction parameters on the container (outer)
 			TransactionParameters outer = new TransactionParameters();
 			outer.setRequired(RequiredTransaction.none);
 			// TODO test remove next line
-			description.getExtensions().put(KEY_INNER_TRANSACTION, InnerTransactionParameters.build(outer));
+			extensions.put(KEY_INNER_TRANSACTION, InnerTransactionParameters.build(outer));
 			// TODO test add that
 			//descriptionImpl.setRequiredTransactionParameters(outer);
 			// Add transaction parameters on the webscript's description extension (inner)
 			//RequiredTransactionParameters transactionParameters = description.getRequiredTransactionParameters();
 			//InnerTransactionParameters inner = InnerTransactionParameters.build(transactionParameters);
-			//description.getExtensions().put(KEY_INNER_TRANSACTION, inner);
+			//extensions.put(KEY_INNER_TRANSACTION, inner);
 		} else {
 			throw new IllegalStateRemoteException("Could not alter webscript description: " + description.getClass());
 		}
