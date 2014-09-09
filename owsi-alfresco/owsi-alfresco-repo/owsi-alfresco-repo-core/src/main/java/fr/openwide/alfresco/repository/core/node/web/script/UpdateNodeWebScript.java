@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -15,7 +14,7 @@ public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE
 	@Override
 	protected Void execute(UPDATE_NODE_SERVICE request) {
 		nodeService.update(
-				Objects.requireNonNull(request.node, "RepositoryNode"), 
+				Objects.requireNonNull(request.nodes, "RepositoryNode"), 
 				Objects.requireNonNull(request.nodeScope, "NodeScope"));
 		
 		return null;
@@ -23,7 +22,7 @@ public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE
 
 	@Override
 	protected Collection<RepositoryNode> getUploadedNodes(UPDATE_NODE_SERVICE payload) {
-		return Collections.singleton(payload.node);
+		return payload.nodes;
 	}
 	
 	@Override
