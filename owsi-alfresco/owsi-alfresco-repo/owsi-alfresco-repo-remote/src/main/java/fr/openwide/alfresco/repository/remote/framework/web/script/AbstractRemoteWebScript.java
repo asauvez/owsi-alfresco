@@ -33,6 +33,7 @@ import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteEx
 import fr.openwide.alfresco.repository.api.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 import fr.openwide.alfresco.repository.remote.framework.model.InnerTransactionParameters;
 
 /**
@@ -108,6 +109,12 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			logger.warn("Could not get access", e);
 			resException = e;
 			statusCode = Status.STATUS_FORBIDDEN;
+		} catch (InvalidPayloadException e) {
+			String message = buildExceptionMessage("Could not use payload", e);
+			logger.warn(message, e);
+			// any invalid payload exception is encapsulated inside InvalidMessageRemoteException which can be serialized
+			resException = new InvalidMessageRemoteException(message, e);
+			statusCode = Status.STATUS_BAD_REQUEST;
 		} catch (InvalidMessageRemoteException e) {
 			logger.warn("Could not parse message", e);
 			resException = e;

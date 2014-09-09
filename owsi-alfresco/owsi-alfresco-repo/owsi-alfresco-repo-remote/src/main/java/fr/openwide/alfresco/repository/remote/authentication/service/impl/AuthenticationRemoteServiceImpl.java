@@ -36,7 +36,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	private AuthorityService authorityService;
 
 	@Override
-	public RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException {
+	public RepositoryUser authenticate(String username, String password) {
 		try {
 			authenticationService.authenticate(username, password.toCharArray());
 			return getCurrentUser();
@@ -50,15 +50,10 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	@Override
 	public RepositoryUser getAuthenticatedUser() {
 		// user should be pre-authenticated at this point
-		try {
-			return getCurrentUser();
-		} catch (AccessDeniedRemoteException e) {
-			throw new IllegalStateException(e);
-		}
+		return getCurrentUser();
 	}
-	
 
-	private RepositoryUser getCurrentUser() throws AccessDeniedRemoteException {
+	private RepositoryUser getCurrentUser() {
 		// build ticket
 		RepositoryTicket ticket = new RepositoryTicket(authenticationService.getCurrentTicket());
 		final String userTicket = ticketComponent.getAuthorityForTicket(ticket.getTicket());
