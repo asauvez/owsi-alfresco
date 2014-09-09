@@ -10,7 +10,7 @@ import fr.openwide.alfresco.repository.api.remote.model.endpoint.GetMethodEndpoi
 public interface NodeSearchRemoteService {
 
 	class SEARCH_NODE_SERVICE {
-		public static GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/search/node/search") {};
+		public static final GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/search/node/search") {};
 		public String query;
 		public StoreReference storeReference;
 		public NodeScope nodeScope;

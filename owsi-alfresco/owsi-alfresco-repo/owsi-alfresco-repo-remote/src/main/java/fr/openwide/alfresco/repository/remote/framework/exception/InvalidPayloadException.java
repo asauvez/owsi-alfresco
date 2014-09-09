@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.repository.remote.framework.exception;
 
-public class InvalidPayloadException extends RuntimeException {
+import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
+
+public class InvalidPayloadException extends RepositoryRemoteException {
 
 	private static final long serialVersionUID = 2510765840876186680L;
 

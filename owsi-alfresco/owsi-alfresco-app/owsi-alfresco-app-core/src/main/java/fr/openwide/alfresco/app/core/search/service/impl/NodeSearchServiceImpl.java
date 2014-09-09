@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.openwide.alfresco.app.core.node.service.impl.NodeServiceImpl.NodeListResponseExtractor;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
@@ -26,7 +27,7 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 		
 		return repositoryRemoteBinding.builder(SEARCH_NODE_SERVICE.ENDPOINT)
 				.headerPayload(request)
-				.call();
+				.call(new NodeListResponseExtractor(nodeScope.getContentDeserializers()));
 	}
 
 }

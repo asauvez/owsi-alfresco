@@ -14,6 +14,18 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
 
 public interface CmModel {
 
+	// ---- Aspects
+
+	CmTitled titled = new CmTitled();
+
+	CmAuditable auditable = new CmAuditable();
+
+	CmVersionable versionable = new CmVersionable();
+
+	CmOwnable ownable = new CmOwnable();
+
+	CmAuthor author = new CmAuthor();
+
 	// ---- Types
 
 	String NAMESPACE = "cm";
@@ -30,15 +42,4 @@ public interface CmModel {
 	
 	CmPerson person = new CmPerson();
 
-	// ---- Aspects
-
-	CmTitled titled = new CmTitled();
-
-	CmAuditable auditable = new CmAuditable();
-
-	CmVersionable versionable = new CmVersionable();
-
-	CmOwnable ownable = new CmOwnable();
-
-	CmAuthor author = new CmAuthor();
 }

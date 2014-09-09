@@ -74,16 +74,21 @@ public class RepositoryRemoteBinding {
 		return execute(uri, method, requestEntity, null, responseType, null);
 	}
 
-	public void exchange(String path, HttpMethod method, final HttpHeaders headers, ResponseExtractor<?> responseExtractor, Object... urlVariables) {
+	public <T> T exchange(String path, HttpMethod method, final HttpHeaders headers, 
+			final RequestCallback requestCallback, ResponseExtractor<T> responseExtractor, 
+			Object... urlVariables) {
 		URI uri = getURI(path, urlVariables);
 		addTicketHeader(headers);
-		RequestCallback requestCallback = new RequestCallback() {
+		RequestCallback realRequestCallback = new RequestCallback() {
 			@Override
 			public void doWithRequest(ClientHttpRequest request) throws IOException {
 				request.getHeaders().putAll(headers);
+				if (requestCallback != null) {
+					requestCallback.doWithRequest(request);
+				}
 			}
 		};
-		execute(uri, method, null, requestCallback, null, responseExtractor);
+		return execute(uri, method, null, realRequestCallback, null, responseExtractor);
 	}
 
 	protected void addTicketHeader(HttpHeaders headers) {
@@ -95,14 +100,13 @@ public class RepositoryRemoteBinding {
 	}
 
 	protected <T> T execute(URI uri, HttpMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
-			ParameterizedTypeReference<T> responseType, ResponseExtractor<?> responseExtractor) {
+			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing " + method + " method with uri: " + uri);
 		}
 		try {
 			if (responseExtractor != null) {
-				restTemplate.execute(uri, method, requestCallback, responseExtractor);
-				return null;
+				return restTemplate.execute(uri, method, requestCallback, responseExtractor);
 			} else {
 				ResponseEntity<T> exchange = restTemplate.exchange(uri, method, requestEntity, responseType);
 				return exchange.getBody();

@@ -1,0 +1,19 @@
+package fr.openwide.alfresco.app.core.node.serializer;
+
+import java.io.File;
+import java.io.IOException;
+
+import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+
+public class TempFileRepositoryContentSerializer extends AbstractFileRepositoryContentSerializer {
+
+	public static final TempFileRepositoryContentSerializer INSTANCE = new TempFileRepositoryContentSerializer();
+
+	protected TempFileRepositoryContentSerializer() {}
+
+	@Override
+	protected File getFile(RepositoryNode node) throws IOException {
+		return File.createTempFile(TempFileRepositoryContentSerializer.class.getSimpleName(), ".tmp");
+	}
+
+}

@@ -13,7 +13,7 @@ public interface AuthenticationRemoteService {
 	 * Authenticate an unknown user
 	 */
 	class LOGIN_REQUEST_SERVICE {
-		public static PostMethodEndpoint<RepositoryUser> ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/request") {};
+		public static final PostMethodEndpoint<RepositoryUser> ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/request") {};
 		public String username;
 		public String password;
 	}

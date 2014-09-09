@@ -14,4 +14,7 @@ public class SysBase extends TypeModel {
 		super(nameReference);
 	}
 
+	public final SysReferenceable referenceable = addMandatoryAspect(SysModel.referenceable);
+	
+	public final SysLocalized localized = addMandatoryAspect(SysModel.localized);
 }

@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.app.core.remote.model;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +11,13 @@ import java.util.regex.Matcher;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
@@ -69,6 +74,15 @@ public class RestCallBuilder<R> {
 		}
 	}
 
+	public static <R> R getHeaderPayload(ClientHttpResponse response, Class<R> valueType) throws IOException {
+		String value = URLDecoder.decode(response.getHeaders().getFirst(RestEndpoint.HEADER_MESSAGE_CONTENT), "UTF-8");
+		return messageConverter.getObjectMapper().readValue(value, valueType);
+	}
+	public static <R> R getHeaderPayload(ClientHttpResponse response, TypeReference<R> valueType) throws IOException {
+		String value = URLDecoder.decode(response.getHeaders().getFirst(RestEndpoint.HEADER_MESSAGE_CONTENT), "UTF-8");
+		return messageConverter.getObjectMapper().readValue(value, valueType);
+	}
+	
 	public R call() {
 		ParameterizedTypeReference<R> responseType = new ParameterizedTypeReference<R>() {
 			@Override
@@ -85,11 +99,30 @@ public class RestCallBuilder<R> {
 				urlVariables.toArray());
 	}
 
-	public void call(ResponseExtractor<?> responseExtractor) {
-		repositoryRemoteBinding.exchange(
+	public R call(ResponseExtractor<R> responseExtractor) {
+		return repositoryRemoteBinding.exchange(
 				restCall.getPath(), 
 				restCall.getMethod(), 
 				headers, 
+				null,
+				responseExtractor, 
+				urlVariables.toArray());
+	}
+	
+	public R call(RequestCallback requestCallback) {
+		ResponseExtractor<R> responseExtractor = new ResponseExtractor<R>() {
+			@Override
+			public R extractData(ClientHttpResponse response) throws IOException {
+				return messageConverter.getObjectMapper().readValue(response.getBody(),
+						messageConverter.getObjectMapper().constructType(restCall.getType()));
+			}
+		};
+		
+		return repositoryRemoteBinding.exchange(
+				restCall.getPath(), 
+				restCall.getMethod(), 
+				headers, 
+				requestCallback,
 				responseExtractor, 
 				urlVariables.toArray());
 	}

@@ -18,6 +18,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.DateTimeP
 import fr.openwide.alfresco.component.model.node.model.property.single.DoublePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.FloatPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.IntegerPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.LocalePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
@@ -44,6 +45,9 @@ public final class PropertyModels {
 	}
 	public static MultiDateTimePropertyModel newMultiDateTime(ContainerModel type, String namespace, String name) {
 		return new MultiDateTimePropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static LocalePropertyModel newLocale(ContainerModel type, String namespace, String name) {
+		return new LocalePropertyModel(type, NameReference.create(namespace, name));
 	}
 
 	public static IntegerPropertyModel newInteger(ContainerModel type, String namespace, String name) {

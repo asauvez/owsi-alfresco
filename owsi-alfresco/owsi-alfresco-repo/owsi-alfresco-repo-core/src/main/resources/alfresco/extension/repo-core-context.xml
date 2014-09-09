@@ -8,6 +8,7 @@
 	<bean id="owsi.service.nodeService" class="fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl">
 		<property name="nodeService" ref="NodeService" />
 		<property name="contentService" ref="ContentService" />
+		<property name="mimetypeService" ref="MimetypeService" />
 		<property name="permissionService" ref="PermissionService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>

@@ -2,11 +2,6 @@ package fr.openwide.alfresco.repository.core.node.web.script;
 
 import java.util.Objects;
 
-import org.springframework.core.io.Resource;
-import org.springframework.extensions.webscripts.Cache;
-import org.springframework.extensions.webscripts.Status;
-import org.springframework.extensions.webscripts.WebScriptRequest;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
@@ -15,7 +10,7 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 public class DeleteNodeWebScript extends AbstractNodeWebScript<Void, NodeReference> {
 
 	@Override
-	protected Void executeImpl(Resource content, NodeReference nodeReference,  WebScriptRequest req, Status status, Cache cache) {
+	protected Void execute(NodeReference nodeReference) {
 		nodeService.delete(
 				Objects.requireNonNull(nodeReference, "NodeReference"));
 		return null;

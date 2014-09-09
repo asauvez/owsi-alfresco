@@ -1,11 +1,17 @@
 package fr.openwide.alfresco.component.model.node.model;
 
+import java.io.File;
+
+import fr.openwide.alfresco.app.core.node.serializer.ByteArrayRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.serializer.FolderRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.serializer.StringRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.serializer.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
+import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
 
 /**
  * Indique les données liés à un noeud à rapporter lors d'une recherche. 
@@ -26,7 +32,7 @@ public class NodeScopeBuilder {
 		if (node.getRepositoryNode().getPrimaryParentAssociation() != null) primaryParent();
 		
 		scope.getProperties().addAll(repositoryNode.getProperties().keySet());
-		scope.getContentStrings().addAll(repositoryNode.getContentStrings().keySet());
+		scope.getContents().addAll(repositoryNode.getContents().keySet());
 		return this;
 	}
 	
@@ -59,13 +65,27 @@ public class NodeScopeBuilder {
 		return this;
 	}
 
-	public NodeScopeBuilder contentString() {
-		return contentString(CmModel.content.content);
+	public NodeScopeBuilder contentAsString() {
+		return contentWithSerializer(StringRepositoryContentSerializer.INSTANCE);
 	}
-	public NodeScopeBuilder contentString(ContentPropertyModel propertyModel) {
-		scope.getContentStrings().add(propertyModel.getNameReference());
+	public NodeScopeBuilder contentAsByteArray() {
+		return contentWithSerializer(ByteArrayRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder contentAsTempFile() {
+		return contentWithSerializer(TempFileRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder contentAsFilesInFolder(File destinationFolder) {
+		return contentWithSerializer(new FolderRepositoryContentSerializer(destinationFolder));
+	}
+	public NodeScopeBuilder contentWithSerializer(RepositoryContentDeserializer<?> deserializer) {
+		return contentWithSerializer(CmModel.content.content, deserializer);
+	}
+	public NodeScopeBuilder contentWithSerializer(PropertyModel<?> propertyModel, RepositoryContentDeserializer<?> deserializer) {
+		scope.getContents().add(propertyModel.getNameReference());
+		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
 		return this;
 	}
+	
 
 	public NodeScopeBuilder aspect(AspectModel aspectModel) {
 		scope.getAspects().add(aspectModel.getNameReference());
@@ -96,6 +116,9 @@ public class NodeScopeBuilder {
 		scope.getChildAssociations().put(childAssociation.getNameReference(), other.getScope());
 		return other;
 	}
+	public NodeScopeBuilder parentAssociationContains() {
+		return parentAssociation(CmModel.folder.contains);
+	}
 	public NodeScopeBuilder parentAssociation(ChildAssociationModel childAssociation) {
 		NodeScopeBuilder other = new NodeScopeBuilder();
 		scope.getParentAssociations().put(childAssociation.getNameReference(), other.getScope());
@@ -110,6 +133,21 @@ public class NodeScopeBuilder {
 		NodeScopeBuilder other = new NodeScopeBuilder();
 		scope.getSourceAssocs().put(association.getNameReference(), other.getScope());
 		return other;
+	}
+
+	public NodeScopeBuilder recursiveChildAssociationsContains() {
+		return recursiveChildAssociations(CmModel.folder.contains);
+	}
+	public NodeScopeBuilder recursiveChildAssociations(ChildAssociationModel childAssociation) {
+		scope.getRecursiveChildAssociations().add(childAssociation.getNameReference());
+		return this;
+	}
+	public NodeScopeBuilder recursiveParentAssociationsContains() {
+		return recursiveParentAssociations(CmModel.folder.contains);
+	}
+	public NodeScopeBuilder recursiveParentAssociations(ChildAssociationModel childAssociation) {
+		scope.getRecursiveParentAssociations().add(childAssociation.getNameReference());
+		return this;
 	}
 
 }

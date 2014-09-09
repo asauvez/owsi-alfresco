@@ -1,19 +1,11 @@
 package fr.openwide.alfresco.component.model.node.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
@@ -22,6 +14,7 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryChildAssociation;
+import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
@@ -109,48 +102,26 @@ public class BusinessNode {
 		return property(propertyModel, Arrays.asList(values));
 	}
 
-	public String getContentString() {
-		return getContentString(CmModel.content.content);
+	public Object getContent() {
+		return getContent(CmModel.content.content);
 	}
-	public String getContentString(ContentPropertyModel propertyModel) {
-		return node.getContentStrings().get(propertyModel.getNameReference());
+	public Object getContent(ContentPropertyModel propertyModel) {
+		return node.getContents().get(propertyModel.getNameReference());
 	}
-	public BusinessNode contentString(String content) {
-		return contentString(CmModel.content.content, content);
+	public BusinessNode content(Object content) {
+		return content(CmModel.content.content, content);
 	}
-	public BusinessNode contentString(ContentPropertyModel property, String content) {
-		node.getContentStrings().put(property.getNameReference(), content);
-		return this;
+	public BusinessNode content(ContentPropertyModel property, Object content) {
+		return content(property, null, content);
 	}
-	
-
-	public BusinessNode contentResource(File file) {
-		return contentResource(new FileSystemResource(file));
+	public BusinessNode content(RepositoryContentData contentData, Object content) {
+		return content(CmModel.content.content, contentData, content);
 	}
-	public BusinessNode contentResource(MultipartFile file) {
-		try {
-			return contentResource(file.getInputStream(), file.getSize());
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
+	public BusinessNode content(ContentPropertyModel property, RepositoryContentData contentData, Object content) {
+		node.getContents().put(property.getNameReference(), content);
+		if (contentData != null) {
+			node.getProperties().put(property.getNameReference(), contentData);
 		}
-	}
-	public BusinessNode contentResource(InputStream input, final long contentLength) {
-		return contentResource(new InputStreamResource(input) {
-			@Override
-			public long contentLength() throws IOException {
-				return contentLength;
-			}
-			@Override
-			public String getFilename() {
-				return BusinessNode.this.getName();
-			}
-		});
-	}
-	public BusinessNode contentResource(Resource content) {
-		return contentResource(CmModel.content.content, content);
-	}
-	public BusinessNode contentResource(ContentPropertyModel property, Resource content) {
-		node.getContentResources().put(property.getNameReference(), content);
 		return this;
 	}
 

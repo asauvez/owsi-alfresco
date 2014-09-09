@@ -1,11 +1,8 @@
 package fr.openwide.alfresco.repository.core.node.web.script;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
-
-import org.springframework.core.io.Resource;
-import org.springframework.extensions.webscripts.Cache;
-import org.springframework.extensions.webscripts.Status;
-import org.springframework.extensions.webscripts.WebScriptRequest;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
@@ -16,10 +13,15 @@ import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.GET_NO
 public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_NODE_SERVICE> {
 
 	@Override
-	protected RepositoryNode executeImpl(Resource content, GET_NODE_SERVICE parameter,  WebScriptRequest req, Status status, Cache cache) {
+	protected RepositoryNode execute(GET_NODE_SERVICE payload) {
 		return nodeService.get(
-				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
-				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
+				Objects.requireNonNull(payload.nodeReference, "NodeReference"), 
+				Objects.requireNonNull(payload.nodeScope, "NodeScope"));
+	}
+
+	@Override
+	protected Collection<RepositoryNode> getDownloadedNodes(RepositoryNode node) {
+		return Collections.singleton(node);
 	}
 
 	@Override

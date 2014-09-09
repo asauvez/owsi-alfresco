@@ -5,23 +5,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import org.springframework.core.io.Resource;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -41,14 +39,14 @@ public class RepositoryNode implements Serializable {
 	private RepositoryChildAssociation primaryParentAssociation;
 	
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
-	private final Map<NameReference, String> contentStrings = new LinkedHashMap<>();
-	private final Map<NameReference, Resource> contentResources = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
-	
-	private Map<NameReference, List<RepositoryNode>> childAssociations = new HashMap<>();
-	private Map<NameReference, List<RepositoryNode>> parentAssociations = new HashMap<>();
-	private Map<NameReference, List<RepositoryNode>> targetAssocs = new HashMap<>();
-	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new HashMap<>();
+
+	private final Map<NameReference, Object> contents = new LinkedHashMap<>();
+
+	private Map<NameReference, List<RepositoryNode>> childAssociations = new LinkedHashMap<>();
+	private Map<NameReference, List<RepositoryNode>> parentAssociations = new LinkedHashMap<>();
+	private Map<NameReference, List<RepositoryNode>> targetAssocs = new LinkedHashMap<>();
+	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new LinkedHashMap<>();
 
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 	private Boolean inheritParentPermissions;
@@ -70,6 +68,8 @@ public class RepositoryNode implements Serializable {
 	@JsonSubTypes({
 		@JsonSubTypes.Type(value=Date.class, name = "date"),
 		@JsonSubTypes.Type(value=Date[].class, name = "dateList"),
+		@JsonSubTypes.Type(value=Locale.class, name = "locale"),
+		@JsonSubTypes.Type(value=Locale[].class, name = "localeList"),
 		@JsonSubTypes.Type(value=Long.class, name = "long"),
 		@JsonSubTypes.Type(value=Long[].class, name = "longList"),
 		@JsonSubTypes.Type(value=Float.class, name = "float"),
@@ -92,6 +92,8 @@ public class RepositoryNode implements Serializable {
 					Object firstValue = it.next();
 					if (firstValue instanceof Date) {
 						propertiesJson.put(property.getKey(), collection.toArray(new Date[collection.size()]));
+					} else if (firstValue instanceof Locale) {
+						propertiesJson.put(property.getKey(), collection.toArray(new Locale[collection.size()]));
 					} else if (firstValue instanceof Long) {
 						propertiesJson.put(property.getKey(), collection.toArray(new Long[collection.size()]));
 					} else if (firstValue instanceof Float) {
@@ -117,6 +119,8 @@ public class RepositoryNode implements Serializable {
 		for (Entry<NameReference, Serializable> property : propertiesJSon.entrySet()) {
 			if (property.getValue() instanceof Date[]) {
 				properties.put(property.getKey(), (Serializable) Arrays.asList((Date[]) property.getValue()));
+			} else if (property.getValue() instanceof Locale[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((Locale[]) property.getValue()));
 			} else if (property.getValue() instanceof Long[]) {
 				properties.put(property.getKey(), (Serializable) Arrays.asList((Long[]) property.getValue()));
 			} else if (property.getValue() instanceof Float[]) {
@@ -157,12 +161,9 @@ public class RepositoryNode implements Serializable {
 		this.primaryParentAssociation = primaryParentAssociation;
 	}
 
-	public Map<NameReference, String> getContentStrings() {
-		return contentStrings;
-	}
 	@JsonIgnore
-	public Map<NameReference, Resource> getContentResources() {
-		return contentResources;
+	public Map<NameReference, Object> getContents() {
+		return contents;
 	}
 	public Set<NameReference> getAspects() {
 		return aspects;
@@ -194,6 +195,21 @@ public class RepositoryNode implements Serializable {
 		return accessPermissions;
 	}
 
+	public void visit(RepositoryNodeVisitor visitor) {
+		visitor.visit(this);
+		visitMap(visitor, childAssociations);
+		visitMap(visitor, parentAssociations);
+		visitMap(visitor, sourceAssocs);
+		visitMap(visitor, targetAssocs);
+	}
+	private void visitMap(RepositoryNodeVisitor visitor, Map<NameReference, List<RepositoryNode>> map) {
+		for (List<RepositoryNode> list : map.values()) {
+			for (RepositoryNode node : list) {
+				node.visit(visitor);
+			}
+		}
+	}
+	
 	@Override
 	public boolean equals(Object object) {
 		if (object == null) {

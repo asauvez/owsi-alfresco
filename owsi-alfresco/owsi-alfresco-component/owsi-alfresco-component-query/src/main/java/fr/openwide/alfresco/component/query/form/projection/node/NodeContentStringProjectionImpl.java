@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.query.form.projection.node;
 
+import fr.openwide.alfresco.app.core.node.serializer.StringRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
@@ -23,13 +24,14 @@ public class NodeContentStringProjectionImpl extends AbstractNodeProjectionImpl<
 	
 	@Override
 	public String apply(RepositoryNode node) {
-		return node.getContentStrings().get(property.getNameReference());
+		return (String) node.getContents().get(property.getNameReference());
 	}
 
 	@Override
 	public void initNodeScope(NodeScope nodeScope) {
 		super.initNodeScope(nodeScope);
 
-		nodeScope.getContentStrings().add(property.getNameReference());
+		nodeScope.getContents().add(property.getNameReference());
+		nodeScope.getContentDeserializers().put(property.getNameReference(), StringRepositoryContentSerializer.INSTANCE);
 	}
 }

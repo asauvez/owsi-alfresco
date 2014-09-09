@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 @JsonInclude(Include.NON_EMPTY)
@@ -20,7 +22,8 @@ public class NodeScope implements Serializable {
 	private boolean path = false;
 	private boolean type = false;
 	private Set<NameReference> properties = new HashSet<>();
-	private Set<NameReference> contentStrings = new HashSet<>();
+	private Set<NameReference> contents = new HashSet<>();
+	private Map<NameReference, RepositoryContentDeserializer<?>> contentDeserializers = new HashMap<>();
 	private Set<NameReference> aspects = new HashSet<>();
 
 	private NodeScope primaryParent;
@@ -28,6 +31,9 @@ public class NodeScope implements Serializable {
 	private Map<NameReference, NodeScope> parentAssociations = new HashMap<>();
 	private Map<NameReference, NodeScope> targetAssocs = new HashMap<>();
 	private Map<NameReference, NodeScope> sourceAssocs = new HashMap<>();
+
+	private Set<NameReference> recursiveChildAssociations = new HashSet<>();
+	private Set<NameReference> recursiveParentAssociations = new HashSet<>();
 
 	private Set<RepositoryPermission> userPermissions = new HashSet<>();
 	private boolean accessPermissions = false;
@@ -59,8 +65,12 @@ public class NodeScope implements Serializable {
 	public Set<NameReference> getProperties() {
 		return properties;
 	}
-	public Set<NameReference> getContentStrings() {
-		return contentStrings;
+	public Set<NameReference> getContents() {
+		return contents;
+	}
+	@JsonIgnore
+	public Map<NameReference, RepositoryContentDeserializer<?>> getContentDeserializers() {
+		return contentDeserializers;
 	}
 	public Set<NameReference> getAspects() {
 		return aspects;
@@ -77,6 +87,13 @@ public class NodeScope implements Serializable {
 	}
 	public Map<NameReference, NodeScope> getSourceAssocs() {
 		return sourceAssocs;
+	}
+	
+	public Set<NameReference> getRecursiveChildAssociations() {
+		return recursiveChildAssociations;
+	}
+	public Set<NameReference> getRecursiveParentAssociations() {
+		return recursiveParentAssociations;
 	}
 
 	public Set<RepositoryPermission> getUserPermissions() {

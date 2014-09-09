@@ -63,48 +63,49 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		// construct model for script / template
 		Status status = new Status();
 		Cache cache = new Cache(getDescription().getRequiredCache());
-		Object model;
+		R resValue = null;
+		Exception resException = null;
 		int statusCode;
 		try {
-			model = executeImpl(req, res, status, cache);
-			if (model == null && status.getCode() == HttpServletResponse.SC_OK) {
+			resValue = executeImpl(req, res, status, cache);
+			if (resValue == null && status.getCode() == HttpServletResponse.SC_OK) {
 				status.setCode(Status.STATUS_NO_CONTENT);
 			}
 			statusCode = status.getCode();
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
 			setActiveUserTransactionRollbackOnly(e);
 			logger.warn("Could not get access", e);
-			model = e;
+			resException = e;
 			statusCode = Status.STATUS_FORBIDDEN;
-			setExceptionHeader(res, model);
+			setExceptionHeader(res, resValue);
 		} catch (InvalidPayloadException e) {
 			setActiveUserTransactionRollbackOnly(e);
 			String message = buildExceptionMessage("Could not use payload", e);
 			logger.warn(message, e);
 			// any invalid payload exception is encapsulated inside InvalidMessageRemoteException which can be serialized
-			model = new InvalidMessageRemoteException(message, e);
+			resException = new InvalidMessageRemoteException(message, e);
 			statusCode = Status.STATUS_BAD_REQUEST;
-			setExceptionHeader(res, model);
+			setExceptionHeader(res, resValue);
 		} catch (InvalidMessageRemoteException e) {
 			setActiveUserTransactionRollbackOnly(e);
 			logger.warn("Could not parse message", e);
-			model = e;
+			resException = e;
 			statusCode = Status.STATUS_BAD_REQUEST;
-			setExceptionHeader(res, model);
+			setExceptionHeader(res, resValue);
 		} catch (RepositoryRemoteException e) {
 			setActiveUserTransactionRollbackOnly(e);
 			logger.warn("Could not execute request", e);
-			model = e;
+			resException = e;
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
-			setExceptionHeader(res, model);
+			setExceptionHeader(res, resValue);
 		} catch (Throwable e) {
 			setActiveUserTransactionRollbackOnly(e);
 			// any unexpected exception is encapsulated inside IllegalStateRemoteException which can be serialized
 			String message = buildExceptionMessage("Unexpected error occured", e);
 			logger.error(message, e);
-			model = new IllegalStateRemoteException(message, e);
+			resException = new IllegalStateRemoteException(message, e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
-			setExceptionHeader(res, model);
+			setExceptionHeader(res, resValue);
 		}
 		// is a redirect to a status specific template required?
 		if (status.getRedirect()) {
@@ -134,10 +135,16 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 				logger.debug("Rendering response: content type=" + mimetype + ", status=" + statusCode);
 			}
 			// render response according to model
-			if (model != null) {
-				objectMapper.writeValue(res.getOutputStream(), model);
+			if (resValue != null) {
+				handleResult(res, resValue);
+			} else if (resException != null) {
+				objectMapper.writeValue(res.getOutputStream(), resException);
 			}
 		}
+	}
+	
+	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
+		objectMapper.writeValue(res.getOutputStream(), resValue);
 	}
 
 	protected static void setExceptionHeader(WebScriptResponse res, Object model) {

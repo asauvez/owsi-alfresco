@@ -20,7 +20,7 @@ public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemot
 	@Override
 	protected R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) {
 		P payload = extractPayload(req);
-		return executeImpl(payload, status, cache);
+		return executeImpl(payload, req);
 	}
 
 	protected P extractPayload(WebScriptRequest req) {
@@ -42,7 +42,7 @@ public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemot
 		return req.getContent().getContent();
 	}
 
-	protected abstract R executeImpl(P payload, Status status, Cache cache);
+	protected abstract R executeImpl(P payload, WebScriptRequest req);
 
 	/**
 	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and null is passed

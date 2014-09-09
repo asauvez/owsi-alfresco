@@ -3,23 +3,20 @@ package fr.openwide.alfresco.repository.core.search.web.script;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.extensions.webscripts.Cache;
-import org.springframework.extensions.webscripts.Status;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService.SEARCH_NODE_SERVICE;
-import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractParameterRemoteWebScript;
+import fr.openwide.alfresco.repository.core.node.web.script.AbstractNodeListWebScript;
 
-public class SearchNodeWebScript extends AbstractParameterRemoteWebScript<List<RepositoryNode>, SEARCH_NODE_SERVICE> {
+public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_SERVICE> {
 
 	protected NodeSearchRemoteService nodeSearchService;
 
 	@Override
-	protected List<RepositoryNode> executeImpl(SEARCH_NODE_SERVICE parameter, Status status, Cache cache) {
+	protected List<RepositoryNode> execute(SEARCH_NODE_SERVICE parameter) {
 		return nodeSearchService.search(
 				Objects.requireNonNull(parameter.query, "Query"), 
 				Objects.requireNonNull(parameter.storeReference, "StoreReference"), 
