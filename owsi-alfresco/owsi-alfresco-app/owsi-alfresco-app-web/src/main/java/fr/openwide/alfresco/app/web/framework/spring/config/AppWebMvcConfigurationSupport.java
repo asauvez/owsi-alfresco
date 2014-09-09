@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.app.web.framework.spring.config;
 
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +161,7 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	@Bean
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-		messageSource.setDefaultEncoding("UTF-8");
+		messageSource.setDefaultEncoding(StandardCharsets.UTF_8.name());
 		
 		List<String> paths = new ArrayList<>();
 		addMessageSourcePath(paths);

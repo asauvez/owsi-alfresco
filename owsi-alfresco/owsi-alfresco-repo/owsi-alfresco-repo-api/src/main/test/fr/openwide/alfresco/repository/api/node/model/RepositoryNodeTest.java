@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,7 @@ public class RepositoryNodeTest {
 		node.getProperties().put(NameReference.create("cm:double"), 7D);
 		node.getProperties().put(NameReference.create("cm:long"), 6L);
 		node.getProperties().put(NameReference.create("cm:boolean"), true);
-		node.getProperties().put(NameReference.create("cm:content"), new RepositoryContentData("text/plain", "Text", 123L, "UTF-8", Locale.FRANCE));
+		node.getProperties().put(NameReference.create("cm:content"), new RepositoryContentData("text/plain", "Text", 123L, StandardCharsets.UTF_8.name(), Locale.FRANCE));
 		node.getProperties().put(NameReference.create("cm:s"), "ABC");
 		node.getProperties().put(NameReference.create("cm:date"), new Date());
 		String s = objectMapper.writeValueAsString(node);

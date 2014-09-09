@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.app.web.validation.binding;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -115,7 +116,7 @@ public class ValidationResponseMethodProcessor extends AbstractMessageConverterM
 			} else {
 				// iframe : renvoie le json avec un mimetype text/html;charset=utf-8
 				ServletServerHttpResponse outputMessage = createOutputMessage(webRequest);
-				MediaType html = new MediaType(MediaType.TEXT_HTML.getType(), MediaType.TEXT_HTML.getSubtype(), Charset.forName("UTF-8"));
+				MediaType html = new MediaType(MediaType.TEXT_HTML.getType(), MediaType.TEXT_HTML.getSubtype(), StandardCharsets.UTF_8);
 				new MappingIframeJsonHttpMessageConverter().write(returnValue, html, outputMessage);
 			}
 		} else {

@@ -10,6 +10,7 @@
 
 	<bean id="webscript.owsi.remote" parent="webscript" abstract="true"
 			class="fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript">
+		<property name="transactionService" ref="transactionService" />
 		<property name="objectMapper" ref="owsi.objectMapper" />
 	</bean>
 

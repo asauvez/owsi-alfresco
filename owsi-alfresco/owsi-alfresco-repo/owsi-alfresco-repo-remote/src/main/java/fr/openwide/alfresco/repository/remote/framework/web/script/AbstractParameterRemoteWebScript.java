@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repository.remote.framework.web.script;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
@@ -15,7 +16,7 @@ public abstract class AbstractParameterRemoteWebScript<R, P> extends AbstractMes
 
 	@Override
 	protected String getRawPayload(WebScriptRequest req) throws IOException {
-		return URLDecoder.decode(req.getHeader(RestEndpoint.HEADER_MESSAGE_CONTENT), "UTF-8");
+		return URLDecoder.decode(req.getHeader(RestEndpoint.HEADER_MESSAGE_CONTENT), StandardCharsets.UTF_8.name());
 	}
 
 }
