@@ -20,7 +20,6 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
-import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessPermission;
@@ -51,7 +50,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 	private NodeService nodeService;
 	private ContentService contentService;
-	private MimetypeService mimetypeService;
 	private PermissionService permissionService;
 
 	private ConversionService conversionService;
@@ -142,14 +140,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				node.getProperties().put(property, conversionService.getForApplication(value));
 			}
 		}
-		for (NameReference property : scope.getContents()) {
+		for (NameReference property : scope.getContentDeserializers().keySet()) {
 			ContentReader reader = contentService.getReader(nodeRef, conversionService.getRequired(property));
 			if (reader != null) {
 				node.getContents().put(property, reader.getContentInputStream());
-				String mimetypeDisplay = mimetypeService.getDisplaysByMimetype().get(reader.getMimetype());
-				node.getProperties().put(property, new RepositoryContentData(
-						reader.getMimetype(), mimetypeDisplay, 
-						reader.getSize(), reader.getEncoding(), reader.getLocale()));
 			}
 		}
 		for (NameReference aspect : scope.getAspects()) {
@@ -192,7 +186,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					getParent(nodeReference, association, scope));
 		}
 		
-		// get premissions
+		// get permissions
 		for (RepositoryPermission permission : scope.getUserPermissions()) {
 			if (permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED) {
 				node.getUserPermissions().add(permission);
@@ -485,9 +479,6 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	public void setContentService(ContentService contentService) {
 		this.contentService = contentService;
-	}
-	public void setMimetypeService(MimetypeService mimetypeService) {
-		this.mimetypeService = mimetypeService;
 	}
 	public void setPermissionService(PermissionService permissionService) {
 		this.permissionService = permissionService;

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
@@ -22,7 +23,6 @@ public class NodeScope implements Serializable {
 	private boolean path = false;
 	private boolean type = false;
 	private Set<NameReference> properties = new HashSet<>();
-	private Set<NameReference> contents = new HashSet<>();
 	private Map<NameReference, RepositoryContentDeserializer<?>> contentDeserializers = new HashMap<>();
 	private Set<NameReference> aspects = new HashSet<>();
 
@@ -65,8 +65,15 @@ public class NodeScope implements Serializable {
 	public Set<NameReference> getProperties() {
 		return properties;
 	}
-	public Set<NameReference> getContents() {
-		return contents;
+	@JsonProperty("contents")
+	private Set<NameReference> getContentsJson() {
+		return contentDeserializers.keySet();
+	}
+	@SuppressWarnings("unused")
+	private void setContentsJson(Set<NameReference> nameReferences) {
+		for (NameReference nameReference : nameReferences) {
+			contentDeserializers.put(nameReference, null);
+		}
 	}
 	@JsonIgnore
 	public Map<NameReference, RepositoryContentDeserializer<?>> getContentDeserializers() {

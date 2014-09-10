@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.app.web.validation.binding;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 

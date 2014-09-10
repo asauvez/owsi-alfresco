@@ -12,6 +12,7 @@ import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
 import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 /**
  * Indique les données liés à un noeud à rapporter lors d'une recherche. 
@@ -32,7 +33,10 @@ public class NodeScopeBuilder {
 		if (node.getRepositoryNode().getPrimaryParentAssociation() != null) primaryParent();
 		
 		scope.getProperties().addAll(repositoryNode.getProperties().keySet());
-		scope.getContents().addAll(repositoryNode.getContents().keySet());
+		for (NameReference contentProperty : repositoryNode.getContents().keySet()) {
+			// Le nodeScope sera envoyé à Alfresco sans le deserializer. Donc on peut mettre null.
+			scope.getContentDeserializers().put(contentProperty, null);
+		}
 		return this;
 	}
 	
@@ -81,11 +85,10 @@ public class NodeScopeBuilder {
 		return contentWithSerializer(CmModel.content.content, deserializer);
 	}
 	public NodeScopeBuilder contentWithSerializer(PropertyModel<?> propertyModel, RepositoryContentDeserializer<?> deserializer) {
-		scope.getContents().add(propertyModel.getNameReference());
+		scope.getProperties().add(propertyModel.getNameReference());
 		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
 		return this;
 	}
-	
 
 	public NodeScopeBuilder aspect(AspectModel aspectModel) {
 		scope.getAspects().add(aspectModel.getNameReference());

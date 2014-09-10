@@ -74,6 +74,8 @@ public class RepositoryNode implements Serializable {
 		@JsonSubTypes.Type(value=Long[].class, name = "longList"),
 		@JsonSubTypes.Type(value=Float.class, name = "float"),
 		@JsonSubTypes.Type(value=Float[].class, name = "floatList"),
+		@JsonSubTypes.Type(value=Double.class, name = "double"),
+		@JsonSubTypes.Type(value=Double[].class, name = "doubleList"),
 		@JsonSubTypes.Type(value=NameReference.class, name = "nameReference"),
 		@JsonSubTypes.Type(value=NameReference[].class, name = "nameReferenceList"),
 		@JsonSubTypes.Type(value=NodeReference.class, name = "nodeReference"),
@@ -98,6 +100,8 @@ public class RepositoryNode implements Serializable {
 						propertiesJson.put(property.getKey(), collection.toArray(new Long[collection.size()]));
 					} else if (firstValue instanceof Float) {
 						propertiesJson.put(property.getKey(), collection.toArray(new Float[collection.size()]));
+					} else if (firstValue instanceof Double) {
+						propertiesJson.put(property.getKey(), collection.toArray(new Double[collection.size()]));
 					} else if (firstValue instanceof NameReference) {
 						propertiesJson.put(property.getKey(), collection.toArray(new NameReference[collection.size()]));
 					} else if (firstValue instanceof NodeReference) {
@@ -125,6 +129,8 @@ public class RepositoryNode implements Serializable {
 				properties.put(property.getKey(), (Serializable) Arrays.asList((Long[]) property.getValue()));
 			} else if (property.getValue() instanceof Float[]) {
 				properties.put(property.getKey(), (Serializable) Arrays.asList((Float[]) property.getValue()));
+			} else if (property.getValue() instanceof Double[]) {
+				properties.put(property.getKey(), (Serializable) Arrays.asList((Double[]) property.getValue()));
 			} else if (property.getValue() instanceof NameReference[]) {
 				properties.put(property.getKey(), (Serializable) Arrays.asList((NameReference[]) property.getValue()));
 			} else if (property.getValue() instanceof NodeReference[]) {

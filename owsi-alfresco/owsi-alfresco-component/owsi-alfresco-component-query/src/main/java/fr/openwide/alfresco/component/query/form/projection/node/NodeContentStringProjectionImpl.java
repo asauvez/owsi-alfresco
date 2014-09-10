@@ -31,7 +31,6 @@ public class NodeContentStringProjectionImpl extends AbstractNodeProjectionImpl<
 	public void initNodeScope(NodeScope nodeScope) {
 		super.initNodeScope(nodeScope);
 
-		nodeScope.getContents().add(property.getNameReference());
 		nodeScope.getContentDeserializers().put(property.getNameReference(), StringRepositoryContentSerializer.INSTANCE);
 	}
 }
