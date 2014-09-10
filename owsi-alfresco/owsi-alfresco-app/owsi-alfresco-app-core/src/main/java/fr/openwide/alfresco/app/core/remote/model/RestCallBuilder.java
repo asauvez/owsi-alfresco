@@ -13,12 +13,12 @@ import java.util.regex.Matcher;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
@@ -28,7 +28,7 @@ import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
 public class RestCallBuilder<R> {
 
-	private static MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final RepositoryRemoteBinding repositoryRemoteBinding;
 	private final RestEndpoint<R> restCall;
@@ -68,7 +68,7 @@ public class RestCallBuilder<R> {
 
 	public RestCallBuilder<R> headerPayload(Object payload) {
 		try {
-			String value = messageConverter.getObjectMapper().writeValueAsString(payload);
+			String value = objectMapper.writeValueAsString(payload);
 			return header(RestEndpoint.HEADER_MESSAGE_CONTENT, URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
 		} catch (JsonProcessingException | UnsupportedEncodingException e) {
 			throw new InvalidMessageRemoteException(e);
@@ -76,12 +76,12 @@ public class RestCallBuilder<R> {
 	}
 
 	public static <R> R getHeaderPayload(ClientHttpResponse response, Class<R> valueType) throws IOException {
-		String value = URLDecoder.decode(response.getHeaders().getFirst(RestEndpoint.HEADER_MESSAGE_CONTENT), "UTF-8");
-		return messageConverter.getObjectMapper().readValue(value, valueType);
+		String value = URLDecoder.decode(response.getHeaders().getFirst(RestEndpoint.HEADER_MESSAGE_CONTENT), StandardCharsets.UTF_8.name());
+		return objectMapper.readValue(value, valueType);
 	}
 	public static <R> R getHeaderPayload(ClientHttpResponse response, TypeReference<R> valueType) throws IOException {
-		String value = URLDecoder.decode(response.getHeaders().getFirst(RestEndpoint.HEADER_MESSAGE_CONTENT), "UTF-8");
-		return messageConverter.getObjectMapper().readValue(value, valueType);
+		String value = URLDecoder.decode(response.getHeaders().getFirst(RestEndpoint.HEADER_MESSAGE_CONTENT), StandardCharsets.UTF_8.name());
+		return objectMapper.readValue(value, valueType);
 	}
 	
 	public R call() {
@@ -114,8 +114,8 @@ public class RestCallBuilder<R> {
 		ResponseExtractor<R> responseExtractor = new ResponseExtractor<R>() {
 			@Override
 			public R extractData(ClientHttpResponse response) throws IOException {
-				return messageConverter.getObjectMapper().readValue(response.getBody(),
-						messageConverter.getObjectMapper().constructType(restCall.getType()));
+				return objectMapper.readValue(response.getBody(),
+						objectMapper.constructType(restCall.getType()));
 			}
 		};
 		
