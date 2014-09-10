@@ -72,17 +72,14 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			DescriptionImpl descriptionImpl = (DescriptionImpl) description;
 			HashMap<String, Serializable> extensions = new HashMap<>();
 			descriptionImpl.setExtensions(extensions);
+			// Add transaction parameters on the webscript's description extension (inner)
+			RequiredTransactionParameters transactionParameters = description.getRequiredTransactionParameters();
+			InnerTransactionParameters inner = InnerTransactionParameters.build(transactionParameters);
+			extensions.put(KEY_INNER_TRANSACTION, inner);
 			// Remove transaction parameters on the container (outer)
 			TransactionParameters outer = new TransactionParameters();
 			outer.setRequired(RequiredTransaction.none);
-			// TODO test remove next line
-			extensions.put(KEY_INNER_TRANSACTION, InnerTransactionParameters.build(outer));
-			// TODO test add that
-			//descriptionImpl.setRequiredTransactionParameters(outer);
-			// Add transaction parameters on the webscript's description extension (inner)
-			//RequiredTransactionParameters transactionParameters = description.getRequiredTransactionParameters();
-			//InnerTransactionParameters inner = InnerTransactionParameters.build(transactionParameters);
-			//extensions.put(KEY_INNER_TRANSACTION, inner);
+			descriptionImpl.setRequiredTransactionParameters(outer);
 		} else {
 			throw new IllegalStateRemoteException("Could not alter webscript description: " + description.getClass());
 		}
