@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repository.api.remote.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -10,7 +11,7 @@ public class NodeReference implements Serializable {
 
 	private static final long serialVersionUID = -1502875087111354789L;
 
-	public static final Pattern PATTERN = Pattern.compile("(.+)://(.+)/(.+)");
+	public static final Pattern PATTERN = Pattern.compile("((.+)://(.+))/(.+)");
 
 	private final String reference;
 
@@ -21,7 +22,16 @@ public class NodeReference implements Serializable {
 	public static NodeReference create(String reference) {
 		return new NodeReference(reference);
 	}
+	public static NodeReference create(StoreReference storeReference, String uuid) {
+		return new NodeReference(storeReference + "/" + uuid);
+	}
 
+	public StoreReference getStoreReference() {
+		Matcher matcher = PATTERN.matcher(reference);
+		matcher.matches();
+		return StoreReference.create(matcher.group(1));
+	}
+	
 	@JsonValue
 	public String getReference() {
 		return reference;
