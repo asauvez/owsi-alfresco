@@ -111,7 +111,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return res;
 	}
 
-	private RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeException {
+	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeException {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
 			throw new NoSuchNodeException(nodeReference.getReference());
