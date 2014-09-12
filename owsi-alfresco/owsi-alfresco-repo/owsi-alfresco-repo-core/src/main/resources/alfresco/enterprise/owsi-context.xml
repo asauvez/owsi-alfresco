@@ -3,6 +3,6 @@
 
 <beans>
 
-	<import resource="classpath:alfresco/owsi/*-context.xml" />
+	<import resource="classpath*:alfresco/owsi/*-context.xml" />
 
 </beans>
