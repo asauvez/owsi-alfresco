@@ -34,12 +34,12 @@ public final class RepositoryContentSerializerUtils {
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
 				if (! node.getContents().isEmpty()) {
-					node.getProperties().put(CONTENT_IDS, new ArrayList<>());
-					node.getProperties().put(CONTENT_PROPERTIES, new ArrayList<>());
+					node.getExtensions().put(CONTENT_IDS, new ArrayList<Integer>());
+					node.getExtensions().put(CONTENT_PROPERTIES, new ArrayList<String>());
 				}
 				for (NameReference contentProperty : node.getContents().keySet()) {
-					((ArrayList<Integer>) node.getProperties().get(CONTENT_IDS)).add(nextContentId);
-					((ArrayList<NameReference>) node.getProperties().get(CONTENT_PROPERTIES)).add(contentProperty);
+					((List<Integer>) node.getExtensions().get(CONTENT_IDS)).add(nextContentId);
+					((List<String>) node.getExtensions().get(CONTENT_PROPERTIES)).add(contentProperty.getFullName());
 					nextContentId ++;
 				}
 			}
@@ -62,12 +62,12 @@ public final class RepositoryContentSerializerUtils {
 			@Override
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
-				ArrayList<Integer> contentIds = (ArrayList<Integer>) node.getProperties().get(CONTENT_IDS);
+				List<Integer> contentIds = (List<Integer>) node.getExtensions().get(CONTENT_IDS);
 				if (contentIds != null) {
-					List<NameReference> contentProperties = (List<NameReference>) node.getProperties().get(CONTENT_PROPERTIES);
+					List<String> contentProperties = (List<String>) node.getExtensions().get(CONTENT_PROPERTIES);
 					for (int i=0; i<contentIds.size(); i++) {
 						int contentId = contentIds.get(i);
-						NameReference contentProperty = contentProperties.get(i);
+						NameReference contentProperty = NameReference.create(contentProperties.get(i));
 						
 						Object content = node.getContents().get(contentProperty);
 						RepositoryContentSerializer<Object> serializer = (RepositoryContentSerializer<Object>) serializersByProperties.get(contentProperty);
@@ -121,14 +121,14 @@ public final class RepositoryContentSerializerUtils {
 			@Override
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
-				ArrayList<Integer> contentIds = (ArrayList<Integer>) node.getProperties().remove(CONTENT_IDS);
+				ArrayList<Integer> contentIds = (ArrayList<Integer>) node.getExtensions().remove(CONTENT_IDS);
 				if (contentIds != null) {
-					List<NameReference> contentProperties = (List<NameReference>) node.getProperties().remove(CONTENT_PROPERTIES);
+					List<String> contentProperties = (List<String>) node.getExtensions().remove(CONTENT_PROPERTIES);
 					
 					for (int i=0; i<contentIds.size(); i++) {
 						ContentPropertyWrapper wrapper = new ContentPropertyWrapper();
 						wrapper.node = node;
-						wrapper.contentProperty = contentProperties.get(i);
+						wrapper.contentProperty = NameReference.create(contentProperties.get(i));
 						wrappers.put(contentIds.get(i), wrapper);
 					}
 				}

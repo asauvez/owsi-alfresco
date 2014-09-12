@@ -41,16 +41,18 @@ public class RepositoryNode implements Serializable {
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 
+	private final Map<NameReference, Serializable> extensions = new LinkedHashMap<>();
+	
 	private final Map<NameReference, Object> contents = new LinkedHashMap<>();
 
-	private Map<NameReference, List<RepositoryNode>> childAssociations = new LinkedHashMap<>();
-	private Map<NameReference, List<RepositoryNode>> parentAssociations = new LinkedHashMap<>();
-	private Map<NameReference, List<RepositoryNode>> targetAssocs = new LinkedHashMap<>();
-	private Map<NameReference, List<RepositoryNode>> sourceAssocs = new LinkedHashMap<>();
+	private final Map<NameReference, List<RepositoryNode>> childAssociations = new LinkedHashMap<>();
+	private final Map<NameReference, List<RepositoryNode>> parentAssociations = new LinkedHashMap<>();
+	private final Map<NameReference, List<RepositoryNode>> targetAssocs = new LinkedHashMap<>();
+	private final Map<NameReference, List<RepositoryNode>> sourceAssocs = new LinkedHashMap<>();
 
-	private Set<RepositoryPermission> userPermissions = new HashSet<>();
+	private final Set<RepositoryPermission> userPermissions = new HashSet<>();
 	private Boolean inheritParentPermissions;
-	private Set<RepositoryAuthorityPermission> accessPermissions = new LinkedHashSet<>();
+	private final Set<RepositoryAuthorityPermission> accessPermissions = new LinkedHashSet<>();
 
 	public RepositoryNode() {
 	}
@@ -175,6 +177,10 @@ public class RepositoryNode implements Serializable {
 		return aspects;
 	}
 
+	public Map<NameReference, Serializable> getExtensions() {
+		return extensions;
+	}
+	
 	public Map<NameReference, List<RepositoryNode>> getChildAssociations() {
 		return childAssociations;
 	}

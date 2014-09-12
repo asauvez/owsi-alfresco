@@ -1,15 +1,15 @@
 package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -22,20 +22,22 @@ public class NodeScope implements Serializable {
 	private boolean nodeReference = true;
 	private boolean path = false;
 	private boolean type = false;
-	private Set<NameReference> properties = new HashSet<>();
-	private Map<NameReference, RepositoryContentDeserializer<?>> contentDeserializers = new HashMap<>();
-	private Set<NameReference> aspects = new HashSet<>();
+	private final Set<NameReference> properties = new LinkedHashSet<>();
+	private final Map<NameReference, RepositoryContentDeserializer<?>> contentDeserializers = new LinkedHashMap<>();
+	private final Set<NameReference> aspects = new LinkedHashSet<>();
+	
+	private final Map<NameReference, String> extensions = new LinkedHashMap<>();
 
 	private NodeScope primaryParent;
-	private Map<NameReference, NodeScope> childAssociations = new HashMap<>();
-	private Map<NameReference, NodeScope> parentAssociations = new HashMap<>();
-	private Map<NameReference, NodeScope> targetAssocs = new HashMap<>();
-	private Map<NameReference, NodeScope> sourceAssocs = new HashMap<>();
+	private final Map<NameReference, NodeScope> childAssociations = new LinkedHashMap<>();
+	private final Map<NameReference, NodeScope> parentAssociations = new LinkedHashMap<>();
+	private final Map<NameReference, NodeScope> targetAssocs = new LinkedHashMap<>();
+	private final Map<NameReference, NodeScope> sourceAssocs = new LinkedHashMap<>();
 
-	private Set<NameReference> recursiveChildAssociations = new HashSet<>();
-	private Set<NameReference> recursiveParentAssociations = new HashSet<>();
+	private Set<NameReference> recursiveChildAssociations = new LinkedHashSet<>();
+	private Set<NameReference> recursiveParentAssociations = new LinkedHashSet<>();
 
-	private Set<RepositoryPermission> userPermissions = new HashSet<>();
+	private Set<RepositoryPermission> userPermissions = new LinkedHashSet<>();
 	private boolean accessPermissions = false;
 
 	public boolean isNodeReference() {
@@ -81,6 +83,10 @@ public class NodeScope implements Serializable {
 	}
 	public Set<NameReference> getAspects() {
 		return aspects;
+	}
+	
+	public Map<NameReference, String> getExtensions() {
+		return extensions;
 	}
 
 	public Map<NameReference, NodeScope> getChildAssociations() {

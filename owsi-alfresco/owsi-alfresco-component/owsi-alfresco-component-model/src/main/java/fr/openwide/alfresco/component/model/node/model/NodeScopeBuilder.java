@@ -2,8 +2,11 @@ package fr.openwide.alfresco.component.model.node.model;
 
 import java.io.File;
 
+import javax.servlet.http.HttpServletResponse;
+
 import fr.openwide.alfresco.app.core.node.serializer.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.serializer.FolderRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.serializer.HttpServletResponseRepositoryContentDeserializer;
 import fr.openwide.alfresco.app.core.node.serializer.StringRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.serializer.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -81,6 +84,18 @@ public class NodeScopeBuilder {
 	public NodeScopeBuilder contentAsFilesInFolder(File destinationFolder) {
 		return contentWithSerializer(new FolderRepositoryContentSerializer(destinationFolder));
 	}
+	
+	public NodeScopeBuilder contentAsInlineHttpResponse(HttpServletResponse response) {
+		return contentAsDownloadHttpResponse(response);
+	}
+	public NodeScopeBuilder contentAsDownloadHttpResponse(HttpServletResponse response) {
+		this.name(); // on va avoir besoin du cm:name
+		return contentWithSerializer(new HttpServletResponseRepositoryContentDeserializer(response, CmModel.object.name.getNameReference()));
+	}
+	public NodeScopeBuilder contentAsDownloadHttpResponse(HttpServletResponse response, String fileName) {
+		return contentWithSerializer(new HttpServletResponseRepositoryContentDeserializer(response, fileName));
+	}
+	
 	public NodeScopeBuilder contentWithSerializer(RepositoryContentDeserializer<?> deserializer) {
 		return contentWithSerializer(CmModel.content.content, deserializer);
 	}
