@@ -32,4 +32,5 @@ public interface NodeService extends NodeRemoteService {
 	void update(RepositoryNode node, NodeScope nodeScope, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException;
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException;
 
+	void delete(NodeReference nodeReference);
 }

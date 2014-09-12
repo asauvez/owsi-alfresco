@@ -148,5 +148,8 @@ public class NodeModelServiceImpl implements NodeModelService {
 	public void delete(NodeReference nodeReference) {
 		nodeService.delete(nodeReference);
 	}
-
+	@Override
+	public void delete(List<NodeReference> nodeReferences) {
+		nodeService.delete(nodeReferences);
+	}
 }

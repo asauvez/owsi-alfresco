@@ -52,5 +52,6 @@ public interface NodeModelService {
 	void update(List<BusinessNode> nodes, NodeScopeBuilder nodeScopeBuilder) throws DuplicateChildNameException;
 	
 	void delete(NodeReference nodeReference);
+	void delete(List<NodeReference> nodeReferences);
 
 }

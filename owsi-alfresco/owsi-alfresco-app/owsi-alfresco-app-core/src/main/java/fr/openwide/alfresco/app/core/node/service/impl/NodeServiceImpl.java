@@ -229,8 +229,13 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public void delete(NodeReference nodeReference) {
+		delete(Collections.singletonList(nodeReference));
+	}
+	
+	@Override
+	public void delete(List<NodeReference> nodeReferences) {
 		repositoryRemoteBinding.builder(DELETE_NODE_SERVICE_ENDPOINT)
-			.headerPayload(nodeReference)
+			.headerPayload(nodeReferences)
 			.call();
 	}
 

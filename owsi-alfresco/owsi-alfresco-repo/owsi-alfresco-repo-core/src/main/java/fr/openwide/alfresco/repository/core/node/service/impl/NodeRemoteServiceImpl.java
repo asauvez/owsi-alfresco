@@ -470,8 +470,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	
 	@Override
-	public void delete(NodeReference nodeReference) {
-		nodeService.deleteNode(conversionService.getRequired(nodeReference));
+	public void delete(List<NodeReference> nodeReferences) {
+		for (NodeReference nodeReference : nodeReferences) {
+			nodeService.deleteNode(conversionService.getRequired(nodeReference));
+		}
 	}
 
 	public void setNodeService(NodeService nodeService) {
