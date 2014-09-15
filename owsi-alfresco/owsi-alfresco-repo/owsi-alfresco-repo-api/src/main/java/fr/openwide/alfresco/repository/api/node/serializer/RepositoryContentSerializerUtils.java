@@ -22,8 +22,8 @@ public final class RepositoryContentSerializerUtils {
 
 	public static final String CONTENT_TYPE = "application/zip";
 	
-	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializerUtils.class.getName(), "contentIds");
-	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializerUtils.class.getName(), "contentProperties");
+	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializerUtils.class.getSimpleName(), "contentIds");
+	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializerUtils.class.getSimpleName(), "contentProperties");
 	
 	private RepositoryContentSerializerUtils() {}
 

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.apache.commons.io.IOUtils;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
@@ -84,11 +85,12 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractParameterRemot
 		res.setContentType(RepositoryContentSerializerUtils.CONTENT_TYPE);
 		
 		Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass = new HashMap<>();
-		serializersByClass.put(InputStream.class, new RepositoryContentSerializer<InputStream>() {
+		serializersByClass.put(ContentReader.class, new RepositoryContentSerializer<ContentReader>() {
 			@Override
-			public void serialize(RepositoryNode node, NameReference contentProperty, InputStream content, OutputStream outputStream) throws IOException {
-				IOUtils.copy(content, outputStream);
-				content.close();
+			public void serialize(RepositoryNode node, NameReference contentProperty, ContentReader ContentReader, OutputStream outputStream) throws IOException {
+				try (InputStream inputStream = ContentReader.getContentInputStream()) {
+					IOUtils.copy(inputStream, outputStream);
+				}
 			}
 		});
 		

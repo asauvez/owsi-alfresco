@@ -143,7 +143,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		for (NameReference property : scope.getContentDeserializers().keySet()) {
 			ContentReader reader = contentService.getReader(nodeRef, conversionService.getRequired(property));
 			if (reader != null) {
-				node.getContents().put(property, reader.getContentInputStream());
+				node.getContents().put(property, reader);
 			}
 		}
 		for (NameReference aspect : scope.getAspects()) {
