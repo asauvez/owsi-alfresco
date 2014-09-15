@@ -87,58 +87,103 @@ public class RepositoryNode implements Serializable {
 		@JsonSubTypes.Type(value=ArrayList.class, name = "list"),
 	})
 	private Map<NameReference, Serializable> getPropertiesJson() {
-		Map<NameReference, Serializable> propertiesJson = new LinkedHashMap<NameReference, Serializable>();
-		for (Entry<NameReference, Serializable> property : properties.entrySet()) {
+		return toJSon(properties);
+	}
+	
+	@SuppressWarnings("unused")
+	private void setPropertiesJson(Map<NameReference, Serializable> propertiesJSon) {
+		toNative(properties, propertiesJSon);
+	}
+	
+	@JsonIgnore
+	public Map<NameReference, Serializable> getExtensions() {
+		return extensions;
+	}
+	@JsonProperty("extensions")
+	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
+	@JsonSubTypes({
+		@JsonSubTypes.Type(value=Date.class, name = "date"),
+		@JsonSubTypes.Type(value=Date[].class, name = "dateList"),
+		@JsonSubTypes.Type(value=Locale.class, name = "locale"),
+		@JsonSubTypes.Type(value=Locale[].class, name = "localeList"),
+		@JsonSubTypes.Type(value=Long.class, name = "long"),
+		@JsonSubTypes.Type(value=Long[].class, name = "longList"),
+		@JsonSubTypes.Type(value=Float.class, name = "float"),
+		@JsonSubTypes.Type(value=Float[].class, name = "floatList"),
+		@JsonSubTypes.Type(value=Double.class, name = "double"),
+		@JsonSubTypes.Type(value=Double[].class, name = "doubleList"),
+		@JsonSubTypes.Type(value=NameReference.class, name = "nameReference"),
+		@JsonSubTypes.Type(value=NameReference[].class, name = "nameReferenceList"),
+		@JsonSubTypes.Type(value=NodeReference.class, name = "nodeReference"),
+		@JsonSubTypes.Type(value=NodeReference[].class, name = "nodeReferenceList"),
+		
+		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content"),
+		@JsonSubTypes.Type(value=ArrayList.class, name = "list"),
+	})
+	private Map<NameReference, Serializable> getExtensionsJson() {
+		return toJSon(extensions);
+	}
+	
+	@SuppressWarnings("unused")
+	private void setExtensionsJson(Map<NameReference, Serializable> extensionsJSon) {
+		toNative(extensions, extensionsJSon);
+	}
+
+
+	private Map<NameReference, Serializable> toJSon(Map<NameReference, Serializable> map) {
+		Map<NameReference, Serializable> mapJson = new LinkedHashMap<NameReference, Serializable>();
+		for (Entry<NameReference, Serializable> property : map.entrySet()) {
 			if (property.getValue() instanceof Collection) {
 				Collection<?> collection = (Collection<?>) property.getValue();
 				Iterator<?> it = collection.iterator();
 				if (it.hasNext()) {
 					Object firstValue = it.next();
 					if (firstValue instanceof Date) {
-						propertiesJson.put(property.getKey(), collection.toArray(new Date[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new Date[collection.size()]));
 					} else if (firstValue instanceof Locale) {
-						propertiesJson.put(property.getKey(), collection.toArray(new Locale[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new Locale[collection.size()]));
 					} else if (firstValue instanceof Long) {
-						propertiesJson.put(property.getKey(), collection.toArray(new Long[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new Long[collection.size()]));
 					} else if (firstValue instanceof Float) {
-						propertiesJson.put(property.getKey(), collection.toArray(new Float[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new Float[collection.size()]));
 					} else if (firstValue instanceof Double) {
-						propertiesJson.put(property.getKey(), collection.toArray(new Double[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new Double[collection.size()]));
 					} else if (firstValue instanceof NameReference) {
-						propertiesJson.put(property.getKey(), collection.toArray(new NameReference[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new NameReference[collection.size()]));
 					} else if (firstValue instanceof NodeReference) {
-						propertiesJson.put(property.getKey(), collection.toArray(new NodeReference[collection.size()]));
+						mapJson.put(property.getKey(), collection.toArray(new NodeReference[collection.size()]));
 					} else if (collection instanceof ArrayList) {
-						propertiesJson.put(property.getKey(), (ArrayList<?>) collection);
+						mapJson.put(property.getKey(), (ArrayList<?>) collection);
 					} else {
-						propertiesJson.put(property.getKey(), new ArrayList<Object>(collection));
+						mapJson.put(property.getKey(), new ArrayList<Object>(collection));
 					}
 				}
 			} else {
-				propertiesJson.put(property.getKey(), property.getValue());
+				mapJson.put(property.getKey(), property.getValue());
 			}
 		}
-		return propertiesJson;
+		return mapJson;
 	}
-	@SuppressWarnings("unused")
-	private void setPropertiesJson(Map<NameReference, Serializable> propertiesJSon) {
-		for (Entry<NameReference, Serializable> property : propertiesJSon.entrySet()) {
+	
+	private void toNative(Map<NameReference, Serializable> mapNative, Map<NameReference, Serializable> mapJson) {
+		mapNative.clear();
+		for (Entry<NameReference, Serializable> property : mapJson.entrySet()) {
 			if (property.getValue() instanceof Date[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((Date[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((Date[]) property.getValue()));
 			} else if (property.getValue() instanceof Locale[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((Locale[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((Locale[]) property.getValue()));
 			} else if (property.getValue() instanceof Long[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((Long[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((Long[]) property.getValue()));
 			} else if (property.getValue() instanceof Float[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((Float[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((Float[]) property.getValue()));
 			} else if (property.getValue() instanceof Double[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((Double[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((Double[]) property.getValue()));
 			} else if (property.getValue() instanceof NameReference[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((NameReference[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((NameReference[]) property.getValue()));
 			} else if (property.getValue() instanceof NodeReference[]) {
-				properties.put(property.getKey(), (Serializable) Arrays.asList((NodeReference[]) property.getValue()));
+				mapNative.put(property.getKey(), (Serializable) Arrays.asList((NodeReference[]) property.getValue()));
 			} else {
-				properties.put(property.getKey(), property.getValue());
+				mapNative.put(property.getKey(), property.getValue());
 			}
 		}
 	}
@@ -177,11 +222,6 @@ public class RepositoryNode implements Serializable {
 		return aspects;
 	}
 
-	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
-	public Map<NameReference, Serializable> getExtensions() {
-		return extensions;
-	}
-	
 	public Map<NameReference, List<RepositoryNode>> getChildAssociations() {
 		return childAssociations;
 	}
