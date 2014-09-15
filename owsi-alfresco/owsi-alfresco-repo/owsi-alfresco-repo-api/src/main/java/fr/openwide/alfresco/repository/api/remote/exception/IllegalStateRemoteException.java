@@ -1,7 +1,7 @@
 package fr.openwide.alfresco.repository.api.remote.exception;
 
 /**
- * Lancée quand une erreur inconnue est lancé par un service.
+ * Lancée quand une erreur inconnue est renvoyée par un service
  */
 public class IllegalStateRemoteException extends RepositoryRemoteException {
 

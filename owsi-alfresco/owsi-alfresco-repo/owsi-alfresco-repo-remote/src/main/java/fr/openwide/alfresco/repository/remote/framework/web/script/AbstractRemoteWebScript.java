@@ -129,11 +129,11 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			resException = e;
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (IntegrityException e) {
-			logger.warn("IntegrityException", e);
+			logger.warn("Integrity error", e);
 			resException = new IntegrityRemoteException(e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (NodeExistsException e) {
-			logger.warn("IntegrityException", e);
+			logger.warn("Node exists", e);
 			resException = new NodeExistsRemoteException(e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (Throwable e) {
