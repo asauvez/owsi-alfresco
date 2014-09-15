@@ -9,6 +9,7 @@ import javax.transaction.UserTransaction;
 
 import net.sf.acegisecurity.AccessDeniedException;
 
+import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.transaction.TransactionService;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.IllegalStateRemoteException;
+import fr.openwide.alfresco.repository.api.remote.exception.IntegrityRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
@@ -123,6 +125,10 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		} catch (RepositoryRemoteException e) {
 			logger.warn("Could not execute request", e);
 			resException = e;
+			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
+		} catch (IntegrityException e) {
+			logger.warn("IntegrityException", e);
+			resException = new IntegrityRemoteException(e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (Throwable e) {
 			// any unexpected exception is encapsulated inside IllegalStateRemoteException which can be serialized
