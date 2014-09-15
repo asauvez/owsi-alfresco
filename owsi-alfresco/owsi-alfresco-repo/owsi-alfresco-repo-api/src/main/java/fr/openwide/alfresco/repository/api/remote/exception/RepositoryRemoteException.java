@@ -23,7 +23,7 @@ public class RepositoryRemoteException extends RuntimeException {
 	}
 
 	public RepositoryRemoteException(Throwable cause) {
-		super(cause);
+		super(cause.toString(), cause);
 	}
 
 	public RepositoryRemoteException(String message, Throwable cause) {
