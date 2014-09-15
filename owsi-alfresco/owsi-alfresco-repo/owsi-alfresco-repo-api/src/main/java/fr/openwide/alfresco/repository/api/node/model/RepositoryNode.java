@@ -177,6 +177,7 @@ public class RepositoryNode implements Serializable {
 		return aspects;
 	}
 
+	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
 	public Map<NameReference, Serializable> getExtensions() {
 		return extensions;
 	}
