@@ -20,8 +20,8 @@ public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_
 	}
 
 	@Override
-	protected Collection<RepositoryNode> getDownloadedNodes(RepositoryNode node) {
-		return Collections.singleton(node);
+	protected Collection<RepositoryNode> getOutputNodes(RepositoryNode result) {
+		return Collections.singleton(result);
 	}
 
 	@Override

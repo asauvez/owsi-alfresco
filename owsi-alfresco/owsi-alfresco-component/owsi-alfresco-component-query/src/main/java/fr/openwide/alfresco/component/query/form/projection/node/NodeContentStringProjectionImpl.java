@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.component.query.form.projection.node;
 
-import fr.openwide.alfresco.app.core.node.serializer.StringRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;

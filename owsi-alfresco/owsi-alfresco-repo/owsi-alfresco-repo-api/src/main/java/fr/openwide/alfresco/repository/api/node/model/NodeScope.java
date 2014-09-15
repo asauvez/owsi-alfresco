@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 @JsonInclude(Include.NON_EMPTY)

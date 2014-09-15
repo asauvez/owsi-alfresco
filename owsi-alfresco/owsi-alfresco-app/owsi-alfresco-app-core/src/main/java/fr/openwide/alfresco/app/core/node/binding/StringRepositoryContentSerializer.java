@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.node.serializer;
+package fr.openwide.alfresco.app.core.node.binding;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,18 +9,17 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class StringRepositoryContentSerializer 
-		implements RepositoryContentSerializer<String>, RepositoryContentDeserializer<String> {
+public class StringRepositoryContentSerializer implements RepositoryContentSerializer<String>, RepositoryContentDeserializer<String> {
 
 	public static final StringRepositoryContentSerializer INSTANCE = new StringRepositoryContentSerializer(StandardCharsets.UTF_8);
-	
+
 	private final Charset charset;
-	
+
 	public StringRepositoryContentSerializer(Charset charset) {
 		this.charset = charset;
 	}

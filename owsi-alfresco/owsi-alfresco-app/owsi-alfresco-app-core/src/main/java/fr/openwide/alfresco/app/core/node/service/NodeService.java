@@ -6,11 +6,11 @@ import java.util.Map;
 
 import org.springframework.web.client.ResponseExtractor;
 
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;

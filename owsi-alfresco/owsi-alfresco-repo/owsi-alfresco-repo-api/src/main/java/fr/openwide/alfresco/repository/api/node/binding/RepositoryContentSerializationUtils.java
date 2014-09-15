@@ -1,9 +1,10 @@
-package fr.openwide.alfresco.repository.api.node.serializer;
+package fr.openwide.alfresco.repository.api.node.binding;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,42 +15,45 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNodeVisitor;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public final class RepositoryContentSerializerUtils {
+public final class RepositoryContentSerializationUtils {
 
 	public static final String CONTENT_TYPE = "application/zip";
-	
-	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializerUtils.class.getSimpleName(), "contentIds");
-	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializerUtils.class.getSimpleName(), "contentProperties");
-	
-	private RepositoryContentSerializerUtils() {}
 
-	public static void serializeProperties(Collection<RepositoryNode> nodes) {
+	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationUtils.class.getSimpleName(), "contentIds");
+	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationUtils.class.getSimpleName(), "contentProperties");
+
+	private RepositoryContentSerializationUtils() {}
+
+	public static void serializeContentExtensions(Collection<RepositoryNode> nodes) {
 		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
 			private int nextContentId = 0;
 			@Override
-			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
 				if (! node.getContents().isEmpty()) {
-					node.getExtensions().put(CONTENT_IDS, new ArrayList<Integer>());
-					node.getExtensions().put(CONTENT_PROPERTIES, new ArrayList<String>());
-				}
-				for (NameReference contentProperty : node.getContents().keySet()) {
-					((List<Integer>) node.getExtensions().get(CONTENT_IDS)).add(nextContentId);
-					((List<String>) node.getExtensions().get(CONTENT_PROPERTIES)).add(contentProperty.getFullName());
-					nextContentId ++;
+					List<Integer> contentIds = new ArrayList<>();
+					List<String> contentProperties = new ArrayList<>();
+					// init lists
+					node.getExtensions().put(CONTENT_IDS, (Serializable) contentIds);
+					node.getExtensions().put(CONTENT_PROPERTIES, (Serializable) contentProperties);
+					// populate lists
+					for (NameReference contentProperty : node.getContents().keySet()) {
+						contentIds.add(nextContentId);
+						contentProperties.add(contentProperty.getFullName());
+						nextContentId++;
+					}
 				}
 			}
 		};
-		
 		for (RepositoryNode node : nodes) {
 			node.visit(visitor);
 		}
 	}
-	
+
 	public static void serializeContent(Collection<RepositoryNode> nodes,
 			final Map<NameReference, RepositoryContentSerializer<?>> serializersByProperties,
 			final Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass,
@@ -100,22 +104,17 @@ public final class RepositoryContentSerializerUtils {
 		zos.flush();
 		zos.close();
 	}
-	
-	public static class ContentPropertyWrapper {
-		public RepositoryNode node;
-		public NameReference contentProperty;
-	}
-	
+
 	public static void deserialize(
 			Collection<RepositoryNode> nodes, 
 			Map<NameReference, RepositoryContentDeserializer<?>> deserializersByProperties,
 			RepositoryContentDeserializer<?> defaultDeserializer,
 			InputStream inputStream) throws IOException {
-		Map<Integer, ContentPropertyWrapper> wrapper = deserializeProperties(nodes);
+		Map<Integer, ContentPropertyWrapper> wrapper = deserializeContentExtensions(nodes);
 		deserializeContent(wrapper, deserializersByProperties, defaultDeserializer, inputStream);
 	}
 
-	public static Map<Integer, ContentPropertyWrapper> deserializeProperties(Collection<RepositoryNode> nodes) {
+	public static Map<Integer, ContentPropertyWrapper> deserializeContentExtensions(Collection<RepositoryNode> nodes) {
 		final Map<Integer, ContentPropertyWrapper> wrappers = new HashMap<>();
 		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
 			@Override
@@ -126,9 +125,7 @@ public final class RepositoryContentSerializerUtils {
 					List<String> contentProperties = (List<String>) node.getExtensions().remove(CONTENT_PROPERTIES);
 					
 					for (int i=0; i<contentIds.size(); i++) {
-						ContentPropertyWrapper wrapper = new ContentPropertyWrapper();
-						wrapper.node = node;
-						wrapper.contentProperty = NameReference.create(contentProperties.get(i));
+						ContentPropertyWrapper wrapper = new ContentPropertyWrapper(node, NameReference.create(contentProperties.get(i)));
 						wrappers.put(contentIds.get(i), wrapper);
 					}
 				}
@@ -139,7 +136,7 @@ public final class RepositoryContentSerializerUtils {
 		}
 		return wrappers;
 	}
-	
+
 	public static void deserializeContent(
 			Map<Integer, ContentPropertyWrapper> wrappers,
 			Map<NameReference, RepositoryContentDeserializer<?>> deserializersByProperties,
@@ -151,20 +148,20 @@ public final class RepositoryContentSerializerUtils {
 			int contentId = Integer.parseInt(zipEntry.getName());
 			ContentPropertyWrapper wrapper = wrappers.get(contentId);
 
-			RepositoryContentDeserializer<?> serializer = deserializersByProperties.get(wrapper.contentProperty);
+			RepositoryContentDeserializer<?> serializer = deserializersByProperties.get(wrapper.getContentProperty());
 			if (serializer == null) {
 				serializer = defaultDeserializer;
 			}
-			Object content = serializer.deserialize(wrapper.node, wrapper.contentProperty, new FilterInputStream(zis) {
+			Object content = serializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), new FilterInputStream(zis) {
 				@Override
 				public void close() throws IOException {
-					// on ne veut pas que le deserializer (Alfresco) ferme le flux, car c'est un flux Zip. 
+					// on ne veut pas que le deserializer (Alfresco) ferme le flux, car c'est un flux zip. 
 					// On ne pourrait pas lire l'entrée suivante. 
 				}
 			});
-			wrapper.node.getContents().put(wrapper.contentProperty, content);
+			wrapper.getNode().getContents().put(wrapper.getContentProperty(), content);
 		}
 		zis.close();
 	}
-	
+
 }

@@ -1,8 +1,9 @@
-package fr.openwide.alfresco.app.core.node.serializer;
+package fr.openwide.alfresco.app.core.node.binding;
 
 import java.io.File;
 import java.io.IOException;
 
+import fr.openwide.alfresco.app.core.node.binding.AbstractFileRepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 

@@ -19,7 +19,7 @@ public class CreateNodeWebScript extends AbstractNodeWebScript<List<NodeReferenc
 	}
 
 	@Override
-	protected Collection<RepositoryNode> getUploadedNodes(CREATE_NODE_SERVICE payload) {
+	protected Collection<RepositoryNode> getInputNodes(CREATE_NODE_SERVICE payload) {
 		return payload.nodes;
 	}
 	

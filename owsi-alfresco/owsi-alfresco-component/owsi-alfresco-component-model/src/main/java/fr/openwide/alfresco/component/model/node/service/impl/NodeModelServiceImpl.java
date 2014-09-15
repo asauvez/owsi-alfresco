@@ -12,7 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.openwide.alfresco.app.core.node.serializer.MultipartFileRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -21,11 +21,11 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 

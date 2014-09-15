@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.api.node.serializer;
+package fr.openwide.alfresco.repository.api.node.binding;
 
 import java.io.IOException;
 import java.io.InputStream;

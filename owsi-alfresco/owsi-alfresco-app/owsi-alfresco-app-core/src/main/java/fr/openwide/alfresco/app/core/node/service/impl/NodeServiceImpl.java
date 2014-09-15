@@ -22,21 +22,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import fr.openwide.alfresco.app.core.node.serializer.ByteArrayRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.InputStreamRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.MultipartFileRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.StringRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.TempFileRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.InputStreamRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.remote.model.RestCallBuilder;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationUtils;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializer;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializerUtils;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
@@ -68,7 +68,7 @@ public class NodeServiceImpl implements NodeService {
 					@Override
 					public RepositoryNode extractData(ClientHttpResponse response) throws IOException {
 						RepositoryNode node = RestCallBuilder.getHeaderPayload(response, RepositoryNode.class);
-						RepositoryContentSerializerUtils.deserialize(
+						RepositoryContentSerializationUtils.deserialize(
 								Collections.singleton(node), 
 								nodeScope.getContentDeserializers(), 
 								DEFAULT_REPOSITORY_CONTENT_DESERIALIZER, 
@@ -112,7 +112,7 @@ public class NodeServiceImpl implements NodeService {
 		@Override
 		public List<RepositoryNode> extractData(ClientHttpResponse response) throws IOException {
 			List<RepositoryNode> nodes = RestCallBuilder.getHeaderPayload(response, new TypeReference<List<RepositoryNode>>() {});
-			RepositoryContentSerializerUtils.deserialize(nodes, deserializers, DEFAULT_REPOSITORY_CONTENT_DESERIALIZER, response.getBody());
+			RepositoryContentSerializationUtils.deserialize(nodes, deserializers, DEFAULT_REPOSITORY_CONTENT_DESERIALIZER, response.getBody());
 			return nodes;
 		}
 	}
@@ -174,15 +174,15 @@ public class NodeServiceImpl implements NodeService {
 		CREATE_NODE_SERVICE request = new CREATE_NODE_SERVICE();
 		request.nodes = nodes;
 		
-		RepositoryContentSerializerUtils.serializeProperties(nodes);
+		RepositoryContentSerializationUtils.serializeContentExtensions(nodes);
 		
 		return repositoryRemoteBinding.builder(CREATE_NODE_SERVICE.ENDPOINT)
 			.headerPayload(request)
-			.header("Content-Type", RepositoryContentSerializerUtils.CONTENT_TYPE)
+			.header("Content-Type", RepositoryContentSerializationUtils.CONTENT_TYPE)
 			.call(new RequestCallback() {
 				@Override
 				public void doWithRequest(ClientHttpRequest request) throws IOException {
-					RepositoryContentSerializerUtils.serializeContent(nodes, 
+					RepositoryContentSerializationUtils.serializeContent(nodes, 
 							serializers, 
 							SERIALIZERS_BY_CLASS, 
 							request.getBody());
@@ -211,7 +211,7 @@ public class NodeServiceImpl implements NodeService {
 		request.nodes = nodes;
 		request.nodeScope = nodeScope;
 		
-		RepositoryContentSerializerUtils.serializeProperties(nodes);
+		RepositoryContentSerializationUtils.serializeContentExtensions(nodes);
 		
 		repositoryRemoteBinding.builder(UPDATE_NODE_SERVICE.ENDPOINT)
 			.headerPayload(request)
@@ -219,7 +219,7 @@ public class NodeServiceImpl implements NodeService {
 			.call(new RequestCallback() {
 				@Override
 				public void doWithRequest(ClientHttpRequest request) throws IOException {
-					RepositoryContentSerializerUtils.serializeContent(nodes, 
+					RepositoryContentSerializationUtils.serializeContent(nodes, 
 							serializers, 
 							SERIALIZERS_BY_CLASS, 
 							request.getBody());

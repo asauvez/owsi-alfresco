@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,12 +14,13 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationUtils;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializer;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializerUtils;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializerUtils.ContentPropertyWrapper;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
+import fr.openwide.alfresco.repository.api.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractParameterRemoteWebScript;
@@ -28,62 +30,50 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractParameterRemot
 	protected NodeRemoteService nodeService;
 
 	protected abstract R execute(P payload);
-	
-	protected Collection<RepositoryNode> getUploadedNodes(@SuppressWarnings("unused") P payload) {
+
+	protected Collection<RepositoryNode> getInputNodes(P payload) {
 		return null;
 	}
-	protected Collection<RepositoryNode> getDownloadedNodes(@SuppressWarnings("unused") R response) {
+	protected Collection<RepositoryNode> getOutputNodes(R result) {
 		return null;
 	}
 
-	
 	@Override
-	protected R executeImpl(P payload, WebScriptRequest req) {
-		Collection<RepositoryNode> uploadedNodes = getUploadedNodes(payload);
+	protected R executeImpl(P payload, WebScriptRequest request) {
+		Collection<RepositoryNode> inputNodes = getInputNodes(payload);
 		
-		Map<Integer, ContentPropertyWrapper> wrappers = (uploadedNodes != null) ? deserializeContentProperties(uploadedNodes) : null;
+		Map<Integer, ContentPropertyWrapper> wrappers = (inputNodes != null) ? deserializeContentExtensions(inputNodes) : null;
 		
 		R result = execute(payload);
 		
 		if (wrappers != null) {
 			// Ecrit les contents uploadés dans Alfresco
-			deserializeContentData(wrappers, req);
+			deserializeContentData(wrappers, request);
 		}
-
 		return result;
 	}
-	
+
 	@Override
-	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
-		Collection<RepositoryNode> downloadedNodes = getDownloadedNodes(resValue);
-		if (downloadedNodes == null) {
-			super.handleResult(res, resValue);
+	protected void handleResult(WebScriptResponse response, R result) throws IOException {
+		Collection<RepositoryNode> outputNodes = getOutputNodes(result);
+		if (outputNodes == null) {
+			super.handleResult(response, result);
 		} else {
-			serializeProperties(downloadedNodes);
+			RepositoryContentSerializationUtils.serializeContentExtensions(outputNodes);
 			
-			String valueHeader = objectMapper.writeValueAsString(resValue);
-			res.setHeader(RestEndpoint.HEADER_MESSAGE_CONTENT, URLEncoder.encode(valueHeader, "UTF-8"));
+			String valueHeader = objectMapper.writeValueAsString(result);
+			response.setHeader(RestEndpoint.HEADER_MESSAGE_CONTENT, URLEncoder.encode(valueHeader, StandardCharsets.UTF_8.name()));
 			
-			serializeContent(downloadedNodes, res);
+			serializeContent(outputNodes, response);
 		}
 	}
-	
-	
-	
-	
-	
+
 	public static class ContentCallback {
-		@SuppressWarnings("unused")
 		public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {}
 	}
-	
-	private void serializeProperties(Collection<RepositoryNode> nodes) {
-		RepositoryContentSerializerUtils.serializeProperties(nodes);
-	}
-	
-	private void serializeContent(Collection<RepositoryNode> nodes, WebScriptResponse res) {
-		res.setContentType(RepositoryContentSerializerUtils.CONTENT_TYPE);
-		
+
+	private void serializeContent(Collection<RepositoryNode> nodes, WebScriptResponse response) throws IOException {
+		// register ContentReader serializer
 		Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass = new HashMap<>();
 		serializersByClass.put(ContentReader.class, new RepositoryContentSerializer<ContentReader>() {
 			@Override
@@ -93,50 +83,47 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractParameterRemot
 				}
 			}
 		});
-		
-		try {
-			RepositoryContentSerializerUtils.serializeContent(
-					nodes, 
-					new HashMap<NameReference, RepositoryContentSerializer<?>>(), 
-					serializersByClass, 
-					res.getOutputStream());
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+		// generate output
+		response.setContentType(RepositoryContentSerializationUtils.CONTENT_TYPE);
+		RepositoryContentSerializationUtils.serializeContent(
+				nodes, 
+				new HashMap<NameReference, RepositoryContentSerializer<?>>(), 
+				serializersByClass, 
+				response.getOutputStream());
 	}
 
-	/** Initialise la map de content.
-	 *  Appeler avant l'appel au service */
-	private Map<Integer, ContentPropertyWrapper> deserializeContentProperties(Collection<RepositoryNode> nodes) {
-		Map<Integer, ContentPropertyWrapper> wrappers = RepositoryContentSerializerUtils.deserializeProperties(nodes);
+	/** 
+	 * Pré-traitement : initialise la map de content avec un callback noop écrasé
+	 */
+	private Map<Integer, ContentPropertyWrapper> deserializeContentExtensions(Collection<RepositoryNode> nodes) {
+		Map<Integer, ContentPropertyWrapper> wrappers = RepositoryContentSerializationUtils.deserializeContentExtensions(nodes);
 		for (ContentPropertyWrapper wrapper : wrappers.values()) {
-			wrapper.node.getContents().put(wrapper.contentProperty, new ContentCallback());
+			wrapper.getNode().getContents().put(wrapper.getContentProperty(), new ContentCallback());
 		}
 		return wrappers;
 	}
-	
-	/** Lit le zip de content et appelle les callbacks.
-	 *  Appeler après l'appel au service */
-	private void deserializeContentData(Map<Integer, ContentPropertyWrapper> wrappers, WebScriptRequest req) {
-		try {
-			RepositoryContentDeserializer<Void> defaultDeserializer = new RepositoryContentDeserializer<Void>() {
-				@Override
-				public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-					ContentCallback callback = (ContentCallback) node.getContents().get(contentProperty);
-					callback.doWithInputStream(contentProperty, inputStream);
-					return null;
-				}
-			};
 
-			RepositoryContentSerializerUtils.deserializeContent(wrappers, 
-					new HashMap<NameReference, RepositoryContentDeserializer<?>>(),  
+	/** 
+	 * Post-traitement : lit le zip de content et appelle les callbacks
+	 */
+	private void deserializeContentData(Map<Integer, ContentPropertyWrapper> wrappers, WebScriptRequest request) {
+		RepositoryContentDeserializer<Void> defaultDeserializer = new RepositoryContentDeserializer<Void>() {
+			@Override
+			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
+				ContentCallback callback = (ContentCallback) node.getContents().get(contentProperty);
+				callback.doWithInputStream(contentProperty, inputStream);
+				return null;
+			}
+		};
+		try {
+			RepositoryContentSerializationUtils.deserializeContent(wrappers, 
+					new HashMap<NameReference, RepositoryContentDeserializer<?>>(), 
 					defaultDeserializer, 
-					req.getContent().getInputStream());
+					request.getContent().getInputStream());
 		} catch (IOException e) {
-			throw new IllegalStateException(e);
+			throw new IllegalStateRemoteException(e);
 		}
 	}
-
 
 	public void setNodeService(NodeRemoteService nodeService) {
 		this.nodeService = nodeService;

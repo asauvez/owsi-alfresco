@@ -6,6 +6,8 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class RepositoryChildAssociation implements Serializable {
 
+	private static final long serialVersionUID = 8802950808307844861L;
+
 	private RepositoryNode parentNode;
 	private NameReference type;
 

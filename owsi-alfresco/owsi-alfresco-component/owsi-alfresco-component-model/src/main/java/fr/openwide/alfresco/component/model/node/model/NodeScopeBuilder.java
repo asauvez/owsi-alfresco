@@ -4,17 +4,17 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
-import fr.openwide.alfresco.app.core.node.serializer.ByteArrayRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.FolderRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.HttpServletResponseRepositoryContentDeserializer;
-import fr.openwide.alfresco.app.core.node.serializer.StringRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.serializer.TempFileRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
+import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentDeserializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 /**

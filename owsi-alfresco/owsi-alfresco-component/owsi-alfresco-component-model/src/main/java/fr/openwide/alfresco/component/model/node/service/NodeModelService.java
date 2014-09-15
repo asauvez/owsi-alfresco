@@ -11,10 +11,10 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.node.serializer.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 /**

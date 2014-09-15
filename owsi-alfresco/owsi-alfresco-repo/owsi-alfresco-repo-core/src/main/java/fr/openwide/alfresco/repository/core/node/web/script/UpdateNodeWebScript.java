@@ -21,7 +21,7 @@ public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE
 	}
 
 	@Override
-	protected Collection<RepositoryNode> getUploadedNodes(UPDATE_NODE_SERVICE payload) {
+	protected Collection<RepositoryNode> getInputNodes(UPDATE_NODE_SERVICE payload) {
 		return payload.nodes;
 	}
 	
