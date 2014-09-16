@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
@@ -19,18 +20,23 @@ public class CmAuditable extends AspectModel {
 	}
 
 	public final DateTimePropertyModel created = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "created",
-			ProtectedPropertyConstraint.INSTANCE);
+			ProtectedPropertyConstraint.INSTANCE,
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
 
 	public final TextPropertyModel creator = PropertyModels.newText(this, CmModel.NAMESPACE, "creator",
-			ProtectedPropertyConstraint.INSTANCE);
+			ProtectedPropertyConstraint.INSTANCE,
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
 
 	public final DateTimePropertyModel modified = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "modified",
-			ProtectedPropertyConstraint.INSTANCE);
+			ProtectedPropertyConstraint.INSTANCE,
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
 
 	public final TextPropertyModel modifier = PropertyModels.newText(this, CmModel.NAMESPACE, "modifier",
-			ProtectedPropertyConstraint.INSTANCE);
+			ProtectedPropertyConstraint.INSTANCE,
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
 
 	public final DateTimePropertyModel accessed = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "accessed",
-			ProtectedPropertyConstraint.INSTANCE);
+			ProtectedPropertyConstraint.INSTANCE,
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
 
 }

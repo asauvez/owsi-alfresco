@@ -1,7 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.component.model.node.model.constraint.FileNamePropertyConstraint;
-import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryPropertyConstraint;
+import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
+import fr.openwide.alfresco.component.model.node.model.constraint.RegexPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -19,8 +19,8 @@ public class CmObject extends SysBase {
 	}
 
 	public final TextPropertyModel name = PropertyModels.newText(this, CmModel.NAMESPACE, "name",
-			MandatoryPropertyConstraint.INSTANCE,
-			FileNamePropertyConstraint.INSTANCE);
+			MandatoryEnforcedPropertyConstraint.INSTANCE,
+			new RegexPropertyConstraint("(.*[\\\"\\*\\\\\\>\\<\\?\\/\\:\\|]+.*)|(.*[\\.]?.*[\\.]+$)|(.*[ ]+$)", false));
 
 	public final CmAuditable auditable = addMandatoryAspect(CmModel.auditable);
 }
