@@ -40,7 +40,7 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 	public void validate(Serializable value) {
 		validateType(value);
 		for (PropertyConstraint constraint : constraints) {
-			if (! constraint.valid(value)) {
+			if (! constraint.valid(this, value)) {
 				throw new ConstraintException(getNameReference() + ": Value does not satisfy constraint " + constraint.getMessage());
 			}
 		}
