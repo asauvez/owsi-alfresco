@@ -16,11 +16,13 @@ public abstract class MultiPropertyModel<C extends Serializable> extends Propert
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void validateType(Serializable value) {
-		if (value != null && ! (value instanceof Iterable)) {
-			throw new ConstraintException(getNameReference() + ": Value of type " + value.getClass().getName() + " instead of Iterable.");
-		}
-		for (Serializable item : (Iterable<Serializable>) value) {
-			super.validateType(item);
+		if (value != null) {
+			if (! (value instanceof Iterable)) {
+				throw new ConstraintException(getNameReference() + ": Value of type " + value.getClass().getName() + " instead of Iterable.");
+			}
+			for (Serializable item : (Iterable<Serializable>) value) {
+				super.validateType(item);
+			}
 		}
 	}
 }
