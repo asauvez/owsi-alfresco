@@ -9,7 +9,7 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.lang.StringUtils;
 
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
@@ -38,7 +38,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 				try {
 					res.add(nodeRemoteService.get(conversionService.get(nodeRef), scope));
-				} catch (NoSuchNodeException e) {
+				} catch (NoSuchNodeRemoteException e) {
 					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
 				}
 			}

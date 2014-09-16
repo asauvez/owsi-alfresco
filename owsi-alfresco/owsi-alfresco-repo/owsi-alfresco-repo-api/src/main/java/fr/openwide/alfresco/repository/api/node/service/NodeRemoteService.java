@@ -2,8 +2,8 @@ package fr.openwide.alfresco.repository.api.node.service;
 
 import java.util.List;
 
-import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
+import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -20,7 +20,7 @@ public interface NodeRemoteService {
 		public NodeReference nodeReference;
 		public NodeScope nodeScope;
 	}
-	RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope) throws NoSuchNodeException;
+	RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope) throws NoSuchNodeRemoteException;
 
 	class CHILDREN_NODE_SERVICE {
 		public static final GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/node/children") {};
@@ -50,14 +50,14 @@ public interface NodeRemoteService {
 		public static final PostMethodEndpoint<List<NodeReference>> ENDPOINT = new PostMethodEndpoint<List<NodeReference>>("/owsi/node") {};
 		public List<RepositoryNode> nodes;
 	}
-	List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNameException;
+	List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException;
 
 	class UPDATE_NODE_SERVICE {
 		public static final PutMethodEndpoint<Void> ENDPOINT = new PutMethodEndpoint<Void>("/owsi/node") {};
 		public List<RepositoryNode> nodes;
 		public NodeScope nodeScope;
 	}
-	void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNameException;
+	void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException;
 
 	DeleteMethodEndpoint<Void> DELETE_NODE_SERVICE_ENDPOINT = new DeleteMethodEndpoint<Void>("/owsi/node") {};
 	void delete(List<NodeReference> nodeReferences);

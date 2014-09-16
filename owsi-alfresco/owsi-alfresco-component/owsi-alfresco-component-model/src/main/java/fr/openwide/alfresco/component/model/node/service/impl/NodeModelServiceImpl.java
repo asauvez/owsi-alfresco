@@ -22,8 +22,8 @@ import fr.openwide.alfresco.component.model.node.model.property.single.ContentPr
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
-import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
+import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -35,7 +35,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 	private NodeService nodeService;
 
 	@Override
-	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeException {
+	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope()));
 	}
 
@@ -70,19 +70,19 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 	
 	@Override
-	public NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNameException {
+	public NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
 		return create(new BusinessNode(parentRef, CmModel.folder, folderName));
 	}
 
 	@Override
-	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNameException {
+	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNodeNameRemoteException {
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 				.property(CmModel.content.content, new RepositoryContentData(mimeType, encoding))
 				.content(content));
 	}
 
 	@Override
-	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNameException {
+	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNodeNameRemoteException {
 		String fileName = FilenameUtils.getName(file.getOriginalFilename());
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 				.property(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
@@ -91,21 +91,21 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 
 	@Override
-	public NodeReference create(BusinessNode node) throws DuplicateChildNameException {
+	public NodeReference create(BusinessNode node) throws DuplicateChildNodeNameRemoteException {
 		return nodeService.create(node.getRepositoryNode());
 	}
 	@Override
-	public NodeReference create(BusinessNode node, RepositoryContentSerializer<?> serializer) throws DuplicateChildNameException {
+	public NodeReference create(BusinessNode node, RepositoryContentSerializer<?> serializer) throws DuplicateChildNodeNameRemoteException {
 		Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers = new HashMap<>();
 		serializers.put(CmModel.content.content, serializer);
 		return create(node, serializers);
 	}
 	@Override
-	public NodeReference create(BusinessNode node, Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException {
+	public NodeReference create(BusinessNode node, Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
 		return create(Collections.singletonList(node), serializers).get(0);
 	}
 	@Override
-	public List<NodeReference> create(List<BusinessNode> nodes) throws DuplicateChildNameException {
+	public List<NodeReference> create(List<BusinessNode> nodes) throws DuplicateChildNodeNameRemoteException {
 		List<RepositoryNode> repoNodes = new ArrayList<>();
 		for (BusinessNode node : nodes) {
 			repoNodes.add(node.getRepositoryNode());
@@ -113,7 +113,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 		return nodeService.create(repoNodes);
 	}
 	@Override
-	public List<NodeReference> create(List<BusinessNode> nodes, Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException {
+	public List<NodeReference> create(List<BusinessNode> nodes, Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
 		Map<NameReference, RepositoryContentSerializer<?>> serializers2 = new HashMap<>();
 		for (Entry<ContentPropertyModel, RepositoryContentSerializer<?>> entry : serializers.entrySet()) {
 			serializers2.put(entry.getKey().getNameReference(), entry.getValue());
@@ -126,17 +126,17 @@ public class NodeModelServiceImpl implements NodeModelService {
 	}
 
 	@Override
-	public void update(BusinessNode node) throws DuplicateChildNameException {
+	public void update(BusinessNode node) throws DuplicateChildNodeNameRemoteException {
 		update(node, new NodeScopeBuilder()
 				.fromNode(node));
 	}
 
 	@Override
-	public void update(BusinessNode node, NodeScopeBuilder scope) throws DuplicateChildNameException {
+	public void update(BusinessNode node, NodeScopeBuilder scope) throws DuplicateChildNodeNameRemoteException {
 		nodeService.update(node.getRepositoryNode(), scope.getScope());
 	}
 	@Override
-	public void update(List<BusinessNode> nodes, NodeScopeBuilder nodeScopeBuilder) throws DuplicateChildNameException {
+	public void update(List<BusinessNode> nodes, NodeScopeBuilder nodeScopeBuilder) throws DuplicateChildNodeNameRemoteException {
 		List<RepositoryNode> repoNodes = new ArrayList<>();
 		for (BusinessNode node : nodes) {
 			repoNodes.add(node.getRepositoryNode());

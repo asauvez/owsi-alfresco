@@ -29,8 +29,8 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
-import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeException;
+import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
@@ -55,7 +55,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, NodeScope scope) throws NoSuchNodeException {
+	public RepositoryNode get(NodeReference nodeReference, NodeScope scope) throws NoSuchNodeRemoteException {
 		return getRepositoryNode(conversionService.getRequired(nodeReference), scope);
 	}
 
@@ -111,10 +111,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return res;
 	}
 
-	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeException {
+	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
-			throw new NoSuchNodeException(nodeReference.getReference());
+			throw new NoSuchNodeRemoteException(nodeReference.getReference());
 		}
 		RepositoryNode node = new RepositoryNode();
 		if (scope.isNodeReference()) {
@@ -219,7 +219,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	
 	@Override
-	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNameException {
+	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException {
 		List<NodeReference> nodesReferences = new ArrayList<>();
 		for (RepositoryNode node : nodes) {
 			nodesReferences.add(create(node));
@@ -227,7 +227,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return nodesReferences;
 	}
 	
-	protected NodeReference create(RepositoryNode node) throws DuplicateChildNameException {
+	protected NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
 		validateCreate(node);
 		
 		Map<QName, Serializable> properties = new LinkedHashMap<QName, Serializable>();
@@ -288,18 +288,18 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 			return nodeReference;
 		} catch (DuplicateChildNodeNameException e) {
-			throw new DuplicateChildNameException(cmName, e);
+			throw new DuplicateChildNodeNameRemoteException(cmName, e);
 		}
 	}
 
 	@Override
-	public void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNameException {
+	public void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		for (RepositoryNode node : nodes) {
 			update(node, nodeScope);
 		}
 	}
 	
-	protected void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNameException {
+	protected void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
 		try {
 			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
@@ -365,11 +365,11 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				setPermissions(nodeRef, node);
 			}
 		} catch (DuplicateChildNodeNameException e) {
-			throw new DuplicateChildNameException(cmName, e);
+			throw new DuplicateChildNodeNameRemoteException(cmName, e);
 		}
 	}
 
-	private void saveOrUpdate(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNameException {
+	private void saveOrUpdate(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		if (node.getNodeReference() != null) {
 			update(node, nodeScope);
 		} else if (node.getPrimaryParentAssociation() != null) {

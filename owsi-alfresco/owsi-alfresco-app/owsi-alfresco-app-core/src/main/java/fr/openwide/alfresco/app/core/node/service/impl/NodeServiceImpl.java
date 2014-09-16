@@ -33,7 +33,7 @@ import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationUtils;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
-import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNameException;
+import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
@@ -154,23 +154,23 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public NodeReference create(RepositoryNode node) throws DuplicateChildNameException {
+	public NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
 		return create(node, new HashMap<NameReference, RepositoryContentSerializer<?>>());
 	}
 
 	@Override
-	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNameException {
+	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException {
 		return create(nodes, new HashMap<NameReference, RepositoryContentSerializer<?>>());
 	}
 	
 	@Override
-	public NodeReference create(RepositoryNode node, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException {
+	public NodeReference create(RepositoryNode node, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
 		List<NodeReference> list = create(Collections.singletonList(node), serializers);
 		return list.get(0);
 	}
 	
 	@Override
-	public List<NodeReference> create(final List<RepositoryNode> nodes, final Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException {
+	public List<NodeReference> create(final List<RepositoryNode> nodes, final Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
 		CREATE_NODE_SERVICE request = new CREATE_NODE_SERVICE();
 		request.nodes = nodes;
 		
@@ -191,22 +191,22 @@ public class NodeServiceImpl implements NodeService {
 	}
 	
 	@Override
-	public void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNameException {
+	public void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		update(nodes, nodeScope, new HashMap<NameReference, RepositoryContentSerializer<?>>());
 	}
 	@Override
-	public void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNameException {
+	public void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		update(node, nodeScope, new HashMap<NameReference, RepositoryContentSerializer<?>>());
 	}
 	@Override
 	public void update(RepositoryNode node, NodeScope nodeScope,
-			Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException {
+			Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
 		update(Collections.singletonList(node), nodeScope, serializers);
 	}
 
 	@Override
 	public void update(final List<RepositoryNode> nodes, final NodeScope nodeScope, 
-			final Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNameException {
+			final Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
 		UPDATE_NODE_SERVICE request = new UPDATE_NODE_SERVICE();
 		request.nodes = nodes;
 		request.nodeScope = nodeScope;
