@@ -17,7 +17,7 @@
 	<description>Définition des dépendances et plugins partagées par les autres projets et modules</description>
 
 	<properties>
-		<owsi-alfresco.alfresco.version>4.2.2</owsi-alfresco.alfresco.version>
+		<owsi-alfresco.alfresco.version>4.2.3.1</owsi-alfresco.alfresco.version>
 	</properties>
 
 	<modules>
