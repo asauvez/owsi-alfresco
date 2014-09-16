@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
+import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
+import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
@@ -21,7 +23,9 @@ public class CmPerson extends CmAuthority {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel userName = PropertyModels.newText(this, CmModel.NAMESPACE, "userName");
+	public final TextPropertyModel userName = PropertyModels.newText(this, CmModel.NAMESPACE, "userName",
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
+	
 	public final NodeReferencePropertyModel homeFolder = PropertyModels.newNodeReference(this, CmModel.NAMESPACE, "homeFolder");
 	public final TextPropertyModel firstName = PropertyModels.newText(this, CmModel.NAMESPACE, "firstName");
 	public final TextPropertyModel lastName = PropertyModels.newText(this, CmModel.NAMESPACE, "lastName");
@@ -52,9 +56,12 @@ public class CmPerson extends CmAuthority {
 	public final TextPropertyModel googleusername = PropertyModels.newText(this, CmModel.NAMESPACE, "googleusername");
 	public final BooleanPropertyModel emailFeedDisabled = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "emailFeedDisabled");
 	public final BooleanPropertyModel subscriptionsPrivate = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "subscriptionsPrivate");
-	public final LongPropertyModel emailFeedId = PropertyModels.newLong(this, CmModel.NAMESPACE, "emailFeedId");
-	public final LongPropertyModel sizeCurrent = PropertyModels.newLong(this, CmModel.NAMESPACE, "sizeCurrent");
-	public final LongPropertyModel sizeQuota = PropertyModels.newLong(this, CmModel.NAMESPACE, "sizeQuota");
+	public final LongPropertyModel emailFeedId = PropertyModels.newLong(this, CmModel.NAMESPACE, "emailFeedId",
+			ProtectedPropertyConstraint.INSTANCE);
+	public final LongPropertyModel sizeCurrent = PropertyModels.newLong(this, CmModel.NAMESPACE, "sizeCurrent",
+			ProtectedPropertyConstraint.INSTANCE);
+	public final LongPropertyModel sizeQuota = PropertyModels.newLong(this, CmModel.NAMESPACE, "sizeQuota",
+			ProtectedPropertyConstraint.INSTANCE);
 
 	public final AssociationModel avatar = new AssociationModel(NameReference.create(CmModel.NAMESPACE, "avatar"));
 }

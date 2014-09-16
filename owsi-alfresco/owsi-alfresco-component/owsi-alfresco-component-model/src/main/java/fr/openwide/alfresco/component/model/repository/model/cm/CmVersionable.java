@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
@@ -17,9 +18,11 @@ public class CmVersionable extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel versionLabel = PropertyModels.newText(this, CmModel.NAMESPACE, "versionLabel");
+	public final TextPropertyModel versionLabel = PropertyModels.newText(this, CmModel.NAMESPACE, "versionLabel",
+			ProtectedPropertyConstraint.INSTANCE);
 
-	public final TextPropertyModel versionType = PropertyModels.newText(this, CmModel.NAMESPACE, "versionType");
+	public final TextPropertyModel versionType = PropertyModels.newText(this, CmModel.NAMESPACE, "versionType",
+			ProtectedPropertyConstraint.INSTANCE);
 
 	public final BooleanPropertyModel initialVersion = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "initialVersion");
 

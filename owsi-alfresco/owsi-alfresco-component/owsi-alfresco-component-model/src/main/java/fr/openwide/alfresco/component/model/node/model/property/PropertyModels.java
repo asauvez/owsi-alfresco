@@ -67,6 +67,9 @@ public final class PropertyModels {
 	public static LongPropertyModel newLong(ContainerModel type, String namespace, String name) {
 		return new LongPropertyModel(type, NameReference.create(namespace, name));
 	}
+	public static LongPropertyModel newLong(ContainerModel type, String namespace, String name, PropertyConstraint ... constraints) {
+		return addConstraints(new LongPropertyModel(type, NameReference.create(namespace, name)), constraints);
+	}
 	public static MultiLongPropertyModel newMultiLong(ContainerModel type, String namespace, String name) {
 		return new MultiLongPropertyModel(type, NameReference.create(namespace, name));
 	}

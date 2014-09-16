@@ -11,6 +11,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTitled;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
 
 public interface CmModel {
 
@@ -27,6 +28,8 @@ public interface CmModel {
 	CmOwnable ownable = new CmOwnable();
 
 	CmAuthor author = new CmAuthor();
+	
+	CmWorkingCopy workingCopy = new CmWorkingCopy();
 
 	// ---- Types
 
