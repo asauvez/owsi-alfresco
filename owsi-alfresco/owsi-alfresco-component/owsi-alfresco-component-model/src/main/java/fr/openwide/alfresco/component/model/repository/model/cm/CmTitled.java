@@ -16,8 +16,8 @@ public class CmTitled extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel title = PropertyModels.newText(this, "title");
+	public final TextPropertyModel title = PropertyModels.newText(this, CmModel.NAMESPACE, "title");
 	
-	public final TextPropertyModel description = PropertyModels.newText(this, "description");
+	public final TextPropertyModel description = PropertyModels.newText(this, CmModel.NAMESPACE, "description");
 
 }

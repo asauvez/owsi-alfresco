@@ -15,6 +15,6 @@ public class CmContent extends CmObject {
 		super(nameReference);
 	}
 
-	public final ContentPropertyModel content = PropertyModels.newContent(this, "content");
+	public final ContentPropertyModel content = PropertyModels.newContent(this, CmModel.NAMESPACE, "content");
 
 }

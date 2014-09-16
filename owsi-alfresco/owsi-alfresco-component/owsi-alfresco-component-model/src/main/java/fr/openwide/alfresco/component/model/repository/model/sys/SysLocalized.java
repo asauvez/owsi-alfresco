@@ -16,6 +16,6 @@ public class SysLocalized extends AspectModel {
 		super(nameReference);
 	}
 
-	public final LocalePropertyModel locale = PropertyModels.newLocale(this, "locale");
+	public final LocalePropertyModel locale = PropertyModels.newLocale(this, SysModel.NAMESPACE, "locale");
 	
 }
