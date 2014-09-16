@@ -18,19 +18,19 @@ public class CmAuditable extends AspectModel {
 		super(nameReference);
 	}
 
-	public final DateTimePropertyModel created = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "created",
+	public final DateTimePropertyModel created = PropertyModels.newDateTime(this, "created",
 			ProtectedPropertyConstraint.INSTANCE);
 
-	public final TextPropertyModel creator = PropertyModels.newText(this, CmModel.NAMESPACE, "creator",
+	public final TextPropertyModel creator = PropertyModels.newText(this, "creator",
 			ProtectedPropertyConstraint.INSTANCE);
 
-	public final DateTimePropertyModel modified = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "modified",
+	public final DateTimePropertyModel modified = PropertyModels.newDateTime(this, "modified",
 			ProtectedPropertyConstraint.INSTANCE);
 
-	public final TextPropertyModel modifier = PropertyModels.newText(this, CmModel.NAMESPACE, "modifier",
+	public final TextPropertyModel modifier = PropertyModels.newText(this, "modifier",
 			ProtectedPropertyConstraint.INSTANCE);
 
-	public final DateTimePropertyModel accessed = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "accessed",
+	public final DateTimePropertyModel accessed = PropertyModels.newDateTime(this, "accessed",
 			ProtectedPropertyConstraint.INSTANCE);
 
 }

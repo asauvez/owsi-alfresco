@@ -16,6 +16,6 @@ public class CmAuthor extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel author = PropertyModels.newText(this, CmModel.NAMESPACE, "author");
+	public final TextPropertyModel author = PropertyModels.newText(this, "author");
 
 }

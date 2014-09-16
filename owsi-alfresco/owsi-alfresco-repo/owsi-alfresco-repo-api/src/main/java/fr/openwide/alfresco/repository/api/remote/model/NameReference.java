@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Objects;
 
+import org.springframework.util.Assert;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -22,6 +24,9 @@ public class NameReference implements Serializable {
 	}
 
 	private NameReference(String namespace, String name) {
+		Assert.notNull(namespace, "namespace");
+		Assert.notNull(name, "name");
+		
 		this.namespace = namespace;
 		this.name = name;
 	}

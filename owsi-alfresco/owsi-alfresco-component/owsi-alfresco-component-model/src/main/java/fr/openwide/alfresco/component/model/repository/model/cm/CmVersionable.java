@@ -17,14 +17,14 @@ public class CmVersionable extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel versionLabel = PropertyModels.newText(this, CmModel.NAMESPACE, "versionLabel");
+	public final TextPropertyModel versionLabel = PropertyModels.newText(this, "versionLabel");
 
-	public final TextPropertyModel versionType = PropertyModels.newText(this, CmModel.NAMESPACE, "versionType");
+	public final TextPropertyModel versionType = PropertyModels.newText(this, "versionType");
 
-	public final BooleanPropertyModel initialVersion = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "initialVersion");
+	public final BooleanPropertyModel initialVersion = PropertyModels.newBoolean(this, "initialVersion");
 
-	public final BooleanPropertyModel autoVersion = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "autoVersion");
+	public final BooleanPropertyModel autoVersion = PropertyModels.newBoolean(this, "autoVersion");
 
-	public final BooleanPropertyModel autoVersionOnUpdateProps = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "autoVersionOnUpdateProps");
+	public final BooleanPropertyModel autoVersionOnUpdateProps = PropertyModels.newBoolean(this, "autoVersionOnUpdateProps");
 
 }

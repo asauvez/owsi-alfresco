@@ -17,12 +17,12 @@ public class SysReferenceable extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel storeProtocol = PropertyModels.newText(this, SysModel.NAMESPACE, "store-protocol");
+	public final TextPropertyModel storeProtocol = PropertyModels.newText(this, "store-protocol");
 	
-	public final TextPropertyModel storeIdentifier = PropertyModels.newText(this, SysModel.NAMESPACE, "store-identifier");
+	public final TextPropertyModel storeIdentifier = PropertyModels.newText(this, "store-identifier");
 
-	public final TextPropertyModel nodeUuid = PropertyModels.newText(this, SysModel.NAMESPACE, "node-uuid");
+	public final TextPropertyModel nodeUuid = PropertyModels.newText(this, "node-uuid");
 
-	public final LongPropertyModel nodeDbid = PropertyModels.newLong(this, SysModel.NAMESPACE, "node-dbid");
+	public final LongPropertyModel nodeDbid = PropertyModels.newLong(this, "node-dbid");
 
 }

@@ -18,7 +18,7 @@ public class CmObject extends SysBase {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel name = PropertyModels.newText(this, CmModel.NAMESPACE, "name",
+	public final TextPropertyModel name = PropertyModels.newText(this, "name",
 			MandatoryPropertyConstraint.INSTANCE,
 			FileNamePropertyConstraint.INSTANCE);
 

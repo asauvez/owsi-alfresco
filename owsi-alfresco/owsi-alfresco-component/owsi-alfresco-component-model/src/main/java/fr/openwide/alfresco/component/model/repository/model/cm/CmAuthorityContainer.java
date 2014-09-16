@@ -17,10 +17,10 @@ public class CmAuthorityContainer extends CmAuthority {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel authorityName = PropertyModels.newText(this, CmModel.NAMESPACE, "authorityName",
+	public final TextPropertyModel authorityName = PropertyModels.newText(this, "authorityName",
 			AuthorityNamePropertyConstraint.INSTANCE);
 	
-	public final TextPropertyModel authorityDisplayName = PropertyModels.newText(this, CmModel.NAMESPACE, "authorityDisplayName");
+	public final TextPropertyModel authorityDisplayName = PropertyModels.newText(this, "authorityDisplayName");
 	
 	public final ChildAssociationModel member = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "member"));
 }

@@ -16,6 +16,6 @@ public class CmOwnable extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel owner = PropertyModels.newText(this, CmModel.NAMESPACE, "owner");
+	public final TextPropertyModel owner = PropertyModels.newText(this, "owner");
 
 }
