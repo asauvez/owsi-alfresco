@@ -14,6 +14,8 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
 
 public interface CmModel {
 
+	String NAMESPACE = "cm";
+
 	// ---- Aspects
 
 	CmTitled titled = new CmTitled();
@@ -27,8 +29,6 @@ public interface CmModel {
 	CmAuthor author = new CmAuthor();
 
 	// ---- Types
-
-	String NAMESPACE = "cm";
 
 	CmObject object = new CmObject();
 

@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model.property;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiBooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDateTimePropertyModel;
@@ -27,8 +28,15 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public final class PropertyModels {
 
-	public static TextPropertyModel newText(ContainerModel type, String namespace, String name) {
-		return new TextPropertyModel(type, NameReference.create(namespace, name));
+	public static <M extends PropertyModel<?>> M addConstraints(M propertyModel, PropertyConstraint ... constraints) {
+		for (PropertyConstraint constraint : constraints) {
+			propertyModel.add(constraint);
+		}
+		return propertyModel;
+	}
+	
+	public static TextPropertyModel newText(ContainerModel type, String namespace, String name, PropertyConstraint ... constraints) {
+		return addConstraints(new TextPropertyModel(type, NameReference.create(namespace, name)), constraints);
 	}
 	public static MultiTextPropertyModel newMultiText(ContainerModel type, String namespace, String name) {
 		return new MultiTextPropertyModel(type, NameReference.create(namespace, name));
@@ -40,8 +48,8 @@ public final class PropertyModels {
 	public static MultiDatePropertyModel newMultiDate(ContainerModel type, String namespace, String name) {
 		return new MultiDatePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static DateTimePropertyModel newDateTime(ContainerModel type, String namespace, String name) {
-		return new DateTimePropertyModel(type, NameReference.create(namespace, name));
+	public static DateTimePropertyModel newDateTime(ContainerModel type, String namespace, String name, PropertyConstraint ... constraints) {
+		return addConstraints(new DateTimePropertyModel(type, NameReference.create(namespace, name)), constraints);
 	}
 	public static MultiDateTimePropertyModel newMultiDateTime(ContainerModel type, String namespace, String name) {
 		return new MultiDateTimePropertyModel(type, NameReference.create(namespace, name));

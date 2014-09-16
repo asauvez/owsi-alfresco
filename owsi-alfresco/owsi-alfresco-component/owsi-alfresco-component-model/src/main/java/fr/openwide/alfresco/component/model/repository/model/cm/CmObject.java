@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
+import fr.openwide.alfresco.component.model.node.model.constraint.FileNamePropertyConstraint;
+import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -16,7 +18,9 @@ public class CmObject extends SysBase {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel name = PropertyModels.newText(this, CmModel.NAMESPACE, "name");
+	public final TextPropertyModel name = PropertyModels.newText(this, CmModel.NAMESPACE, "name",
+			MandatoryPropertyConstraint.INSTANCE,
+			FileNamePropertyConstraint.INSTANCE);
 
 	public final CmAuditable auditable = addMandatoryAspect(CmModel.auditable);
 }
