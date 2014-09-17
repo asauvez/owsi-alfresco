@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -47,10 +48,12 @@ public class RepositoryNodeTest {
 		node = objectMapper.readValue(s, RepositoryNode.class);
 		System.out.println(node.getProperties());
 		
-		List<?> multiDate = (List<?>) node.getProperties().get("cm:multiDate");
-		assert multiDate.get(0) instanceof Date;
-		assert node.getProperties().get("cm:double") instanceof Double;
-		assert node.getProperties().get("cm:float") instanceof Float;
-		assert node.getProperties().get("cm:int") instanceof Integer;
+		Assert.isInstanceOf(Double.class, node.getProperties().get(NameReference.create("cm:double")));
+		Assert.isInstanceOf(Float.class, node.getProperties().get(NameReference.create("cm:float")));
+		Assert.isInstanceOf(Integer.class, node.getProperties().get(NameReference.create("cm:int")));
+		Assert.isInstanceOf(NodeReference.class, node.getProperties().get(NameReference.create("cm:nodeRef")));
+
+		List<?> multiDate = (List<?>) node.getProperties().get(NameReference.create("cm:multiDate"));
+		Assert.isInstanceOf(Date.class, multiDate.get(0));
 	}
 }
