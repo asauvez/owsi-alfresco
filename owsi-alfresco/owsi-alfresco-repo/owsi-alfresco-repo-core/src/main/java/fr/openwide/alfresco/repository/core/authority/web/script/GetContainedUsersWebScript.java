@@ -3,8 +3,6 @@ package fr.openwide.alfresco.repository.core.authority.web.script;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.extensions.webscripts.WebScriptRequest;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
@@ -14,7 +12,7 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<List<RepositoryNode>, GET_CONTAINED_USERS> {
 
 	@Override
-	protected List<RepositoryNode> executeImpl(GET_CONTAINED_USERS payload, WebScriptRequest req) {
+	protected List<RepositoryNode> execute(GET_CONTAINED_USERS payload) {
 		return authorityRemoteService.getContainedUsers(
 				Objects.requireNonNull(payload.authority, "Authority"), 
 				payload.immediate, 

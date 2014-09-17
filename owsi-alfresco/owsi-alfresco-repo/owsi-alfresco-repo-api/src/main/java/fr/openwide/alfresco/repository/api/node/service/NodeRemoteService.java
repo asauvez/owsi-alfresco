@@ -9,21 +9,20 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.DeleteMethodEndpoint;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.GetMethodEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PostMethodEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PutMethodEndpoint;
 
 public interface NodeRemoteService {
 
 	class GET_NODE_SERVICE {
-		public static final GetMethodEndpoint<RepositoryNode> ENDPOINT = new GetMethodEndpoint<RepositoryNode>("/owsi/node/get") {};
+		public static final PostMethodEndpoint<RepositoryNode> ENDPOINT = new PostMethodEndpoint<RepositoryNode>("/owsi/node/get") {};
 		public NodeReference nodeReference;
 		public NodeScope nodeScope;
 	}
 	RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope) throws NoSuchNodeRemoteException;
 
 	class CHILDREN_NODE_SERVICE {
-		public static final GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/node/children") {};
+		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/children") {};
 		public NodeReference nodeReference;
 		public NameReference childAssocTypeName; 
 		public NodeScope nodeScope;
@@ -31,7 +30,7 @@ public interface NodeRemoteService {
 	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope);
 
 	class TARGET_ASSOC_NODE_SERVICE {
-		public static final GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/node/targetassoc") {};
+		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/targetassoc") {};
 		public NodeReference nodeReference;
 		public NameReference assocName; 
 		public NodeScope nodeScope;
@@ -39,7 +38,7 @@ public interface NodeRemoteService {
 	List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope);
 
 	class SOURCE_ASSOC_NODE_SERVICE {
-		public static final GetMethodEndpoint<List<RepositoryNode>> ENDPOINT = new GetMethodEndpoint<List<RepositoryNode>>("/owsi/node/sourceassoc") {};
+		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/sourceassoc") {};
 		public NodeReference nodeReference;
 		public NameReference assocName; 
 		public NodeScope nodeScope;
@@ -59,7 +58,7 @@ public interface NodeRemoteService {
 	}
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException;
 
-	DeleteMethodEndpoint<Void> DELETE_NODE_SERVICE_ENDPOINT = new DeleteMethodEndpoint<Void>("/owsi/node") {};
+	DeleteMethodEndpoint<Void> DELETE_NODE_SERVICE_ENDPOINT = new DeleteMethodEndpoint<Void>("/owsi/node/delete") {};
 	void delete(List<NodeReference> nodeReferences);
 
 }

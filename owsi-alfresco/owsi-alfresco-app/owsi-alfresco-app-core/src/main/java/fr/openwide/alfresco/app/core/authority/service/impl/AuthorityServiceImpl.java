@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
@@ -15,30 +15,24 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 public class AuthorityServiceImpl implements AuthorityService {
 
 	@Autowired
-	private RepositoryRemoteBinding repositoryRemoteBinding;
+	private NodeService nodeService;
 
 	@Override
 	public List<RepositoryNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScope nodeScope) {
-		GET_CONTAINED_USERS request = new GET_CONTAINED_USERS();
-		request.authority = authority;
-		request.immediate = immediate;
-		request.nodeScope = nodeScope;
-		
-		return repositoryRemoteBinding.builder(GET_CONTAINED_USERS.ENDPOINT)
-				.headerPayload(request)
-				.call();
+		GET_CONTAINED_USERS payload = new GET_CONTAINED_USERS();
+		payload.authority = authority;
+		payload.immediate = immediate;
+		payload.nodeScope = nodeScope;
+		return nodeService.callNodeListSerializer(GET_CONTAINED_USERS.ENDPOINT, payload, nodeScope);
 	}
 	
 	@Override
 	public List<RepositoryNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScope nodeScope) {
-		GET_CONTAINED_GROUPS request = new GET_CONTAINED_GROUPS();
-		request.authority = authority;
-		request.immediate = immediate;
-		request.nodeScope = nodeScope;
-		
-		return repositoryRemoteBinding.builder(GET_CONTAINED_GROUPS.ENDPOINT)
-				.headerPayload(request)
-				.call();
+		GET_CONTAINED_GROUPS payload = new GET_CONTAINED_GROUPS();
+		payload.authority = authority;
+		payload.immediate = immediate;
+		payload.nodeScope = nodeScope;
+		return nodeService.callNodeListSerializer(GET_CONTAINED_GROUPS.ENDPOINT, payload, nodeScope);
 	}
 
 }

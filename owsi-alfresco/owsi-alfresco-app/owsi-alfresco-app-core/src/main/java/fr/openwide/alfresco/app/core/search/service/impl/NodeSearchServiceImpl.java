@@ -5,8 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.openwide.alfresco.app.core.node.service.impl.NodeServiceImpl.NodeListResponseExtractor;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
@@ -16,18 +15,15 @@ import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 public class NodeSearchServiceImpl implements NodeSearchService {
 
 	@Autowired
-	private RepositoryRemoteBinding repositoryRemoteBinding;
+	private NodeService nodeService;
 
 	@Override
 	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope) {
-		SEARCH_NODE_SERVICE request = new SEARCH_NODE_SERVICE();
-		request.query = query;
-		request.storeReference = storeReference;
-		request.nodeScope = nodeScope;
-		
-		return repositoryRemoteBinding.builder(SEARCH_NODE_SERVICE.ENDPOINT)
-				.headerPayload(request)
-				.call(new NodeListResponseExtractor(nodeScope.getContentDeserializers()));
+		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
+		payload.query = query;
+		payload.storeReference = storeReference;
+		payload.nodeScope = nodeScope;
+		return nodeService.callNodeListSerializer(SEARCH_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 
 }

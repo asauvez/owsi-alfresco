@@ -14,6 +14,7 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.GetMethodEndpoint;
 
 public interface NodeService extends NodeRemoteService {
@@ -33,4 +34,7 @@ public interface NodeService extends NodeRemoteService {
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException;
 
 	void delete(NodeReference nodeReference);
+	
+	public List<RepositoryNode> callNodeListSerializer(EntityEnclosingRestEndpoint<List<RepositoryNode>> endPoint,
+			Object payload, NodeScope nodeScope);
 }

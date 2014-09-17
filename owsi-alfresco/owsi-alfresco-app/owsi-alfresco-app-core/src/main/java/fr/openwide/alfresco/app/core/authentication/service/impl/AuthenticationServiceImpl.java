@@ -69,8 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		requiringExplicitTicketRemoteBinding.builder(LOGOUT_SERVICE_ENDPOINT)
-			.headerPayload(ticket)
+		requiringExplicitTicketRemoteBinding.builder(LOGOUT_SERVICE_ENDPOINT, ticket)
 			.urlVariable(ticket)
 			.call();
 	}

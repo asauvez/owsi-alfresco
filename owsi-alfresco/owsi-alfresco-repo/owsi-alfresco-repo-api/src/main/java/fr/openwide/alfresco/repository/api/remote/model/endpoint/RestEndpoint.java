@@ -7,8 +7,6 @@ import org.springframework.http.HttpMethod;
 
 public abstract class RestEndpoint<R> {
 
-	public static final String HEADER_MESSAGE_CONTENT = "X-Remote-Message-Content";
-
 	private String path;
 	private HttpMethod method;
 	private Type parameterType;

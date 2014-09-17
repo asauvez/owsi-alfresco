@@ -42,7 +42,7 @@ import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.core.node.web.script.AbstractNodeWebScript.ContentCallback;
+import fr.openwide.alfresco.repository.core.node.web.script.NodeContentCallback;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
@@ -429,7 +429,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		for (Entry<NameReference, Object> entry : node.getContents().entrySet()) {
 			final RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(entry.getKey());
 			
-			entry.setValue(new ContentCallback() {
+			entry.setValue(new NodeContentCallback() {
 				@Override
 				public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
 					setContent(nodeRef, contentProperty, 

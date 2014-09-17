@@ -1,10 +1,9 @@
 package fr.openwide.alfresco.repository.api.node.binding;
 
-import java.io.FilterInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,6 +14,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNodeVisitor;
@@ -23,46 +25,52 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 public final class RepositoryContentSerializationUtils {
 
 	public static final String CONTENT_TYPE = "application/zip";
-
-	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationUtils.class.getSimpleName(), "contentIds");
-	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationUtils.class.getSimpleName(), "contentProperties");
-
+	
+	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationUtils.class.getName(), "contentIds");
+	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationUtils.class.getName(), "contentProperties");
+	
+	private static ObjectMapper objectMapper = new ObjectMapper();
+	
 	private RepositoryContentSerializationUtils() {}
 
-	public static void serializeContentExtensions(Collection<RepositoryNode> nodes) {
-		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
-			private int nextContentId = 0;
-			@Override
-			public void visit(RepositoryNode node) {
-				if (! node.getContents().isEmpty()) {
-					List<Integer> contentIds = new ArrayList<>();
-					List<String> contentProperties = new ArrayList<>();
-					// init lists
-					node.getExtensions().put(CONTENT_IDS, (Serializable) contentIds);
-					node.getExtensions().put(CONTENT_PROPERTIES, (Serializable) contentProperties);
-					// populate lists
-					for (NameReference contentProperty : node.getContents().keySet()) {
-						contentIds.add(nextContentId);
-						contentProperties.add(contentProperty.getFullName());
-						nextContentId++;
-					}
-				}
-			}
-		};
-		for (RepositoryNode node : nodes) {
-			node.visit(visitor);
-		}
-	}
-
-	public static void serializeContent(Collection<RepositoryNode> nodes,
+	public static void serialize(
+			Object payload,
+			Collection<RepositoryNode> nodes,
 			final Map<NameReference, RepositoryContentSerializer<?>> serializersByProperties,
 			final Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass,
 			OutputStream outputStream) throws IOException {
 
-		final ZipOutputStream zos = new ZipOutputStream(outputStream);
-		zos.setLevel(0); // sans compression
+		RepositoryNodeVisitor visitor1 = new RepositoryNodeVisitor() {
+			private int nextContentId = 0;
+			@Override
+			@SuppressWarnings("unchecked")
+			public void visit(RepositoryNode node) {
+				if (! node.getContents().isEmpty()) {
+					node.getExtensions().put(CONTENT_IDS, new ArrayList<Integer>());
+					node.getExtensions().put(CONTENT_PROPERTIES, new ArrayList<String>());
+				}
+				for (NameReference contentProperty : node.getContents().keySet()) {
+					((List<Integer>) node.getExtensions().get(CONTENT_IDS)).add(nextContentId);
+					((List<String>) node.getExtensions().get(CONTENT_PROPERTIES)).add(contentProperty.getFullName());
+					nextContentId ++;
+				}
+			}
+		};
+		
+		if (nodes != null) {
+			for (RepositoryNode node : nodes) {
+				node.visit(visitor1);
+			}
+		}
 
-		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
+		final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(outputStream));
+		zos.setLevel(0); // sans compression
+		
+		zos.putNextEntry(new ZipEntry("json"));
+		objectMapper.writeValue(NonclosingStreamUtils.nonClosing(zos), payload);
+		zos.closeEntry();
+
+		RepositoryNodeVisitor visitor2 = new RepositoryNodeVisitor() {
 			@Override
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
@@ -98,24 +106,30 @@ public final class RepositoryContentSerializationUtils {
 			}
 		};
 		
-		for (RepositoryNode node : nodes) {
-			node.visit(visitor);
+		if (nodes != null) {
+			for (RepositoryNode node : nodes) {
+				node.visit(visitor2);
+			}
 		}
 		zos.flush();
 		zos.close();
 	}
+	
 
-	public static void deserialize(
-			Collection<RepositoryNode> nodes, 
+	public static <P> P deserialize(
+			JavaType valueType,
+			NodePayloadCallback<P> payloadCallback,
 			Map<NameReference, RepositoryContentDeserializer<?>> deserializersByProperties,
 			RepositoryContentDeserializer<?> defaultDeserializer,
 			InputStream inputStream) throws IOException {
-		Map<Integer, ContentPropertyWrapper> wrapper = deserializeContentExtensions(nodes);
-		deserializeContent(wrapper, deserializersByProperties, defaultDeserializer, inputStream);
-	}
 
-	public static Map<Integer, ContentPropertyWrapper> deserializeContentExtensions(Collection<RepositoryNode> nodes) {
+		ZipInputStream zis = new ZipInputStream(inputStream);
 		final Map<Integer, ContentPropertyWrapper> wrappers = new HashMap<>();
+		
+		zis.getNextEntry();
+		InputStream nonClosingZis = NonclosingStreamUtils.nonClosing(zis);
+		P payload = objectMapper.readValue(nonClosingZis, valueType);
+		
 		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
 			@Override
 			@SuppressWarnings("unchecked")
@@ -131,18 +145,14 @@ public final class RepositoryContentSerializationUtils {
 				}
 			}
 		};
-		for (RepositoryNode node : nodes) {
-			node.visit(visitor);
+		
+		if (payloadCallback != null) {
+			for (RepositoryNode node : payloadCallback.extractNodes(payload)) {
+				node.visit(visitor);
+			}
+			payloadCallback.doWithPayload(payload, wrappers);
 		}
-		return wrappers;
-	}
-
-	public static void deserializeContent(
-			Map<Integer, ContentPropertyWrapper> wrappers,
-			Map<NameReference, RepositoryContentDeserializer<?>> deserializersByProperties,
-			RepositoryContentDeserializer<?> defaultDeserializer,
-			InputStream inputStream) throws IOException {
-		ZipInputStream zis = new ZipInputStream(inputStream);
+		
 		ZipEntry zipEntry;
 		while ((zipEntry = zis.getNextEntry()) != null) {
 			int contentId = Integer.parseInt(zipEntry.getName());
@@ -152,16 +162,12 @@ public final class RepositoryContentSerializationUtils {
 			if (serializer == null) {
 				serializer = defaultDeserializer;
 			}
-			Object content = serializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), new FilterInputStream(zis) {
-				@Override
-				public void close() throws IOException {
-					// on ne veut pas que le deserializer (Alfresco) ferme le flux, car c'est un flux zip. 
-					// On ne pourrait pas lire l'entrée suivante. 
-				}
-			});
+			Object content = serializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), nonClosingZis);
 			wrapper.getNode().getContents().put(wrapper.getContentProperty(), content);
 		}
 		zis.close();
+		
+		return payload;
 	}
 
 }

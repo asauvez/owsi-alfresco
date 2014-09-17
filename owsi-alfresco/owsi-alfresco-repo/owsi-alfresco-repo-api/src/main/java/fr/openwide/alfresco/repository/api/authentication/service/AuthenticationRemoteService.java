@@ -3,7 +3,6 @@ package fr.openwide.alfresco.repository.api.authentication.service;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.DeleteMethodEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.GetMethodEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PostMethodEndpoint;
 
@@ -28,7 +27,7 @@ public interface AuthenticationRemoteService {
 	/**
 	 * Log out an authenticated user
 	 */
-	DeleteMethodEndpoint<RepositoryUser> LOGOUT_SERVICE_ENDPOINT = new DeleteMethodEndpoint<RepositoryUser>("/owsi/authentication/ticket") {};
+	PostMethodEndpoint<RepositoryUser> LOGOUT_SERVICE_ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/ticket/logout") {};
 	void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException;
 
 }

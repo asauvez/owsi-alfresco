@@ -217,7 +217,7 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		}
 	}
 
-	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache);
+	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws IOException;
 
 	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
 		objectMapper.writeValue(res.getOutputStream(), resValue);

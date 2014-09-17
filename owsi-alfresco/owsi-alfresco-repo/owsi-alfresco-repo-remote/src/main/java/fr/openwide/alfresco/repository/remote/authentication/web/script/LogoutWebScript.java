@@ -2,21 +2,19 @@ package fr.openwide.alfresco.repository.remote.authentication.web.script;
 
 import java.util.Objects;
 
-import org.springframework.extensions.webscripts.WebScriptRequest;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractParameterRemoteWebScript;
+import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
 
-public class LogoutWebScript extends AbstractParameterRemoteWebScript<Void, RepositoryTicket> {
+public class LogoutWebScript extends AbstractMessageRemoteWebScript<Void, RepositoryTicket> {
 
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected Void executeImpl(RepositoryTicket ticket, WebScriptRequest req) {
+	protected Void executeImpl(RepositoryTicket ticket) {
 		authenticationRemoteService.logout(
 				Objects.requireNonNull(ticket, "RepositoryTicket"));
 		return null;
