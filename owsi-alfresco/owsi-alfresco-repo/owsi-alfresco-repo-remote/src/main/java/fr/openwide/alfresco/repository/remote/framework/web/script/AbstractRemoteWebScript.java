@@ -91,16 +91,6 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	@Override
 	public final void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
-		// retrieve requested format
-		String format = req.getFormat();
-		if (! WebScriptResponse.JSON_FORMAT.equals(format)) {
-			throw new WebScriptException("Web Script format '" + format + "' is not JSON");
-		}
-		// establish mimetype from format
-		String mimetype = getContainer().getFormatRegistry().getMimeType(req.getAgent(), format);
-		if (mimetype == null) {
-			throw new WebScriptException("Web Script format '" + format + "' is not registered");
-		}
 		// construct model for script / template
 		Status status = new Status();
 		Cache cache = new Cache(getDescription().getRequiredCache());
@@ -168,11 +158,6 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			}
 			// apply cache
 			res.setCache(cache);
-			// apply content type and charset
-			res.setContentType(mimetype + ";charset=UTF-8");
-			if (logger.isDebugEnabled()) {
-				logger.debug("Rendering response: content type=" + mimetype + ", status=" + statusCode);
-			}
 			// render response according to model
 			if (resValue != null) {
 				handleResult(res, resValue);
@@ -220,10 +205,12 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws IOException;
 
 	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
+		res.setContentType("application/json;charset=UTF-8");
 		objectMapper.writeValue(res.getOutputStream(), resValue);
 	}
 
 	protected static void setExceptionHeader(WebScriptResponse res, Exception e) {
+		res.setContentType("application/json;charset=UTF-8");
 		res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, e.getClass().getName());
 	}
 
