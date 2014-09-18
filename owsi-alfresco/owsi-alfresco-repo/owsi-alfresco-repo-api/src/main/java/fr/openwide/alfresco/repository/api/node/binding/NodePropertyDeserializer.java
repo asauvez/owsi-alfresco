@@ -18,8 +18,7 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 
-public class NodePropertyDeserializer extends JsonDeserializer<Serializable> 
-	implements NodePropertySerializerConstants  {
+public class NodePropertyDeserializer extends JsonDeserializer<Serializable> implements NodePropertySerializerConstants {
 
 	@Override
 	public Serializable deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
@@ -47,7 +46,7 @@ public class NodePropertyDeserializer extends JsonDeserializer<Serializable>
 		case VALUE_NUMBER_FLOAT:
 			return jp.readValueAs(Float.class);
 		case START_OBJECT:
-			Serializable res = readComplexObject(jp);
+			Serializable res = readJsonObject(jp);
 			Assert.isTrue(jp.nextToken() == JsonToken.END_OBJECT);
 			return res;
 		default:
@@ -55,7 +54,7 @@ public class NodePropertyDeserializer extends JsonDeserializer<Serializable>
 		}
 	}
 	
-	private Serializable readComplexObject(JsonParser jp) throws IOException {
+	private Serializable readJsonObject(JsonParser jp) throws IOException {
 		Assert.isTrue(jp.nextToken() == JsonToken.FIELD_NAME);
 		String type = jp.getText();
 		jp.nextToken();
