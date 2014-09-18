@@ -8,8 +8,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.junit.Assert;
+
 import org.junit.Test;
-import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -48,12 +49,15 @@ public class RepositoryNodeTest {
 		node = objectMapper.readValue(s, RepositoryNode.class);
 		System.out.println(node.getProperties());
 		
-		Assert.isInstanceOf(Double.class, node.getProperties().get(NameReference.create("cm:double")));
-		Assert.isInstanceOf(Float.class, node.getProperties().get(NameReference.create("cm:float")));
-		Assert.isInstanceOf(Integer.class, node.getProperties().get(NameReference.create("cm:int")));
-		Assert.isInstanceOf(NodeReference.class, node.getProperties().get(NameReference.create("cm:nodeRef")));
+		Assert.assertEquals(Double.class, node.getProperties().get(NameReference.create("cm:double")).getClass());
+		Assert.assertEquals(Float.class, node.getProperties().get(NameReference.create("cm:float")).getClass());
+		Assert.assertEquals(Integer.class, node.getProperties().get(NameReference.create("cm:int")).getClass());
+		Assert.assertEquals(NodeReference.class, node.getProperties().get(NameReference.create("cm:nodeRef")).getClass());
 
 		List<?> multiDate = (List<?>) node.getProperties().get(NameReference.create("cm:multiDate"));
-		Assert.isInstanceOf(Date.class, multiDate.get(0));
+		Assert.assertEquals(Date.class, multiDate.get(0).getClass());
+		
+		RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(NameReference.create("cm:content"));
+		Assert.assertEquals("text/plain", contentData.getMimetype());
 	}
 }

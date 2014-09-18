@@ -1,13 +1,10 @@
 package fr.openwide.alfresco.repository.api.node.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -15,13 +12,11 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryNodeSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodePropertyDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodePropertySerializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
@@ -58,72 +53,16 @@ public class RepositoryNode implements Serializable {
 		this.nodeReference = nodeReference;
 	}
 
-	@JsonIgnore
+	@JsonSerialize(contentUsing=NodePropertySerializer.class)
+	@JsonDeserialize(contentUsing=NodePropertyDeserializer.class)
 	public Map<NameReference, Serializable> getProperties() {
 		return properties;
 	}
-	@JsonProperty("properties")
-	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
-	@JsonSubTypes({
-		@JsonSubTypes.Type(value=Date.class, name = "date"),
-		@JsonSubTypes.Type(value=Date[].class, name = "dateList"),
-		@JsonSubTypes.Type(value=Locale.class, name = "locale"),
-		@JsonSubTypes.Type(value=Locale[].class, name = "localeList"),
-		@JsonSubTypes.Type(value=Long.class, name = "long"),
-		@JsonSubTypes.Type(value=Long[].class, name = "longList"),
-		@JsonSubTypes.Type(value=Float.class, name = "float"),
-		@JsonSubTypes.Type(value=Float[].class, name = "floatList"),
-		@JsonSubTypes.Type(value=Double.class, name = "double"),
-		@JsonSubTypes.Type(value=Double[].class, name = "doubleList"),
-		@JsonSubTypes.Type(value=NameReference.class, name = "nameReference"),
-		@JsonSubTypes.Type(value=NameReference[].class, name = "nameReferenceList"),
-		@JsonSubTypes.Type(value=NodeReference.class, name = "nodeReference"),
-		@JsonSubTypes.Type(value=NodeReference[].class, name = "nodeReferenceList"),
-		
-		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content"),
-		@JsonSubTypes.Type(value=ArrayList.class, name = "list"),
-	})
-	private Map<NameReference, Serializable> getPropertiesJson() {
-		return RepositoryNodeSerializer.toJSon(properties);
-	}
 	
-	@SuppressWarnings("unused")
-	private void setPropertiesJson(Map<NameReference, Serializable> propertiesJSon) {
-		RepositoryNodeSerializer.toNative(properties, propertiesJSon);
-	}
-	
-	@JsonIgnore
+	@JsonSerialize(contentUsing=NodePropertySerializer.class)
+	@JsonDeserialize(contentUsing=NodePropertyDeserializer.class)
 	public Map<NameReference, Serializable> getExtensions() {
 		return extensions;
-	}
-	@JsonProperty("extensions")
-	@JsonTypeInfo(use=Id.NAME, include=As.WRAPPER_OBJECT)
-	@JsonSubTypes({
-		@JsonSubTypes.Type(value=Date.class, name = "date"),
-		@JsonSubTypes.Type(value=Date[].class, name = "dateList"),
-		@JsonSubTypes.Type(value=Locale.class, name = "locale"),
-		@JsonSubTypes.Type(value=Locale[].class, name = "localeList"),
-		@JsonSubTypes.Type(value=Long.class, name = "long"),
-		@JsonSubTypes.Type(value=Long[].class, name = "longList"),
-		@JsonSubTypes.Type(value=Float.class, name = "float"),
-		@JsonSubTypes.Type(value=Float[].class, name = "floatList"),
-		@JsonSubTypes.Type(value=Double.class, name = "double"),
-		@JsonSubTypes.Type(value=Double[].class, name = "doubleList"),
-		@JsonSubTypes.Type(value=NameReference.class, name = "nameReference"),
-		@JsonSubTypes.Type(value=NameReference[].class, name = "nameReferenceList"),
-		@JsonSubTypes.Type(value=NodeReference.class, name = "nodeReference"),
-		@JsonSubTypes.Type(value=NodeReference[].class, name = "nodeReferenceList"),
-		
-		@JsonSubTypes.Type(value=RepositoryContentData.class, name = "content"),
-		@JsonSubTypes.Type(value=ArrayList.class, name = "list"),
-	})
-	private Map<NameReference, Serializable> getExtensionsJson() {
-		return RepositoryNodeSerializer.toJSon(extensions);
-	}
-	
-	@SuppressWarnings("unused")
-	private void setExtensionsJson(Map<NameReference, Serializable> extensionsJSon) {
-		RepositoryNodeSerializer.toNative(extensions, extensionsJSon);
 	}
 
 	public NodeReference getNodeReference() {
