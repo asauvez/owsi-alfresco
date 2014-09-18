@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.springframework.util.Assert;
 
@@ -66,6 +67,8 @@ public class NodePropertyDeserializer extends JsonDeserializer<Serializable> imp
 			} catch (ParseException e) {
 				throw new IllegalStateException(e);
 			}
+		case LOCALE:
+			return Locale.forLanguageTag(jp.getText());
 		case SHORT:
 			return jp.readValueAs(Short.class);
 		case LONG:

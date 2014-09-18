@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,6 +48,8 @@ public class NodePropertySerializer extends JsonSerializer<Serializable>
 			jgen.writeEndObject();
 		} else if (value instanceof Date) {
 			writeStringObject(jgen, DATE, DATE_FORMAT.format(value));
+		} else if (value instanceof Locale) {
+			writeStringObject(jgen, LOCALE, ((Locale) value).toLanguageTag());
 		} else if (value instanceof Collection) {
 			jgen.writeStartArray();
 			for (Object o : ((Collection<?>) value)) {
