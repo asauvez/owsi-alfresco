@@ -18,10 +18,11 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.openwide.alfresco.repository.api.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationUtils;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
@@ -32,6 +33,7 @@ import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemot
 public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R> {
 
 	protected NodeRemoteService nodeService;
+	private RepositoryContentSerializationComponent serializationComponent;
 
 	protected abstract R execute(P payload);
 
@@ -51,43 +53,48 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	@Override
 	protected R executeImpl(WebScriptRequest request, WebScriptResponse res, Status status, Cache cache) throws IOException {
 		final List<R> resultList = new ArrayList<>();
-		RepositoryContentSerializationUtils.deserialize(
-				getParameterType(), 
-				new NodePayloadCallback<P>() {
-					@Override
-					public Collection<RepositoryNode> extractNodes(P payload) {
-						return getInputNodes(payload);
-					}
-					@Override
-					public void doWithPayload(P payload, Map<Integer, ContentPropertyWrapper> wrappers) {
-						for (ContentPropertyWrapper wrapper : wrappers.values()) {
-							wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentCallback() {
-								@Override
-								public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
-									// va être surchargé par le service
-								}
-							});
+		NodePayloadCallback<P> payloadCallback = new NodePayloadCallback<P>() {
+			@Override
+			public Collection<RepositoryNode> extractNodes(P payload) {
+				return getInputNodes(payload);
+			}
+			@Override
+			public void doWithPayload(P payload, Map<Integer, ContentPropertyWrapper> wrappers) {
+				for (ContentPropertyWrapper wrapper : wrappers.values()) {
+					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentCallback() {
+						@Override
+						public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
+							// va être surchargé par le service
 						}
-						R result = execute(payload);
-						resultList.add(result);
-					}
-				}, 
-				new HashMap<NameReference, RepositoryContentDeserializer<?>>(),
-				new RepositoryContentDeserializer<Void>() {
-					@Override
-					public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-						NodeContentCallback callback = (NodeContentCallback) node.getContents().get(contentProperty);
-						callback.doWithInputStream(contentProperty, inputStream);
-						return null;
-					}
-				}, 
+					});
+				}
+				R result = execute(payload);
+				resultList.add(result);
+			}
+		};
+		
+		serializationComponent.deserialize(
+				getParameterType(), payloadCallback, null,
 				request.getContent().getInputStream());
+		
 		return resultList.get(0);
 	}
 
 	@Override
 	protected void handleResult(WebScriptResponse response, R result) throws IOException {
 		Collection<RepositoryNode> outputNodes = getOutputNodes(result);
+		// generate output
+		response.setContentType(RepositoryContentSerializationComponent.CONTENT_TYPE);
+		serializationComponent.serialize(result, outputNodes, null, response.getOutputStream());
+	}
+
+	public void setNodeService(NodeRemoteService nodeService) {
+		this.nodeService = nodeService;
+	}
+	@Override
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		super.setObjectMapper(objectMapper);
+		
 		// register ContentReader serializer
 		Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass = new HashMap<>();
 		serializersByClass.put(ContentReader.class, new RepositoryContentSerializer<ContentReader>() {
@@ -98,17 +105,17 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 				}
 			}
 		});
-		// generate output
-		response.setContentType(RepositoryContentSerializationUtils.CONTENT_TYPE);
-		RepositoryContentSerializationUtils.serialize(
-				result, outputNodes, 
-				new HashMap<NameReference, RepositoryContentSerializer<?>>(), 
-				serializersByClass, 
-				response.getOutputStream());
-	}
-
-	public void setNodeService(NodeRemoteService nodeService) {
-		this.nodeService = nodeService;
+		
+		RepositoryContentDeserializer<?> defaultDeserializer = new RepositoryContentDeserializer<Void>() {
+			@Override
+			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
+				NodeContentCallback callback = (NodeContentCallback) node.getContents().get(contentProperty);
+				callback.doWithInputStream(contentProperty, inputStream);
+				return null;
+			}
+		};
+		
+		serializationComponent = new RepositoryContentSerializationComponent(objectMapper, serializersByClass, defaultDeserializer);
 	}
 
 }

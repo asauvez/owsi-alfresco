@@ -25,11 +25,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketAware;
+import fr.openwide.alfresco.app.core.remote.model.NodeRestCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RestCallBuilder;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
@@ -39,21 +41,26 @@ public class RepositoryRemoteBinding {
 	private static final Logger logger = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
 
 	private final RestTemplate restTemplate;
+	private final RepositoryContentSerializationComponent serializationComponent;
 	private final UserService userService;
 	private final String rootUri;
 	private final String ticketParam;
 	private final String ticketHeader;
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri) {
-		this(restTemplate, rootUri, null);
+	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
+			String rootUri) {
+		this(restTemplate, serializationComponent, rootUri, null);
 	}
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri, String ticketParam) {
-		this(restTemplate, rootUri, ticketParam, null, null);
+	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
+			String rootUri, String ticketParam) {
+		this(restTemplate, serializationComponent, rootUri, ticketParam, null, null);
 	}
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, String rootUri, String ticketParam, String ticketHeader, UserService userService) {
+	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
+			String rootUri, String ticketParam, String ticketHeader, UserService userService) {
 		this.restTemplate = restTemplate;
+		this.serializationComponent = serializationComponent;
 		this.rootUri = rootUri;
 		this.ticketParam = ticketParam;
 		this.ticketHeader = ticketHeader;
@@ -65,6 +72,9 @@ public class RepositoryRemoteBinding {
 	}
 	public <R> RestCallBuilder<R> builder(EntityEnclosingRestEndpoint<R> restCall, Object content) {
 		return new RestCallBuilder<R>(this, restCall, content);
+	}
+	public <R> NodeRestCallBuilder<R> builderWithSerializer(EntityEnclosingRestEndpoint<R> restCall) {
+		return new NodeRestCallBuilder<R>(this, restCall, serializationComponent);
 	}
 
 	public <T> T exchange(String path, HttpMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {

@@ -33,14 +33,14 @@ public class NodeServiceImpl implements NodeService {
 
 	@Autowired
 	private RepositoryRemoteBinding repositoryRemoteBinding;
-
+	
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope) {
 		GET_NODE_SERVICE payload = new GET_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.nodeScope = nodeScope;
 		
-		return repositoryRemoteBinding.builder(GET_NODE_SERVICE.ENDPOINT)
+		return repositoryRemoteBinding.builderWithSerializer(GET_NODE_SERVICE.ENDPOINT)
 			.callPayloadSerializer(payload, null, 
 				new NodePayloadCallback<RepositoryNode>() {
 					@Override
@@ -61,7 +61,7 @@ public class NodeServiceImpl implements NodeService {
 		repositoryRemoteBinding.builder(GET_NODE_CONTENT_ENDPOINT)
 			.urlVariable((property != null) ? ";" + property.getFullName() : "")
 			.urlVariable(nodeReference)
-			.call(responseExtractor);
+			.call(null, responseExtractor);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class NodeServiceImpl implements NodeService {
 			EntityEnclosingRestEndpoint<List<RepositoryNode>> endPoint,
 			Object payload,
 			NodeScope nodeScope) {
-		return repositoryRemoteBinding.builder(endPoint)
+		return repositoryRemoteBinding.builderWithSerializer(endPoint)
 			.callPayloadSerializer(
 				payload, null, 
 				new NodePayloadCallback<List<RepositoryNode>>() {
@@ -151,7 +151,7 @@ public class NodeServiceImpl implements NodeService {
 			Object payload,
 			List<RepositoryNode> nodes,
 			Map<NameReference, RepositoryContentSerializer<?>> serializers) {
-		return repositoryRemoteBinding.builder(endPoint)
+		return repositoryRemoteBinding.builderWithSerializer(endPoint)
 			.callPayloadSerializer(payload, nodes, null, serializers, null);
 	}
 	
@@ -192,7 +192,7 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public void delete(List<NodeReference> nodeReferences) {
-		repositoryRemoteBinding.builder(DELETE_NODE_SERVICE_ENDPOINT)
+		repositoryRemoteBinding.builderWithSerializer(DELETE_NODE_SERVICE_ENDPOINT)
 			.callPayloadSerializer(nodeReferences, null, null, null, null);
 	}
 

@@ -8,7 +8,6 @@ import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.DeleteMethodEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PostMethodEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PutMethodEndpoint;
 
@@ -58,7 +57,7 @@ public interface NodeRemoteService {
 	}
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException;
 
-	DeleteMethodEndpoint<Void> DELETE_NODE_SERVICE_ENDPOINT = new DeleteMethodEndpoint<Void>("/owsi/node/delete") {};
+	PostMethodEndpoint<Void> DELETE_NODE_SERVICE_ENDPOINT = new PostMethodEndpoint<Void>("/owsi/node/delete") {};
 	void delete(List<NodeReference> nodeReferences);
 
 }
