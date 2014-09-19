@@ -22,7 +22,7 @@ public class FolderRepositoryContentSerializer extends AbstractFileRepositoryCon
 
 	@Override
 	protected File getFile(RepositoryNode node) throws IOException {
-		String fileName = (String) node.getProperties().get(propertyName);
+		String fileName = node.getProperty(propertyName, String.class);
 		if (fileName == null) {
 			throw new IllegalStateException("Node " + node.getNodeReference() + " doesn't have a " + propertyName);
 		}

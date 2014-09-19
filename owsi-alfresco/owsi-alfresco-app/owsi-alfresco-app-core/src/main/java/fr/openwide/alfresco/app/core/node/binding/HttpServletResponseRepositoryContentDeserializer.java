@@ -35,16 +35,16 @@ public class HttpServletResponseRepositoryContentDeserializer implements Reposit
 
 	@Override
 	public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-		RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(contentProperty);
+		RepositoryContentData contentData = node.getProperty(contentProperty, RepositoryContentData.class);
 		response.setContentLength(contentData.getSize().intValue());
 		response.setContentType(contentData.getMimetype());
 		
 		if (name != null) {
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
 		} else if (nameProperty != null) {
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + node.getProperties().get(nameProperty) + "\"");
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + node.getProperty(nameProperty) + "\"");
 		} else {
-			response.setHeader("Content-Disposition", "inline; filename=\"" + node.getProperties().get(nameProperty) + "\"");
+			response.setHeader("Content-Disposition", "inline; filename=\"" + node.getProperty(nameProperty) + "\"");
 		}
 		
 		IOUtils.copy(inputStream, response.getOutputStream());

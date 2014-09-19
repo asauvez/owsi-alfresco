@@ -49,15 +49,15 @@ public class RepositoryNodeTest {
 		node = objectMapper.readValue(s, RepositoryNode.class);
 		System.out.println(node.getProperties());
 		
-		Assert.assertEquals(Double.class, node.getProperties().get(NameReference.create("cm:double")).getClass());
-		Assert.assertEquals(Float.class, node.getProperties().get(NameReference.create("cm:float")).getClass());
-		Assert.assertEquals(Integer.class, node.getProperties().get(NameReference.create("cm:int")).getClass());
-		Assert.assertEquals(NodeReference.class, node.getProperties().get(NameReference.create("cm:nodeRef")).getClass());
+		Assert.assertEquals(Double.class, node.getProperty(NameReference.create("cm:double")).getClass());
+		Assert.assertEquals(Float.class, node.getProperty(NameReference.create("cm:float")).getClass());
+		Assert.assertEquals(Integer.class, node.getProperty(NameReference.create("cm:int")).getClass());
+		Assert.assertEquals(NodeReference.class, node.getProperty(NameReference.create("cm:nodeRef")).getClass());
 
-		List<?> multiDate = (List<?>) node.getProperties().get(NameReference.create("cm:multiDate"));
+		List<?> multiDate = (List<?>) node.getProperty(NameReference.create("cm:multiDate"));
 		Assert.assertEquals(Date.class, multiDate.get(0).getClass());
 		
-		RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(NameReference.create("cm:content"));
+		RepositoryContentData contentData = (RepositoryContentData) node.getProperty(NameReference.create("cm:content"));
 		Assert.assertEquals("text/plain", contentData.getMimetype());
 	}
 }

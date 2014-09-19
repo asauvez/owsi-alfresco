@@ -60,7 +60,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 						if (CmModel.folder.getNameReference().equals(node.getType())) {
 							return new IconOutputFieldView("glyphicon glyphicon-folder-close", "mimetype.folder");
 						} else if (CmModel.content.getNameReference().equals(node.getType())) {
-							RepositoryContentData content = (RepositoryContentData) node.getProperties().get(CmModel.content.content.getNameReference());
+							RepositoryContentData content = node.getProperty(CmModel.content.content.getNameReference(), RepositoryContentData.class);
 							if (content.getMimetype().startsWith("text/")
 								|| content.getMimetype().equals("application/vnd.oasis.opendocument.text")
 								|| content.getMimetype().equals("application/msword")

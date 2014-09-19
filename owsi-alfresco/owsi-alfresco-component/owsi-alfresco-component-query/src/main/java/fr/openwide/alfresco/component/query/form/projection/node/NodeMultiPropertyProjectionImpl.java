@@ -26,7 +26,7 @@ public class NodeMultiPropertyProjectionImpl<P extends Serializable> extends Abs
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<P> apply(RepositoryNode node) {
-		return (List<P>) node.getProperties().get(property.getNameReference());
+		return (List<P>) node.getProperty(property.getNameReference());
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class NodePropertyProjectionImpl<P extends Serializable> extends Abstract
 	@Override
 	@SuppressWarnings("unchecked")
 	public P apply(RepositoryNode node) {
-		return (P) node.getProperties().get(property.getNameReference());
+		return (P) node.getProperty(property.getNameReference());
 	}
 
 	@Override

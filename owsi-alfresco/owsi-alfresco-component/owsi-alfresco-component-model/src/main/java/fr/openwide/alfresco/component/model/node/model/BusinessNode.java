@@ -83,7 +83,7 @@ public class BusinessNode {
 
 	@SuppressWarnings("unchecked")
 	public <C extends Serializable> C getProperty(SinglePropertyModel<C> propertyModel) {
-		return (C) node.getProperties().get(propertyModel.getNameReference());
+		return (C) node.getProperty(propertyModel.getNameReference());
 	}
 	public <C extends Serializable> BusinessNode property(SinglePropertyModel<C> propertyModel, C value) {
 		node.getProperties().put(propertyModel.getNameReference(), value);
@@ -92,7 +92,7 @@ public class BusinessNode {
 
 	@SuppressWarnings("unchecked")
 	public <C extends Serializable> List<C> getProperty(MultiPropertyModel<C> propertyModel) {
-		return (List<C>) node.getProperties().get(propertyModel.getNameReference());
+		return (List<C>) node.getProperty(propertyModel.getNameReference());
 	}
 	public <C extends Serializable> BusinessNode property(MultiPropertyModel<C> propertyModel, Collection<C> value) {
 		node.getProperties().put(propertyModel.getNameReference(), (Serializable) value); 

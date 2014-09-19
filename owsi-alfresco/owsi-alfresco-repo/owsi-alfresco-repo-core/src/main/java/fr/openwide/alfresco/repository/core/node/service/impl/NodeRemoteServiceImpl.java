@@ -212,7 +212,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (primaryParent == null || primaryParent.getParentNode() == null) {
 			throw new InvalidPayloadException("A primary parent association is required.");
 		}
-		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
+		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
 		if (cmName == null) {
 			throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
 		}
@@ -239,7 +239,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					conversionService.getForRepository(value));
 			}
 		}
-		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
+		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
 		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
 		try {
 			NodeRef nodeRef = nodeService.createNode(
@@ -300,7 +300,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	
 	protected void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
-		String cmName = (String) node.getProperties().get(conversionService.get(ContentModel.PROP_NAME));
+		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
 		try {
 			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
 			if (nodeScope.isType()) {
@@ -317,7 +317,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 						QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
 			}
 			for (NameReference propertyName : nodeScope.getProperties()) {
-				Serializable value = node.getProperties().get(propertyName);
+				Serializable value = node.getProperty(propertyName);
 				if (value != null) {
 					if (! (value instanceof ContentData)) {
 						nodeService.setProperty(nodeRef, 
@@ -427,7 +427,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 	private void setContents(final NodeRef nodeRef, RepositoryNode node) {
 		for (Entry<NameReference, Object> entry : node.getContents().entrySet()) {
-			final RepositoryContentData contentData = (RepositoryContentData) node.getProperties().get(entry.getKey());
+			final RepositoryContentData contentData = node.getProperty(entry.getKey(), RepositoryContentData.class);
 			
 			entry.setValue(new NodeContentCallback() {
 				@Override

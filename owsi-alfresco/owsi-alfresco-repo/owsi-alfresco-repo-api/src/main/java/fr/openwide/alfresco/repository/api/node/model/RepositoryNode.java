@@ -59,6 +59,14 @@ public class RepositoryNode implements Serializable {
 		return properties;
 	}
 	
+	public Serializable getProperty(NameReference nameReference) {
+		return getProperties().get(nameReference);
+	}
+	@SuppressWarnings("unchecked")
+	public <T> T getProperty(NameReference nameReference, @SuppressWarnings("unused") Class<T> clazz) {
+		return (T) getProperty(nameReference);
+	}
+	
 	@JsonSerialize(contentUsing=NodePropertySerializer.class)
 	@JsonDeserialize(contentUsing=NodePropertyDeserializer.class)
 	public Map<NameReference, Serializable> getExtensions() {
