@@ -20,6 +20,9 @@ public abstract class ContainerModel extends Model {
 	public Map<NameReference, PropertyModel<?>> getProperties() {
 		return Collections.unmodifiableMap(properties);
 	}
+	public PropertyModel<?> getProperty(NameReference nameReference) {
+		return properties.get(nameReference);
+	}
 	public void addProperty(PropertyModel<?> property) {
 		properties.put(property.getNameReference(), property);
 	}

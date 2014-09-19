@@ -72,6 +72,13 @@ public class RepositoryNode implements Serializable {
 	public Map<NameReference, Serializable> getExtensions() {
 		return extensions;
 	}
+	public Serializable getExtension(NameReference nameReference) {
+		return getExtensions().get(nameReference);
+	}
+	@SuppressWarnings("unchecked")
+	public <T> T getExtension(NameReference nameReference, @SuppressWarnings("unused") Class<T> clazz) {
+		return (T) getExtension(nameReference);
+	}
 
 	public NodeReference getNodeReference() {
 		return nodeReference;

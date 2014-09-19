@@ -58,8 +58,8 @@ public class RepositoryContentSerializationComponent {
 					node.getExtensions().put(CONTENT_PROPERTIES, new ArrayList<String>());
 				}
 				for (NameReference contentProperty : node.getContents().keySet()) {
-					((List<Integer>) node.getExtensions().get(CONTENT_IDS)).add(nextContentId);
-					((List<String>) node.getExtensions().get(CONTENT_PROPERTIES)).add(contentProperty.getFullName());
+					((List<Integer>) node.getExtension(CONTENT_IDS)).add(nextContentId);
+					((List<String>) node.getExtension(CONTENT_PROPERTIES)).add(contentProperty.getFullName());
 					nextContentId ++;
 				}
 			}
@@ -82,9 +82,9 @@ public class RepositoryContentSerializationComponent {
 			@Override
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
-				List<Integer> contentIds = (List<Integer>) node.getExtensions().get(CONTENT_IDS);
+				List<Integer> contentIds = (List<Integer>) node.getExtension(CONTENT_IDS);
 				if (contentIds != null) {
-					List<String> contentProperties = (List<String>) node.getExtensions().get(CONTENT_PROPERTIES);
+					List<String> contentProperties = (List<String>) node.getExtension(CONTENT_PROPERTIES);
 					for (int i=0; i<contentIds.size(); i++) {
 						int contentId = contentIds.get(i);
 						NameReference contentProperty = NameReference.create(contentProperties.get(i));
