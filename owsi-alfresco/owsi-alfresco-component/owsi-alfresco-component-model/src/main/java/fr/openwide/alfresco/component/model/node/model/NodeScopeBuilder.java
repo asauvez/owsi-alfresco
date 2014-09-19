@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
-import fr.openwide.alfresco.app.core.node.binding.InputStreamRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.ReaderRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -86,13 +84,6 @@ public class NodeScopeBuilder {
 	public NodeScopeBuilder contentAsFilesInFolder(File destinationFolder) {
 		return contentWithDeserializer(new FolderRepositoryContentSerializer(destinationFolder));
 	}
-	public NodeScopeBuilder contentAsTempInputStream() {
-		return contentWithDeserializer(InputStreamRepositoryContentSerializer.INSTANCE);
-	}
-	public NodeScopeBuilder contentAsTempReader() {
-		return contentWithDeserializer(ReaderRepositoryContentSerializer.INSTANCE);
-	}
-	
 	public NodeScopeBuilder contentAsInlineHttpResponse(HttpServletResponse response) {
 		return contentAsDownloadHttpResponse(response);
 	}
