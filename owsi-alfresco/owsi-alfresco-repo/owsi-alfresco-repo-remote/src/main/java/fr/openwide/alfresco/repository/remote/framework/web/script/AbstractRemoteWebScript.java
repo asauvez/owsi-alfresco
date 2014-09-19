@@ -91,6 +91,8 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	@Override
 	public final void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
+		logger.debug("Call to " + req.getURL());
+		
 		// construct model for script / template
 		Status status = new Status();
 		Cache cache = new Cache(getDescription().getRequiredCache());
