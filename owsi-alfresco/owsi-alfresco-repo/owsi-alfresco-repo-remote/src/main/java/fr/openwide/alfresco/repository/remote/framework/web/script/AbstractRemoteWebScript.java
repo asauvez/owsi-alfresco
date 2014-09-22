@@ -210,6 +210,9 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
 		res.setContentType("application/json;charset=UTF-8");
+		if (logger.isDebugEnabled()) {
+			logger.debug(objectMapper.writeValueAsString(resValue));
+		}
 		objectMapper.writeValue(res.getOutputStream(), resValue);
 	}
 
