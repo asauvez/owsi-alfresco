@@ -14,6 +14,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,6 +27,8 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class RepositoryContentSerializationComponent {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryContentSerializationComponent.class);
+	
 	public static final String CONTENT_TYPE = "application/zip";
 	
 	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationComponent.class.getName(), "contentIds");
@@ -75,6 +80,9 @@ public class RepositoryContentSerializationComponent {
 		zos.setLevel(0); // sans compression
 		
 		zos.putNextEntry(new ZipEntry("json"));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(objectMapper.writeValueAsString(payload));
+		}
 		objectMapper.writeValue(NonclosingStreamUtils.nonClosing(zos), payload);
 		zos.closeEntry();
 
@@ -138,7 +146,10 @@ public class RepositoryContentSerializationComponent {
 		zis.getNextEntry();
 		InputStream nonClosingZis = NonclosingStreamUtils.nonClosing(zis);
 		P payload = objectMapper.readValue(nonClosingZis, valueType);
-		
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(objectMapper.writeValueAsString(payload));
+		}
+
 		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
 			@Override
 			@SuppressWarnings("unchecked")
