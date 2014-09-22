@@ -91,7 +91,9 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	@Override
 	public final void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
-		logger.debug("Call to " + req.getURL());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing " + getDescription().getMethod() + " method with uri: " + req.getPathInfo());
+		}
 		
 		// construct model for script / template
 		Status status = new Status();
