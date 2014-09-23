@@ -2,7 +2,7 @@
 <webscript>
 	<shortname>delete</shortname>
 	<description>Delete an existing node</description>
-	<url>/owsi/node</url>
+	<url>/owsi/node/delete</url>
 	<format default="json" />
 	<authentication>user</authentication>
 	<transaction>required</transaction>
