@@ -34,7 +34,7 @@
 
 	<bean id="webscript.owsi.remote.node.node-create.post" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.CreateNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-update.put" parent="webscript.owsi.node"
+	<bean id="webscript.owsi.remote.node.node-update.post" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.UpdateNodeWebScript" />
 	<bean id="webscript.owsi.remote.node.node-delete.post" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.DeleteNodeWebScript" />

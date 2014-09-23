@@ -9,7 +9,6 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PostMethodEndpoint;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.PutMethodEndpoint;
 
 public interface NodeRemoteService {
 
@@ -45,13 +44,13 @@ public interface NodeRemoteService {
 	List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope);
 
 	class CREATE_NODE_SERVICE {
-		public static final PostMethodEndpoint<List<NodeReference>> ENDPOINT = new PostMethodEndpoint<List<NodeReference>>("/owsi/node") {};
+		public static final PostMethodEndpoint<List<NodeReference>> ENDPOINT = new PostMethodEndpoint<List<NodeReference>>("/owsi/node/create") {};
 		public List<RepositoryNode> nodes;
 	}
 	List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException;
 
 	class UPDATE_NODE_SERVICE {
-		public static final PutMethodEndpoint<Void> ENDPOINT = new PutMethodEndpoint<Void>("/owsi/node") {};
+		public static final PostMethodEndpoint<Void> ENDPOINT = new PostMethodEndpoint<Void>("/owsi/node/update") {};
 		public List<RepositoryNode> nodes;
 		public NodeScope nodeScope;
 	}

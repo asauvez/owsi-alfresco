@@ -2,7 +2,7 @@
 <webscript>
 	<shortname>create</shortname>
 	<description>Create a new node</description>
-	<url>/owsi/node</url>
+	<url>/owsi/node/create</url>
 	<format default="json" />
 	<authentication>user</authentication>
 	<transaction>required</transaction>
