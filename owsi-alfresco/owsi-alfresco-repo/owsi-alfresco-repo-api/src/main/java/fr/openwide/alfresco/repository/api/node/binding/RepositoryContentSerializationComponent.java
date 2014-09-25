@@ -114,6 +114,9 @@ public class RepositoryContentSerializationComponent {
 						}
 						try {
 							zos.putNextEntry(new ZipEntry(Integer.toString(contentId)));
+							if (LOGGER.isDebugEnabled()) {
+								LOGGER.debug("Serializing content for " + node.getNodeReference() + "/" + contentProperty);
+							}
 							serializer.serialize(node, contentProperty, content, zos);
 							zos.closeEntry();
 						} catch (IOException e) {
