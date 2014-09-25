@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.component.model.repository.model.sys;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
@@ -18,16 +17,12 @@ public class SysReferenceable extends AspectModel {
 		super(nameReference);
 	}
 
-	public final TextPropertyModel storeProtocol = PropertyModels.newText(this, SysModel.NAMESPACE, "store-protocol",
-			MandatoryEnforcedPropertyConstraint.INSTANCE);
+	public final TextPropertyModel storeProtocol = PropertyModels.newText(this, SysModel.NAMESPACE, "store-protocol");
 	
-	public final TextPropertyModel storeIdentifier = PropertyModels.newText(this, SysModel.NAMESPACE, "store-identifier",
-			MandatoryEnforcedPropertyConstraint.INSTANCE);
+	public final TextPropertyModel storeIdentifier = PropertyModels.newText(this, SysModel.NAMESPACE, "store-identifier");
 
-	public final TextPropertyModel nodeUuid = PropertyModels.newText(this, SysModel.NAMESPACE, "node-uuid" /*,
-			MandatoryEnforcedPropertyConstraint.INSTANCE */);
+	public final TextPropertyModel nodeUuid = PropertyModels.newText(this, SysModel.NAMESPACE, "node-uuid");
 
-	public final LongPropertyModel nodeDbid = PropertyModels.newLong(this, SysModel.NAMESPACE, "node-dbid",
-			MandatoryEnforcedPropertyConstraint.INSTANCE);
+	public final LongPropertyModel nodeDbid = PropertyModels.newLong(this, SysModel.NAMESPACE, "node-dbid");
 
 }
