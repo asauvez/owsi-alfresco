@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repository.api.remote.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,12 @@ public class NodeReference implements Serializable {
 		matcher.matches();
 		return StoreReference.create(matcher.group(1));
 	}
-	
+	public UUID getUuid() {
+		Matcher matcher = PATTERN.matcher(reference);
+		matcher.matches();
+		return UUID.fromString(matcher.group(4));
+	}
+
 	@JsonValue
 	public String getReference() {
 		return reference;
