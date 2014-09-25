@@ -38,7 +38,7 @@ import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
 public class RepositoryRemoteBinding {
 
-	private static final Logger logger = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
 
 	private final RestTemplate restTemplate;
 	private final RepositoryContentSerializationComponent serializationComponent;
@@ -111,8 +111,8 @@ public class RepositoryRemoteBinding {
 
 	protected <T> T execute(URI uri, HttpMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
 			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Executing " + method + " method with uri: " + uri);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Executing {} method with uri: {}", method, uri);
 		}
 		try {
 			if (responseExtractor != null) {
@@ -123,14 +123,14 @@ public class RepositoryRemoteBinding {
 			}
 		} catch (ResourceAccessException e) {
 			// log to debug, target exception should be logged by the caller/framework
-			if (logger.isDebugEnabled()) {
-				logger.debug("Exception on " + method + " method with uri: " + uri, e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Exception on " + method + " method with uri: " + uri, e);
 			}
 			throw mapResourceAccessException(e);
 		} catch (Exception e) {
 			// log to debug, target exception should be logged by the caller/framework
-			if (logger.isDebugEnabled()) {
-				logger.debug("Unexpected exception on " + method + " method with uri: " + uri, e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Unexpected exception on " + method + " method with uri: " + uri, e);
 			}
 			throw new IllegalStateException(e);
 		}

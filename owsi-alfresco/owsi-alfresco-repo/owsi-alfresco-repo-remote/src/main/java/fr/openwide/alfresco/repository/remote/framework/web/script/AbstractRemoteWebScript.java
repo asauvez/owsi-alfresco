@@ -63,7 +63,7 @@ import fr.openwide.alfresco.repository.remote.framework.model.InnerTransactionPa
 public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	private static final String KEY_INNER_TRANSACTION = "innerTransaction";
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	protected TransactionService transactionService;
 	protected ObjectMapper objectMapper;
@@ -91,8 +91,8 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	@Override
 	public final void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Executing " + getDescription().getMethod() + " method with uri: " + req.getPathInfo());
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Executing {} method with uri: {}", getDescription().getMethod(), req.getPathInfo());
 		}
 		
 		// construct model for script / template
@@ -105,35 +105,35 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			resValue = transactionedExecute(req, res, status, cache);
 			statusCode = status.getCode();
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
-			logger.warn("Could not get access", e);
+			LOGGER.warn("Could not get access", e);
 			resException = e;
 			statusCode = Status.STATUS_FORBIDDEN;
 		} catch (InvalidPayloadException e) {
 			String message = buildExceptionMessage("Could not use payload", e);
-			logger.warn(message, e);
+			LOGGER.warn(message, e);
 			// any invalid payload exception is encapsulated inside InvalidMessageRemoteException which can be serialized
 			resException = new InvalidMessageRemoteException(message, e);
 			statusCode = Status.STATUS_BAD_REQUEST;
 		} catch (InvalidMessageRemoteException e) {
-			logger.warn("Could not parse message", e);
+			LOGGER.warn("Could not parse message", e);
 			resException = e;
 			statusCode = Status.STATUS_BAD_REQUEST;
 		} catch (RepositoryRemoteException e) {
-			logger.warn("Could not execute request", e);
+			LOGGER.warn("Could not execute request", e);
 			resException = e;
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (IntegrityException e) {
-			logger.warn("Integrity error", e);
+			LOGGER.warn("Integrity error", e);
 			resException = new IntegrityRemoteException(e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (NodeExistsException e) {
-			logger.warn("Node exists", e);
+			LOGGER.warn("Node exists", e);
 			resException = new NodeExistsRemoteException(e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (Throwable e) {
 			// any unexpected exception is encapsulated inside IllegalStateRemoteException which can be serialized
 			String message = buildExceptionMessage("Unexpected error occured", e);
-			logger.error(message, e);
+			LOGGER.error(message, e);
 			resException = new IllegalStateRemoteException(message, e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		}
@@ -146,17 +146,17 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		} else {
 			// force status
 			if (statusCode != Status.STATUS_OK && ! req.forceSuccessStatus()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Force success status header in response: " + req.forceSuccessStatus());
-					logger.debug("Setting status " + statusCode);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Force success status header in response: {}", req.forceSuccessStatus());
+					LOGGER.debug("Setting status: {}", statusCode);
 				}
 				res.setStatus(statusCode);
 			}
 			// apply location
 			String location = status.getLocation();
 			if (location != null && location.length() > 0) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Setting location to " + location);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Setting location to: {}", location);
 				}
 				res.setHeader(WebScriptResponse.HEADER_LOCATION, location);
 			}
@@ -210,8 +210,8 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 
 	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
 		res.setContentType("application/json;charset=UTF-8");
-		if (logger.isDebugEnabled()) {
-			logger.debug(objectMapper.writeValueAsString(resValue));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Serializing result: {}", objectMapper.writeValueAsString(resValue));
 		}
 		objectMapper.writeValue(res.getOutputStream(), resValue);
 	}

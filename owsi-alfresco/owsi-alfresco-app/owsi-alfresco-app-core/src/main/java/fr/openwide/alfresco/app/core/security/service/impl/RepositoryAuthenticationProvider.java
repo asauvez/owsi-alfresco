@@ -28,7 +28,7 @@ import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConsta
 @Component
 public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-	private static final Logger logger = LoggerFactory.getLogger(RepositoryAuthenticationProvider.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryAuthenticationProvider.class);
 
 	@Autowired
 	private AuthenticationService authenticationService;
@@ -36,8 +36,8 @@ public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthent
 	@Override
 	public UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) {
 		String credentials = authentication != null ? (String) authentication.getCredentials() : null;
-		if (logger.isDebugEnabled()) {
-			logger.debug("Authenticating user: " + username + " with password: " + ((Strings.isNullOrEmpty(credentials)) ? "null" : "[PROTECTED]"));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Authenticating user with '{}' password: {}", Strings.isNullOrEmpty(credentials) ? "null" : "[PROTECTED]", username);
 		}
 		try {
 			RepositoryUser repositoryUser = authenticationService.authenticate(username, credentials);
@@ -45,23 +45,23 @@ public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthent
 		} catch (RepositoryConnectException e) {
 			throw new AuthenticationServiceException("Repository not responding", e);
 		} catch (AccessDeniedRemoteException e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Could not authenticate user: " + username, e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Could not authenticate user: " + username, e);
 			}
 			throw new BadCredentialsException("Could not authenticate user: " + username, e);
 		}
 	}
 
 	public UserDetails retrieveUser(String username) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Authenticating user: " + username);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Authenticating user: {}", username);
 		}
 		try {
 			RepositoryUser repositoryUser = authenticationService.authenticate(username);
 			return buildUserDetails(repositoryUser, null);
 		} catch (AccessDeniedRemoteException e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Could not authenticate user: " + username, e);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Could not authenticate user: " + username, e);
 			}
 			throw new AuthenticationServiceException("Could not authenticate user: " + username, e);
 		}

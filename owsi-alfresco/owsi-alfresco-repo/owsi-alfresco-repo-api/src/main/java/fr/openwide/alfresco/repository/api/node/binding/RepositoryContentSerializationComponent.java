@@ -28,16 +28,16 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 public class RepositoryContentSerializationComponent {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryContentSerializationComponent.class);
-	
+
 	public static final String CONTENT_TYPE = "application/zip";
-	
+
 	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationComponent.class.getName(), "contentIds");
 	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationComponent.class.getName(), "contentProperties");
-	
+
 	private final ObjectMapper objectMapper;
 	private final Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass;
 	private final RepositoryContentDeserializer<?> defaultDeserializer;
-	
+
 	public RepositoryContentSerializationComponent(
 			ObjectMapper objectMapper, 
 			Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass,
@@ -46,7 +46,7 @@ public class RepositoryContentSerializationComponent {
 		this.serializersByClass = serializersByClass;
 		this.defaultDeserializer = defaultDeserializer;
 	}
-	
+
 	public void serialize(
 			Object payload,
 			Collection<RepositoryNode> nodes,
@@ -81,7 +81,7 @@ public class RepositoryContentSerializationComponent {
 		
 		zos.putNextEntry(new ZipEntry("json"));
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(objectMapper.writeValueAsString(payload));
+			LOGGER.debug("Serializing payload: {}", objectMapper.writeValueAsString(payload));
 		}
 		objectMapper.writeValue(NonclosingStreamUtils.nonClosing(zos), payload);
 		zos.closeEntry();
@@ -115,7 +115,7 @@ public class RepositoryContentSerializationComponent {
 						try {
 							zos.putNextEntry(new ZipEntry(Integer.toString(contentId)));
 							if (LOGGER.isDebugEnabled()) {
-								LOGGER.debug("Serializing content for " + node.getNodeReference() + "/" + contentProperty);
+								LOGGER.debug("Serializing content property '{}' for node: {}", contentProperty, node.getNodeReference());
 							}
 							serializer.serialize(node, contentProperty, content, zos);
 							zos.closeEntry();
@@ -135,7 +135,6 @@ public class RepositoryContentSerializationComponent {
 		zos.flush();
 		zos.close();
 	}
-	
 
 	public <P> P deserialize(
 			JavaType valueType,
@@ -150,7 +149,7 @@ public class RepositoryContentSerializationComponent {
 		InputStream nonClosingZis = NonclosingStreamUtils.nonClosing(zis);
 		P payload = objectMapper.readValue(nonClosingZis, valueType);
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(objectMapper.writeValueAsString(payload));
+			LOGGER.debug("Deserializing payload: {}", objectMapper.writeValueAsString(payload));
 		}
 
 		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
