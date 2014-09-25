@@ -36,7 +36,7 @@ public class HttpServletResponseRepositoryContentDeserializer implements Reposit
 	@Override
 	public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
 		RepositoryContentData contentData = node.getProperty(contentProperty, RepositoryContentData.class);
-		response.setContentLength(contentData.getSize().intValue());
+		response.setHeader("Content-Length", Long.toString(contentData.getSize()));
 		response.setContentType(contentData.getMimetype());
 		
 		if (name != null) {
