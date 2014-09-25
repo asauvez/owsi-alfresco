@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.sys;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.LocalePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
@@ -16,6 +17,7 @@ public class SysLocalized extends AspectModel {
 		super(nameReference);
 	}
 
-	public final LocalePropertyModel locale = PropertyModels.newLocale(this, SysModel.NAMESPACE, "locale");
+	public final LocalePropertyModel locale = PropertyModels.addConstraints(PropertyModels.newLocale(this, SysModel.NAMESPACE, "locale"),
+			MandatoryEnforcedPropertyConstraint.INSTANCE);
 	
 }

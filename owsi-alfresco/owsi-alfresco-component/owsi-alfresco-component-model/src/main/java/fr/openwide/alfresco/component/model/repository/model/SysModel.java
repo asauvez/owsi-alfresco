@@ -7,6 +7,7 @@ import fr.openwide.alfresco.component.model.repository.model.sys.SysTemporary;
 
 public interface SysModel {
 
+	// https://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/model/systemModel.xml
 	String NAMESPACE = "sys";
 
 	// ---- Aspects
