@@ -31,8 +31,8 @@ public class RepositoryContentSerializationComponent {
 
 	public static final String CONTENT_TYPE = "application/zip";
 
-	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationComponent.class.getName(), "contentIds");
-	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationComponent.class.getName(), "contentProperties");
+	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationComponent.class.getSimpleName(), "contentIds");
+	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationComponent.class.getSimpleName(), "contentProperties");
 
 	private final ObjectMapper objectMapper;
 	private final Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass;
