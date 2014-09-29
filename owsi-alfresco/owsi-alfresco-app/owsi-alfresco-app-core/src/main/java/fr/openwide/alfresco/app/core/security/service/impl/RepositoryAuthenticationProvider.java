@@ -37,13 +37,14 @@ public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthent
 	public UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) {
 		String credentials = authentication != null ? (String) authentication.getCredentials() : null;
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Authenticating user with '{}' password: {}", Strings.isNullOrEmpty(credentials) ? "null" : "[PROTECTED]", username);
+			LOGGER.debug("Authenticating user with '{}' password: {}", 
+					Strings.isNullOrEmpty(credentials) ? String.valueOf(credentials) : "[PROTECTED]", username);
 		}
 		try {
 			RepositoryUser repositoryUser = authenticationService.authenticate(username, credentials);
 			return buildUserDetails(repositoryUser, credentials);
 		} catch (RepositoryConnectException e) {
-			throw new AuthenticationServiceException("Repository not responding", e);
+			throw new AuthenticationServiceException("Could not connect to repository", e);
 		} catch (AccessDeniedRemoteException e) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Could not authenticate user: " + username, e);
