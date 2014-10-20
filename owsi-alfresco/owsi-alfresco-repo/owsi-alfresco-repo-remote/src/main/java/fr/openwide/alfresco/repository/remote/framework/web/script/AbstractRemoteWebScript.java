@@ -163,9 +163,9 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			// apply cache
 			res.setCache(cache);
 			// render response according to model
-			if (resValue != null) {
+			if (resException == null) {
 				handleResult(res, resValue);
-			} else if (resException != null) {
+			} else {
 				setExceptionHeader(res, resException);
 				objectMapper.writeValue(res.getOutputStream(), resException);
 			}
