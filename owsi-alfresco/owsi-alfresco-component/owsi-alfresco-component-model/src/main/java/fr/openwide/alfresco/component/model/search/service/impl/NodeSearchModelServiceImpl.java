@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
@@ -26,7 +27,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference,
 			NodeScopeBuilder nodeScopeBuilder) {
-		return BusinessNode.wrapList(nodeSearchService.search(
+		return new BusinessNodeList(nodeSearchService.search(
 				builder.toLuceneQuery(),
 				storeReference,
 				nodeScopeBuilder.getScope()));

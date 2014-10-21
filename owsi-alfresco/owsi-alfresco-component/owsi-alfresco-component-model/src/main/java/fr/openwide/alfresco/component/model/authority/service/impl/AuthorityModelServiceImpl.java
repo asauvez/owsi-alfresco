@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
@@ -27,7 +28,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
-		return BusinessNode.wrapList(authorityService.getContainedUsers(authority, immediate, nodeScopeBuilder.getScope()));
+		return new BusinessNodeList(authorityService.getContainedUsers(authority, immediate, nodeScopeBuilder.getScope()));
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
-		return BusinessNode.wrapList(authorityService.getContainedGroups(authority, immediate, nodeScopeBuilder.getScope()));
+		return new BusinessNodeList(authorityService.getContainedGroups(authority, immediate, nodeScopeBuilder.getScope()));
 	}
 	
 	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {

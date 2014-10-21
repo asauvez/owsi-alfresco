@@ -186,36 +186,28 @@ public class BusinessNode {
 		if (list == null) {
 			node.getChildAssociations().put(childAssociation.getNameReference(), list = new ArrayList<RepositoryNode>());
 		}
-		return wrapList(list);
+		return new BusinessNodeList(list);
 	}
 	public List<BusinessNode> getParentAssociation(ChildAssociationModel childAssociation) {
 		List<RepositoryNode> list = node.getParentAssociations().get(childAssociation.getNameReference());
 		if (list == null) {
 			node.getParentAssociations().put(childAssociation.getNameReference(), list = new ArrayList<RepositoryNode>());
 		}
-		return wrapList(list);
+		return new BusinessNodeList(list);
 	}
 	public List<BusinessNode> getTargetAssociation(AssociationModel association) {
 		List<RepositoryNode> list = node.getTargetAssocs().get(association.getNameReference());
 		if (list == null) {
 			node.getTargetAssocs().put(association.getNameReference(), list = new ArrayList<RepositoryNode>());
 		}
-		return wrapList(list);
+		return new BusinessNodeList(list);
 	}
 	public List<BusinessNode> getSourceAssociation(AssociationModel association) {
 		List<RepositoryNode> list = node.getSourceAssocs().get(association.getNameReference());
 		if (list == null) {
 			node.getSourceAssocs().put(association.getNameReference(), list = new ArrayList<RepositoryNode>());
 		}
-		return wrapList(list);
+		return new BusinessNodeList(list);
 	}
 	
-	public static List<BusinessNode> wrapList(List<RepositoryNode> nodes) {
-		ArrayList<BusinessNode> wrappers = new ArrayList<>();
-		for (RepositoryNode node : nodes) {
-			wrappers.add(new BusinessNode(node));
-		}
-		return wrappers;
-	}
-
 }
