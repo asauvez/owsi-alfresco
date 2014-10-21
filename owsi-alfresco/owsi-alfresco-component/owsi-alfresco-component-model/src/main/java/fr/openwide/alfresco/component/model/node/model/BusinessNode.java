@@ -182,16 +182,32 @@ public class BusinessNode {
 		return getChildAssociation(CmModel.folder.contains);
 	}
 	public List<BusinessNode> getChildAssociation(ChildAssociationModel childAssociation) {
-		return wrapList(node.getChildAssociations().get(childAssociation.getNameReference()));
+		List<RepositoryNode> list = node.getChildAssociations().get(childAssociation.getNameReference());
+		if (list == null) {
+			node.getChildAssociations().put(childAssociation.getNameReference(), list = new ArrayList<RepositoryNode>());
+		}
+		return wrapList(list);
 	}
 	public List<BusinessNode> getParentAssociation(ChildAssociationModel childAssociation) {
-		return wrapList(node.getParentAssociations().get(childAssociation.getNameReference()));
+		List<RepositoryNode> list = node.getParentAssociations().get(childAssociation.getNameReference());
+		if (list == null) {
+			node.getParentAssociations().put(childAssociation.getNameReference(), list = new ArrayList<RepositoryNode>());
+		}
+		return wrapList(list);
 	}
 	public List<BusinessNode> getTargetAssociation(AssociationModel association) {
-		return wrapList(node.getTargetAssocs().get(association.getNameReference()));
+		List<RepositoryNode> list = node.getTargetAssocs().get(association.getNameReference());
+		if (list == null) {
+			node.getTargetAssocs().put(association.getNameReference(), list = new ArrayList<RepositoryNode>());
+		}
+		return wrapList(list);
 	}
 	public List<BusinessNode> getSourceAssociation(AssociationModel association) {
-		return wrapList(node.getSourceAssocs().get(association.getNameReference()));
+		List<RepositoryNode> list = node.getSourceAssocs().get(association.getNameReference());
+		if (list == null) {
+			node.getSourceAssocs().put(association.getNameReference(), list = new ArrayList<RepositoryNode>());
+		}
+		return wrapList(list);
 	}
 	
 	public static List<BusinessNode> wrapList(List<RepositoryNode> nodes) {
