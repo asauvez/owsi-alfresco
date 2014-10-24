@@ -37,6 +37,16 @@ public class BusinessNodeList extends ArrayList<BusinessNode> {
 		return super.addAll(c);
 	}
 	@Override
+	public void add(int index, BusinessNode element) {
+		nodes.add(index, element.getRepositoryNode());
+		super.add(index, element);
+	}
+	@Override
+	public BusinessNode set(int index, BusinessNode element) {
+		nodes.set(index, element.getRepositoryNode());
+		return super.set(index, element);
+	}
+	@Override
 	public BusinessNode remove(int index) {
 		nodes.remove(index);
 		return super.remove(index);
