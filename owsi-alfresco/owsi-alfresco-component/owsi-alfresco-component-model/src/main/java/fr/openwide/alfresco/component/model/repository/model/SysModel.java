@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
+import fr.openwide.alfresco.component.model.repository.model.sys.SysArchived;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysBase;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysLocalized;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysReferenceable;
@@ -17,6 +18,8 @@ public interface SysModel {
 	SysLocalized localized = new SysLocalized();
 	
 	SysTemporary temporary = new SysTemporary();
+	
+	SysArchived archived = new SysArchived();
 	
 	// ---- Types
 
