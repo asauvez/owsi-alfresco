@@ -11,7 +11,7 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 public class SysArchived extends AspectModel {
 
 	public SysArchived() {
-		super(NameReference.create(SysModel.NAMESPACE, "Archived"));
+		super(NameReference.create(SysModel.NAMESPACE, "archived"));
 	}
 
 	protected SysArchived(NameReference nameReference) {
