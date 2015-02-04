@@ -124,6 +124,10 @@ public class NodeScopeBuilder {
 		scope.setPrimaryParent(primaryParent.scope);
 		return primaryParent;
 	}
+	public NodeScopeBuilder recursivePrimaryParent() {
+		scope.setRecursivePrimaryParent(true);
+		return this;
+	}
 	
 	public NodeScopeBuilder childAssociationContains() {
 		return childAssociation(CmModel.folder.contains);

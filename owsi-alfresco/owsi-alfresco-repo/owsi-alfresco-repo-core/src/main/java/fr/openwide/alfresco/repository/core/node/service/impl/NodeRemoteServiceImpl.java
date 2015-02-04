@@ -126,14 +126,22 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (scope.isType()) {
 			node.setType(conversionService.get(nodeService.getType(nodeRef)));
 		}
-		if (scope.getPrimaryParent() != null) {
+		NodeScope primaryParentScope = scope.getPrimaryParent();
+		if (scope.isRecursivePrimaryParent()) {
+			if (primaryParentScope != null) {
+				throw new IllegalArgumentException("You can't specify both a primary parent scope and a recursive primary parent.");
+			}
+			primaryParentScope = scope;
+		}
+		if (primaryParentScope != null) {
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 			if (primaryParent.getParentRef() != null) {
 				node.setPrimaryParentAssociation(new RepositoryChildAssociation(
-						getRepositoryNode(primaryParent.getParentRef(), scope.getPrimaryParent()),
+						getRepositoryNode(primaryParent.getParentRef(), primaryParentScope),
 						conversionService.get(primaryParent.getTypeQName())));
 			}
 		}
+		
 		for (NameReference property : scope.getProperties()) {
 			Serializable value = nodeService.getProperty(nodeRef, conversionService.getRequired(property));
 			if (value != null) {

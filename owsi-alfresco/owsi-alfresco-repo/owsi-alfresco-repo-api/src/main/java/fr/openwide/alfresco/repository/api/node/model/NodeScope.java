@@ -29,6 +29,7 @@ public class NodeScope implements Serializable {
 	private final Map<NameReference, String> extensions = new LinkedHashMap<>();
 
 	private NodeScope primaryParent;
+	private boolean recursivePrimaryParent;
 	private final Map<NameReference, NodeScope> childAssociations = new LinkedHashMap<>();
 	private final Map<NameReference, NodeScope> parentAssociations = new LinkedHashMap<>();
 	private final Map<NameReference, NodeScope> targetAssocs = new LinkedHashMap<>();
@@ -63,6 +64,12 @@ public class NodeScope implements Serializable {
 	}
 	public void setPrimaryParent(NodeScope primaryParent) {
 		this.primaryParent = primaryParent;
+	}
+	public boolean isRecursivePrimaryParent() {
+		return recursivePrimaryParent;
+	}
+	public void setRecursivePrimaryParent(boolean recursivePrimaryParent) {
+		this.recursivePrimaryParent = recursivePrimaryParent;
 	}
 	public Set<NameReference> getProperties() {
 		return properties;
