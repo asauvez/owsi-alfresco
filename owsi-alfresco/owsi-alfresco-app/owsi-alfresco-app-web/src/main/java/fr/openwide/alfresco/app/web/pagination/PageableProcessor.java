@@ -19,7 +19,7 @@ import fr.openwide.core.spring.util.StringUtils;
 
 public class PageableProcessor<T> {
 
-	private Map<String, PageablePropertyDefinition<T, ?>> propertyDefinitions = new HashMap<String, PageablePropertyDefinition<T, ?>>();
+	private Map<String, PageablePropertyDefinition<T, ?>> propertyDefinitions = new HashMap<>();
 
 	private int pageSize;
 

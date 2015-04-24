@@ -17,7 +17,7 @@
 		<share.webapp.name>share</share.webapp.name>
 		
 		<owsi-alfresco.repo.guava.version>18.0</owsi-alfresco.repo.guava.version>
-		<owsi-alfresco.repo.jackson.version>2.4.2</owsi-alfresco.repo.jackson.version>
+		<owsi-alfresco.repo.jackson.version>2.4.3</owsi-alfresco.repo.jackson.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.junit.version>4.11</owsi-alfresco.repo.junit.version>
 		
@@ -44,10 +44,20 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.alfresco</groupId>
+				<artifactId>alfresco</artifactId>
+				<version>${owsi-alfresco.alfresco.version}</version>
+				<type>war</type>
+				<scope>runtime</scope>
+			</dependency>
+			
 			<dependency>
 				<groupId>org.alfresco</groupId>
 				<artifactId>alfresco-web-client</artifactId>
 				<version>${owsi-alfresco.alfresco.version}</version>
+				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
 						<groupId>org.alfresco</groupId>

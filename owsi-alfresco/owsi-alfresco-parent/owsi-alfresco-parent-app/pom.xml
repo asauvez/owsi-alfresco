@@ -13,11 +13,13 @@
 	<description>Définitions des dépendances pour le développement d'une application spécifique sur Alfresco</description>
 
 	<properties>
-		<owsi-alfresco.owsi-core.version>0.9-SNAPSHOT</owsi-alfresco.owsi-core.version>
-		<owsi-alfresco.app.hibernate-jpamodelgen.version>4.3.6.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
+		<owsi-core.spring-security.version>4.0.1.RELEASE</owsi-core.spring-security.version>
+		
+		<owsi-alfresco.owsi-core.version>0.9.8-SNAPSHOT</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.app.hibernate-jpamodelgen.version>4.3.7.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
 		<owsi-alfresco.app.querydsl.version>3.4.3</owsi-alfresco.app.querydsl.version>
 		
-		<owsi-alfresco.hibernate-validator.version>5.0.1.Final</owsi-alfresco.hibernate-validator.version>
+		<owsi-alfresco.hibernate-validator.version>5.1.3.Final</owsi-alfresco.hibernate-validator.version>
 		
 		<owsi-alfresco.javax-el-api.version>3.0.0</owsi-alfresco.javax-el-api.version>
 		<owsi-alfresco.webjars.jquery.version>1.10.2-1</owsi-alfresco.webjars.jquery.version>

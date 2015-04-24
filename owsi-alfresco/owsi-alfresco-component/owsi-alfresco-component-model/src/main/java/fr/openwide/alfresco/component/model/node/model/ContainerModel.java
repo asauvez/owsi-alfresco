@@ -9,9 +9,9 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public abstract class ContainerModel extends Model {
 
-	private Map<NameReference, PropertyModel<?>> properties = new HashMap<NameReference, PropertyModel<?>>();
+	private Map<NameReference, PropertyModel<?>> properties = new HashMap<>();
 
-	private Map<NameReference, AspectModel> mandatoryAspects = new HashMap<NameReference, AspectModel>();
+	private Map<NameReference, AspectModel> mandatoryAspects = new HashMap<>();
 
 	public ContainerModel(NameReference nameReference) {
 		super(nameReference);

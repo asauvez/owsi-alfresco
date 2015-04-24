@@ -238,7 +238,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	protected NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
 		validateCreate(node);
 		
-		Map<QName, Serializable> properties = new LinkedHashMap<QName, Serializable>();
+		Map<QName, Serializable> properties = new LinkedHashMap<>();
 		for (Entry<NameReference, Serializable> property : node.getProperties().entrySet()) {
 			Serializable value = property.getValue();
 			if (! (value instanceof RepositoryContentData)) {

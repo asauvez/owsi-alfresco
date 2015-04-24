@@ -50,7 +50,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	}
 	
 	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {
-		Map<RepositoryAuthority, String> authorities = new LinkedHashMap<RepositoryAuthority, String>();
+		Map<RepositoryAuthority, String> authorities = new LinkedHashMap<>();
 		for (BusinessNode node : groups) {
 			String authorityName = node.getProperty(CmModel.authorityContainer.authorityName);
 			String authorityDisplayName = node.getProperty(CmModel.authorityContainer.authorityDisplayName);
