@@ -17,8 +17,8 @@ public class ValidationResponse {
 
 	private static final String FIELD_ERRORS_MESSAGE_KEY = "alert.fieldErrors.warning";
 
-	private List<Alert> globalAlerts = new ArrayList<Alert>();
-	private List<FieldMessage> fieldErrors = new ArrayList<FieldMessage>();
+	private List<Alert> globalAlerts = new ArrayList<>();
+	private List<FieldMessage> fieldErrors = new ArrayList<>();
 
 	private AlertContainer alertContainer = new AlertContainer();
 	private MessageSource messageSource;
@@ -71,7 +71,7 @@ public class ValidationResponse {
 		Object[] args = { objectError.getObjectName() };
 		return getMessage(objectError, args);
 	}
-	
+
 	/**
 	 * Utilisé pour les erreurs sur les champs.
 	 * @see ValidationResponse#getMessage(ObjectError, Object[])
@@ -87,7 +87,7 @@ public class ValidationResponse {
 		Object[] args = { objectError.getRejectedValue(), field, objectError.getObjectName() };
 		return getMessage(objectError, args);
 	}
-	
+
 	/**
 	 * Retourne le premier message d'erreur valide.
 	 * @param objectError
@@ -164,4 +164,5 @@ public class ValidationResponse {
 	public void setViewName(String viewName) {
 		this.viewName = viewName;
 	}
+
 }

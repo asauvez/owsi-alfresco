@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import fr.openwide.alfresco.app.core.framework.spring.config.AppCoreConfig;
+import fr.openwide.alfresco.app.core.framework.spring.config.AppCoreRemoteBindingConfig;
 import fr.openwide.alfresco.component.model.framework.spring.config.ComponentModelConfig;
 import fr.openwide.alfresco.component.query.search.service.BeanFormQueryService;
 import fr.openwide.alfresco.component.query.search.service.NodeFormQueryService;
@@ -13,7 +13,7 @@ import fr.openwide.alfresco.component.query.search.service.impl.NodeFormQuerySer
 
 @Configuration
 @Import({
-	AppCoreConfig.class,
+	AppCoreRemoteBindingConfig.class,
 	ComponentModelConfig.class
 })
 public class ComponentQueryConfig {

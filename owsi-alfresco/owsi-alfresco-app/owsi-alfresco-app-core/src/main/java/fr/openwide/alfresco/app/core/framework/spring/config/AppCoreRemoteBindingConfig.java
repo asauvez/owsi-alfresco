@@ -28,7 +28,7 @@ import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSeriali
 import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
-import fr.openwide.alfresco.app.core.security.service.UserService;
+import fr.openwide.alfresco.app.core.security.service.NamedUserService;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 
@@ -42,34 +42,38 @@ import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSeriali
 	// on ignore l'annotation @Configuration sur le scan de package.
 	excludeFilters = @Filter(Configuration.class)
 )
-public class AppCoreConfig {
+public class AppCoreRemoteBindingConfig {
 
 	@Autowired
 	private Environment environment;
 
 	@Bean
 	@Primary
-	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent, UserService userService) {
+	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RestTemplate restTemplate, 
+			RepositoryContentSerializationComponent serializationComponent, NamedUserService userService) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName, null, userService);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding(RestTemplate restTemplate, 
+			RepositoryContentSerializationComponent serializationComponent) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding(RestTemplate restTemplate, 
+			RepositoryContentSerializationComponent serializationComponent) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding authenticationRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding authenticationRemoteBinding(RestTemplate restTemplate, 
+			RepositoryContentSerializationComponent serializationComponent) {
 		String authenticationUri = environment.getRequiredProperty("application.authentication.repository.root.uri");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, authenticationUri);
 	}
@@ -92,7 +96,7 @@ public class AppCoreConfig {
 		serializersByClass.put(MultipartFile.class, MultipartFileRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(InputStream.class, InputStreamRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(Reader.class, ReaderRepositoryContentSerializer.INSTANCE);
-				
+		
 		return new RepositoryContentSerializationComponent(
 				new ObjectMapper(), 
 				serializersByClass, 

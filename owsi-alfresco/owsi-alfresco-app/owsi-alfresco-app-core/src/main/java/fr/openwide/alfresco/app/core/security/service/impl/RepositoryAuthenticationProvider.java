@@ -1,83 +1,23 @@
 package fr.openwide.alfresco.app.core.security.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
-
-import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
-import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
-import fr.openwide.alfresco.app.core.security.model.BusinessUser;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
-import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
-
-@Component
+/**
+ * Authentication provider needed to validate {@link UsernamePasswordAuthenticationToken} tokens containing username and
+ * password against the repository
+ */
 public class RepositoryAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryAuthenticationProvider.class);
-
 	@Autowired
-	private AuthenticationService authenticationService;
+	private AuthenticationUserDetailsService<UsernamePasswordAuthenticationToken> authenticationUserDetailsService;
 
 	@Override
 	public UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) {
-		String credentials = authentication != null ? (String) authentication.getCredentials() : null;
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Authenticating user with '{}' password: {}", 
-					Strings.isNullOrEmpty(credentials) ? String.valueOf(credentials) : "[PROTECTED]", username);
-		}
-		try {
-			RepositoryUser repositoryUser = authenticationService.authenticate(username, credentials);
-			return buildUserDetails(repositoryUser, credentials);
-		} catch (RepositoryConnectException e) {
-			throw new AuthenticationServiceException("Could not connect to repository", e);
-		} catch (AccessDeniedRemoteException e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Could not authenticate user: " + username, e);
-			}
-			throw new BadCredentialsException("Could not authenticate user: " + username, e);
-		}
-	}
-
-	public UserDetails retrieveUser(String username) {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Authenticating user: {}", username);
-		}
-		try {
-			RepositoryUser repositoryUser = authenticationService.authenticate(username);
-			return buildUserDetails(repositoryUser, null);
-		} catch (AccessDeniedRemoteException e) {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Could not authenticate user: " + username, e);
-			}
-			throw new AuthenticationServiceException("Could not authenticate user: " + username, e);
-		}
-	}
-
-	private UserDetails buildUserDetails(RepositoryUser repositoryUser, String credentials) {
-		// Build authority list
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		// Add default Authenticated role
-		authorities.add(new SimpleGrantedAuthority(CoreAuthorityConstants.ROLE_AUTHENTICATED));
-		for (RepositoryAuthority autority : repositoryUser.getAuthorities()) {
-			authorities.add(new SimpleGrantedAuthority(autority.getName()));
-		}
-		// Build user
-		return new BusinessUser(repositoryUser, credentials, authorities);
+		return authenticationUserDetailsService.loadUserDetails(authentication);
 	}
 
 	@Override

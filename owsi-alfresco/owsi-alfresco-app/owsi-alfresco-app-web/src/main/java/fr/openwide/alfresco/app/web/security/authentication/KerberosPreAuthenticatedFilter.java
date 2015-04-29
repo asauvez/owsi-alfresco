@@ -35,6 +35,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
+@Deprecated
 public class KerberosPreAuthenticatedFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(KerberosPreAuthenticatedFilter.class);

@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 
 import fr.openwide.alfresco.app.web.security.authentication.RepositoryLogoutHandler;
 
+@Deprecated
 public class AppWebSecurityConfigurationSupport {
 
 	private static final String DEFAULT_LOGOUT_SUCCESS_URL = "/";

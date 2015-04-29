@@ -20,16 +20,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketAware;
+import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.remote.model.NodeRestCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RestCallBuilder;
-import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
@@ -42,7 +42,7 @@ public class RepositoryRemoteBinding {
 
 	private final RestTemplate restTemplate;
 	private final RepositoryContentSerializationComponent serializationComponent;
-	private final UserService userService;
+	private final Optional<RepositoryTicketProvider> ticketProvider;
 	private final String rootUri;
 	private final String ticketParam;
 	private final String ticketHeader;
@@ -58,13 +58,13 @@ public class RepositoryRemoteBinding {
 	}
 
 	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
-			String rootUri, String ticketParam, String ticketHeader, UserService userService) {
+			String rootUri, String ticketParam, String ticketHeader, RepositoryTicketProvider ticketProvider) {
 		this.restTemplate = restTemplate;
 		this.serializationComponent = serializationComponent;
 		this.rootUri = rootUri;
 		this.ticketParam = ticketParam;
 		this.ticketHeader = ticketHeader;
-		this.userService = userService;
+		this.ticketProvider = Optional.fromNullable(ticketProvider);
 	}
 
 	public <R> RestCallBuilder<R> builder(RestEndpoint<R> restCall) {
@@ -102,10 +102,10 @@ public class RepositoryRemoteBinding {
 	}
 
 	protected void addTicketHeader(HttpHeaders headers) {
-		if (ticketHeader != null && userService != null) {
+		if (ticketHeader != null && ticketProvider.isPresent()) {
 			// get ticket
-			RepositoryTicketAware user = userService.getCurrentUser();
-			headers.add(ticketHeader, user.getTicket().getTicket());
+			RepositoryTicket ticket = ticketProvider.get().getTicket();
+			headers.add(ticketHeader, ticket.getTicket());
 		}
 	}
 
@@ -141,10 +141,10 @@ public class RepositoryRemoteBinding {
 		Object[] uriVariables = uriVars;
 		if (ticketParam != null) {
 			builder.queryParam(ticketParam, "{" + ticketParam + "}");
-			if (userService != null) {
+			if (ticketProvider.isPresent()) {
 				// get ticket
-				RepositoryTicketAware user = userService.getCurrentUser();
-				uriVariables = ObjectArrays.concat(uriVariables, user.getTicket());
+				RepositoryTicket ticket = ticketProvider.get().getTicket();
+				uriVariables = ObjectArrays.concat(uriVariables, ticket.getTicket());
 			} else {
 				// check ticket
 				boolean contains = Iterables.any(Arrays.asList(uriVariables), new Predicate<Object>() {

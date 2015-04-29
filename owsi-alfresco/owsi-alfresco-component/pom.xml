@@ -15,6 +15,7 @@
 	<modules>
 		<module>owsi-alfresco-component-model</module>
 		<module>owsi-alfresco-component-query</module>
+		<module>owsi-alfresco-component-kerberos</module>
 	</modules>
 
 </project>

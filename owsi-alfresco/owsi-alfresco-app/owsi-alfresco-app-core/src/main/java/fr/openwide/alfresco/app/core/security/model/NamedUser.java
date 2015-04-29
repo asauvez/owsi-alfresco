@@ -5,19 +5,17 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketAware;
+import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketProvider;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 
-public class BusinessUser extends User implements RepositoryTicketAware {
+public class NamedUser extends User implements RepositoryTicketProvider {
 
 	private static final long serialVersionUID = 336652943037329710L;
 
-	private static final String GROUP_PREFIX = "GROUP_";
-
 	private RepositoryUser repositoryUser;
 
-	public BusinessUser(RepositoryUser repositoryUser, String password, Collection<? extends GrantedAuthority> authorities) {
+	public NamedUser(RepositoryUser repositoryUser, String password, Collection<? extends GrantedAuthority> authorities) {
 		super(repositoryUser.getUserReference().getUsername(), password != null ? password : "N/A", authorities);
 		this.repositoryUser = repositoryUser;
 	}
@@ -34,30 +32,18 @@ public class BusinessUser extends User implements RepositoryTicketAware {
 		return repositoryUser.getEmail();
 	}
 
-	public boolean isAdmin() {
-		return repositoryUser.isAdmin();
-	}
-
 	@Override
 	public RepositoryTicket getTicket() {
 		return repositoryUser.getTicket();
 	}
 
-	public RepositoryUser getRepositoryUser() {
+	@Override
+	public RepositoryUser getTicketOwner() {
 		return repositoryUser;
 	}
 
-	public boolean hasRole(String role) {
-		String prefixedRole = role;
-		if (! prefixedRole.startsWith(GROUP_PREFIX)) {
-			prefixedRole = GROUP_PREFIX + prefixedRole;
-		}
-		for (GrantedAuthority auth : getAuthorities()) {
-			if (auth.getAuthority().equals(prefixedRole)) {
-				return true;
-			}
-		}
-		return false;
+	public RepositoryUser getRepositoryUser() {
+		return repositoryUser;
 	}
 
 }

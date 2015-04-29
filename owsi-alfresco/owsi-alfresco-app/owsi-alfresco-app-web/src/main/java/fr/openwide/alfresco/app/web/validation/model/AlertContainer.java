@@ -7,7 +7,7 @@ public class AlertContainer {
 
 	public static final String ALERTS_FIELD_NAME = "alerts";
 
-	private List<Alert> items = new ArrayList<Alert>();
+	private List<Alert> items = new ArrayList<>();
 
 	public List<Alert> getItems() {
 		return items;

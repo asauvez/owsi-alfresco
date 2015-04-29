@@ -32,6 +32,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.web.download.binding.DownloadResponseMethodProcessor;
 import fr.openwide.alfresco.app.web.framework.spring.binding.HandlerInterceptorAwareModelMethodProcessor;
@@ -51,6 +52,8 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	private EntityManagerFactory entityManagerFactory;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private NodeService nodeService;
 
 	@Override
 	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -81,10 +84,10 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		registry.addFormatter(new StoreReferenceFormatter());
 		registry.addFormatter(new NameReferenceFormatter());
 	}
-	
+
 	@Bean
 	public DownloadResponseMethodProcessor downloadResponseMethodProcessor() {
-		return new DownloadResponseMethodProcessor();
+		return new DownloadResponseMethodProcessor(nodeService);
 	}
 	@Bean
 	public ValidationResponseMethodProcessor validationResponseMethodProcessor() {

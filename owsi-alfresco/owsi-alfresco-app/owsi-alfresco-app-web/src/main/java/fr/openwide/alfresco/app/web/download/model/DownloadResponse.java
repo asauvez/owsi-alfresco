@@ -2,14 +2,13 @@ package fr.openwide.alfresco.app.web.download.model;
 
 import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
 
-
 public abstract class DownloadResponse {
 
-	private boolean attachement = true;
-	private String attachementName;
-	
+	private boolean attachment = true; // force le téléchargement
+	private String attachmentName;
+
 	private AlertContainer alertContainer = new AlertContainer();
-	
+
 	public AlertContainer getAlertContainer() {
 		return alertContainer;
 	}
@@ -18,21 +17,20 @@ public abstract class DownloadResponse {
 		return this;
 	}
 
-	public boolean isAttachement() {
-		return attachement;
+	public boolean isAttachment() {
+		return attachment;
 	}
-	/** Si vrai (le défaut), force le téléchargement 
-	 * @return */
-	public DownloadResponse attachement(boolean attachement) {
-		this.attachement = attachement;
+	public DownloadResponse attachment(boolean attachment) {
+		this.attachment = attachment;
 		return this;
 	}
 
-	public String getAttachementName() {
-		return attachementName;
+	public String getAttachmentName() {
+		return attachmentName;
 	}
-	public DownloadResponse attachementName(String attachementName) {
-		this.attachementName = attachementName;
+	public DownloadResponse attachmentName(String attachmentName) {
+		this.attachmentName = attachmentName;
 		return this;
 	}
+
 }

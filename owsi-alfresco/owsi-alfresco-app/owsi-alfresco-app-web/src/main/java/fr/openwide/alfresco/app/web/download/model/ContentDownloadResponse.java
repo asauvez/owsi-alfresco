@@ -1,11 +1,10 @@
 package fr.openwide.alfresco.app.web.download.model;
 
-import java.io.Closeable;
 import java.io.Flushable;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public abstract class ContentDownloadResponse extends DownloadResponse  implements Flushable, Closeable {
+public abstract class ContentDownloadResponse extends DownloadResponse implements Flushable, AutoCloseable {
 
 	private String contentType;
 

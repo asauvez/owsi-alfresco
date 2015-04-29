@@ -3,40 +3,44 @@ package fr.openwide.alfresco.app.core.security.service.impl;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import fr.openwide.alfresco.app.core.security.model.BusinessUser;
+import com.google.common.base.Optional;
+
 import fr.openwide.alfresco.app.core.security.service.UserService;
 
-@Service
 public class UserServiceImpl implements UserService {
 
 	@Override
-	public BusinessUser getUser(Authentication authentication) {
-		if (authentication == null) {
-			throw new IllegalStateException("Currently not in an authentified thread");
-		}
-		if (authentication instanceof AnonymousAuthenticationToken) {
+	public Optional<Authentication> getCurrentAuthentication() {
+		return Optional.fromNullable(SecurityContextHolder.getContext().getAuthentication());
+	}
+
+	@Override
+	public Optional<UserDetails> getUserDetails(Authentication authentication) {
+		if (authentication instanceof AnonymousAuthenticationToken || authentication == null) {
 			// L'utilisateur n'est pas authentifié
-			return null;
+			return Optional.absent();
 		}
 		Object principal = authentication.getPrincipal();
-		if (principal instanceof BusinessUser) {
-			return (BusinessUser) principal;
+		if (principal instanceof UserDetails) {
+			return Optional.of((UserDetails) principal);
 		} else {
-			throw new IllegalStateException("Currently held authentication is not a BusinessUser: " + principal.getClass());
+			throw new IllegalStateException("Currently held authentication is not a UserDetails: " + 
+					((principal != null) ? principal.getClass() : null));
 		}
 	}
 
 	@Override
-	public BusinessUser getCurrentUser() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		return getUser(authentication);
+	public Optional<UserDetails> getCurrentUserDetails() {
+		Optional<Authentication> authentication = getCurrentAuthentication();
+		return getUserDetails(authentication.orNull());
 	}
 
 	@Override
-	public String getCurrentUserId() {
-		return getCurrentUser().getUsername();
+	public Optional<String> getCurrentUsername() {
+		Optional<UserDetails> current = getCurrentUserDetails();
+		return (current.isPresent()) ? Optional.of(current.get().getUsername()) : Optional.<String>absent();
 	}
 
 }

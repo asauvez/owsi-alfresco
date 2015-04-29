@@ -5,10 +5,10 @@ import java.util.Locale;
 
 import org.springframework.format.Formatter;
 
-import fr.openwide.alfresco.app.core.node.model.NodeReferenceAware;
+import fr.openwide.alfresco.app.core.node.model.NodeReferenceProvider;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
-public abstract class NodeReferenceAwareFormatter<T extends NodeReferenceAware> implements Formatter<T> {
+public abstract class NodeReferenceProviderFormatter<T extends NodeReferenceProvider> implements Formatter<T> {
 
 	private NodeReferenceFormatter nodeReferenceFormatter = new NodeReferenceFormatter();
 

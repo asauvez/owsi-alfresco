@@ -7,19 +7,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.PermissionFactory;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import fr.openwide.alfresco.app.core.security.model.BusinessUser;
+import com.google.common.base.Optional;
+
 import fr.openwide.alfresco.app.core.security.model.PermissionObjectWrapper;
 import fr.openwide.alfresco.app.core.security.service.UserService;
+import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
 import fr.openwide.core.jpa.security.hierarchy.IPermissionHierarchy;
 
 public abstract class UserBasedPermissionEvaluator implements PermissionEvaluator {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserBasedPermissionEvaluator.class);
 
 	@Autowired
 	private UserService userService;
@@ -28,23 +34,22 @@ public abstract class UserBasedPermissionEvaluator implements PermissionEvaluato
 	@Autowired
 	private IPermissionHierarchy permissionHierarchy;
 
-	/**
-	 * Vérifie qu'un utilisateur possède la permission souhaitée
-	 * @param user peut être <code>null</code> dans le cas d'une authentification anonyme
-	 */
-	protected abstract boolean hasPermission(User user, Object targetDomainObject, Permission permission);
+	protected abstract boolean hasPermission(UserDetails user, Object targetDomainObject, Permission permission);
 
 	@Override
 	public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-		BusinessUser user = userService.getUser(authentication); // user may be null
-		if (user != null && user.isAdmin()) {
+		Optional<UserDetails> user = userService.getUserDetails(authentication);
+		if (! user.isPresent()) {
+			return false;
+		}
+		if (user.get().getAuthorities().contains(CoreAuthorityConstants.AUTHORITY_ADMIN)) {
 			return true;
 		}
 		List<Permission> permissions = resolvePermission(permission);
 		if (targetDomainObject instanceof Collection<?>) {
-			return checkObjectsPermissions(user, (Collection<?>) targetDomainObject, permissions);
+			return checkObjectsPermissions(user.get(), (Collection<?>) targetDomainObject, permissions);
 		} else {
-			return checkObjectsPermissions(user, Collections.singletonList(targetDomainObject), permissions);
+			return checkObjectsPermissions(user.get(), Collections.singletonList(targetDomainObject), permissions);
 		}
 	}
 
@@ -53,7 +58,7 @@ public abstract class UserBasedPermissionEvaluator implements PermissionEvaluato
 		throw new UnsupportedOperationException();
 	}
 
-	protected boolean checkObjectsPermissions(User user, Collection<?> targetDomainObject, List<Permission> permissions) {
+	protected boolean checkObjectsPermissions(UserDetails user, Collection<?> targetDomainObject, List<Permission> permissions) {
 		for (Object object : targetDomainObject) {
 			// il faut que tous les objets possèdent les permissions requises
 			boolean allowed = checkAcceptablePermissions(user, object, permissions);
@@ -64,7 +69,7 @@ public abstract class UserBasedPermissionEvaluator implements PermissionEvaluato
 		return true;
 	}
 
-	protected boolean checkAcceptablePermissions(User user, Object targetDomainObject, List<Permission> permissions) {
+	protected boolean checkAcceptablePermissions(UserDetails user, Object targetDomainObject, List<Permission> permissions) {
 		// gère les wrappers pour lesquels les permissions doivent être vérifiées sur l'objet wrappé
 		Object permissionObject = targetDomainObject;
 		if (permissionObject instanceof PermissionObjectWrapper<?>) {
@@ -75,6 +80,10 @@ public abstract class UserBasedPermissionEvaluator implements PermissionEvaluato
 		for (Permission permission : acceptablePermissions) {
 			// Il faut posséder au moins une des permissions acceptées
 			boolean allowed = hasPermission(user, permissionObject, permission);
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Permission check : {} - {} - {} ==> {}", 
+						(user != null ? user.getUsername() : null), targetDomainObject, permission, allowed);
+			}
 			if (allowed) {
 				return true;
 			}
@@ -93,7 +102,7 @@ public abstract class UserBasedPermissionEvaluator implements PermissionEvaluato
 		} else if (permission instanceof String) {
 			String permString = (String) permission;
 			String[] split = permString.split("\\|");
-			List<Permission> result = new ArrayList<Permission>();
+			List<Permission> result = new ArrayList<>();
 			for (String perm : split) {
 				Permission resolvedPermission = resolvePermissionByName(perm);
 				if (! result.contains(resolvedPermission)) {

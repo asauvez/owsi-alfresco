@@ -6,17 +6,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationProvider;
+import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationUserDetailsService;
 
 @Component
+@Deprecated
 public class RepositoryPreAuthenticatedUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
 	@Autowired
-	private RepositoryAuthenticationProvider repositoryAuthenticationProvider;
+	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
 
 	@Override
 	public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) {
-		return repositoryAuthenticationProvider.retrieveUser((String) token.getPrincipal());
+		return repositoryAuthenticationUserDetailsService.loadUserByUsername((String) token.getPrincipal());
 	}
 
 }

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -47,9 +47,15 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	public static final String FILE_DOWNLOAD_TOKEN_NAME = "fileDownloadToken";
 	public static final String FILE_DOWNLOAD_PATH_NAME = "fileDownloadPath";
 
-	@Autowired
-	private NodeService nodeService;
-	
+	protected static final String HEADER_CONTENT_DISPOSITION_NAME = "Content-Disposition";
+	protected static final String HEADER_CONTENT_DISPOSITION_VALUE_PATTERN = "{0};filename=\"{1}\"";
+
+	protected NodeService nodeService;
+
+	public DownloadResponseMethodProcessor(NodeService nodeService) {
+		this.nodeService = nodeService;
+	}
+
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> paramType = parameter.getParameterType();
@@ -77,7 +83,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			request.setAttribute(getClass().getName(), outputStream);
 			return new FileDownloadResponse(tempFile, outputStream);
 		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
-			return new NodeReferenceDownloadResponse(null);
+			return new NodeReferenceDownloadResponse();
 		} else {
 			throw new IllegalArgumentException("Invalid type: " + parameterType);
 		}
@@ -92,20 +98,8 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			mavContainer.setRequestHandled(true);
 			DownloadResponse download = (DownloadResponse) returnValue;
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-			
-			// get filename
-			String fileName;
-			if (download.getAttachementName() == null) {
-				fileName = FilenameUtils.getName(request.getRequestURI());
-			} else {
-				String extension = FilenameUtils.getExtension(download.getAttachementName());
-				if (StringUtils.hasText(extension)) {
-					fileName = StringUtils.urlize(FilenameUtils.getBaseName(download.getAttachementName())) + "." + StringUtils.urlize(extension);
-				} else {
-					fileName = StringUtils.urlize(FilenameUtils.getName(download.getAttachementName()));
-				}
-			}
-			
+			// ensure attachment name
+			ensureAttachmentName(download, request);
 			// deal with AlertContainer for the subsequent request
 			AlertContainer alertContainer = download.getAlertContainer();
 			if (! alertContainer.isEmpty()) {
@@ -124,12 +118,13 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 				FlashMapManager flashMapManager = RequestContextUtils.getFlashMapManager(request);
 				flashMapManager.saveOutputFlashMap(flashMap, request, response);
 			}
-			
-			// stream content
+			// stream input
 			if (download instanceof ContentDownloadResponse) {
-				streamContent((ContentDownloadResponse) download, fileName, webRequest);
+				try (ContentDownloadResponse content = (ContentDownloadResponse) download) {
+					streamContent(content, webRequest);
+				}
 			} else if (download instanceof NodeReferenceDownloadResponse) {
-				streamNodeRef((NodeReferenceDownloadResponse) download, fileName, webRequest);
+				streamNodeReference((NodeReferenceDownloadResponse) download, webRequest);
 			}
 		} else {
 			// should not happen
@@ -138,75 +133,89 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		}
 	}
 
-	private void streamContent(ContentDownloadResponse download, String fileName, NativeWebRequest webRequest) throws IOException {
+	protected void streamContent(ContentDownloadResponse download, NativeWebRequest webRequest) throws IOException {
 		HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
-		try {
-			// flush download output
-			download.flush();
-			// set cookie (do this before header content-length so that client can deal with it early !)
-			setCookie(webRequest);
-
-			// set mimetype and length for the content
-			response.setContentType(download.getContentType());
-			response.setHeader("Content-Length", Long.toString(download.getContentLength()));
-			// output downloadable content
-			streamCommon(download, fileName, response, download.getWrittableStream());
-		} finally {
-			download.close();
-		}
+		// flush download output
+		download.flush();
+		// set cookie (do this before header content-length so that client can deal with it early !)
+		setCookie(webRequest);
+		// set mimetype and length for the content
+		response.setContentType(download.getContentType());
+		response.setHeader("Content-Length", Long.toString(download.getContentLength()));
+		// output downloadable content
+		streamInput(download, download.getWrittableStream(), response);
 	}
 
-	private void streamNodeRef(final NodeReferenceDownloadResponse download, final String fileName, final NativeWebRequest webRequest) {
-		// set cookie (do this before header content-length so that client can deal with it early !)
-		
-		final HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
-		
+	protected void streamNodeReference(final NodeReferenceDownloadResponse download, final NativeWebRequest webRequest) {
 		nodeService.getNodeContent(download.getNodeReference(), download.getProperty(), new ResponseExtractor<Void>() {
 			@Override
 			public Void extractData(ClientHttpResponse repositoryResponse) throws IOException {
+				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 				// set cookie (do this before header content-length so that client can deal with it early !)
 				setCookie(webRequest);
-
+				// recopy headers
 				for (Entry<String, List<String>> entry : repositoryResponse.getHeaders().entrySet()) {
 					for (String value : entry.getValue()) {
 						response.addHeader(entry.getKey(), value);
 					}
 				}
-				InputStream body = repositoryResponse.getBody();
-				try {
-					streamCommon(download, fileName, response, body);
-				} finally {
-					body.close();
+				// recopy content + override content disposition header
+				try (InputStream body = repositoryResponse.getBody()) {
+					streamInput(download, body, response);
 				}
 				return null;
 			}
 		});
 	}
-	
-	private void streamCommon(DownloadResponse download, String fileName, HttpServletResponse response, InputStream in) throws IOException {
-		response.setHeader("Content-Disposition", (download.isAttachement() ? "attachment" : "inline") + "; filename=\"" + fileName + "\"");
-		IOUtils.copy(in, response.getOutputStream());
+
+	/**
+	 * Method can be overriden (not static) to deal with specific input
+	 */
+	protected void streamInput(DownloadResponse download, InputStream input, HttpServletResponse response) throws IOException {
+		setContentDispositionHeader(download, response);
+		IOUtils.copy(input, response.getOutputStream());
 	}
 
-	private void setCookie(NativeWebRequest webRequest) {
+	protected static void setContentDispositionHeader(DownloadResponse download, HttpServletResponse response) {
+		String headerValue = MessageFormat.format(HEADER_CONTENT_DISPOSITION_VALUE_PATTERN, 
+				(download.isAttachment() ? "attachment" : "inline"), download.getAttachmentName());
+		response.setHeader(HEADER_CONTENT_DISPOSITION_NAME, headerValue);
+	}
+
+	protected static void setCookie(NativeWebRequest webRequest) {
 		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 		String salt = getFromRequestOrInputFlashMap(request, FILE_DOWNLOAD_TOKEN_NAME);
 		if (salt != null) {
 			Cookie cookie = new Cookie(FILE_DOWNLOAD_TOKEN_NAME, salt);
-			
 			String path = getFromRequestOrInputFlashMap(request, FILE_DOWNLOAD_PATH_NAME);
 			if (path != null) {
 				cookie.setPath(path);
 			} else {
 				cookie.setPath(StringUtils.trimTrailingCharacter(FilenameUtils.getFullPath(request.getRequestURI()), '/'));
 			}
-			
 			response.addCookie(cookie);
 		}
 	}
 
-	private String getFromRequestOrInputFlashMap(HttpServletRequest request, String name) {
+	protected static String ensureAttachmentName(DownloadResponse download, HttpServletRequest request) {
+		// ensure attachment name
+		String attachmentName;
+		if (download.getAttachmentName() == null) {
+			attachmentName = FilenameUtils.getName(request.getRequestURI());
+		} else {
+			String extension = FilenameUtils.getExtension(download.getAttachmentName());
+			if (StringUtils.hasText(extension)) {
+				attachmentName = StringUtils.urlize(FilenameUtils.getBaseName(download.getAttachmentName())) + "." + StringUtils.urlize(extension);
+			} else {
+				attachmentName = StringUtils.urlize(FilenameUtils.getName(download.getAttachmentName()));
+			}
+		}
+		download.attachmentName(attachmentName);
+		return attachmentName;
+	}
+
+	protected static String getFromRequestOrInputFlashMap(HttpServletRequest request, String name) {
 		String value = request.getParameter(name);
 		if (value != null) {
 			return value;
