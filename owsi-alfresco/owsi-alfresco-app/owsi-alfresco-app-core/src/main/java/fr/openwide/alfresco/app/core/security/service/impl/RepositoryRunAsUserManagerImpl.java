@@ -4,6 +4,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 
 public class RepositoryRunAsUserManagerImpl extends AbstractRunAsUserManagerImpl {

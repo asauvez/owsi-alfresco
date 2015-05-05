@@ -17,4 +17,6 @@ public interface RunAsUserManager {
 
 	<T> T runAsUser(String username, Callable<T> task) throws Exception;
 
+	<T> T runAsUser(UserDetails user, Callable<T> work) throws Exception;
+
 }

@@ -5,18 +5,14 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 
@@ -24,18 +20,21 @@ import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketProvid
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
 
-@Component
-public class RepositoryAuthenticationUserDetailsService implements AuthenticationUserDetailsService<UsernamePasswordAuthenticationToken>, UserDetailsService {
+public class RepositoryAuthenticationUserDetailsServiceImpl implements RepositoryAuthenticationUserDetailsService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryAuthenticationUserDetailsService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryAuthenticationUserDetailsServiceImpl.class);
 
-	@Autowired
 	private AuthenticationService authenticationService;
+
+	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
 
 	@Override
 	public UserDetails loadUserDetails(UsernamePasswordAuthenticationToken token) throws UsernameNotFoundException {
@@ -92,6 +91,7 @@ public class RepositoryAuthenticationUserDetailsService implements Authenticatio
 		return new NamedUser(repositoryUser, credentials, authorities);
 	}
 
+	@Override
 	public void logout(Authentication authentication) {
 		Object principal = authentication.getPrincipal();
 		if (principal instanceof RepositoryTicketProvider) {

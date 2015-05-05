@@ -60,11 +60,11 @@ public abstract class AbstractRunAsUserManagerImpl extends RunAsManagerImpl impl
 		if (username == null) {
 			throw new IllegalStateException("Could not find a username attribute with prefix: " + CoreRunAsManagerImpl.RUN_AS_PREFIX);
 		}
-		return buildRunAs(username, originalAuthentication);
+		UserDetails user = loadUserDetails(username);
+		return buildRunAs(user, originalAuthentication);
 	}
 
-	protected RunAsUserToken buildRunAs(String username, Optional<Authentication> originalAuthentication) {
-		UserDetails user = loadUserDetails(username);
+	protected RunAsUserToken buildRunAs(UserDetails user, Optional<Authentication> originalAuthentication) {
 		Class<? extends Authentication> original = (originalAuthentication.isPresent()) ? originalAuthentication.get().getClass() : null;
 		return new RunAsUserToken(getKey(), user, originalAuthentication.get(), user.getAuthorities(), original);
 	}
@@ -77,19 +77,25 @@ public abstract class AbstractRunAsUserManagerImpl extends RunAsManagerImpl impl
 		if (originalAuthentication.isPresent() && username.equals(originalAuthentication.get().getName())) {
 			// No runAs if the current authenticated user is the target user
 			return work.call();
-		} else {
-			// This acts in fact as a Filter, building token and passing it to authenticationManager before setting the context
-			Authentication runAsAuthentication = buildRunAs(username, originalAuthentication);
-			authenticationManager.authenticate(runAsAuthentication);
-			SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
-			SecurityContextHolder.getContext().setAuthentication(runAsAuthentication);
-			try {
-				return work.call();
-			} finally {
-				// Crucial restore of SecurityContextHolder contents - do this before anything else.
-				SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orNull());
-				afterRunAs(runAsAuthentication);
-			}
+		}
+		UserDetails user = loadUserDetails(username);
+		return runAsUser(user, work);
+	}
+
+	@Override
+	public <T> T runAsUser(UserDetails user, Callable<T> work) throws Exception {
+		Optional<Authentication> originalAuthentication = userService.getCurrentAuthentication();
+		// This acts in fact as a Filter, building token and passing it to authenticationManager before setting the context
+		Authentication runAsAuthentication = buildRunAs(user, originalAuthentication);
+		authenticationManager.authenticate(runAsAuthentication);
+		SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
+		SecurityContextHolder.getContext().setAuthentication(runAsAuthentication);
+		try {
+			return work.call();
+		} finally {
+			// Crucial restore of SecurityContextHolder contents - do this before anything else.
+			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orNull());
+			afterRunAs(runAsAuthentication);
 		}
 	}
 
