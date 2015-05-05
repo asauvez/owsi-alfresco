@@ -15,6 +15,7 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
 import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
 import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
+import fr.openwide.alfresco.repository.api.search.service.SearchQueryLanguage;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
@@ -25,15 +26,16 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public List<RepositoryNode> search(String luceneQuery, StoreReference storeReference, NodeScope scope) {
-		if (StringUtils.isBlank(luceneQuery)) {
+	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope scope,
+			SearchQueryLanguage language) {
+		if (StringUtils.isBlank(query)) {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
 		try {
 			ResultSet resultSet = searchService.query(
 					conversionService.getRequired(storeReference), 
-					SearchService.LANGUAGE_FTS_ALFRESCO, 
-					luceneQuery);
+					language.getAlfrescoName(), 
+					query);
 			List<RepositoryNode> res = new ArrayList<>();
 			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 				try {
@@ -44,7 +46,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			}
 			return res;
 		} catch (FTSQueryException ex) {
-			throw new InvalidPayloadException(luceneQuery, ex);
+			throw new InvalidPayloadException(query, ex);
 		}
 	}
 

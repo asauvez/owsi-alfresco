@@ -14,7 +14,9 @@ public interface NodeSearchRemoteService {
 		public String query;
 		public StoreReference storeReference;
 		public NodeScope nodeScope;
+		public SearchQueryLanguage language;
 	}
-	List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope);
+
+	List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, SearchQueryLanguage language);
 
 }

@@ -20,7 +20,8 @@ public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_S
 		return nodeSearchService.search(
 				Objects.requireNonNull(parameter.query, "Query"), 
 				Objects.requireNonNull(parameter.storeReference, "StoreReference"), 
-				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"), 
+				Objects.requireNonNull(parameter.language, "Language"));
 	}
 
 	@Override
