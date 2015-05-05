@@ -48,7 +48,7 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 
 	@Autowired
 	private Environment environment;
-	@Autowired
+	@Autowired(required=false)
 	private EntityManagerFactory entityManagerFactory;
 	@Autowired
 	private UserService userService;
@@ -65,10 +65,12 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	@Override
 	protected void addInterceptors(InterceptorRegistry registry) {
 		super.addInterceptors(registry);
-		// add open entityManager in view
-		OpenEntityManagerInViewInterceptor openEntityManagerInView = new OpenEntityManagerInViewInterceptor();
-		openEntityManagerInView.setEntityManagerFactory(entityManagerFactory);
-		registry.addWebRequestInterceptor(openEntityManagerInView);
+		if (entityManagerFactory != null) {
+			// add open entityManager in view
+			OpenEntityManagerInViewInterceptor openEntityManagerInView = new OpenEntityManagerInViewInterceptor();
+			openEntityManagerInView.setEntityManagerFactory(entityManagerFactory);
+			registry.addWebRequestInterceptor(openEntityManagerInView);
+		}
 		// add exception logger
 		registry.addInterceptor(new ExceptionLoggerHandlerInterceptor());
 		// add authentication details
