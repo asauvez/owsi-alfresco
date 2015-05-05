@@ -66,7 +66,7 @@ public abstract class AbstractRunAsUserManagerImpl extends RunAsManagerImpl impl
 
 	protected RunAsUserToken buildRunAs(UserDetails user, Optional<Authentication> originalAuthentication) {
 		Class<? extends Authentication> original = (originalAuthentication.isPresent()) ? originalAuthentication.get().getClass() : null;
-		return new RunAsUserToken(getKey(), user, originalAuthentication.get(), user.getAuthorities(), original);
+		return new RunAsUserToken(getKey(), user, originalAuthentication.orNull(), user.getAuthorities(), original);
 	}
 
 	protected abstract UserDetails loadUserDetails(String username);
