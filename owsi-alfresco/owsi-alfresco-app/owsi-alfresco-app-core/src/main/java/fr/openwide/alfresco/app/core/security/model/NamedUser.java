@@ -5,11 +5,10 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketProvider;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 
-public class NamedUser extends User implements RepositoryTicketProvider {
+public class NamedUser extends User implements RepositoryUserProvider {
 
 	private static final long serialVersionUID = 336652943037329710L;
 
@@ -33,15 +32,6 @@ public class NamedUser extends User implements RepositoryTicketProvider {
 	}
 
 	@Override
-	public RepositoryTicket getTicket() {
-		return repositoryUser.getTicket();
-	}
-
-	@Override
-	public RepositoryUser getTicketOwner() {
-		return repositoryUser;
-	}
-
 	public RepositoryUser getRepositoryUser() {
 		return repositoryUser;
 	}

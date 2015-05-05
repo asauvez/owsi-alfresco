@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.openwide.alfresco.app.core.AlfrescoAppCorePackage;
+import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.InputStreamRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
@@ -28,7 +29,6 @@ import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSeriali
 import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
-import fr.openwide.alfresco.app.core.security.service.NamedUserService;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
 import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
 
@@ -50,10 +50,10 @@ public class AppCoreRemoteBindingConfig {
 	@Bean
 	@Primary
 	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RestTemplate restTemplate, 
-			RepositoryContentSerializationComponent serializationComponent, NamedUserService userService) {
+			RepositoryContentSerializationComponent serializationComponent, RepositoryUserProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
-		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName, null, userService);
+		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName, null, ticketProvider);
 	}
 
 	@Bean

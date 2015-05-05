@@ -24,11 +24,11 @@ public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserSe
 		return getUser(userDetails);
 	}
 
-	public NamedUser getUser(Optional<UserDetails> userDetails) {
+	/* package */ static NamedUser getUser(Optional<UserDetails> userDetails) {
 		if (! userDetails.isPresent()) {
 			throw new IllegalStateException("Currently not in an authenticated context");
-		} else if (userDetails.get() instanceof NamedUser) {
-			return (NamedUser) userDetails.get();
+		} else if (userDetails.orNull() instanceof NamedUser) {
+			return (NamedUser) userDetails.orNull();
 		} else {
 			throw new IllegalStateException("Currently held authentication is not a BusinessUser: " + userDetails.getClass());
 		}
@@ -36,7 +36,7 @@ public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserSe
 
 	@Override
 	public RepositoryTicket getTicket() {
-		return getCurrentUser().getTicket();
+		return getCurrentUser().getRepositoryUser().getTicket();
 	}
 
 	@Override

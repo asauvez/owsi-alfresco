@@ -23,9 +23,9 @@ import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
 import fr.openwide.core.jpa.security.hierarchy.IPermissionHierarchy;
 
-public abstract class UserBasedPermissionEvaluator implements PermissionEvaluator {
+public abstract class UserAwarePermissionEvaluator implements PermissionEvaluator {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserBasedPermissionEvaluator.class);
+	protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private UserService userService;

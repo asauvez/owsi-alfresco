@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.base.Strings;
 
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryTicketProvider;
+import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
@@ -94,9 +94,9 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	@Override
 	public void logout(Authentication authentication) {
 		Object principal = authentication.getPrincipal();
-		if (principal instanceof RepositoryTicketProvider) {
-			RepositoryTicketProvider user = (RepositoryTicketProvider) principal;
-			authenticationService.logout(user.getTicket());
+		if (principal instanceof RepositoryUserProvider) {
+			RepositoryUserProvider userProvider = (RepositoryUserProvider) principal;
+			authenticationService.logout(userProvider.getRepositoryUser().getTicket());
 		} else {
 			throw new IllegalStateException("Invalid authentication principal: " + principal);
 		}

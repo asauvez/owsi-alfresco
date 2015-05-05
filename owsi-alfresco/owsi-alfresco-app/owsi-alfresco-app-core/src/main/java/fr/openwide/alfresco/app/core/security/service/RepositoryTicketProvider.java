@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.authentication.model;
+package fr.openwide.alfresco.app.core.security.service;
 
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
