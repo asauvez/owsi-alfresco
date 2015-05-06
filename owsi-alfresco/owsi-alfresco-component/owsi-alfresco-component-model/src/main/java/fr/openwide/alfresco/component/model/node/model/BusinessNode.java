@@ -158,7 +158,9 @@ public class BusinessNode {
 	}
 
 	public BusinessNode getPrimaryParent() {
-		return new BusinessNode(node.getPrimaryParentAssociation().getParentNode());
+		return (node.getPrimaryParentAssociation() != null) 
+				? new BusinessNode(node.getPrimaryParentAssociation().getParentNode())
+				: null;
 	}
 	public BusinessNode primaryParentRef(NodeReference parentRef) {
 		primaryParent().nodeReference(parentRef);
