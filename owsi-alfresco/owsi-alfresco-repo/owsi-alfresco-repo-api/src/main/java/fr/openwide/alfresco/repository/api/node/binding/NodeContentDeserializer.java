@@ -6,7 +6,7 @@ import java.io.InputStream;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public interface RepositoryContentDeserializer<T> {
+public interface NodeContentDeserializer<T> {
 
 	T deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException;
 

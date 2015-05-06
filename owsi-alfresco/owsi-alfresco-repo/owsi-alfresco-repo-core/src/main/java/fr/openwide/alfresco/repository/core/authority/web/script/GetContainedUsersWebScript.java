@@ -7,16 +7,18 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService.GET_CONTAINED_USERS;
+import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 
-public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<List<RepositoryNode>, GET_CONTAINED_USERS> {
+public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<GET_CONTAINED_USERS> {
 
 	@Override
 	protected List<RepositoryNode> execute(GET_CONTAINED_USERS payload) {
 		return authorityRemoteService.getContainedUsers(
 				Objects.requireNonNull(payload.authority, "Authority"), 
-				payload.immediate, 
-				Objects.requireNonNull(payload.nodeScope, "NodeScope"));
+				payload.immediate,
+				Objects.requireNonNull(payload.nodeScope, "NodeScope"), 
+				payload.remoteCallParameters);
 	}
 
 	@Override
@@ -24,4 +26,8 @@ public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<List<
 		return SimpleType.construct(GET_CONTAINED_USERS.class);
 	}
 
+	@Override
+	protected RemoteCallParameters getRemoteCallParameters(GET_CONTAINED_USERS payload) {
+		return payload.remoteCallParameters;
+	}
 }

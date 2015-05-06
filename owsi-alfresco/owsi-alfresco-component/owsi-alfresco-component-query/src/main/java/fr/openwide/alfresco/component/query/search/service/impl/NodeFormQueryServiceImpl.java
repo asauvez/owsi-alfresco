@@ -18,6 +18,7 @@ import fr.openwide.alfresco.component.query.search.model.NodeFormQuery;
 import fr.openwide.alfresco.component.query.search.model.SearchFormQuery;
 import fr.openwide.alfresco.component.query.search.service.NodeFormQueryService;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
+import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
@@ -46,7 +47,8 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		List<RepositoryNode> list = nodeSearchService.search(
 				restrictionBuilder.toLuceneQuery(),
 				formQuery.getStoreReference(),
-				nodeScope);
+				nodeScope,
+				new RemoteCallParameters());
 
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
@@ -57,7 +59,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeService.getChildren(parent, childAssoc.getNameReference(), nodeScope);
+		List<RepositoryNode> list = nodeService.getChildren(parent, childAssoc.getNameReference(), nodeScope, new RemoteCallParameters());
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
@@ -72,7 +74,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeService.getTargetAssocs(parent, assoc.getNameReference(), nodeScope);
+		List<RepositoryNode> list = nodeService.getTargetAssocs(parent, assoc.getNameReference(), nodeScope, new RemoteCallParameters());
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
@@ -82,7 +84,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeService.getSourceAssocs(parent, assoc.getNameReference(), nodeScope);
+		List<RepositoryNode> list = nodeService.getSourceAssocs(parent, assoc.getNameReference(), nodeScope, new RemoteCallParameters());
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}

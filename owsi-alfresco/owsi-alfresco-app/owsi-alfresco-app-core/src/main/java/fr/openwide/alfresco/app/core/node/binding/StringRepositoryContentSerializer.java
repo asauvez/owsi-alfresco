@@ -9,12 +9,12 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class StringRepositoryContentSerializer implements RepositoryContentSerializer<String>, RepositoryContentDeserializer<String> {
+public class StringRepositoryContentSerializer implements NodeContentSerializer<String>, NodeContentDeserializer<String> {
 
 	public static final StringRepositoryContentSerializer INSTANCE = new StringRepositoryContentSerializer(StandardCharsets.UTF_8);
 

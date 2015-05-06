@@ -25,13 +25,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
-import fr.openwide.alfresco.app.core.remote.model.NodeRestCallBuilder;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
-import fr.openwide.alfresco.app.core.remote.model.RestCallBuilder;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
 import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
@@ -41,23 +41,23 @@ public class RepositoryRemoteBinding {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
 
 	private final RestTemplate restTemplate;
-	private final RepositoryContentSerializationComponent serializationComponent;
+	private final NodeContentSerializationComponent serializationComponent;
 	private final Optional<RepositoryTicketProvider> ticketProvider;
 	private final String rootUri;
 	private final String ticketParam;
 	private final String ticketHeader;
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
+	public RepositoryRemoteBinding(RestTemplate restTemplate, NodeContentSerializationComponent serializationComponent,
 			String rootUri) {
 		this(restTemplate, serializationComponent, rootUri, null);
 	}
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
+	public RepositoryRemoteBinding(RestTemplate restTemplate, NodeContentSerializationComponent serializationComponent,
 			String rootUri, String ticketParam) {
 		this(restTemplate, serializationComponent, rootUri, ticketParam, null, null);
 	}
 
-	public RepositoryRemoteBinding(RestTemplate restTemplate, RepositoryContentSerializationComponent serializationComponent,
+	public RepositoryRemoteBinding(RestTemplate restTemplate, NodeContentSerializationComponent serializationComponent,
 			String rootUri, String ticketParam, String ticketHeader, RepositoryTicketProvider ticketProvider) {
 		this.restTemplate = restTemplate;
 		this.serializationComponent = serializationComponent;
@@ -67,14 +67,14 @@ public class RepositoryRemoteBinding {
 		this.ticketProvider = Optional.fromNullable(ticketProvider);
 	}
 
-	public <R> RestCallBuilder<R> builder(RestEndpoint<R> restCall) {
-		return new RestCallBuilder<R>(this, restCall);
+	public <R> RepositoryRemoteCallBuilder<R> builder(RestEndpoint<R> restCall) {
+		return new RepositoryRemoteCallBuilder<R>(this, restCall);
 	}
-	public <R> RestCallBuilder<R> builder(EntityEnclosingRestEndpoint<R> restCall, Object content) {
-		return new RestCallBuilder<R>(this, restCall, content);
+	public <R> RepositoryRemoteCallBuilder<R> builder(EntityEnclosingRestEndpoint<R> restCall, Object content) {
+		return new RepositoryRemoteCallBuilder<R>(this, restCall, content);
 	}
-	public <R> NodeRestCallBuilder<R> builderWithSerializer(EntityEnclosingRestEndpoint<R> restCall) {
-		return new NodeRestCallBuilder<R>(this, restCall, serializationComponent);
+	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(EntityEnclosingRestEndpoint<R> restCall) {
+		return new RepositoryNodeRemoteCallBuilder<R>(this, restCall, serializationComponent);
 	}
 
 	public <T> T exchange(String path, HttpMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {

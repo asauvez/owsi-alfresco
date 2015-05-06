@@ -6,13 +6,13 @@ import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 public class ByteArrayRepositoryContentSerializer 
-		implements RepositoryContentSerializer<byte[]>, RepositoryContentDeserializer<byte[]> {
+		implements NodeContentSerializer<byte[]>, NodeContentDeserializer<byte[]> {
 
 	public static final ByteArrayRepositoryContentSerializer INSTANCE = new ByteArrayRepositoryContentSerializer();
 

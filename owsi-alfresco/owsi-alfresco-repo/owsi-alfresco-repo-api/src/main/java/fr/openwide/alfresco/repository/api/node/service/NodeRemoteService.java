@@ -6,6 +6,7 @@ import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeName
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.PostMethodEndpoint;
@@ -16,32 +17,36 @@ public interface NodeRemoteService {
 		public static final PostMethodEndpoint<RepositoryNode> ENDPOINT = new PostMethodEndpoint<RepositoryNode>("/owsi/node/get") {};
 		public NodeReference nodeReference;
 		public NodeScope nodeScope;
+		public RemoteCallParameters remoteCallParameters;
 	}
-	RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope) throws NoSuchNodeRemoteException;
+	RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) throws NoSuchNodeRemoteException;
 
 	class CHILDREN_NODE_SERVICE {
 		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/children") {};
 		public NodeReference nodeReference;
 		public NameReference childAssocTypeName; 
 		public NodeScope nodeScope;
+		public RemoteCallParameters remoteCallParameters;
 	}
-	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope);
+	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters);
 
 	class TARGET_ASSOC_NODE_SERVICE {
 		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/targetassoc") {};
 		public NodeReference nodeReference;
 		public NameReference assocName; 
 		public NodeScope nodeScope;
+		public RemoteCallParameters remoteCallParameters;
 	}
-	List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope);
+	List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters);
 
 	class SOURCE_ASSOC_NODE_SERVICE {
 		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/sourceassoc") {};
 		public NodeReference nodeReference;
 		public NameReference assocName; 
 		public NodeScope nodeScope;
+		public RemoteCallParameters remoteCallParameters;
 	}
-	List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope);
+	List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters);
 
 	class CREATE_NODE_SERVICE {
 		public static final PostMethodEndpoint<List<NodeReference>> ENDPOINT = new PostMethodEndpoint<List<NodeReference>>("/owsi/node/create") {};

@@ -6,11 +6,11 @@ import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class MultipartFileRepositoryContentSerializer implements RepositoryContentSerializer<MultipartFile> {
+public class MultipartFileRepositoryContentSerializer implements NodeContentSerializer<MultipartFile> {
 
 	public static final MultipartFileRepositoryContentSerializer INSTANCE = new MultipartFileRepositoryContentSerializer();
 

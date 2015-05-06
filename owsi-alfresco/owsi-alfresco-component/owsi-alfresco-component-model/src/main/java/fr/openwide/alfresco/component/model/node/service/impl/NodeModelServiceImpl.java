@@ -3,16 +3,12 @@ package fr.openwide.alfresco.component.model.node.service.impl;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -22,12 +18,11 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 
 public class NodeModelServiceImpl implements NodeModelService {
@@ -37,7 +32,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
-		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope()));
+		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
 	}
 
 	@Override
@@ -57,17 +52,17 @@ public class NodeModelServiceImpl implements NodeModelService {
 	
 	@Override
 	public List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(nodeService.getChildren(nodeReference, childAssoc.getNameReference(), nodeScopeBuilder.getScope()));
+		return new BusinessNodeList(nodeService.getChildren(nodeReference, childAssoc.getNameReference(), nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
 	}
 
 	@Override
 	public List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(nodeService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
+		return new BusinessNodeList(nodeService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
 	}
 
 	@Override
 	public List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
+		return new BusinessNodeList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
 	}
 	
 	@Override
@@ -87,8 +82,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 		String fileName = FilenameUtils.getName(file.getOriginalFilename());
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 				.property(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
-				.content(file),
-			MultipartFileRepositoryContentSerializer.INSTANCE);
+				.content(file));
 	}
 
 	@Override
@@ -96,14 +90,8 @@ public class NodeModelServiceImpl implements NodeModelService {
 		return nodeService.create(node.getRepositoryNode());
 	}
 	@Override
-	public NodeReference create(BusinessNode node, RepositoryContentSerializer<?> serializer) throws DuplicateChildNodeNameRemoteException {
-		Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers = new HashMap<>();
-		serializers.put(CmModel.content.content, serializer);
-		return create(node, serializers);
-	}
-	@Override
-	public NodeReference create(BusinessNode node, Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
-		return create(Collections.singletonList(node), serializers).get(0);
+	public NodeReference create(BusinessNode node, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException {
+		return create(Collections.singletonList(node), parameters).get(0);
 	}
 	@Override
 	public List<NodeReference> create(List<BusinessNode> nodes) throws DuplicateChildNodeNameRemoteException {
@@ -114,16 +102,12 @@ public class NodeModelServiceImpl implements NodeModelService {
 		return nodeService.create(repoNodes);
 	}
 	@Override
-	public List<NodeReference> create(List<BusinessNode> nodes, Map<ContentPropertyModel, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
-		Map<NameReference, RepositoryContentSerializer<?>> serializers2 = new HashMap<>();
-		for (Entry<ContentPropertyModel, RepositoryContentSerializer<?>> entry : serializers.entrySet()) {
-			serializers2.put(entry.getKey().getNameReference(), entry.getValue());
-		}
+	public List<NodeReference> create(List<BusinessNode> nodes, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException {
 		List<RepositoryNode> repoNodes = new ArrayList<>();
 		for (BusinessNode node : nodes) {
 			repoNodes.add(node.getRepositoryNode());
 		}
-		return nodeService.create(repoNodes, serializers2);
+		return nodeService.create(repoNodes, parameters);
 	}
 
 	@Override

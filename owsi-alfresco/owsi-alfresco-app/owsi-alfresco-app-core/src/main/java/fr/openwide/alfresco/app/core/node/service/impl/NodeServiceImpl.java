@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +17,12 @@ import org.springframework.web.client.ResponseExtractor;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.node.binding.NodePayloadCallback;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
+import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
@@ -34,11 +35,21 @@ public class NodeServiceImpl implements NodeService {
 	@Autowired
 	private RepositoryRemoteBinding repositoryRemoteBinding;
 	
+	private NodeContentSerializationParameters defaultSerializationParameters = new NodeContentSerializationParameters();
+	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
+	
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope) {
+	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		GET_NODE_SERVICE payload = new GET_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.nodeScope = nodeScope;
+		payload.remoteCallParameters = remoteCallParameters;
+		
+		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters;
+		if (! nodeScope.getContentDeserializers().isEmpty()) {
+			deserializationParameters = deserializationParameters.clone();
+			deserializationParameters.getDeserializersByProperties().putAll(nodeScope.getContentDeserializers());
+		}
 		
 		return repositoryRemoteBinding.builderWithSerializer(GET_NODE_SERVICE.ENDPOINT)
 			.callPayloadSerializer(payload, null, 
@@ -52,8 +63,8 @@ public class NodeServiceImpl implements NodeService {
 						// on récupére la valeur en retour de la fonction
 					}
 				}, 
-				null, 
-				nodeScope.getContentDeserializers());
+				defaultSerializationParameters, 
+				deserializationParameters);
 	}
 
 	@Override
@@ -85,6 +96,13 @@ public class NodeServiceImpl implements NodeService {
 			EntityEnclosingRestEndpoint<List<RepositoryNode>> endPoint,
 			Object payload,
 			NodeScope nodeScope) {
+		
+		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters;
+		if (! nodeScope.getContentDeserializers().isEmpty()) {
+			deserializationParameters = deserializationParameters.clone();
+			deserializationParameters.getDeserializersByProperties().putAll(nodeScope.getContentDeserializers());
+		}
+		
 		return repositoryRemoteBinding.builderWithSerializer(endPoint)
 			.callPayloadSerializer(
 				payload, null, 
@@ -98,51 +116,53 @@ public class NodeServiceImpl implements NodeService {
 						// on récupére la valeur en retour de la fonction
 					}
 				}, 
-				null, 
-				nodeScope.getContentDeserializers());
+				defaultSerializationParameters, 
+				deserializationParameters);
 	}
 	
 	@Override
-	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope) {
+	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		CHILDREN_NODE_SERVICE payload = new CHILDREN_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.childAssocTypeName = childAssocTypeName;
 		payload.nodeScope = nodeScope;
+		payload.remoteCallParameters = remoteCallParameters;
 		return callNodeListSerializer(CHILDREN_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 
 	@Override
-	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope) {
+	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		TARGET_ASSOC_NODE_SERVICE payload = new TARGET_ASSOC_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.assocName = assocName;
 		payload.nodeScope = nodeScope;
+		payload.remoteCallParameters = remoteCallParameters;
 		return callNodeListSerializer(TARGET_ASSOC_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 
 	@Override
-	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope) {
+	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		SOURCE_ASSOC_NODE_SERVICE payload = new SOURCE_ASSOC_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.assocName = assocName;
 		payload.nodeScope = nodeScope;
-
+		payload.remoteCallParameters = remoteCallParameters;
 		return callNodeListSerializer(SOURCE_ASSOC_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 
 	@Override
 	public NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
-		return create(node, new HashMap<NameReference, RepositoryContentSerializer<?>>());
+		return create(node, defaultSerializationParameters);
 	}
 
 	@Override
 	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException {
-		return create(nodes, new HashMap<NameReference, RepositoryContentSerializer<?>>());
+		return create(nodes, defaultSerializationParameters);
 	}
 	
 	@Override
-	public NodeReference create(RepositoryNode node, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
-		List<NodeReference> list = create(Collections.singletonList(node), serializers);
+	public NodeReference create(RepositoryNode node, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException {
+		List<NodeReference> list = create(Collections.singletonList(node), parameters);
 		return list.get(0);
 	}
 	
@@ -150,39 +170,40 @@ public class NodeServiceImpl implements NodeService {
 			EntityEnclosingRestEndpoint<R> endPoint,
 			Object payload,
 			List<RepositoryNode> nodes,
-			Map<NameReference, RepositoryContentSerializer<?>> serializers) {
+			NodeContentSerializationParameters serializationParameters,
+			NodeContentDeserializationParameters deserializationParameters) {
 		return repositoryRemoteBinding.builderWithSerializer(endPoint)
-			.callPayloadSerializer(payload, nodes, null, serializers, null);
+			.callPayloadSerializer(payload, nodes, null, serializationParameters, deserializationParameters);
 	}
 	
 	@Override
-	public List<NodeReference> create(List<RepositoryNode> nodes, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
+	public List<NodeReference> create(List<RepositoryNode> nodes, NodeContentSerializationParameters serializationParameters) throws DuplicateChildNodeNameRemoteException {
 		CREATE_NODE_SERVICE payload = new CREATE_NODE_SERVICE();
 		payload.nodes = nodes;
-		return callNodeUploadSerializer(CREATE_NODE_SERVICE.ENDPOINT, payload, nodes, serializers);
+		return callNodeUploadSerializer(CREATE_NODE_SERVICE.ENDPOINT, payload, nodes, serializationParameters, defaultDeserializationParameters);
 	}
 	
 	@Override
 	public void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
-		update(nodes, nodeScope, new HashMap<NameReference, RepositoryContentSerializer<?>>());
+		update(nodes, nodeScope, defaultSerializationParameters);
 	}
 	@Override
 	public void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
-		update(node, nodeScope, new HashMap<NameReference, RepositoryContentSerializer<?>>());
+		update(node, nodeScope, defaultSerializationParameters);
 	}
 	@Override
 	public void update(RepositoryNode node, NodeScope nodeScope,
-			Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
-		update(Collections.singletonList(node), nodeScope, serializers);
+			NodeContentSerializationParameters serializationParameters) throws DuplicateChildNodeNameRemoteException {
+		update(Collections.singletonList(node), nodeScope, serializationParameters);
 	}
 
 	@Override
-	public void update(final List<RepositoryNode> nodes, final NodeScope nodeScope, 
-			final Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException {
+	public void update(List<RepositoryNode> nodes, NodeScope nodeScope, 
+			NodeContentSerializationParameters serializationParameters) throws DuplicateChildNodeNameRemoteException {
 		UPDATE_NODE_SERVICE payload = new UPDATE_NODE_SERVICE();
 		payload.nodes = nodes;
 		payload.nodeScope = nodeScope;
-		callNodeUploadSerializer(UPDATE_NODE_SERVICE.ENDPOINT, payload, nodes, serializers);
+		callNodeUploadSerializer(UPDATE_NODE_SERVICE.ENDPOINT, payload, nodes, serializationParameters, defaultDeserializationParameters);
 	}
 	
 	@Override
@@ -194,7 +215,7 @@ public class NodeServiceImpl implements NodeService {
 	public void delete(List<NodeReference> nodeReferences) {
 		DELETE_NODE_SERVICE payload = new DELETE_NODE_SERVICE();
 		payload.nodeReferences = nodeReferences;
-		callNodeUploadSerializer(DELETE_NODE_SERVICE.ENDPOINT, payload, null, null);
+		callNodeUploadSerializer(DELETE_NODE_SERVICE.ENDPOINT, payload, null, defaultSerializationParameters, defaultDeserializationParameters);
 	}
 
 }

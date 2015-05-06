@@ -2,11 +2,10 @@ package fr.openwide.alfresco.app.core.node.service;
 
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.client.ResponseExtractor;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
@@ -26,12 +25,12 @@ public interface NodeService extends NodeRemoteService {
 	RepositoryContentData getNodeContent(NodeReference nodeReference, NameReference property, OutputStream out);
 
 	NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException;
-	NodeReference create(RepositoryNode node, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException;
-	List<NodeReference> create(List<RepositoryNode> nodes, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException;
+	NodeReference create(RepositoryNode node, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
+	List<NodeReference> create(List<RepositoryNode> nodes, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
 	
 	void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException;
-	void update(RepositoryNode node, NodeScope nodeScope, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException;
-	void update(List<RepositoryNode> nodes, NodeScope nodeScope, Map<NameReference, RepositoryContentSerializer<?>> serializers) throws DuplicateChildNodeNameRemoteException;
+	void update(RepositoryNode node, NodeScope nodeScope, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
+	void update(List<RepositoryNode> nodes, NodeScope nodeScope, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
 
 	void delete(NodeReference nodeReference);
 	

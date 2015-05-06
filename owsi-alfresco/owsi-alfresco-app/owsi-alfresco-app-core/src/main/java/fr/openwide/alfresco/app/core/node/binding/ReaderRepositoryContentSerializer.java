@@ -8,11 +8,11 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.input.ReaderInputStream;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class ReaderRepositoryContentSerializer implements RepositoryContentSerializer<Reader> {
+public class ReaderRepositoryContentSerializer implements NodeContentSerializer<Reader> {
 
 	public static final ReaderRepositoryContentSerializer INSTANCE = new ReaderRepositoryContentSerializer(StandardCharsets.UTF_8);
 	

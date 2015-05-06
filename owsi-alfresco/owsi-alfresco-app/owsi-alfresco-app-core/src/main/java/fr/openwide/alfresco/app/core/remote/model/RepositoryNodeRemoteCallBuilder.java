@@ -2,7 +2,6 @@ package fr.openwide.alfresco.app.core.remote.model;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -13,19 +12,18 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.repository.api.node.binding.NodePayloadCallback;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
-public class NodeRestCallBuilder<R> extends RestCallBuilder<R> {
+public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuilder<R> {
 
-	private final RepositoryContentSerializationComponent serializationComponent;
+	private final NodeContentSerializationComponent serializationComponent;
 
-	public NodeRestCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RestEndpoint<R> restCall,
-			RepositoryContentSerializationComponent serializationComponent) {
+	public RepositoryNodeRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RestEndpoint<R> restCall,
+			NodeContentSerializationComponent serializationComponent) {
 		super(repositoryRemoteBinding, restCall);
 		this.serializationComponent = serializationComponent;
 	}
@@ -34,17 +32,17 @@ public class NodeRestCallBuilder<R> extends RestCallBuilder<R> {
 			final Object payload, 
 			final Collection<RepositoryNode> nodes, 
 			final NodePayloadCallback<R> payloadCallback,
-			final Map<NameReference, RepositoryContentSerializer<?>> serializers,
-			final Map<NameReference, RepositoryContentDeserializer<?>> deserializers) {
+			final NodeContentSerializationParameters serializationParameters,
+			final NodeContentDeserializationParameters deserializationParameters) {
 		
-		this.header("Content-Type", RepositoryContentSerializationComponent.CONTENT_TYPE);
+		this.header("Content-Type", NodeContentSerializationComponent.CONTENT_TYPE);
 		
 		RequestCallback requestCallback = new RequestCallback() {
 			@Override
 			public void doWithRequest(ClientHttpRequest request) throws IOException {
 				serializationComponent.serialize(
 						payload, nodes, 
-						serializers, 
+						serializationParameters, 
 						request.getBody());
 			}
 		};
@@ -54,7 +52,7 @@ public class NodeRestCallBuilder<R> extends RestCallBuilder<R> {
 				return serializationComponent.deserialize(
 						TypeFactory.defaultInstance().constructType(getRestCallType()), 
 						payloadCallback,
-						deserializers, 
+						deserializationParameters, 
 						response.getBody());
 			}
 		};

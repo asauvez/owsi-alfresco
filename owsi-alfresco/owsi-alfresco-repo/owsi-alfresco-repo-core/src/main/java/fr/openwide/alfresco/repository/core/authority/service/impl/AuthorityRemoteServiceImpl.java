@@ -10,6 +10,7 @@ import org.alfresco.service.cmr.security.AuthorityType;
 
 import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
+import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
@@ -23,21 +24,21 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	private AuthorityService authorityService;
 
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope) {
-		return getContained(repoAuthority, AuthorityType.USER, immediate, nodeScope);
+	public List<RepositoryNode> getContainedUsers(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
+		return getContained(repoAuthority, AuthorityType.USER, immediate, nodeScope, remoteCallParameters);
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope) {
-		return getContained(repoAuthority, AuthorityType.GROUP, immediate, nodeScope);
+	public List<RepositoryNode> getContainedGroups(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
+		return getContained(repoAuthority, AuthorityType.GROUP, immediate, nodeScope, remoteCallParameters);
 	}
 
-	private List<RepositoryNode> getContained(RepositoryAuthority repoAuthority, AuthorityType type, boolean immediate, NodeScope nodeScope) {
+	private List<RepositoryNode> getContained(RepositoryAuthority repoAuthority, AuthorityType type, boolean immediate, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		Set<String> authorities = authorityService.getContainedAuthorities(type, repoAuthority.getName(), immediate);
 		List<RepositoryNode> nodes = new ArrayList<RepositoryNode>();
 		for (String authority : authorities) {
 			NodeRef nodeRef = authorityService.getAuthorityNodeRef(authority);
-			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), nodeScope));
+			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), nodeScope, remoteCallParameters));
 		}
 		return nodes;
 	}

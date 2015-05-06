@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 @JsonInclude(Include.NON_EMPTY)
@@ -23,7 +23,7 @@ public class NodeScope implements Serializable {
 	private boolean path = false;
 	private boolean type = false;
 	private final Set<NameReference> properties = new LinkedHashSet<>();
-	private final Map<NameReference, RepositoryContentDeserializer<?>> contentDeserializers = new LinkedHashMap<>();
+	private final Map<NameReference, NodeContentDeserializer<?>> contentDeserializers = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 	
 	private final Map<NameReference, String> extensions = new LinkedHashMap<>();
@@ -74,6 +74,7 @@ public class NodeScope implements Serializable {
 	public Set<NameReference> getProperties() {
 		return properties;
 	}
+	
 	@JsonProperty("contents")
 	private Set<NameReference> getContentsJson() {
 		return contentDeserializers.keySet();
@@ -85,7 +86,7 @@ public class NodeScope implements Serializable {
 		}
 	}
 	@JsonIgnore
-	public Map<NameReference, RepositoryContentDeserializer<?>> getContentDeserializers() {
+	public Map<NameReference, NodeContentDeserializer<?>> getContentDeserializers() {
 		return contentDeserializers;
 	}
 	public Set<NameReference> getAspects() {

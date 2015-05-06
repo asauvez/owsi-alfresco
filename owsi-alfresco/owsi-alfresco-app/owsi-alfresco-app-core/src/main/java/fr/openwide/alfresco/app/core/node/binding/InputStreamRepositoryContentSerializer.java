@@ -6,11 +6,11 @@ import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class InputStreamRepositoryContentSerializer implements RepositoryContentSerializer<InputStream> {
+public class InputStreamRepositoryContentSerializer implements NodeContentSerializer<InputStream> {
 
 	public static final InputStreamRepositoryContentSerializer INSTANCE = new InputStreamRepositoryContentSerializer();
 

@@ -25,23 +25,23 @@ import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNodeVisitor;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class RepositoryContentSerializationComponent {
+public class NodeContentSerializationComponent {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryContentSerializationComponent.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(NodeContentSerializationComponent.class);
 
 	public static final String CONTENT_TYPE = "application/zip";
 
-	private static final NameReference CONTENT_IDS = NameReference.create(RepositoryContentSerializationComponent.class.getSimpleName(), "contentIds");
-	private static final NameReference CONTENT_PROPERTIES = NameReference.create(RepositoryContentSerializationComponent.class.getSimpleName(), "contentProperties");
+	private static final NameReference CONTENT_IDS = NameReference.create(NodeContentSerializationComponent.class.getSimpleName(), "contentIds");
+	private static final NameReference CONTENT_PROPERTIES = NameReference.create(NodeContentSerializationComponent.class.getSimpleName(), "contentProperties");
 
 	private final ObjectMapper objectMapper;
-	private final Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass;
-	private final RepositoryContentDeserializer<?> defaultDeserializer;
+	private final Map<Class<?>, NodeContentSerializer<?>> serializersByClass;
+	private final NodeContentDeserializer<?> defaultDeserializer;
 
-	public RepositoryContentSerializationComponent(
+	public NodeContentSerializationComponent(
 			ObjectMapper objectMapper, 
-			Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass,
-			RepositoryContentDeserializer<?> defaultDeserializer) {
+			Map<Class<?>, NodeContentSerializer<?>> serializersByClass,
+			NodeContentDeserializer<?> defaultDeserializer) {
 		this.objectMapper = objectMapper;
 		this.serializersByClass = serializersByClass;
 		this.defaultDeserializer = defaultDeserializer;
@@ -50,7 +50,7 @@ public class RepositoryContentSerializationComponent {
 	public void serialize(
 			Object payload,
 			Collection<RepositoryNode> nodes,
-			final Map<NameReference, RepositoryContentSerializer<?>> serializersByProperties,
+			final NodeContentSerializationParameters parameters,
 			OutputStream outputStream) throws IOException {
 
 		RepositoryNodeVisitor visitor1 = new RepositoryNodeVisitor() {
@@ -77,7 +77,7 @@ public class RepositoryContentSerializationComponent {
 		}
 
 		final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(outputStream));
-		zos.setLevel(0); // sans compression
+		zos.setLevel(parameters.getCompressionLevel().or(NodeContentSerializationParameters.DEFAULT_COMPRESSION_LEVEL));
 		
 		zos.putNextEntry(new ZipEntry("json"));
 		if (LOGGER.isDebugEnabled()) {
@@ -98,13 +98,12 @@ public class RepositoryContentSerializationComponent {
 						NameReference contentProperty = NameReference.create(contentProperties.get(i));
 						
 						Object content = node.getContents().get(contentProperty);
-						RepositoryContentSerializer<Object> serializer = (serializersByProperties != null) 
-								? (RepositoryContentSerializer<Object>) serializersByProperties.get(contentProperty) 
-								: null;
+						NodeContentSerializer<Object> serializer = (NodeContentSerializer<Object>) 
+								parameters.getSerializersByProperties().get(contentProperty);
 						if (serializer == null) {
-							for (Entry<Class<?>, RepositoryContentSerializer<?>> serializerEntry : serializersByClass.entrySet()) {
+							for (Entry<Class<?>, NodeContentSerializer<?>> serializerEntry : serializersByClass.entrySet()) {
 								if (serializerEntry.getKey().isInstance(content)) {
-									serializer = (RepositoryContentSerializer<Object>) serializerEntry.getValue();
+									serializer = (NodeContentSerializer<Object>) serializerEntry.getValue();
 									break;
 								}
 							}
@@ -139,7 +138,7 @@ public class RepositoryContentSerializationComponent {
 	public <P> P deserialize(
 			JavaType valueType,
 			NodePayloadCallback<P> payloadCallback,
-			Map<NameReference, RepositoryContentDeserializer<?>> deserializersByProperties,
+			NodeContentDeserializationParameters parameters,
 			InputStream inputStream) throws IOException {
 
 		ZipInputStream zis = new ZipInputStream(inputStream);
@@ -180,9 +179,7 @@ public class RepositoryContentSerializationComponent {
 			int contentId = Integer.parseInt(zipEntry.getName());
 			ContentPropertyWrapper wrapper = wrappers.get(contentId);
 
-			RepositoryContentDeserializer<?> serializer = (deserializersByProperties != null) 
-					? deserializersByProperties.get(wrapper.getContentProperty())
-					: null;
+			NodeContentDeserializer<?> serializer = parameters.getDeserializersByProperties().get(wrapper.getContentProperty());
 			if (serializer == null) {
 				serializer = defaultDeserializer;
 			}

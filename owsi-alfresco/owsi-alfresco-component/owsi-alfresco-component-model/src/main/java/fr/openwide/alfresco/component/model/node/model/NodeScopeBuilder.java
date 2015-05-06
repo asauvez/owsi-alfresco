@@ -11,10 +11,11 @@ import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSeriali
 import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.repository.api.node.model.NodeScope;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
+import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
 /**
@@ -25,9 +26,13 @@ import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 public class NodeScopeBuilder {
 
 	private NodeScope scope = new NodeScope();
+	private RemoteCallParameters remoteCallParameters = new RemoteCallParameters();
 
 	public NodeScope getScope() {
 		return scope;
+	}
+	public RemoteCallParameters getRemoteCallParameters() {
+		return remoteCallParameters;
 	}
 
 	public NodeScopeBuilder fromNode(BusinessNode node) {
@@ -95,12 +100,16 @@ public class NodeScopeBuilder {
 		return contentWithDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, fileName));
 	}
 	
-	public NodeScopeBuilder contentWithDeserializer(RepositoryContentDeserializer<?> deserializer) {
+	public NodeScopeBuilder contentWithDeserializer(NodeContentDeserializer<?> deserializer) {
 		return contentWithDeserializer(CmModel.content.content, deserializer);
 	}
-	public NodeScopeBuilder contentWithDeserializer(PropertyModel<?> propertyModel, RepositoryContentDeserializer<?> deserializer) {
+	public NodeScopeBuilder contentWithDeserializer(PropertyModel<?> propertyModel, NodeContentDeserializer<?> deserializer) {
 		scope.getProperties().add(propertyModel.getNameReference());
 		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
+		return this;
+	}
+	public NodeScopeBuilder compressionLevel(Integer compressionLevel) {
+		remoteCallParameters.setCompressionLevel(compressionLevel);
 		return this;
 	}
 

@@ -29,8 +29,8 @@ import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSeria
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentSerializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 
 @Configuration
 @ComponentScan(
@@ -50,7 +50,7 @@ public class AppCoreRemoteBindingConfig {
 	@Bean
 	@Primary
 	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RestTemplate restTemplate, 
-			RepositoryContentSerializationComponent serializationComponent, RepositoryTicketProvider ticketProvider) {
+			NodeContentSerializationComponent serializationComponent, RepositoryTicketProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName, null, ticketProvider);
@@ -58,14 +58,14 @@ public class AppCoreRemoteBindingConfig {
 
 	@Bean
 	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding(RestTemplate restTemplate, 
-			RepositoryContentSerializationComponent serializationComponent) {
+			NodeContentSerializationComponent serializationComponent) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri);
 	}
 
 	@Bean
 	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding(RestTemplate restTemplate, 
-			RepositoryContentSerializationComponent serializationComponent) {
+			NodeContentSerializationComponent serializationComponent) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName);
@@ -73,7 +73,7 @@ public class AppCoreRemoteBindingConfig {
 
 	@Bean
 	public RepositoryRemoteBinding authenticationRemoteBinding(RestTemplate restTemplate, 
-			RepositoryContentSerializationComponent serializationComponent) {
+			NodeContentSerializationComponent serializationComponent) {
 		String authenticationUri = environment.getRequiredProperty("application.authentication.repository.root.uri");
 		return new RepositoryRemoteBinding(restTemplate, serializationComponent, authenticationUri);
 	}
@@ -88,8 +88,8 @@ public class AppCoreRemoteBindingConfig {
 	}
 
 	@Bean
-	public RepositoryContentSerializationComponent serializationComponent() {
-		Map<Class<?>, RepositoryContentSerializer<?>> serializersByClass = new HashMap<>();
+	public NodeContentSerializationComponent serializationComponent() {
+		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new HashMap<>();
 		serializersByClass.put(String.class, StringRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(byte[].class, ByteArrayRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(File.class, TempFileRepositoryContentSerializer.INSTANCE);
@@ -97,7 +97,7 @@ public class AppCoreRemoteBindingConfig {
 		serializersByClass.put(InputStream.class, InputStreamRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(Reader.class, ReaderRepositoryContentSerializer.INSTANCE);
 		
-		return new RepositoryContentSerializationComponent(
+		return new NodeContentSerializationComponent(
 				new ObjectMapper(), 
 				serializersByClass, 
 				ByteArrayRepositoryContentSerializer.INSTANCE);

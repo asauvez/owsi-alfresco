@@ -15,7 +15,7 @@ import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
 import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
-public class RestCallBuilder<R> {
+public class RepositoryRemoteCallBuilder<R> {
 
 	private final RepositoryRemoteBinding repositoryRemoteBinding;
 	private final RestEndpoint<R> restCall;
@@ -24,27 +24,27 @@ public class RestCallBuilder<R> {
 	private List<Object> urlVariables = new ArrayList<Object>();
 	private Object content;
 
-	public RestCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RestEndpoint<R> restCall) {
+	public RepositoryRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RestEndpoint<R> restCall) {
 		this.repositoryRemoteBinding = repositoryRemoteBinding;
 		this.restCall = restCall;
 	}
 
-	public RestCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, EntityEnclosingRestEndpoint<R> restCall, Object content) {
+	public RepositoryRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, EntityEnclosingRestEndpoint<R> restCall, Object content) {
 		this (repositoryRemoteBinding, restCall);
 		this.content = content;
 	}
 
-	public RestCallBuilder<R> header(String headerName, String headerValue) {
+	public RepositoryRemoteCallBuilder<R> header(String headerName, String headerValue) {
 		headers.add(headerName, headerValue);
 		return this;
 	}
 
-	public RestCallBuilder<R> urlVariable(Object value) {
+	public RepositoryRemoteCallBuilder<R> urlVariable(Object value) {
 		urlVariables.add(value);
 		return this;
 	}
 
-	public RestCallBuilder<R> urlVariable(NodeReference nodeReference) {
+	public RepositoryRemoteCallBuilder<R> urlVariable(NodeReference nodeReference) {
 		Matcher matcher = NodeReference.PATTERN.matcher(nodeReference.getReference());
 		matcher.matches();
 		urlVariable(matcher.group(1));

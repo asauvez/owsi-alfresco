@@ -7,12 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.openwide.alfresco.repository.api.node.binding.RepositoryContentDeserializer;
+import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
 import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
 import fr.openwide.alfresco.repository.api.remote.model.NameReference;
 
-public class HttpServletResponseRepositoryContentDeserializer implements RepositoryContentDeserializer<Void> {
+public class HttpServletResponseRepositoryContentDeserializer implements NodeContentDeserializer<Void> {
 
 	private final HttpServletResponse response;
 	private final String name;
