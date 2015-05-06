@@ -2,7 +2,7 @@ package fr.openwide.alfresco.app.web.pagination;
 
 import java.io.Serializable;
 
-public class SortParams implements Serializable {
+public class SortParameters implements Serializable {
 
 	public enum SortDirection { NONE, ASC, DESC }
 

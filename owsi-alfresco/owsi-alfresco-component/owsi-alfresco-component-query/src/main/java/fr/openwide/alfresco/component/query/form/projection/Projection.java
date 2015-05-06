@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 import com.google.common.base.Function;
 
-import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
+import fr.openwide.alfresco.app.web.pagination.SortParameters.SortDirection;
 import fr.openwide.alfresco.component.query.form.projection.button.TopButtonBuilder;
 
 public interface Projection<I, PB extends ProjectionBuilder<I, PB>, P> {

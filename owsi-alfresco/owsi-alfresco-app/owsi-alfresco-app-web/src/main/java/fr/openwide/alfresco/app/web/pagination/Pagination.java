@@ -10,16 +10,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
+import fr.openwide.alfresco.app.web.pagination.SortParameters.SortDirection;
 
 public class Pagination implements Serializable {
 
-	private final PaginationParams params;
+	private final PaginationParameters params;
 	private int nbItemsTotal;
 	private final UriComponents uriComponentsPage;
 	private final UriComponents uriComponentsSort;
 
-	public Pagination(PaginationParams params, UriComponentsBuilder uriComponentsBuilder) {
+	public Pagination(PaginationParameters params, UriComponentsBuilder uriComponentsBuilder) {
 		this.params = params;
 		this.uriComponentsPage = uriComponentsBuilder
 				.replaceQueryParam("pagination.currentPage", "{page}")
@@ -128,7 +128,7 @@ public class Pagination implements Serializable {
 		return getPageUri(getNextPage());
 	}
 
-	public SortParams getSort() {
+	public SortParameters getSort() {
 		return params.getSort();
 	}
 	public Map<String, String> getSortUri() {

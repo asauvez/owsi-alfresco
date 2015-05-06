@@ -2,7 +2,7 @@ package fr.openwide.alfresco.component.query.search.model;
 
 import org.springframework.validation.Errors;
 
-import fr.openwide.alfresco.app.web.pagination.PaginationParams;
+import fr.openwide.alfresco.app.web.pagination.PaginationParameters;
 import fr.openwide.alfresco.component.query.form.field.FieldSet;
 import fr.openwide.alfresco.component.query.form.field.InputField;
 import fr.openwide.alfresco.component.query.form.field.InputFieldBuilder;
@@ -11,7 +11,7 @@ import fr.openwide.alfresco.component.query.form.util.MessageUtils;
 
 public abstract class AbstractFormQuery<I> {
 
-	private PaginationParams pagination = new PaginationParams();
+	private PaginationParameters pagination = new PaginationParameters();
 	private InputFieldBuilder inputFieldBuilder = new InputFieldBuilder();
 	private boolean doQuery;
 	
@@ -38,7 +38,7 @@ public abstract class AbstractFormQuery<I> {
 		return inputFieldBuilder;
 	}
 
-	public PaginationParams getPagination() {
+	public PaginationParameters getPagination() {
 		return pagination;
 	}
 

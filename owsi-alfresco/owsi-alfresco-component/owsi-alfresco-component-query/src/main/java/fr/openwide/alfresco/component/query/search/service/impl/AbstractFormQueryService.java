@@ -18,8 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.google.common.collect.Ordering;
 
 import fr.openwide.alfresco.app.web.pagination.Pagination;
-import fr.openwide.alfresco.app.web.pagination.PaginationParams;
-import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
+import fr.openwide.alfresco.app.web.pagination.PaginationParameters;
+import fr.openwide.alfresco.app.web.pagination.SortParameters.SortDirection;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionBuilder;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionColumn;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionImpl;
@@ -63,7 +63,7 @@ public class AbstractFormQueryService {
 			}
 		}
 
-		PaginationParams paginationParams = formQuery.getPagination();
+		PaginationParameters paginationParams = formQuery.getPagination();
 
 		// Tri
 		if (paginationParams.getSort().getColumn() != null) {

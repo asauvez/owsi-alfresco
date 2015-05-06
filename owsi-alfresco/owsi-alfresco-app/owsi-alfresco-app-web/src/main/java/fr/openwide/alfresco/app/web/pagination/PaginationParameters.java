@@ -2,18 +2,18 @@ package fr.openwide.alfresco.app.web.pagination;
 
 import java.io.Serializable;
 
-public class PaginationParams implements Serializable {
+public class PaginationParameters implements Serializable {
 
-	private SortParams sort = new SortParams();
+	private SortParameters sort = new SortParameters();
 
 	private int currentPage = 1;
 	private int nbItemsPerPage = Integer.MAX_VALUE;
 	private int nbPagesToDisplay = 5;
 
-	public SortParams getSort() {
+	public SortParameters getSort() {
 		return sort;
 	}
-	public void setSort(SortParams sort) {
+	public void setSort(SortParameters sort) {
 		this.sort = sort;
 	}
 

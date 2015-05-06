@@ -2,12 +2,12 @@ package fr.openwide.alfresco.app.web.pagination;
 
 public abstract class PageableForm {
 
-	private PaginationParams pagination = new PaginationParams();
+	private PaginationParameters pagination = new PaginationParameters();
 
-	public PaginationParams getPagination() {
+	public PaginationParameters getPagination() {
 		return pagination;
 	}
-	public void setPagination(PaginationParams pagination) {
+	public void setPagination(PaginationParameters pagination) {
 		this.pagination = pagination;
 	}
 }

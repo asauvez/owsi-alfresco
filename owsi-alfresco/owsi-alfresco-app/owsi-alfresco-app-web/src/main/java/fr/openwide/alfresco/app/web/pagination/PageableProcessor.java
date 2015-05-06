@@ -14,7 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.google.common.collect.Ordering;
 
-import fr.openwide.alfresco.app.web.pagination.SortParams.SortDirection;
+import fr.openwide.alfresco.app.web.pagination.SortParameters.SortDirection;
 import fr.openwide.core.spring.util.StringUtils;
 
 public class PageableProcessor<T> {
@@ -24,7 +24,7 @@ public class PageableProcessor<T> {
 	private int pageSize;
 
 	public PageableResult<T> paginate(Collection<T> items, PageableForm pageable, HttpServletRequest request) {
-		PaginationParams paginationParams = pageable.getPagination();
+		PaginationParameters paginationParams = pageable.getPagination();
 		paginationParams.setNbItemsPerPage(pageSize);
 		List<T> allItems = new ArrayList<T>(items);
 				
