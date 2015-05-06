@@ -56,7 +56,10 @@ public interface NodeRemoteService {
 	}
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException;
 
-	PostMethodEndpoint<Void> DELETE_NODE_SERVICE_ENDPOINT = new PostMethodEndpoint<Void>("/owsi/node/delete") {};
+	class DELETE_NODE_SERVICE {
+		public static final PostMethodEndpoint<Void> ENDPOINT = new PostMethodEndpoint<Void>("/owsi/node/delete") {};
+		public List<NodeReference> nodeReferences;
+	}
 	void delete(List<NodeReference> nodeReferences);
 
 }

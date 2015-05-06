@@ -192,8 +192,9 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public void delete(List<NodeReference> nodeReferences) {
-		repositoryRemoteBinding.builderWithSerializer(DELETE_NODE_SERVICE_ENDPOINT)
-			.callPayloadSerializer(nodeReferences, null, null, null, null);
+		DELETE_NODE_SERVICE payload = new DELETE_NODE_SERVICE();
+		payload.nodeReferences = nodeReferences;
+		callNodeUploadSerializer(DELETE_NODE_SERVICE.ENDPOINT, payload, null, null);
 	}
 
 }
