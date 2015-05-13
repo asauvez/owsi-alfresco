@@ -104,11 +104,21 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		argumentResolvers.add(new AlertContainerMethodArgumentResolver());
 	}
 
+	protected void addExceptionResolverMethodArgumentResolver(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		argumentResolvers.add(new HandlerInterceptorAwareModelMethodProcessor(getInterceptors()));
+		argumentResolvers.add(validationResponseMethodProcessor());
+		argumentResolvers.add(new AlertContainerMethodArgumentResolver());
+	}
+
 	@Override
 	protected void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
 		super.addReturnValueHandlers(returnValueHandlers);
 		returnValueHandlers.add(validationResponseMethodProcessor());
 		returnValueHandlers.add(downloadResponseMethodProcessor());
+	}
+
+	protected void addExceptionResolverReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
+		returnValueHandlers.add(validationResponseMethodProcessor());
 	}
 
 	@Override
@@ -118,16 +128,14 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 		exceptionHandlerExceptionResolver.setMessageConverters(getMessageConverters());
 		// add custom argument resolvers
 		List<HandlerMethodArgumentResolver> argumentResolvers = new ArrayList<HandlerMethodArgumentResolver>();
-		argumentResolvers.add(new HandlerInterceptorAwareModelMethodProcessor(getInterceptors()));
-		argumentResolvers.add(validationResponseMethodProcessor());
-		argumentResolvers.add(new AlertContainerMethodArgumentResolver());
+		addExceptionResolverMethodArgumentResolver(argumentResolvers);
 		exceptionHandlerExceptionResolver.setCustomArgumentResolvers(argumentResolvers);
 		// add custom return value handlers
 		List<HandlerMethodReturnValueHandler> returnValueHandlers = new ArrayList<HandlerMethodReturnValueHandler>();
-		returnValueHandlers.add(validationResponseMethodProcessor());
+		addExceptionResolverReturnValueHandlers(returnValueHandlers);
 		exceptionHandlerExceptionResolver.setCustomReturnValueHandlers(returnValueHandlers);
 		exceptionHandlerExceptionResolver.afterPropertiesSet();
-
+		// build list of exception resolvers
 		exceptionResolvers.add(exceptionHandlerExceptionResolver);
 		exceptionResolvers.add(new ResponseStatusExceptionResolver());
 		exceptionResolvers.add(new DefaultHandlerExceptionResolver());
