@@ -22,7 +22,30 @@
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		
 		<owsi-alfresco.repo.quartz.version>1.8.3-alfresco-patched</owsi-alfresco.repo.quartz.version>
+		<owsi-alfresco.repo.freemarker.version>2.3.18-alfresco-patched-2</owsi-alfresco.repo.freemarker.version>
+		<owsi-alfresco.repo.poi.version>3.10.1</owsi-alfresco.repo.poi.version>
+		<owsi-alfresco.repo.tika.version>1.6-20140428-alfresco-patched</owsi-alfresco.repo.tika.version>
+		<owsi-alfresco.repo.pdfbox.version>1.8.4-alfresco-patched</owsi-alfresco.repo.pdfbox.version>
+		<owsi-alfresco.repo.xerces.version>2.10.0-alfresco-patched</owsi-alfresco.repo.xerces.version>
+		<owsi-alfresco.repo.commons-lang.version>2.6</owsi-alfresco.repo.commons-lang.version>
+		<owsi-alfresco.repo.commons-io.version>2.4</owsi-alfresco.repo.commons-io.version>
+		<owsi-alfresco.repo.commons-fileupload.version>1.3.1</owsi-alfresco.repo.commons-fileupload.version>
 		<owsi-alfresco.repo.commons-codec.version>1.5</owsi-alfresco.repo.commons-codec.version>
+		<owsi-alfresco.repo.commons-digester.version>1.6</owsi-alfresco.repo.commons-digester.version>
+		<owsi-alfresco.repo.commons-beanutils.version>1.7.0</owsi-alfresco.repo.commons-beanutils.version>
+		<owsi-alfresco.repo.commons-httpclient.version>3.1-HTTPCLIENT-1265</owsi-alfresco.repo.commons-httpclient.version>
+		<owsi-alfresco.repo.jaxen.version>1.1.4</owsi-alfresco.repo.jaxen.version>
+		<owsi-alfresco.repo.joda-time.version>2.3</owsi-alfresco.repo.joda-time.version>
+		<owsi-alfresco.repo.axiom.version>1.2.5</owsi-alfresco.repo.axiom.version>
+		<owsi-alfresco.repo.xmlbeans.version>2.6.0</owsi-alfresco.repo.xmlbeans.version>
+		<owsi-alfresco.repo.javax-mail.version>1.4.4</owsi-alfresco.repo.javax-mail.version>
+		<owsi-alfresco.repo.json-simple.version>1.1.1</owsi-alfresco.repo.json-simple.version>
+		<owsi-alfresco.repo.xpp3.version>1.1.3_8</owsi-alfresco.repo.xpp3.version>
+		<owsi-alfresco.repo.javax-activation.version>1.1</owsi-alfresco.repo.javax-activation.version>
+		<owsi-alfresco.repo.jaxb.version>2.1.11</owsi-alfresco.repo.jaxb.version>
+		<owsi-alfresco.repo.stax-ex.version>1.2</owsi-alfresco.repo.stax-ex.version>
+		<owsi-alfresco.repo.stax-api.version>1.0-2</owsi-alfresco.repo.stax-api.version>
+		<owsi-alfresco.repo.spring-social.version>1.0.3.RELEASE</owsi-alfresco.repo.spring-social.version>
 	</properties>
 
 	<dependencyManagement>
@@ -66,8 +89,68 @@
 						<artifactId>tools</artifactId>
 					</exclusion>
 					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>rhino</groupId>
+						<artifactId>js</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>cglib</groupId>
+						<artifactId>cglib</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
+					</exclusion>
+					<exclusion>
 						<groupId>commons-logging</groupId>
 						<artifactId>commons-logging</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-dbcp</groupId>
+						<artifactId>commons-dbcp</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>jdom</groupId>
+						<artifactId>jdom</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xalan</groupId>
+						<artifactId>xalan</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.woodstox</groupId>
+						<artifactId>wstx-asl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.security</groupId>
+						<artifactId>spring-security-crypto</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.myfaces.core</groupId>
+						<artifactId>myfaces-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.myfaces.core</groupId>
+						<artifactId>myfaces-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.json</groupId>
+						<artifactId>json</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.jackson</groupId>
+						<artifactId>jackson-mapper-asl</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -76,12 +159,14 @@
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>${owsi-alfresco.repo.postgresql.version}</version>
+				<scope>runtime</scope>
 			</dependency>
 			
 			<dependency>
 				<groupId>org.quartz-scheduler</groupId>
 				<artifactId>quartz</artifactId>
 				<version>${owsi-alfresco.repo.quartz.version}</version>
+				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
 						<artifactId>c3p0</artifactId>
@@ -89,28 +174,182 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-			
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${owsi-alfresco.repo.freemarker.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>${owsi-alfresco.repo.poi.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>${owsi-alfresco.repo.poi.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml-schema</artifactId>
+				<version>${owsi-alfresco.repo.poi.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-scratchpad</artifactId>
+				<version>${owsi-alfresco.repo.poi.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-core</artifactId>
+				<version>${owsi-alfresco.repo.tika.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.pdfbox</groupId>
+				<artifactId>pdfbox</artifactId>
+				<version>${owsi-alfresco.repo.pdfbox.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>xerces</groupId>
+				<artifactId>xercesImpl</artifactId>
+				<version>${owsi-alfresco.repo.xerces.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${owsi-alfresco.repo.commons-lang.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${owsi-alfresco.repo.commons-io.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>${owsi-alfresco.repo.commons-fileupload.version}</version>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
 				<version>${owsi-alfresco.repo.commons-codec.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>${owsi-alfresco.repo.commons-digester.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${owsi-alfresco.repo.commons-beanutils.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-httpclient</groupId>
+				<artifactId>commons-httpclient</artifactId>
+				<version>${owsi-alfresco.repo.commons-httpclient.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>jaxen</groupId>
+				<artifactId>jaxen</artifactId>
+				<version>${owsi-alfresco.repo.jaxen.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${owsi-alfresco.repo.joda-time.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.ws.commons.axiom</groupId>
+				<artifactId>axiom-api</artifactId>
+				<version>${owsi-alfresco.repo.axiom.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.ws.commons.axiom</groupId>
+				<artifactId>axiom-impl</artifactId>
+				<version>${owsi-alfresco.repo.axiom.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.xmlbeans</groupId>
+				<artifactId>xmlbeans</artifactId>
+				<version>${owsi-alfresco.repo.xmlbeans.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${owsi-alfresco.repo.javax-mail.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.googlecode.json-simple</groupId>
+				<artifactId>json-simple</artifactId>
+				<version>${owsi-alfresco.repo.json-simple.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>xpp3</groupId>
+				<artifactId>xpp3</artifactId>
+				<version>${owsi-alfresco.repo.xpp3.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.activation</groupId>
+				<artifactId>activation</artifactId>
+				<version>${owsi-alfresco.repo.javax-activation.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-impl</artifactId>
+				<version>${owsi-alfresco.repo.jaxb.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.staxex</groupId>
+				<artifactId>stax-ex</artifactId>
+				<version>${owsi-alfresco.repo.stax-ex.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.xml.stream</groupId>
+				<artifactId>stax-api</artifactId>
+				<version>${owsi-alfresco.repo.stax-api.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.social</groupId>
+				<artifactId>spring-social-core</artifactId>
+				<version>${owsi-alfresco.repo.spring-social.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-core</artifactId>
+				<version>${owsi-alfresco.repo.tika.version}</version>
+				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-enforcer-plugin</artifactId>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 
 	<repositories>
 		<repository>
