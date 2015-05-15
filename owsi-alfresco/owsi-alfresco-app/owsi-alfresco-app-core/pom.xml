@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-app-core</artifactId>
 
-	<name>OWSI Alfresco - App - Core</name>
+	<name>OWSI Alfresco - Application - Core</name>
 
 	<dependencies>
 		<dependency>

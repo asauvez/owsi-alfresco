@@ -14,11 +14,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-app-web</artifactId>
+			<artifactId>owsi-alfresco-app-dictionary</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-component-model</artifactId>
+			<artifactId>owsi-alfresco-app-web</artifactId>
 		</dependency>
 		
 		<dependency>

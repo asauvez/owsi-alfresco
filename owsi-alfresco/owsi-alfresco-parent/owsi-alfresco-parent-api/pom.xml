@@ -9,6 +9,8 @@
 	<artifactId>owsi-alfresco-parent-api</artifactId>
 	<packaging>pom</packaging>
 
+	<name>OWSI Alfresco - Parent - API</name>
+
 	<properties>
 		<owsi-alfresco.api.guava.version>18.0</owsi-alfresco.api.guava.version> <!-- owsi-core version -->
 		<owsi-alfresco.api.jackson.version>2.4.3</owsi-alfresco.api.jackson.version> <!-- owsi-core version -->
@@ -19,6 +21,16 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-api-core</artifactId>
+				<version>0.2.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-component-model</artifactId>
+				<version>0.2.0-SNAPSHOT</version>
+			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>

@@ -9,7 +9,7 @@
 	<artifactId>owsi-alfresco-parent-app</artifactId>
 	<packaging>pom</packaging>
 
-	<name>OWSI Alfresco - Parent - App</name>
+	<name>OWSI Alfresco - Parent - Application</name>
 	<description>Définitions des dépendances pour le développement d'une application spécifique sur Alfresco</description>
 
 	<properties>
