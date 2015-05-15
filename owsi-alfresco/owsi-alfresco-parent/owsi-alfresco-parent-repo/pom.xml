@@ -214,4 +214,15 @@
 		</pluginManagement>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>alfresco-enterprise</id>
+			<name>Alfresco Enterprise Artifacts</name>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 </project>
