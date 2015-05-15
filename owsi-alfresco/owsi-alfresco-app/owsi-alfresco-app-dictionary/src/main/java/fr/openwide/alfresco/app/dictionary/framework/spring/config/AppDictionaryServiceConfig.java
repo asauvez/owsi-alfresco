@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.component.model.framework.spring.config;
+package fr.openwide.alfresco.app.dictionary.framework.spring.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelS
 
 @Configuration
 @Import(AppCoreRemoteBindingConfig.class)
-public class ComponentModelConfig {
+public class AppDictionaryServiceConfig {
 
 	@Bean
 	public NodeModelService nodeModelService() {

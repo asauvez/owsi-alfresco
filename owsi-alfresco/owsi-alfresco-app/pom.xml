@@ -10,12 +10,13 @@
 	<artifactId>owsi-alfresco-app</artifactId>
 	<packaging>pom</packaging>
 
-	<name>OWSI Alfresco - App</name>
+	<name>OWSI Alfresco - Application</name>
 	<description>Composants pour le développement d'une application spécifique en Spring MVC sur Alfresco</description>
 
 	<modules>
 		<module>owsi-alfresco-app-core</module>
 		<module>owsi-alfresco-app-web</module>
+		<module>owsi-alfresco-app-dictionary</module>
 	</modules>
 
 </project>
