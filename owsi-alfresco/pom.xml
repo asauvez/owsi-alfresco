@@ -15,6 +15,10 @@
 	<name>OWSI Alfresco</name>
 	<description>Capitalisation des développements utilisés sur les projets Alfresco</description>
 
+	<properties>
+		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5</owsi-alfresco.jgitflow-maven-plugin.version>
+	</properties>
+
 	<modules>
 		<module>owsi-alfresco-parent</module>
 		<module>owsi-alfresco-api</module>
@@ -58,7 +62,7 @@
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
 					<artifactId>jgitflow-maven-plugin</artifactId>
-					<version>1.0-m5</version>
+					<version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
 					<configuration>
 						<flowInitContext>
 							<masterBranchName>master</masterBranchName>
