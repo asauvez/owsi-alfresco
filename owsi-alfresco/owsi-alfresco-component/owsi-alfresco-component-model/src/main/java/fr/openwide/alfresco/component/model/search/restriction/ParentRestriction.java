@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.component.model.search.restriction;
 
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class ParentRestriction extends Restriction {
 

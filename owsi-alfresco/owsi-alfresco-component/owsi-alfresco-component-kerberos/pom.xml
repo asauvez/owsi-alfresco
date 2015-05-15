@@ -9,6 +9,8 @@
 	</parent>
 	<artifactId>owsi-alfresco-component-kerberos</artifactId>
 
+	<name>OWSI Alfresco - Component - Kerberos</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.security.kerberos</groupId>

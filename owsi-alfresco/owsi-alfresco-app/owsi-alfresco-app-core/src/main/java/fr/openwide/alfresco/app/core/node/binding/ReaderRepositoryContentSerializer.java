@@ -8,9 +8,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.input.ReaderInputStream;
 
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class ReaderRepositoryContentSerializer implements NodeContentSerializer<Reader> {
 

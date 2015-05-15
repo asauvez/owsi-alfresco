@@ -18,12 +18,12 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
-import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeModelServiceImpl implements NodeModelService {
 

@@ -2,7 +2,7 @@ package fr.openwide.alfresco.component.model.repository.model.sys;
 
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class SysBase extends TypeModel {
 

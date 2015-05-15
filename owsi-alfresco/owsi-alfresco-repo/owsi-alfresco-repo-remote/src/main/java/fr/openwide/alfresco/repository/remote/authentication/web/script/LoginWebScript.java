@@ -5,9 +5,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService.LOGIN_REQUEST_SERVICE;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
+import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService.LOGIN_REQUEST_SERVICE;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
 
 public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUser, LOGIN_REQUEST_SERVICE> {

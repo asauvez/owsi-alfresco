@@ -11,13 +11,13 @@ import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPrope
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthorityPermission;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryChildAssociation;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAuthorityPermission;
+import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 /**
  * Contient les informations liées à une node. 

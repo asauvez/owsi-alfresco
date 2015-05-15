@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.DELETE_NODE_SERVICE;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.DELETE_NODE_SERVICE;
 
 public class DeleteNodeWebScript extends AbstractNodeWebScript<Void, DELETE_NODE_SERVICE> {
 

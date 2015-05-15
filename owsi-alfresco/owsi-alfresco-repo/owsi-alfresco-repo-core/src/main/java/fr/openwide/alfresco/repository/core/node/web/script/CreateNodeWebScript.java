@@ -7,9 +7,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.CREATE_NODE_SERVICE;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.CREATE_NODE_SERVICE;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class CreateNodeWebScript extends AbstractNodeWebScript<List<NodeReference>, CREATE_NODE_SERVICE> {
 

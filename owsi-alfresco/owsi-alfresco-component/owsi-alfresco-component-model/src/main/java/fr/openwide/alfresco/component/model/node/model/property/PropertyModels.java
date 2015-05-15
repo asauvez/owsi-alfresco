@@ -24,7 +24,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.LongPrope
 import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public final class PropertyModels {
 

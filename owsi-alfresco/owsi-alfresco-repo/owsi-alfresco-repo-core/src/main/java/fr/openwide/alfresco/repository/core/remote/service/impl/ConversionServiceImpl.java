@@ -11,10 +11,10 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
-import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 

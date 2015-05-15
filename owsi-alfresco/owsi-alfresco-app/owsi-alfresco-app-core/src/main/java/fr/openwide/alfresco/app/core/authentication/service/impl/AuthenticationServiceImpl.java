@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {

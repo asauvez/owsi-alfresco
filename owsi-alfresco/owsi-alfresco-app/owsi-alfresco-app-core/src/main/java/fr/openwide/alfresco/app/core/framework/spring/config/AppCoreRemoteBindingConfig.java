@@ -29,8 +29,8 @@ import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSeria
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
 
 @Configuration
 @ComponentScan(

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 
 /**
  * Wrappe une liste de RepositoryNode dans une liste de BusinessNode.

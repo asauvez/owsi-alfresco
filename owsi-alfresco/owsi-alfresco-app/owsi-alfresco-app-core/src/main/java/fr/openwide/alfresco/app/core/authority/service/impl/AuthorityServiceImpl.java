@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 
 @Service
 public class AuthorityServiceImpl implements AuthorityService {

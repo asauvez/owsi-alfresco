@@ -1,7 +1,7 @@
 package fr.openwide.alfresco.app.web.download.model;
 
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeReferenceDownloadResponse extends DownloadResponse {
 

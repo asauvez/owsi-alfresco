@@ -12,7 +12,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
 
 public class AuthorityModelServiceImpl implements AuthorityModelService {
 

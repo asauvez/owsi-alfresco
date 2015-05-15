@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-component-model</artifactId>
 
-	<name>OWSI Alfresco - Query - Core</name>
+	<name>OWSI Alfresco - Component - Model</name>
 
 	<dependencies>
 		<dependency>
