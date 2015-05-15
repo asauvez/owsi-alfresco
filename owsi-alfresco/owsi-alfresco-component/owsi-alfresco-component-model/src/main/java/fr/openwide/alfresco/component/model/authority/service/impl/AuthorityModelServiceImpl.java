@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
 
 public class AuthorityModelServiceImpl implements AuthorityModelService {
 

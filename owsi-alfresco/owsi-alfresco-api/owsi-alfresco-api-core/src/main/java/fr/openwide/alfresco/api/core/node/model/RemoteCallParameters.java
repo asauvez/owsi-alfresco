@@ -8,12 +8,15 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_EMPTY)
 public class RemoteCallParameters implements Serializable {
 
-	private Integer compressionLevel = null;
-	
+	private static final long serialVersionUID = 6488062940282466202L;
+
+	private Integer compressionLevel;
+
 	public Integer getCompressionLevel() {
 		return compressionLevel;
 	}
 	public void setCompressionLevel(Integer compressionLevel) {
 		this.compressionLevel = compressionLevel;
 	}
+
 }

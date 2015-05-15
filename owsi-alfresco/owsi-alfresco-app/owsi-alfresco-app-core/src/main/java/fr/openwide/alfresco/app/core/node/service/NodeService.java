@@ -13,7 +13,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRestEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.GetMethodEndpoint;
 
 public interface NodeService extends NodeRemoteService {
@@ -34,6 +34,6 @@ public interface NodeService extends NodeRemoteService {
 
 	void delete(NodeReference nodeReference);
 	
-	public List<RepositoryNode> callNodeListSerializer(EntityEnclosingRestEndpoint<List<RepositoryNode>> endPoint,
+	public List<RepositoryNode> callNodeListSerializer(EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endPoint,
 			Object payload, NodeScope nodeScope);
 }

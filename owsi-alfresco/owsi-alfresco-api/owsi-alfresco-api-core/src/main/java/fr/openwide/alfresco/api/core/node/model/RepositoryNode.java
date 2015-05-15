@@ -44,7 +44,7 @@ public class RepositoryNode implements Serializable {
 
 	private final Set<RepositoryPermission> userPermissions = new HashSet<>();
 	private Boolean inheritParentPermissions;
-	private final Set<RepositoryAuthorityPermission> accessPermissions = new LinkedHashSet<>();
+	private final Set<RepositoryAccessControl> accessControlList = new LinkedHashSet<>();
 
 	public RepositoryNode() {
 	}
@@ -63,7 +63,7 @@ public class RepositoryNode implements Serializable {
 		return getProperties().get(nameReference);
 	}
 	@SuppressWarnings("unchecked")
-	public <T> T getProperty(NameReference nameReference, @SuppressWarnings("unused") Class<T> clazz) {
+	public <T> T getProperty(NameReference nameReference, Class<T> clazz) {
 		return (T) getProperty(nameReference);
 	}
 	
@@ -76,7 +76,7 @@ public class RepositoryNode implements Serializable {
 		return getExtensions().get(nameReference);
 	}
 	@SuppressWarnings("unchecked")
-	public <T> T getExtension(NameReference nameReference, @SuppressWarnings("unused") Class<T> clazz) {
+	public <T> T getExtension(NameReference nameReference, Class<T> clazz) {
 		return (T) getExtension(nameReference);
 	}
 
@@ -136,8 +136,8 @@ public class RepositoryNode implements Serializable {
 	public void setInheritParentPermissions(Boolean inheritParentPermissions) {
 		this.inheritParentPermissions = inheritParentPermissions;
 	}
-	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
-		return accessPermissions;
+	public Set<RepositoryAccessControl> getAccessControlList() {
+		return accessControlList;
 	}
 
 	public void visit(RepositoryNodeVisitor visitor) {

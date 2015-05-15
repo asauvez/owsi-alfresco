@@ -2,10 +2,10 @@ package fr.openwide.alfresco.api.core.authority.service;
 
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 
 public interface AuthorityRemoteService {

@@ -14,6 +14,8 @@ import fr.openwide.alfresco.app.web.pagination.SortParameters.SortDirection;
 
 public class Pagination implements Serializable {
 
+	private static final long serialVersionUID = 6109378132360950451L;
+
 	private final PaginationParameters params;
 	private int nbItemsTotal;
 	private final UriComponents uriComponentsPage;
@@ -133,6 +135,8 @@ public class Pagination implements Serializable {
 	}
 	public Map<String, String> getSortUri() {
 		return new HashMap<String, String>() {
+			private static final long serialVersionUID = -6563499017526815799L;
+			
 			@Override
 			public String get(Object column) {
 				SortDirection direction = 

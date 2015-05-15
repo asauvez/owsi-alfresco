@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
-import fr.openwide.alfresco.app.core.node.service.NodeService;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
+import fr.openwide.alfresco.app.core.node.service.NodeService;
 
 @Service
 public class AuthorityServiceImpl implements AuthorityService {

@@ -27,7 +27,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRestEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 
 @Service
 public class NodeServiceImpl implements NodeService {
@@ -93,7 +93,7 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public List<RepositoryNode> callNodeListSerializer(
-			EntityEnclosingRestEndpoint<List<RepositoryNode>> endPoint,
+			EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endPoint,
 			Object payload,
 			NodeScope nodeScope) {
 		
@@ -167,7 +167,7 @@ public class NodeServiceImpl implements NodeService {
 	}
 	
 	private <R> R callNodeUploadSerializer(
-			EntityEnclosingRestEndpoint<R> endPoint,
+			EntityEnclosingRemoteEndpoint<R> endPoint,
 			Object payload,
 			List<RepositoryNode> nodes,
 			NodeContentSerializationParameters serializationParameters,

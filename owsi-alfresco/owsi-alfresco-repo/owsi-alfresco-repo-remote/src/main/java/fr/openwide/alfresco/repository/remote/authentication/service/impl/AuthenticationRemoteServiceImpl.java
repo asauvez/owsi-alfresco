@@ -24,7 +24,7 @@ import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 
 public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteService {

@@ -29,12 +29,12 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthorityPermission;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -204,7 +204,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (scope.isAccessPermissions()) {
 			node.setInheritParentPermissions(permissionService.getInheritParentPermissions(nodeRef));
 			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
-				node.getAccessPermissions().add(new RepositoryAuthorityPermission(
+				node.getAccessControlList().add(new RepositoryAccessControl(
 						new RepositoryAuthority(accessPermission.getAuthority()),
 						new RepositoryPermission(accessPermission.getPermission()),
 						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
@@ -408,17 +408,17 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			permissionService.setInheritParentPermissions(nodeRef, node.getInheritParentPermissions());
 		}
 		
-		Set<RepositoryAuthorityPermission> oldPermissions = new HashSet<RepositoryAuthorityPermission>();
+		Set<RepositoryAccessControl> oldPermissions = new HashSet<RepositoryAccessControl>();
 		for (AccessPermission oldPermission : permissionService.getAllSetPermissions(nodeRef)) {
 			if (oldPermission.isSetDirectly()) {
-				oldPermissions.add(new RepositoryAuthorityPermission(
+				oldPermissions.add(new RepositoryAccessControl(
 					new RepositoryAuthority(oldPermission.getAuthority()),
 					new RepositoryPermission(oldPermission.getPermission()),
 					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
 		}
 		
-		for (RepositoryAuthorityPermission newPermission : node.getAccessPermissions()) {
+		for (RepositoryAccessControl newPermission : node.getAccessControlList()) {
 			if (! oldPermissions.remove(newPermission)) {
 				permissionService.setPermission(nodeRef, 
 						newPermission.getAuthority().getName(), 
@@ -427,7 +427,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 		}
 		
-		for (RepositoryAuthorityPermission oldPermission : oldPermissions) {
+		for (RepositoryAccessControl oldPermission : oldPermissions) {
 			permissionService.deletePermission(nodeRef, 
 					oldPermission.getAuthority().getName(), 
 					oldPermission.getPermission().getName());

@@ -6,16 +6,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
-/**
- * Permet de créer de façon propre une requête Lucene à appliquer dans la GED.
- *  
- * @author asauvez
- */
 public class RestrictionBuilder extends Restriction {
 
 	public enum LogicalOperator { AND, OR }

@@ -4,6 +4,12 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
@@ -11,18 +17,7 @@ import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSeriali
 import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
-import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-/**
- * Indique les données liés à un noeud à rapporter lors d'une recherche. 
- *  
- * @author asauvez
- */
 public class NodeScopeBuilder {
 
 	private NodeScope scope = new NodeScope();

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 
 public class RepositoryUser implements Serializable {
 

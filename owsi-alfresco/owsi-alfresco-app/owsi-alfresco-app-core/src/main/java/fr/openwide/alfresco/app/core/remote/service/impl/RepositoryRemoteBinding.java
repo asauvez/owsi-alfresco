@@ -33,8 +33,8 @@ import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRestEndpoint;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RestEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
 
 public class RepositoryRemoteBinding {
 
@@ -67,13 +67,13 @@ public class RepositoryRemoteBinding {
 		this.ticketProvider = Optional.fromNullable(ticketProvider);
 	}
 
-	public <R> RepositoryRemoteCallBuilder<R> builder(RestEndpoint<R> restCall) {
+	public <R> RepositoryRemoteCallBuilder<R> builder(RemoteEndpoint<R> restCall) {
 		return new RepositoryRemoteCallBuilder<R>(this, restCall);
 	}
-	public <R> RepositoryRemoteCallBuilder<R> builder(EntityEnclosingRestEndpoint<R> restCall, Object content) {
+	public <R> RepositoryRemoteCallBuilder<R> builder(EntityEnclosingRemoteEndpoint<R> restCall, Object content) {
 		return new RepositoryRemoteCallBuilder<R>(this, restCall, content);
 	}
-	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(EntityEnclosingRestEndpoint<R> restCall) {
+	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(EntityEnclosingRemoteEndpoint<R> restCall) {
 		return new RepositoryNodeRemoteCallBuilder<R>(this, restCall, serializationComponent);
 	}
 

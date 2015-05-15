@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.api.core.node.model;
+package fr.openwide.alfresco.api.core.authority.model;
 
 import java.io.Serializable;
 import java.util.Objects;

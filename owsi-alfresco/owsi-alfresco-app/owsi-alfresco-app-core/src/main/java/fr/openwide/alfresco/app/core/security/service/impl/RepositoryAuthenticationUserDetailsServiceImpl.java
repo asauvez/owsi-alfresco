@@ -16,14 +16,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.base.Strings;
 
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
 
 public class RepositoryAuthenticationUserDetailsServiceImpl implements RepositoryAuthenticationUserDetailsService {

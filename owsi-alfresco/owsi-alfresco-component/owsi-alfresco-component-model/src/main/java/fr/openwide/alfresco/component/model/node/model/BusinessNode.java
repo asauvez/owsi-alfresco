@@ -7,22 +7,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
-import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.node.model.RepositoryAuthorityPermission;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
-/**
- * Contient les informations liées à une node. 
- * @author asauvez
- */
 public class BusinessNode {
 
 	private RepositoryNode node;
@@ -149,11 +145,11 @@ public class BusinessNode {
 		return this;
 	}
 	
-	public Set<RepositoryAuthorityPermission> getAccessPermissions() {
-		return node.getAccessPermissions();
+	public Set<RepositoryAccessControl> getAccessControlList() {
+		return node.getAccessControlList();
 	}
-	public BusinessNode addAccessPermission(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
-		node.getAccessPermissions().add(new RepositoryAuthorityPermission(authority, permission, allowed));
+	public BusinessNode addAccessControl(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
+		node.getAccessControlList().add(new RepositoryAccessControl(authority, permission, allowed));
 		return this;
 	}
 

@@ -16,13 +16,13 @@ import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationPara
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RestEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
 
 public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuilder<R> {
 
 	private final NodeContentSerializationComponent serializationComponent;
 
-	public RepositoryNodeRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RestEndpoint<R> restCall,
+	public RepositoryNodeRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RemoteEndpoint<R> restCall,
 			NodeContentSerializationComponent serializationComponent) {
 		super(repositoryRemoteBinding, restCall);
 		this.serializationComponent = serializationComponent;

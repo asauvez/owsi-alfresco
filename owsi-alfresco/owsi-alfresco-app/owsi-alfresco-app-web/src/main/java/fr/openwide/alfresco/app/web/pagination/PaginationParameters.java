@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class PaginationParameters implements Serializable {
 
+	private static final long serialVersionUID = 555065374685286649L;
+
 	private SortParameters sort = new SortParameters();
 
 	private int currentPage = 1;

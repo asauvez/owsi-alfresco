@@ -5,7 +5,9 @@ import java.util.Objects;
 
 import com.google.common.base.Joiner;
 
-public class RepositoryAuthorityPermission implements Serializable {
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+
+public class RepositoryAccessControl implements Serializable {
 
 	private static final long serialVersionUID = 1391171626983929282L;
 
@@ -13,9 +15,9 @@ public class RepositoryAuthorityPermission implements Serializable {
 	private RepositoryPermission permission;
 	private boolean allowed;
 
-	public RepositoryAuthorityPermission() {}
+	public RepositoryAccessControl() {}
 
-	public RepositoryAuthorityPermission(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
+	public RepositoryAccessControl(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
 		this.authority = authority;
 		this.permission = permission;
 		this.allowed = allowed;
@@ -55,8 +57,8 @@ public class RepositoryAuthorityPermission implements Serializable {
 		if (object == this) {
 			return true;
 		}
-		if (object instanceof RepositoryAuthorityPermission) {
-			RepositoryAuthorityPermission other = (RepositoryAuthorityPermission) object;
+		if (object instanceof RepositoryAccessControl) {
+			RepositoryAccessControl other = (RepositoryAccessControl) object;
 			return Objects.equals(authority, other.getAuthority())
 				&& Objects.equals(permission, other.getPermission())
 				&& Objects.equals(allowed, other.isAllowed());

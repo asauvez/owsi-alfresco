@@ -12,24 +12,24 @@ import org.springframework.web.client.ResponseExtractor;
 
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRestEndpoint;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RestEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
 
 public class RepositoryRemoteCallBuilder<R> {
 
 	private final RepositoryRemoteBinding repositoryRemoteBinding;
-	private final RestEndpoint<R> restCall;
+	private final RemoteEndpoint<R> restCall;
 
 	private HttpHeaders headers = new HttpHeaders();
 	private List<Object> urlVariables = new ArrayList<Object>();
 	private Object content;
 
-	public RepositoryRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RestEndpoint<R> restCall) {
+	public RepositoryRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RemoteEndpoint<R> restCall) {
 		this.repositoryRemoteBinding = repositoryRemoteBinding;
 		this.restCall = restCall;
 	}
 
-	public RepositoryRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, EntityEnclosingRestEndpoint<R> restCall, Object content) {
+	public RepositoryRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, EntityEnclosingRemoteEndpoint<R> restCall, Object content) {
 		this (repositoryRemoteBinding, restCall);
 		this.content = content;
 	}

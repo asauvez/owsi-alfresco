@@ -43,13 +43,13 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 
 	protected abstract R execute(P payload);
 
-	protected Collection<RepositoryNode> getInputNodes(@SuppressWarnings("unused") P payload) {
+	protected Collection<RepositoryNode> getInputNodes(P payload) {
 		return Collections.emptySet();
 	}
-	protected Collection<RepositoryNode> getOutputNodes(@SuppressWarnings("unused") R result) {
+	protected Collection<RepositoryNode> getOutputNodes(R result) {
 		return Collections.emptySet();
 	}
-	protected RemoteCallParameters getRemoteCallParameters(@SuppressWarnings("unused") P payload) {
+	protected RemoteCallParameters getRemoteCallParameters(P payload) {
 		return null;
 	}
 

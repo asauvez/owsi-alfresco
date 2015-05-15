@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class SortParameters implements Serializable {
 
+	private static final long serialVersionUID = -8019001561774052701L;
+
 	public enum SortDirection { NONE, ASC, DESC }
 
 	private String column = null;
