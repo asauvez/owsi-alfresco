@@ -5,7 +5,7 @@ import java.util.Map;
 
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryAuthority;
 
 /**
  * @author asauvez

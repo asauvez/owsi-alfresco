@@ -6,9 +6,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService.GET_CONTAINED_GROUPS;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.GET_CONTAINED_GROUPS;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 
 public class GetContainedGroupsWebScript extends AbstractAuthorityWebScript<GET_CONTAINED_GROUPS> {
 

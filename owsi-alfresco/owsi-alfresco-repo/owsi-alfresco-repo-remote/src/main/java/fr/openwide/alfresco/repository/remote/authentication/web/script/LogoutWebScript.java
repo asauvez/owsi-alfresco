@@ -5,8 +5,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
 
 public class LogoutWebScript extends AbstractMessageRemoteWebScript<Void, RepositoryTicket> {

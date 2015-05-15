@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-component-query</artifactId>
 
-	<name>OWSI Alfresco - Query - Web</name>
+	<name>OWSI Alfresco - Component - Query</name>
 
 	<dependencies>
 		<dependency>
@@ -22,18 +22,10 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>

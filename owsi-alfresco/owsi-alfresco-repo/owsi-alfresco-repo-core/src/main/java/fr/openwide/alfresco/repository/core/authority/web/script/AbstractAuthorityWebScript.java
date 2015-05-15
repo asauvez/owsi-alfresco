@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.repository.core.authority.web.script;
 
-import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService;
+import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.repository.core.node.web.script.AbstractNodeListWebScript;
 
 public abstract class AbstractAuthorityWebScript<P> extends AbstractNodeListWebScript<P> {

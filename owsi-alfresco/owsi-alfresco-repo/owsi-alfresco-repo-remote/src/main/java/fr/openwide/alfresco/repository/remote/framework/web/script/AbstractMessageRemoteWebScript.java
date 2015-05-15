@@ -9,7 +9,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.JavaType;
 
-import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 
 /**
  * Base class for web services that provide automatic one argument handling. Payload must be a unique object in message body,

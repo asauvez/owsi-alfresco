@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.app.core.node.model;
 
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public interface NodeReferenceProvider {
 

@@ -5,7 +5,7 @@ import java.util.Locale;
 
 import org.springframework.format.Formatter;
 
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class NameReferenceFormatter implements Formatter<NameReference> {
 

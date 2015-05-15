@@ -2,7 +2,7 @@ package fr.openwide.alfresco.component.model.node.model;
 
 import java.util.Objects;
 
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 
 public abstract class Model {

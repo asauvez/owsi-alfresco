@@ -33,12 +33,12 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.openwide.alfresco.repository.api.node.exception.NodeExistsRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.IllegalStateRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.IntegrityRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.InvalidMessageRemoteException;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.api.core.node.exception.NodeExistsRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.IntegrityRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 import fr.openwide.alfresco.repository.remote.framework.model.InnerTransactionParameters;
 

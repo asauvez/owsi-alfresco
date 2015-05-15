@@ -17,11 +17,11 @@ import fr.openwide.alfresco.component.query.form.projection.Projection.Align;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionBuilder;
 import fr.openwide.alfresco.component.query.form.view.output.IconOutputFieldView;
 import fr.openwide.alfresco.component.query.form.view.output.OutputFieldView;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, NodeProjectionBuilder> {
 

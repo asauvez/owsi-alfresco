@@ -9,14 +9,14 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.lang.StringUtils;
 
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
-import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
-import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
-import fr.openwide.alfresco.repository.api.search.service.SearchQueryLanguage;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.model.StoreReference;
+import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
+import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 

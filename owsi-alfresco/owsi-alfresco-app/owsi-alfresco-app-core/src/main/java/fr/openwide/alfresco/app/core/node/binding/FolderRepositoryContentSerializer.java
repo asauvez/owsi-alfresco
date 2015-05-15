@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import fr.openwide.alfresco.app.core.node.binding.AbstractFileRepositoryContentSerializer;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class FolderRepositoryContentSerializer extends AbstractFileRepositoryContentSerializer {
 

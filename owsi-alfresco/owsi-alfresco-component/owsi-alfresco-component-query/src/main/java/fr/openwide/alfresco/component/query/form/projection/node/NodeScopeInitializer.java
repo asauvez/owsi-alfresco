@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.component.query.form.projection.node;
 
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
 
 public interface NodeScopeInitializer {
 

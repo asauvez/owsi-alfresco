@@ -20,17 +20,17 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializationParameters;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
-import fr.openwide.alfresco.repository.api.node.binding.NodePayloadCallback;
-import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
+import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
 public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R> {

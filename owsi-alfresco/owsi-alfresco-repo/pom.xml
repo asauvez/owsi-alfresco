@@ -11,10 +11,9 @@
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Repository</name>
-	<description>Composants à inclure dans l'application Alfresco</description>
+	<description>Composants pour le développement d'extensions dans l'application Alfresco</description>
 
 	<modules>
-		<module>owsi-alfresco-repo-api</module>
 		<module>owsi-alfresco-repo-remote</module>
 		<module>owsi-alfresco-repo-core</module>
 	</modules>

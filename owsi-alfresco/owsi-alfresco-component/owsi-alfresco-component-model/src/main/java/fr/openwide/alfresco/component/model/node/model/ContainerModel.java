@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class ContainerModel extends Model {
 

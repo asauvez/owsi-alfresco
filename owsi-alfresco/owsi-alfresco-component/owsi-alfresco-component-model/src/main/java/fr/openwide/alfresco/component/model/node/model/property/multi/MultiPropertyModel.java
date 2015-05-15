@@ -5,7 +5,7 @@ import java.io.Serializable;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.ConstraintException;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class MultiPropertyModel<C extends Serializable> extends PropertyModel<C> {
 

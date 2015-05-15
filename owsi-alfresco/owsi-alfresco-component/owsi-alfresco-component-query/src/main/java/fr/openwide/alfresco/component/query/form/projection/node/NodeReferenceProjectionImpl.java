@@ -1,8 +1,8 @@
 package fr.openwide.alfresco.component.query.form.projection.node;
 
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeReferenceProjectionImpl extends AbstractNodeProjectionImpl<NodeReference> {
 

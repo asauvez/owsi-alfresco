@@ -16,18 +16,18 @@ import org.springframework.web.client.ResponseExtractor;
 
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.repository.api.node.binding.NodePayloadCallback;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializationParameters;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
-import fr.openwide.alfresco.repository.api.node.exception.DuplicateChildNodeNameRemoteException;
-import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryContentData;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
+import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRestEndpoint;
 
 @Service
 public class NodeServiceImpl implements NodeService {

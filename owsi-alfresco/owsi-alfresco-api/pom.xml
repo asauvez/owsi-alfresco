@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-parent-api</artifactId>
+		<version>0.2.0-SNAPSHOT</version>
+		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-api/pom.xml</relativePath>
+	</parent>
+	<artifactId>owsi-alfresco-api</artifactId>
+	<packaging>pom</packaging>
+
+	<name>OWSI Alfresco - API</name>
+	<description>Composants pour le développement d'extensions à la fois dans Alfresco et dans une application spécifique sur Alfresco</description>
+
+	<modules>
+		<module>owsi-alfresco-api-core</module>
+	</modules>
+
+</project>
