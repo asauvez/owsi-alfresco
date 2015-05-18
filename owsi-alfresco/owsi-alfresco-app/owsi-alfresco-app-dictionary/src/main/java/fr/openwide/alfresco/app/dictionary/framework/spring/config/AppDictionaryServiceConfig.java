@@ -30,7 +30,7 @@ public class AppDictionaryServiceConfig {
 	}
 
 	@Bean
-	public final AuthorityModelService authorityModelService(AuthorityService authorityService) {
+	public AuthorityModelService authorityModelService(AuthorityService authorityService) {
 		return new AuthorityModelServiceImpl(authorityService);
 	}
 

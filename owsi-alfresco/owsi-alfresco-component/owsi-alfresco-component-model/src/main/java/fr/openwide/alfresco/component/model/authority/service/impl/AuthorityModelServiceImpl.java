@@ -14,7 +14,7 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class AuthorityModelServiceImpl implements AuthorityModelService {
 
-	private AuthorityService authorityService;
+	private final AuthorityService authorityService;
 
 	public AuthorityModelServiceImpl(AuthorityService authorityService) {
 		this.authorityService = authorityService;
