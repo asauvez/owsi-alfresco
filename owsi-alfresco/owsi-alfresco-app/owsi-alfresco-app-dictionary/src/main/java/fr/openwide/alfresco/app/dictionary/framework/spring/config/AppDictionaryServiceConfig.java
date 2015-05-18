@@ -4,7 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import fr.openwide.alfresco.app.core.framework.spring.config.AppCoreRemoteBindingConfig;
+import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
+import fr.openwide.alfresco.app.core.framework.spring.config.AppCoreServiceConfig;
+import fr.openwide.alfresco.app.core.node.service.NodeService;
+import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
@@ -13,21 +16,22 @@ import fr.openwide.alfresco.component.model.search.service.NodeSearchModelServic
 import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl;
 
 @Configuration
-@Import(AppCoreRemoteBindingConfig.class)
+@Import(AppCoreServiceConfig.class)
 public class AppDictionaryServiceConfig {
 
 	@Bean
-	public NodeModelService nodeModelService() {
-		return new NodeModelServiceImpl();
+	public NodeModelService nodeModelService(NodeService nodeService) {
+		return new NodeModelServiceImpl(nodeService);
 	}
 
 	@Bean
-	public NodeSearchModelService nodeSearchModelService() {
-		return new NodeSearchModelServiceImpl();
+	public NodeSearchModelService nodeSearchModelService(NodeSearchService nodeSearchService) {
+		return new NodeSearchModelServiceImpl(nodeSearchService);
 	}
 
 	@Bean
-	public AuthorityModelService authorityModelService() {
-		return new AuthorityModelServiceImpl();
+	public final AuthorityModelService authorityModelService(AuthorityService authorityService) {
+		return new AuthorityModelServiceImpl(authorityService);
 	}
+
 }

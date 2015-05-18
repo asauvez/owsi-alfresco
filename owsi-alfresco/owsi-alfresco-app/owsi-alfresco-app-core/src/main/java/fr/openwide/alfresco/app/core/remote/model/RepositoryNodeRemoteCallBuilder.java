@@ -10,13 +10,13 @@ import org.springframework.web.client.ResponseExtractor;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
+import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 
 public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuilder<R> {
 

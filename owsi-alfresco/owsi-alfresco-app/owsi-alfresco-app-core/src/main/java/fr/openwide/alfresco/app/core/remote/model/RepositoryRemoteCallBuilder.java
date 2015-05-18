@@ -10,10 +10,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
+import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 
 public class RepositoryRemoteCallBuilder<R> {
 

@@ -4,11 +4,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.UserService;
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 
 public class UserAwareRepositoryTicketProvider implements RepositoryTicketProvider {
 

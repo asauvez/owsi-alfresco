@@ -8,9 +8,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
-import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 
 public class RepositoryRemoteExceptionHandler extends DefaultResponseErrorHandler {
 

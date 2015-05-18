@@ -8,17 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResponseExtractor;
 
-import fr.openwide.alfresco.app.core.node.service.NodeService;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
@@ -28,16 +24,20 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
+import fr.openwide.alfresco.app.core.node.service.NodeService;
+import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 
-@Service
 public class NodeServiceImpl implements NodeService {
 
-	@Autowired
-	private RepositoryRemoteBinding repositoryRemoteBinding;
-	
+	private final RepositoryRemoteBinding repositoryRemoteBinding;
+
 	private NodeContentSerializationParameters defaultSerializationParameters = new NodeContentSerializationParameters();
 	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
-	
+
+	public NodeServiceImpl(RepositoryRemoteBinding repositoryRemoteBinding) {
+		this.repositoryRemoteBinding = repositoryRemoteBinding;
+	}
+
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		GET_NODE_SERVICE payload = new GET_NODE_SERVICE();
@@ -90,7 +90,7 @@ public class NodeServiceImpl implements NodeService {
 		});
 		return contentData;
 	}
-	
+
 	@Override
 	public List<RepositoryNode> callNodeListSerializer(
 			EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endPoint,
@@ -119,7 +119,7 @@ public class NodeServiceImpl implements NodeService {
 				defaultSerializationParameters, 
 				deserializationParameters);
 	}
-	
+
 	@Override
 	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
 		CHILDREN_NODE_SERVICE payload = new CHILDREN_NODE_SERVICE();
@@ -159,13 +159,13 @@ public class NodeServiceImpl implements NodeService {
 	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException {
 		return create(nodes, defaultSerializationParameters);
 	}
-	
+
 	@Override
 	public NodeReference create(RepositoryNode node, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException {
 		List<NodeReference> list = create(Collections.singletonList(node), parameters);
 		return list.get(0);
 	}
-	
+
 	private <R> R callNodeUploadSerializer(
 			EntityEnclosingRemoteEndpoint<R> endPoint,
 			Object payload,
@@ -182,15 +182,17 @@ public class NodeServiceImpl implements NodeService {
 		payload.nodes = nodes;
 		return callNodeUploadSerializer(CREATE_NODE_SERVICE.ENDPOINT, payload, nodes, serializationParameters, defaultDeserializationParameters);
 	}
-	
+
 	@Override
 	public void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		update(nodes, nodeScope, defaultSerializationParameters);
 	}
+
 	@Override
 	public void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		update(node, nodeScope, defaultSerializationParameters);
 	}
+
 	@Override
 	public void update(RepositoryNode node, NodeScope nodeScope,
 			NodeContentSerializationParameters serializationParameters) throws DuplicateChildNodeNameRemoteException {
@@ -205,12 +207,12 @@ public class NodeServiceImpl implements NodeService {
 		payload.nodeScope = nodeScope;
 		callNodeUploadSerializer(UPDATE_NODE_SERVICE.ENDPOINT, payload, nodes, serializationParameters, defaultDeserializationParameters);
 	}
-	
+
 	@Override
 	public void delete(NodeReference nodeReference) {
 		delete(Collections.singletonList(nodeReference));
 	}
-	
+
 	@Override
 	public void delete(List<NodeReference> nodeReferences) {
 		DELETE_NODE_SERVICE payload = new DELETE_NODE_SERVICE();
