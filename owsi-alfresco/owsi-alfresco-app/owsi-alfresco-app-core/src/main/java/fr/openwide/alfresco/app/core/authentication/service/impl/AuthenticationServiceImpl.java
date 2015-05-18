@@ -1,41 +1,26 @@
 package fr.openwide.alfresco.app.core.authentication.service.impl;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
-import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
+import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 
-@Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-	@Autowired
-	@Qualifier("unauthenticatedRepositoryRemoteBinding")
-	private RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding;
+	private final RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding;
+	private final RepositoryRemoteBinding requiringExplicitTicketRemoteBinding;
+	private final RepositoryRemoteBinding authenticationRemoteBinding;
 
-	@Autowired
-	@Qualifier("requiringExplicitTicketRemoteBinding")
-	private RepositoryRemoteBinding requiringExplicitTicketRemoteBinding;
+	private final String authenticationHeader;
 
-	@Autowired
-	@Qualifier("authenticationRemoteBinding")
-	private RepositoryRemoteBinding authenticationRemoteBinding;
-
-	@Autowired
-	private Environment environment;
-
-	private String authenticationHeader;
-
-	@PostConstruct
-	private void initFromEnvironment() {
-		authenticationHeader = environment.getRequiredProperty("application.authentication.repository.header.name");
+	public AuthenticationServiceImpl(RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding,
+			RepositoryRemoteBinding requiringExplicitTicketRemoteBinding,
+			RepositoryRemoteBinding authenticationRemoteBinding, String authenticationHeader) {
+		this.unauthenticatedRepositoryRemoteBinding = unauthenticatedRepositoryRemoteBinding;
+		this.requiringExplicitTicketRemoteBinding = requiringExplicitTicketRemoteBinding;
+		this.authenticationRemoteBinding = authenticationRemoteBinding;
+		this.authenticationHeader = authenticationHeader;
 	}
 
 	@Override

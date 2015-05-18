@@ -8,8 +8,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
@@ -19,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.openwide.alfresco.app.core.AlfrescoAppCorePackage;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.InputStreamRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
@@ -29,19 +28,8 @@ import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSeria
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
 
 @Configuration
-@ComponentScan(
-	basePackageClasses = {
-		AlfrescoAppCorePackage.class
-	},
-	// https://jira.springsource.org/browse/SPR-8808
-	// on veut charger de manière explicite le contexte ; de ce fait,
-	// on ignore l'annotation @Configuration sur le scan de package.
-	excludeFilters = @Filter(Configuration.class)
-)
 public class AppCoreRemoteBindingConfig {
 
 	@Autowired

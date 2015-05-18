@@ -25,16 +25,16 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
-import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
-import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
-import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
-import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
-import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
+import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 
 public class RepositoryRemoteBinding {
 

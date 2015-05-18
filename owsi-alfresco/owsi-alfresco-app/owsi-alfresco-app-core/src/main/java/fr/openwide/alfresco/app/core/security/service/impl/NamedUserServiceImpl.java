@@ -5,10 +5,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Optional;
 
-import fr.openwide.alfresco.app.core.security.model.NamedUser;
-import fr.openwide.alfresco.app.core.security.service.NamedUserService;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
+import fr.openwide.alfresco.app.core.security.service.NamedUserService;
 
 public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserService {
 

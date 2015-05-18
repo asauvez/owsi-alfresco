@@ -3,23 +3,32 @@ package fr.openwide.alfresco.app.web.security.authentication;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.stereotype.Component;
 
+import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 
-@Component
 public class RepositoryLogoutHandler implements LogoutHandler {
 
-	@Autowired
+	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryLogoutHandler.class);
+
 	private RepositoryAuthenticationUserDetailsService userDetailsService;
+
+	public RepositoryLogoutHandler(RepositoryAuthenticationUserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
 
 	@Override
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 		if (authentication != null) {
-			userDetailsService.logout(authentication);
+			try {
+				userDetailsService.logout(authentication);
+			} catch (AccessDeniedRemoteException e) {
+				LOGGER.warn("Could not logout authentication on the repository: {}", authentication);
+			}
 		}
 	}
 

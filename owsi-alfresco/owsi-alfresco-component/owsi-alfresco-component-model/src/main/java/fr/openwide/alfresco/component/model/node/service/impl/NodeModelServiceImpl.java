@@ -6,9 +6,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -18,17 +23,14 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
-import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
-import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
-import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeModelServiceImpl implements NodeModelService {
 
-	@Autowired
-	private NodeService nodeService;
+	private final NodeService nodeService;
+
+	public NodeModelServiceImpl(NodeService nodeService) {
+		this.nodeService = nodeService;
+	}
 
 	@Override
 	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {

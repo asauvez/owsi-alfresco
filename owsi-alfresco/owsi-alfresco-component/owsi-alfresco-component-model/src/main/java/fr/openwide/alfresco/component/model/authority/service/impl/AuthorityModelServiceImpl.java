@@ -4,8 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
@@ -16,8 +14,11 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class AuthorityModelServiceImpl implements AuthorityModelService {
 
-	@Autowired
-	private AuthorityService authorityService;
+	private final AuthorityService authorityService;
+
+	public AuthorityModelServiceImpl(AuthorityService authorityService) {
+		this.authorityService = authorityService;
+	}
 
 	@Override
 	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate) {

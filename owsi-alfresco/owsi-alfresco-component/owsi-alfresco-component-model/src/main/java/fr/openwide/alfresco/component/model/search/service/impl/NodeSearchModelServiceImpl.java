@@ -2,22 +2,23 @@ package fr.openwide.alfresco.component.model.search.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
-import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 
 public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 
-	@Autowired
-	private NodeSearchService nodeSearchService;
+	private final NodeSearchService nodeSearchService;
+
+	public NodeSearchModelServiceImpl(NodeSearchService nodeSearchService) {
+		this.nodeSearchService = nodeSearchService;
+	}
 
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) {
