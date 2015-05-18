@@ -10,7 +10,7 @@ public class MatchAllRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toLuceneQueryInternal() {
+	protected String toQueryInternal() {
 		return (value != null) ? "ALL:" + toLuceneValue(null, value) : "";
 	}
 

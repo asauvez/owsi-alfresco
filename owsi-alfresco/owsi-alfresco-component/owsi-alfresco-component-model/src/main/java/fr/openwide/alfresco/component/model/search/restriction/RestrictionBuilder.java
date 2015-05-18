@@ -128,10 +128,10 @@ public class RestrictionBuilder extends Restriction {
 	}
 
 	@Override
-	protected String toLuceneQueryInternal() {
+	protected String toQueryInternal() {
 		StringBuilder buf = new StringBuilder();
 		for (Restriction restriction : restrictions) {
-			String query = restriction.toLuceneQuery();
+			String query = restriction.toQuery();
 			if (query.length() > 0) {
 				if (buf.length() > 0) {
 					buf.append("\n").append(operator.name()).append(" ");

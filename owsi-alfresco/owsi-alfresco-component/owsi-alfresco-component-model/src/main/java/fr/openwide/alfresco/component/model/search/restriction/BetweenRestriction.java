@@ -31,7 +31,7 @@ public class BetweenRestriction<C extends Serializable> extends Restriction {
 	}
 
 	@Override
-	protected String toLuceneQueryInternal() {
+	protected String toQueryInternal() {
 		if (min == null && max == null) {
 			return "";
 		}

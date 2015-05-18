@@ -18,7 +18,7 @@ public class AspectRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toLuceneQueryInternal() {
+	protected String toQueryInternal() {
 		return ((exact) ? "EXACTASPECT:" : "ASPECT:") + aspect.toLucene();
 	}
 

@@ -28,7 +28,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	public List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference,
 			NodeScopeBuilder nodeScopeBuilder) {
 		return new BusinessNodeList(nodeSearchService.search(
-				builder.toLuceneQuery(),
+				builder.toQuery(),
 				storeReference,
 				nodeScopeBuilder.getScope(),
 				nodeScopeBuilder.getRemoteCallParameters()));
@@ -38,9 +38,9 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	public BusinessNode searchUnique(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		List<BusinessNode> list = search(builder, nodeScopeBuilder);
 		if (list.size() > 1) {
-			throw new IllegalStateException("More than one result for " + builder.toLuceneQuery());
+			throw new IllegalStateException("More than one result for " + builder.toQuery());
 		} else if (list.isEmpty()) {
-			throw new NoSuchNodeRemoteException(builder.toLuceneQuery());
+			throw new NoSuchNodeRemoteException(builder.toQuery());
 		}
 		return list.get(0);
 	}

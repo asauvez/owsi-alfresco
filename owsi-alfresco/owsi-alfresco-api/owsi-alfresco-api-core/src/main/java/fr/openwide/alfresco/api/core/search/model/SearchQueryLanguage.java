@@ -21,5 +21,5 @@ public enum SearchQueryLanguage {
 	public String getAlfrescoName() {
 		return alfrescoName;
 	}
-
+	
 }

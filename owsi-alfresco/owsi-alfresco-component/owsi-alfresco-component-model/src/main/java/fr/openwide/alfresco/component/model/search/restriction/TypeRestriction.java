@@ -18,7 +18,7 @@ public class TypeRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toLuceneQueryInternal() {
+	protected String toQueryInternal() {
 		return ((exact) ? "EXACTTYPE:" : "TYPE:") + type.toLucene();
 	}
 

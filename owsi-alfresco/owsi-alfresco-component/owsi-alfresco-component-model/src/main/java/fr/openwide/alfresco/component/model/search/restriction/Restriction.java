@@ -29,12 +29,12 @@ public abstract class Restriction {
 		return parent;
 	}
 
-	public final String toLuceneQuery() {
-		String query = toLuceneQueryInternal();
+	public final String toQuery() {
+		String query = toQueryInternal();
 		return (query.length() > 0) ? ((not) ? "NOT (" + query + ")" : query) : "";
 	}
 
-	protected abstract String toLuceneQueryInternal();
+	protected abstract String toQueryInternal();
 
 	protected static String toLuceneValue(PropertyModel<?> propertyModel, Object value) {
 		if (value instanceof Date) {

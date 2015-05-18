@@ -10,7 +10,7 @@ public class CustomRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toLuceneQueryInternal() {
+	protected String toQueryInternal() {
 		return customQuery;
 	}
 

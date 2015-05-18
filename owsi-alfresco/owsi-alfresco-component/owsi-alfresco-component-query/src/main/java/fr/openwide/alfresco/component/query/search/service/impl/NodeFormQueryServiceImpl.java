@@ -45,7 +45,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
 		List<RepositoryNode> list = nodeSearchService.search(
-				restrictionBuilder.toLuceneQuery(),
+				restrictionBuilder.toQuery(),
 				formQuery.getStoreReference(),
 				nodeScope,
 				new RemoteCallParameters());

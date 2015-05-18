@@ -20,12 +20,7 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 		this.type = type;
 		type.addProperty(this);
 	}
-
-	@Override
-	public String toLucene() {
-		return "@" + super.toLucene();
-	}
-
+	
 	public abstract Class<C> getValueClass();
 
 	public ContainerModel getType() {
