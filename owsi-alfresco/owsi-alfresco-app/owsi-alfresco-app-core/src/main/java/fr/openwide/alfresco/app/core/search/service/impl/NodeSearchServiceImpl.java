@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
@@ -20,17 +19,16 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 	private NodeService nodeService;
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
-		return search(query, storeReference, nodeScope, remoteCallParameters, SearchQueryLanguage.FTS_ALFRESCO);
+	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope) {
+		return search(query, storeReference, nodeScope, SearchQueryLanguage.FTS_ALFRESCO);
 	}
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, RemoteCallParameters remoteCallParameters, SearchQueryLanguage language) {
+	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, SearchQueryLanguage language) {
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
 		payload.query = query;
 		payload.storeReference = storeReference;
 		payload.nodeScope = nodeScope;
-		payload.remoteCallParameters = remoteCallParameters;
 		payload.language = language;
 		return nodeService.callNodeListSerializer(SEARCH_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}

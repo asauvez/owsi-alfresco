@@ -6,7 +6,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService.SEARCH_NODE_SERVICE;
@@ -22,7 +21,6 @@ public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_S
 				Objects.requireNonNull(parameter.query, "Query"), 
 				Objects.requireNonNull(parameter.storeReference, "StoreReference"), 
 				Objects.requireNonNull(parameter.nodeScope, "NodeScope"),
-				Objects.requireNonNull(parameter.remoteCallParameters, "RemoteCallParameters"), 
 				Objects.requireNonNull(parameter.language, "Language"));
 	}
 
@@ -35,8 +33,4 @@ public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_S
 		this.nodeSearchService = nodeSearchService;
 	}
 
-	@Override
-	protected RemoteCallParameters getRemoteCallParameters(SEARCH_NODE_SERVICE payload) {
-		return payload.remoteCallParameters;
-	}
 }

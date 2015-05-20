@@ -14,20 +14,20 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResponseExtractor;
 
-import fr.openwide.alfresco.app.core.node.service.NodeService;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
+import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
+import fr.openwide.alfresco.app.core.node.service.NodeService;
+import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 
 @Service
 public class NodeServiceImpl implements NodeService {
@@ -39,11 +39,10 @@ public class NodeServiceImpl implements NodeService {
 	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
 	
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
+	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope) {
 		GET_NODE_SERVICE payload = new GET_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.nodeScope = nodeScope;
-		payload.remoteCallParameters = remoteCallParameters;
 		
 		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters;
 		if (! nodeScope.getContentDeserializers().isEmpty()) {
@@ -59,7 +58,7 @@ public class NodeServiceImpl implements NodeService {
 						return Collections.singleton(value);
 					}
 					@Override
-					public void doWithPayload(RepositoryNode payload, Map<Integer, ContentPropertyWrapper> wrappers) {
+					public void doWithPayload(RemoteCallPayload<RepositoryNode> payload, Map<Integer, ContentPropertyWrapper> wrappers) {
 						// on récupére la valeur en retour de la fonction
 					}
 				}, 
@@ -112,7 +111,7 @@ public class NodeServiceImpl implements NodeService {
 						return nodes;
 					}
 					@Override
-					public void doWithPayload(List<RepositoryNode> payload, Map<Integer, ContentPropertyWrapper> wrappers) {
+					public void doWithPayload(RemoteCallPayload<List<RepositoryNode>> payload, Map<Integer, ContentPropertyWrapper> wrappers) {
 						// on récupére la valeur en retour de la fonction
 					}
 				}, 
@@ -121,32 +120,29 @@ public class NodeServiceImpl implements NodeService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
+	public List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope) {
 		CHILDREN_NODE_SERVICE payload = new CHILDREN_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.childAssocTypeName = childAssocTypeName;
 		payload.nodeScope = nodeScope;
-		payload.remoteCallParameters = remoteCallParameters;
 		return callNodeListSerializer(CHILDREN_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 
 	@Override
-	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
+	public List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope) {
 		TARGET_ASSOC_NODE_SERVICE payload = new TARGET_ASSOC_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.assocName = assocName;
 		payload.nodeScope = nodeScope;
-		payload.remoteCallParameters = remoteCallParameters;
 		return callNodeListSerializer(TARGET_ASSOC_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 
 	@Override
-	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
+	public List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope) {
 		SOURCE_ASSOC_NODE_SERVICE payload = new SOURCE_ASSOC_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.assocName = assocName;
 		payload.nodeScope = nodeScope;
-		payload.remoteCallParameters = remoteCallParameters;
 		return callNodeListSerializer(SOURCE_ASSOC_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 

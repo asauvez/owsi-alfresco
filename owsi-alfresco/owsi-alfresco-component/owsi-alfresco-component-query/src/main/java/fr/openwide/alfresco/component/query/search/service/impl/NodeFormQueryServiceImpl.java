@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
@@ -11,16 +14,12 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionVisitor;
-import fr.openwide.alfresco.component.query.form.projection.node.NodeScopeInitializer;
 import fr.openwide.alfresco.component.query.form.projection.node.NodeProjectionBuilder;
+import fr.openwide.alfresco.component.query.form.projection.node.NodeScopeInitializer;
 import fr.openwide.alfresco.component.query.form.result.FormQueryResult;
 import fr.openwide.alfresco.component.query.search.model.NodeFormQuery;
 import fr.openwide.alfresco.component.query.search.model.SearchFormQuery;
 import fr.openwide.alfresco.component.query.search.service.NodeFormQueryService;
-import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeFormQueryServiceImpl extends AbstractFormQueryService implements NodeFormQueryService {
 
@@ -47,8 +46,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		List<RepositoryNode> list = nodeSearchService.search(
 				restrictionBuilder.toLuceneQuery(),
 				formQuery.getStoreReference(),
-				nodeScope,
-				new RemoteCallParameters());
+				nodeScope);
 
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
@@ -59,7 +57,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeService.getChildren(parent, childAssoc.getNameReference(), nodeScope, new RemoteCallParameters());
+		List<RepositoryNode> list = nodeService.getChildren(parent, childAssoc.getNameReference(), nodeScope);
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
@@ -74,7 +72,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeService.getTargetAssocs(parent, assoc.getNameReference(), nodeScope, new RemoteCallParameters());
+		List<RepositoryNode> list = nodeService.getTargetAssocs(parent, assoc.getNameReference(), nodeScope);
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}
@@ -84,7 +82,7 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeService.getSourceAssocs(parent, assoc.getNameReference(), nodeScope, new RemoteCallParameters());
+		List<RepositoryNode> list = nodeService.getSourceAssocs(parent, assoc.getNameReference(), nodeScope);
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
 	}

@@ -27,7 +27,7 @@ public interface AuthenticationRemoteService {
 	/**
 	 * Log out an authenticated user
 	 */
-	PostMethodEndpoint<RepositoryUser> LOGOUT_SERVICE_ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/ticket/logout") {};
+	PostMethodEndpoint<Void> LOGOUT_SERVICE_ENDPOINT = new PostMethodEndpoint<Void>("/owsi/authentication/ticket/logout") {};
 	void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException;
 
 }

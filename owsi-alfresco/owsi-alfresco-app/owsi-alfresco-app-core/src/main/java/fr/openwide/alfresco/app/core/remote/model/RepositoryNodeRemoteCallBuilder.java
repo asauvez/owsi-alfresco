@@ -28,6 +28,11 @@ public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuil
 		this.serializationComponent = serializationComponent;
 	}
 
+	public R callPayloadSerializer(Object payload) {
+		return callPayloadSerializer(payload, null, null, null, null);
+	}
+	
+			
 	public R callPayloadSerializer(
 			final Object payload, 
 			final Collection<RepositoryNode> nodes, 
@@ -53,7 +58,7 @@ public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuil
 						TypeFactory.defaultInstance().constructType(getRestCallType()), 
 						payloadCallback,
 						deserializationParameters, 
-						response.getBody());
+						response.getBody()).getPayload();
 			}
 		};
 		

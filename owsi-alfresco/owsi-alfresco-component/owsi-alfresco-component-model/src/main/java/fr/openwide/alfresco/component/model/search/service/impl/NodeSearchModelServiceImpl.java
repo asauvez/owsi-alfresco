@@ -30,8 +30,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 		return new BusinessNodeList(nodeSearchService.search(
 				builder.toLuceneQuery(),
 				storeReference,
-				nodeScopeBuilder.getScope(),
-				nodeScopeBuilder.getRemoteCallParameters()));
+				nodeScopeBuilder.getScope()));
 	}
 
 	@Override

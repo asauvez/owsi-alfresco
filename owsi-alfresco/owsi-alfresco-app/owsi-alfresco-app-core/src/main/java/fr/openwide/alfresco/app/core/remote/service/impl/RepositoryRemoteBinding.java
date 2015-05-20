@@ -112,7 +112,7 @@ public class RepositoryRemoteBinding {
 	protected <T> T execute(URI uri, HttpMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
 			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Executing {} method with uri: {}", method, uri);
+			LOGGER.debug("Executing {} method with uri: {}", method, getProtectedURI(uri));
 		}
 		try {
 			if (responseExtractor != null) {
@@ -124,16 +124,21 @@ public class RepositoryRemoteBinding {
 		} catch (ResourceAccessException e) {
 			// log to debug, target exception should be logged by the caller/framework
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Exception on " + method + " method with uri: " + uri, e);
+				LOGGER.debug("Exception on " + method + " method with uri: " + getProtectedURI(uri), e);
 			}
 			throw mapResourceAccessException(e);
 		} catch (Exception e) {
 			// log to debug, target exception should be logged by the caller/framework
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Unexpected exception on " + method + " method with uri: " + uri, e);
+				LOGGER.debug("Unexpected exception on " + method + " method with uri: " + getProtectedURI(uri), e);
 			}
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	private URI getProtectedURI(URI uri) {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri);
+		return (builder.build().getQueryParams().get(ticketParam) != null) ? builder.replaceQueryParam(ticketParam, "[PROTECTED]").build().toUri() : uri;
 	}
 
 	protected URI getURI(String path, Object... uriVars) {

@@ -32,7 +32,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
-		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
+		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope()));
 	}
 
 	@Override
@@ -52,17 +52,17 @@ public class NodeModelServiceImpl implements NodeModelService {
 	
 	@Override
 	public List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(nodeService.getChildren(nodeReference, childAssoc.getNameReference(), nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
+		return new BusinessNodeList(nodeService.getChildren(nodeReference, childAssoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 
 	@Override
 	public List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(nodeService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
+		return new BusinessNodeList(nodeService.getTargetAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 
 	@Override
 	public List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
+		return new BusinessNodeList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 	
 	@Override
