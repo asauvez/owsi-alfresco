@@ -11,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
@@ -27,7 +26,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope scope, RemoteCallParameters remoteCallParameters,
+	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope scope,
 			SearchQueryLanguage language) {
 		if (StringUtils.isBlank(query)) {
 			throw new InvalidPayloadException("The query should not be an empty string.");
@@ -40,7 +39,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			List<RepositoryNode> res = new ArrayList<>();
 			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 				try {
-					res.add(nodeRemoteService.get(conversionService.get(nodeRef), scope, remoteCallParameters));
+					res.add(nodeRemoteService.get(conversionService.get(nodeRef), scope));
 				} catch (NoSuchNodeRemoteException e) {
 					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
 				}

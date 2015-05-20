@@ -29,7 +29,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(authorityService.getContainedUsers(authority, immediate, nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
+		return new BusinessNodeList(authorityService.getContainedUsers(authority, immediate, nodeScopeBuilder.getScope()));
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(authorityService.getContainedGroups(authority, immediate, nodeScopeBuilder.getScope(), nodeScopeBuilder.getRemoteCallParameters()));
+		return new BusinessNodeList(authorityService.getContainedGroups(authority, immediate, nodeScopeBuilder.getScope()));
 	}
 	
 	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {

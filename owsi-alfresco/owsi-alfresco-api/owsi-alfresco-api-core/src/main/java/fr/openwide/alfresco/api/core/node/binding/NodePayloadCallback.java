@@ -10,6 +10,6 @@ public interface NodePayloadCallback<P> {
 
 	Collection<RepositoryNode> extractNodes(P payload);
 
-	void doWithPayload(P payload, Map<Integer, ContentPropertyWrapper> wrappers);
+	void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Map<Integer, ContentPropertyWrapper> wrappers);
 
 }

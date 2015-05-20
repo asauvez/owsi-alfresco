@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.GET_CONTAINED_GROUPS;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 
 public class GetContainedGroupsWebScript extends AbstractAuthorityWebScript<GET_CONTAINED_GROUPS> {
@@ -17,8 +16,7 @@ public class GetContainedGroupsWebScript extends AbstractAuthorityWebScript<GET_
 		return authorityRemoteService.getContainedGroups(
 				Objects.requireNonNull(payload.authority, "Authority"), 
 				payload.immediate, 
-				Objects.requireNonNull(payload.nodeScope, "NodeScope"), 
-				payload.remoteCallParameters);
+				Objects.requireNonNull(payload.nodeScope, "NodeScope"));
 	}
 
 	@Override
@@ -26,8 +24,4 @@ public class GetContainedGroupsWebScript extends AbstractAuthorityWebScript<GET_
 		return SimpleType.construct(GET_CONTAINED_GROUPS.class);
 	}
 
-	@Override
-	protected RemoteCallParameters getRemoteCallParameters(GET_CONTAINED_GROUPS payload) {
-		return payload.remoteCallParameters;
-	}
 }

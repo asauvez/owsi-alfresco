@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNodeVisitor;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -28,7 +29,7 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 public class NodeContentSerializationComponent {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeContentSerializationComponent.class);
-
+	
 	public static final String CONTENT_TYPE = "application/zip";
 
 	private static final NameReference CONTENT_IDS = NameReference.create(NodeContentSerializationComponent.class.getSimpleName(), "contentIds");
@@ -77,13 +78,18 @@ public class NodeContentSerializationComponent {
 		}
 
 		final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(outputStream));
-		zos.setLevel(parameters.getCompressionLevel().or(NodeContentSerializationParameters.DEFAULT_COMPRESSION_LEVEL));
+		RemoteCallParameters remoteCallParameters = RemoteCallParameters.currentParameters();
+		zos.setLevel(remoteCallParameters.getCompressionLevel());
+		
+		RemoteCallPayload<Object> remoteCallPayload = new RemoteCallPayload<>();
+		remoteCallPayload.setPayload(payload);
+		remoteCallPayload.setRemoteCallParameters(remoteCallParameters);
 		
 		zos.putNextEntry(new ZipEntry("json"));
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Serializing payload: {}", objectMapper.writeValueAsString(payload));
+			LOGGER.debug("Serializing payload: {}", objectMapper.writeValueAsString(remoteCallPayload));
 		}
-		objectMapper.writeValue(NonClosingStreamUtils.nonClosing(zos), payload);
+		objectMapper.writeValue(NonClosingStreamUtils.nonClosing(zos), remoteCallPayload);
 		zos.closeEntry();
 
 		RepositoryNodeVisitor visitor2 = new RepositoryNodeVisitor() {
@@ -98,8 +104,9 @@ public class NodeContentSerializationComponent {
 						NameReference contentProperty = NameReference.create(contentProperties.get(i));
 						
 						Object content = node.getContents().get(contentProperty);
-						NodeContentSerializer<Object> serializer = (NodeContentSerializer<Object>) 
-								parameters.getSerializersByProperties().get(contentProperty);
+						NodeContentSerializer<Object> serializer = (parameters != null) 
+								? (NodeContentSerializer<Object>) parameters.getSerializersByProperties().get(contentProperty)
+								: null;
 						if (serializer == null) {
 							for (Entry<Class<?>, NodeContentSerializer<?>> serializerEntry : serializersByClass.entrySet()) {
 								if (serializerEntry.getKey().isInstance(content)) {
@@ -135,7 +142,7 @@ public class NodeContentSerializationComponent {
 		zos.close();
 	}
 
-	public <P> P deserialize(
+	public <P> RemoteCallPayload<P> deserialize(
 			JavaType valueType,
 			NodePayloadCallback<P> payloadCallback,
 			NodeContentDeserializationParameters parameters,
@@ -146,9 +153,13 @@ public class NodeContentSerializationComponent {
 		
 		zis.getNextEntry();
 		InputStream nonClosingZis = NonClosingStreamUtils.nonClosing(zis);
-		P payload = objectMapper.readValue(nonClosingZis, valueType);
+		
+		
+		JavaType remoteCallPayloadType = objectMapper.getTypeFactory().constructSimpleType(RemoteCallPayload.class, 
+				new JavaType[] { valueType  });
+		RemoteCallPayload<P> remoteCallPayload = objectMapper.readValue(nonClosingZis, remoteCallPayloadType);
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Deserializing payload: {}", objectMapper.writeValueAsString(payload));
+			LOGGER.debug("Deserializing payload: {}", objectMapper.writeValueAsString(remoteCallPayload));
 		}
 
 		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
@@ -168,10 +179,10 @@ public class NodeContentSerializationComponent {
 		};
 		
 		if (payloadCallback != null) {
-			for (RepositoryNode node : payloadCallback.extractNodes(payload)) {
+			for (RepositoryNode node : payloadCallback.extractNodes(remoteCallPayload.getPayload())) {
 				node.visit(visitor);
 			}
-			payloadCallback.doWithPayload(payload, wrappers);
+			payloadCallback.doWithPayload(remoteCallPayload, wrappers);
 		}
 		
 		ZipEntry zipEntry;
@@ -179,7 +190,7 @@ public class NodeContentSerializationComponent {
 			int contentId = Integer.parseInt(zipEntry.getName());
 			ContentPropertyWrapper wrapper = wrappers.get(contentId);
 
-			NodeContentDeserializer<?> serializer = parameters.getDeserializersByProperties().get(wrapper.getContentProperty());
+			NodeContentDeserializer<?> serializer = (parameters != null) ? parameters.getDeserializersByProperties().get(wrapper.getContentProperty()) : null;
 			if (serializer == null) {
 				serializer = defaultDeserializer;
 			}
@@ -188,7 +199,7 @@ public class NodeContentSerializationComponent {
 		}
 		zis.close();
 		
-		return payload;
+		return remoteCallPayload;
 	}
 
 }

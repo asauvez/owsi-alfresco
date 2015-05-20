@@ -33,7 +33,6 @@ import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
@@ -56,63 +55,63 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private ConversionService conversionService;
 
 	@Override
-	public RepositoryNode get(NodeReference nodeReference, NodeScope scope, RemoteCallParameters remoteCallParameters) throws NoSuchNodeRemoteException {
-		return getRepositoryNode(conversionService.getRequired(nodeReference), scope, remoteCallParameters);
+	public RepositoryNode get(NodeReference nodeReference, NodeScope scope) throws NoSuchNodeRemoteException {
+		return getRepositoryNode(conversionService.getRequired(nodeReference), scope);
 	}
 
 	@Override
 	public List<RepositoryNode> getChildren(
-			NodeReference nodeReference, NameReference childAssocTypeName, NodeScope scope, RemoteCallParameters remoteCallParameters) {
+			NodeReference nodeReference, NameReference childAssocTypeName, NodeScope scope) {
 		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(childAssocTypeName), 
 				RegexQNamePattern.MATCH_ALL, true);
 		List<RepositoryNode> res = new ArrayList<>();
 		for (ChildAssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getChildRef(), scope, remoteCallParameters));
+			res.add(getRepositoryNode(assoc.getChildRef(), scope));
 		}
 		return res;
 	}
 	private List<RepositoryNode> getParent(
-			NodeReference nodeReference, NameReference childAssocTypeName, NodeScope scope, RemoteCallParameters remoteCallParameters) {
+			NodeReference nodeReference, NameReference childAssocTypeName, NodeScope scope) {
 		List<ChildAssociationRef> assocs = nodeService.getParentAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(childAssocTypeName), 
 				RegexQNamePattern.MATCH_ALL);
 		List<RepositoryNode> res = new ArrayList<>();
 		for (ChildAssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getParentRef(), scope, remoteCallParameters));
+			res.add(getRepositoryNode(assoc.getParentRef(), scope));
 		}
 		return res;
 	}
 
 	@Override
 	public List<RepositoryNode> getTargetAssocs(
-			NodeReference nodeReference, NameReference assocName, NodeScope scope, RemoteCallParameters remoteCallParameters) {
+			NodeReference nodeReference, NameReference assocName, NodeScope scope) {
 		List<AssociationRef> assocs = nodeService.getTargetAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(assocName));
 		List<RepositoryNode> res = new ArrayList<>();
 		for (AssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getTargetRef(), scope, remoteCallParameters));
+			res.add(getRepositoryNode(assoc.getTargetRef(), scope));
 		}
 		return res;
 	}
 
 	@Override
 	public List<RepositoryNode> getSourceAssocs(
-			NodeReference nodeReference, NameReference assocName, NodeScope scope, RemoteCallParameters remoteCallParameters) {
+			NodeReference nodeReference, NameReference assocName, NodeScope scope) {
 		List<AssociationRef> assocs = nodeService.getSourceAssocs(
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(assocName));
 		List<RepositoryNode> res = new ArrayList<>();
 		for (AssociationRef assoc : assocs) {
-			res.add(getRepositoryNode(assoc.getSourceRef(), scope, remoteCallParameters));
+			res.add(getRepositoryNode(assoc.getSourceRef(), scope));
 		}
 		return res;
 	}
 
-	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope, RemoteCallParameters remoteCallParameters) throws NoSuchNodeRemoteException {
+	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
 			throw new NoSuchNodeRemoteException(nodeReference.getReference());
@@ -138,7 +137,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 			if (primaryParent.getParentRef() != null) {
 				node.setPrimaryParentAssociation(new RepositoryChildAssociation(
-						getRepositoryNode(primaryParent.getParentRef(), primaryParentScope, remoteCallParameters),
+						getRepositoryNode(primaryParent.getParentRef(), primaryParentScope),
 						conversionService.get(primaryParent.getTypeQName())));
 			}
 		}
@@ -165,34 +164,34 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		for (Entry<NameReference, NodeScope> entry : scope.getChildAssociations().entrySet()) {
 			node.getChildAssociations().put(
 					entry.getKey(), 
-					getChildren(nodeReference, entry.getKey(), entry.getValue(), remoteCallParameters));
+					getChildren(nodeReference, entry.getKey(), entry.getValue()));
 		}
 		for (Entry<NameReference, NodeScope> entry : scope.getParentAssociations().entrySet()) {
 			node.getParentAssociations().put(
 					entry.getKey(), 
-					getParent(nodeReference, entry.getKey(), entry.getValue(), remoteCallParameters));
+					getParent(nodeReference, entry.getKey(), entry.getValue()));
 		}
 		for (Entry<NameReference, NodeScope> entry : scope.getTargetAssocs().entrySet()) {
 			node.getTargetAssocs().put(
 					entry.getKey(), 
-					getTargetAssocs(nodeReference, entry.getKey(), entry.getValue(), remoteCallParameters));
+					getTargetAssocs(nodeReference, entry.getKey(), entry.getValue()));
 		}
 		for (Entry<NameReference, NodeScope> entry : scope.getSourceAssocs().entrySet()) {
 			node.getSourceAssocs().put(
 					entry.getKey(), 
-					getSourceAssocs(nodeReference, entry.getKey(), entry.getValue(), remoteCallParameters));
+					getSourceAssocs(nodeReference, entry.getKey(), entry.getValue()));
 		}
 		
 		// get recursive associations
 		for (NameReference association : scope.getRecursiveChildAssociations()) {
 			node.getChildAssociations().put(
 					association, 
-					getChildren(nodeReference, association, scope, remoteCallParameters));
+					getChildren(nodeReference, association, scope));
 		}
 		for (NameReference association : scope.getRecursiveParentAssociations()) {
 			node.getParentAssociations().put(
 					association, 
-					getParent(nodeReference, association, scope, remoteCallParameters));
+					getParent(nodeReference, association, scope));
 		}
 		
 		// get permissions

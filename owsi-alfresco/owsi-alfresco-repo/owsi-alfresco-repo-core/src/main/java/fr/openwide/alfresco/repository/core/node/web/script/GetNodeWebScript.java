@@ -7,7 +7,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.GET_NODE_SERVICE;
 
@@ -17,8 +16,7 @@ public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_
 	protected RepositoryNode execute(GET_NODE_SERVICE parameter) {
 		return nodeService.get(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
-				Objects.requireNonNull(parameter.nodeScope, "NodeScope"),
-				Objects.requireNonNull(parameter.remoteCallParameters, "RemoteCallParameters"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override
@@ -26,11 +24,6 @@ public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_
 		return Collections.singleton(result);
 	}
 
-	@Override
-	protected RemoteCallParameters getRemoteCallParameters(GET_NODE_SERVICE payload) {
-		return payload.remoteCallParameters;
-	}
-	
 	@Override
 	protected JavaType getParameterType() {
 		return SimpleType.construct(GET_NODE_SERVICE.class);

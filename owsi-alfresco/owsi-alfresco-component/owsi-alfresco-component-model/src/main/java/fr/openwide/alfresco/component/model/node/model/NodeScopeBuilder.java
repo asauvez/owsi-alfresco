@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -21,13 +20,9 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class NodeScopeBuilder {
 
 	private NodeScope scope = new NodeScope();
-	private RemoteCallParameters remoteCallParameters = new RemoteCallParameters();
 
 	public NodeScope getScope() {
 		return scope;
-	}
-	public RemoteCallParameters getRemoteCallParameters() {
-		return remoteCallParameters;
 	}
 
 	public NodeScopeBuilder fromNode(BusinessNode node) {
@@ -101,10 +96,6 @@ public class NodeScopeBuilder {
 	public NodeScopeBuilder contentWithDeserializer(PropertyModel<?> propertyModel, NodeContentDeserializer<?> deserializer) {
 		scope.getProperties().add(propertyModel.getNameReference());
 		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
-		return this;
-	}
-	public NodeScopeBuilder compressionLevel(Integer compressionLevel) {
-		remoteCallParameters.setCompressionLevel(compressionLevel);
 		return this;
 	}
 
