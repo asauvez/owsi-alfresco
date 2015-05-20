@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 
-@JsonInclude(Include.NON_EMPTY)
 public class RemoteCallPayload<P> {
 	
 	private P payload;
@@ -18,6 +17,7 @@ public class RemoteCallPayload<P> {
 		this.payload = payload;
 	}
 	
+	@JsonInclude(Include.NON_EMPTY)
 	public RemoteCallParameters getRemoteCallParameters() {
 		return remoteCallParameters;
 	}
