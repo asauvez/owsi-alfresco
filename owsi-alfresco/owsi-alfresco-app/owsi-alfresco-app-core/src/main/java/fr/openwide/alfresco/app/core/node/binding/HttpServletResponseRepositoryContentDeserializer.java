@@ -15,22 +15,22 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 public class HttpServletResponseRepositoryContentDeserializer implements NodeContentDeserializer<Void> {
 
 	private final HttpServletResponse response;
-	private final String name;
+	private final String fileName;
 	private final NameReference nameProperty;
+	private final boolean inline;
 	
-	public HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response) {
-		this(response, null, null);
+	public HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response, String fileName, boolean inline) {
+		this(response, fileName, null, inline);
 	}
-	public HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response, String name) {
-		this(response, name, null);
+	public HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response, NameReference nameProperty, boolean inline) {
+		this(response, null, nameProperty, inline);
 	}
-	public HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response, NameReference nameProperty) {
-		this(response, null, nameProperty);
-	}
-	protected HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response, String fileName, NameReference nameProperty) {
+	protected HttpServletResponseRepositoryContentDeserializer(HttpServletResponse response, 
+			String fileName, NameReference nameProperty, boolean inline) {
 		this.response = response;
-		this.name = fileName;
+		this.fileName = fileName;
 		this.nameProperty = nameProperty;
+		this.inline = inline;
 	}
 
 	@Override
@@ -39,14 +39,14 @@ public class HttpServletResponseRepositoryContentDeserializer implements NodeCon
 		response.setHeader("Content-Length", Long.toString(contentData.getSize()));
 		response.setContentType(contentData.getMimetype());
 		
-		if (name != null) {
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
-		} else if (nameProperty != null) {
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + node.getProperty(nameProperty) + "\"");
-		} else {
-			response.setHeader("Content-Disposition", "inline; filename=\"" + node.getProperty(nameProperty) + "\"");
+		String fileName = "export.bin";
+		if (nameProperty != null) {
+			fileName = (String) node.getProperty(nameProperty);
 		}
-		
+		if (this.fileName != null) {
+			fileName = this.fileName;
+		}
+		response.setHeader("Content-Disposition", (inline ? "inline" : "attachment") + "; filename=\"" + fileName + "\"");
 		IOUtils.copy(inputStream, response.getOutputStream());
 		
 		return null;
