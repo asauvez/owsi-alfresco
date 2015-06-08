@@ -80,7 +80,7 @@ public class RestrictionBuilder extends Restriction {
 	}
 
 	public <C extends Serializable> MatchRestriction<C> eq(PropertyModel<C> property, C value) {
-		return add(new MatchRestriction<C>(this, property, value));
+		return add(new MatchRestriction<C>(this, property, value).exact(true));
 	}
 
 	public MatchAllRestriction matchAll(String value) {
@@ -127,6 +127,10 @@ public class RestrictionBuilder extends Restriction {
 		return restriction;
 	}
 
+	public boolean isEmpty() {
+		return restrictions.isEmpty();
+	}
+	
 	@Override
 	protected String toQueryInternal() {
 		StringBuilder buf = new StringBuilder();

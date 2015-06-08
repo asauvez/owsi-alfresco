@@ -128,6 +128,21 @@ public class BusinessNode {
 		property(CmModel.object.name, name);
 		return this;
 	}
+	
+	public String getTitle() {
+		return getProperty(CmModel.titled.title);
+	}
+	public BusinessNode title(String name) {
+		property(CmModel.titled.title, name);
+		return this;
+	}
+	public String getDescription() {
+		return getProperty(CmModel.titled.description);
+	}
+	public BusinessNode description(String name) {
+		property(CmModel.titled.description, name);
+		return this;
+	}
 
 	public boolean hasUserPermission(RepositoryPermission permission) {
 		return node.getUserPermissions().contains(permission);
