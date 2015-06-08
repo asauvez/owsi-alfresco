@@ -30,6 +30,7 @@ import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationCompon
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
@@ -77,14 +78,14 @@ public class RepositoryRemoteBinding {
 		return new RepositoryNodeRemoteCallBuilder<R>(this, restCall, serializationComponent);
 	}
 
-	public <T> T exchange(String path, HttpMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
+	public <T> T exchange(String path, RemoteEndpointMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
 		URI uri = getURI(path, urlVariables);
 		addTicketHeader(headers);
 		HttpEntity<Object> requestEntity = new HttpEntity<Object>(request, headers);
 		return execute(uri, method, requestEntity, null, responseType, null);
 	}
 
-	public <T> T exchange(String path, HttpMethod method, final HttpHeaders headers, 
+	public <T> T exchange(String path, RemoteEndpointMethod method, final HttpHeaders headers, 
 			final RequestCallback requestCallback, ResponseExtractor<T> responseExtractor, 
 			Object... urlVariables) {
 		URI uri = getURI(path, urlVariables);
@@ -109,16 +110,17 @@ public class RepositoryRemoteBinding {
 		}
 	}
 
-	protected <T> T execute(URI uri, HttpMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
+	protected <T> T execute(URI uri, RemoteEndpointMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
 			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Executing {} method with uri: {}", method, getProtectedURI(uri));
 		}
+		HttpMethod httpMethod = HttpMethod.valueOf(method.name());
 		try {
 			if (responseExtractor != null) {
-				return restTemplate.execute(uri, method, requestCallback, responseExtractor);
+				return restTemplate.execute(uri, httpMethod, requestCallback, responseExtractor);
 			} else {
-				ResponseEntity<T> exchange = restTemplate.exchange(uri, method, requestEntity, responseType);
+				ResponseEntity<T> exchange = restTemplate.exchange(uri, httpMethod, requestEntity, responseType);
 				return exchange.getBody();
 			}
 		} catch (ResourceAccessException e) {

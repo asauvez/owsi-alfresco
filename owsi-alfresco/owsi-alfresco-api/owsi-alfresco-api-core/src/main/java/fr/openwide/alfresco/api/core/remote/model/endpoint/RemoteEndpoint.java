@@ -3,15 +3,18 @@ package fr.openwide.alfresco.api.core.remote.model.endpoint;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.springframework.http.HttpMethod;
-
 public abstract class RemoteEndpoint<R> {
 
+	public static enum RemoteEndpointMethod {
+		GET, PUT, POST, DELETE, HEAD, OPTIONS;
+	}
+
+	
 	private String path;
-	private HttpMethod method;
+	private RemoteEndpointMethod method;
 	private Type parameterType;
 
-	public RemoteEndpoint(String path, HttpMethod method) {
+	public RemoteEndpoint(String path, RemoteEndpointMethod method) {
 		this.path = path;
 		this.method = method;
 		Type type = getClass().getGenericSuperclass();
@@ -22,7 +25,7 @@ public abstract class RemoteEndpoint<R> {
 		return path;
 	}
 
-	public HttpMethod getMethod() {
+	public RemoteEndpointMethod getMethod() {
 		return method;
 	}
 
