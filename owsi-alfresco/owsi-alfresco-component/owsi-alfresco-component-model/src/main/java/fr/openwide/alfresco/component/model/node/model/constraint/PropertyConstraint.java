@@ -6,7 +6,9 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 public abstract class PropertyConstraint {
 
-	public boolean valid(PropertyModel<?> propertyModel, Serializable value) {
+	public boolean valid(
+			@SuppressWarnings("unused") PropertyModel<?> propertyModel, 
+			Serializable value) {
 		return valid(value);
 	}
 
