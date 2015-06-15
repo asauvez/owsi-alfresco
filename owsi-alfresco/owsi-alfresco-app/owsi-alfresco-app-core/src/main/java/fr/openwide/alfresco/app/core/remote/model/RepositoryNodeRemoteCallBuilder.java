@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.app.core.remote.model;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 
 import org.springframework.http.client.ClientHttpRequest;
@@ -45,20 +47,24 @@ public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuil
 		RequestCallback requestCallback = new RequestCallback() {
 			@Override
 			public void doWithRequest(ClientHttpRequest request) throws IOException {
-				serializationComponent.serialize(
-						payload, nodes, 
-						serializationParameters, 
-						request.getBody());
+				try (OutputStream outputStream = request.getBody()) {
+					serializationComponent.serialize(
+							payload, nodes, 
+							serializationParameters, 
+							outputStream);
+				}
 			}
 		};
 		ResponseExtractor<R> responseExtractor = new ResponseExtractor<R>() {
 			@Override
 			public R extractData(ClientHttpResponse response) throws IOException {
-				return serializationComponent.deserialize(
-						TypeFactory.defaultInstance().constructType(getRestCallType()), 
-						payloadCallback,
-						deserializationParameters, 
-						response.getBody()).getPayload();
+				try (InputStream inputStream = response.getBody()) {
+					return serializationComponent.deserialize(
+							TypeFactory.defaultInstance().constructType(getRestCallType()), 
+							payloadCallback,
+							deserializationParameters, 
+							inputStream).getPayload();
+				}
 			}
 		};
 		

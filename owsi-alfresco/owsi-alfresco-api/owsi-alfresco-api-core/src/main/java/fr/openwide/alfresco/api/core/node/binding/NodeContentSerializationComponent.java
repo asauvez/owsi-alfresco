@@ -139,7 +139,6 @@ public class NodeContentSerializationComponent {
 			}
 		}
 		zos.flush();
-		zos.close();
 	}
 
 	public <P> RemoteCallPayload<P> deserialize(
@@ -197,8 +196,6 @@ public class NodeContentSerializationComponent {
 			Object content = serializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), nonClosingZis);
 			wrapper.getNode().getContents().put(wrapper.getContentProperty(), content);
 		}
-		zis.close();
-		
 		return remoteCallPayload;
 	}
 
