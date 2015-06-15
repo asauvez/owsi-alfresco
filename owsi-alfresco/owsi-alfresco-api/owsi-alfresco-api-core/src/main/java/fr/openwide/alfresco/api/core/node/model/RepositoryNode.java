@@ -62,7 +62,7 @@ public class RepositoryNode implements Serializable {
 	public Serializable getProperty(NameReference nameReference) {
 		return getProperties().get(nameReference);
 	}
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	public <T> T getProperty(NameReference nameReference, Class<T> clazz) {
 		return (T) getProperty(nameReference);
 	}
@@ -75,7 +75,7 @@ public class RepositoryNode implements Serializable {
 	public Serializable getExtension(NameReference nameReference) {
 		return getExtensions().get(nameReference);
 	}
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	public <T> T getExtension(NameReference nameReference, Class<T> clazz) {
 		return (T) getExtension(nameReference);
 	}
