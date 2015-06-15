@@ -96,8 +96,10 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 		RemoteCallParameters.execute(remoteCallPayload.getRemoteCallParameters(), new Callable<Void>() {
 			@Override
 			public Void call() throws IOException {
-				serializationComponent.serialize(result, outputNodes, defaultSerializationParameters, response.getOutputStream());
-				return null;
+				try (OutputStream outputStream = response.getOutputStream()) {
+					serializationComponent.serialize(result, outputNodes, defaultSerializationParameters, outputStream);
+					return null;
+				}
 			}
 		});
 		
