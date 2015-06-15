@@ -22,7 +22,7 @@ public class RepositoryTicket implements Serializable {
 
 	@Override
 	public String toString() {
-		return getTicket();
+		return ticket;
 	}
 
 	@Override

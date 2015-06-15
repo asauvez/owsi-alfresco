@@ -1,9 +1,12 @@
 package fr.openwide.alfresco.api.core.authentication.model;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.google.common.base.Strings;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -88,6 +91,31 @@ public class RepositoryUser implements Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(userReference);
+	}
+
+	/** {@see org.springframework.security.core.userdetails.User#toString()} */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("UserReference: ").append(userReference).append("; ");
+		if (ticket != null) {
+			sb.append("Ticket: ").append(Strings.isNullOrEmpty(ticket.getTicket()) ? ticket : "[PROTECTED]").append("; ");
+		}
+		sb.append("Admin: ").append(admin).append("; ");
+		if (authorities != null && ! authorities.isEmpty()) {
+			sb.append("Repository Authorities: ");
+			boolean first = true;
+			for (RepositoryAuthority auth : authorities) {
+				if (! first) {
+					sb.append(",");
+				}
+				first = false;
+				sb.append(auth);
+			}
+		} else {
+			sb.append("Not granted any authorities in the repository");
+		}
+		return sb.toString();
 	}
 
 }

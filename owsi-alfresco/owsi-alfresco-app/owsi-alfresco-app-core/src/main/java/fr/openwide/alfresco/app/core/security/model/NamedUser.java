@@ -36,4 +36,12 @@ public class NamedUser extends User implements RepositoryUserProvider {
 		return repositoryUser;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(super.toString()).append("; ");
+		sb.append("RepositoryUser: ").append(repositoryUser);
+		return sb.toString();
+	}
+
 }
