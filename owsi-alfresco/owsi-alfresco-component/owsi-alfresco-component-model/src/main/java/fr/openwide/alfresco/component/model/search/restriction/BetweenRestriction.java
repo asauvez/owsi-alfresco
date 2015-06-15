@@ -36,7 +36,7 @@ public class BetweenRestriction<C extends Serializable> extends Restriction {
 			return "";
 		}
 		return property.toLucene() + ":"
-			+ (minInclusive ? "[" : "{")
+			+ (minInclusive ? "[" : "<")
 			+ ((min == null)
 					? ((max instanceof String) ? "\\\\u0000" : "MIN")
 					: toLuceneValue(property, min))
@@ -44,7 +44,7 @@ public class BetweenRestriction<C extends Serializable> extends Restriction {
 			+ ((max == null)
 					? ((min instanceof String) ? "\\\\uFFFF" : "MAX")
 					: toLuceneValue(property, max))
-			+ (maxInclusive ? "]" : "}");
+			+ (maxInclusive ? "]" : ">");
 	}
 
 }
