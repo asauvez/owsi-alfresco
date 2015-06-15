@@ -75,16 +75,16 @@ public class NodeModelServiceImpl implements NodeModelService {
 	@Override
 	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNodeNameRemoteException {
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
-				.property(CmModel.content.content, new RepositoryContentData(mimeType, encoding))
-				.content(content));
+				.properties().set(CmModel.content.content, new RepositoryContentData(mimeType, encoding))
+				.contents().set(content));
 	}
 
 	@Override
 	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNodeNameRemoteException {
 		String fileName = FilenameUtils.getName(file.getOriginalFilename());
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
-				.property(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
-				.content(file));
+				.properties().set(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
+				.contents().set(file));
 	}
 
 	@Override

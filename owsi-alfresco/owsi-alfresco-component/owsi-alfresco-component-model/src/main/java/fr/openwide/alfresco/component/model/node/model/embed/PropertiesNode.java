@@ -1,0 +1,66 @@
+package fr.openwide.alfresco.component.model.node.model.embed;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
+
+public class PropertiesNode {
+
+	private final BusinessNode node;
+	private final RepositoryNode repoNode;
+	
+	public PropertiesNode(BusinessNode node) {
+		this.node = node;
+		this.repoNode = node.getRepositoryNode();
+	}
+	
+	public String getName() {
+		return get(CmModel.object.name);
+	}
+	public BusinessNode name(String name) {
+		return set(CmModel.object.name, name);
+	}
+
+	public String getTitle() {
+		return get(CmModel.titled.title);
+	}
+	public BusinessNode title(String name) {
+		return set(CmModel.titled.title, name);
+	}
+	
+	public String getDescription() {
+		return get(CmModel.titled.description);
+	}
+	public BusinessNode description(String name) {
+		return set(CmModel.titled.description, name);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <C extends Serializable> C get(SinglePropertyModel<C> propertyModel) {
+		return (C) repoNode.getProperty(propertyModel.getNameReference());
+	}
+	public <C extends Serializable> BusinessNode set(SinglePropertyModel<C> propertyModel, C value) {
+		repoNode.getProperties().put(propertyModel.getNameReference(), value);
+		return node;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <C extends Serializable> List<C> get(MultiPropertyModel<C> propertyModel) {
+		return (List<C>) repoNode.getProperty(propertyModel.getNameReference());
+	}
+	public <C extends Serializable> BusinessNode set(MultiPropertyModel<C> propertyModel, Collection<C> value) {
+		repoNode.getProperties().put(propertyModel.getNameReference(), (Serializable) value); 
+		return node;
+	}
+	public <C extends Serializable> BusinessNode set(MultiPropertyModel<C> propertyModel, @SuppressWarnings("unchecked") C ... values) {
+		return set(propertyModel, Arrays.asList(values));
+	}
+
+}

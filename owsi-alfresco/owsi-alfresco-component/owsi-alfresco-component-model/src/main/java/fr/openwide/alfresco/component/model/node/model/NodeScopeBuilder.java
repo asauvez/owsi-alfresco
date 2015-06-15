@@ -1,27 +1,21 @@
 package fr.openwide.alfresco.component.model.node.model;
 
-import java.io.File;
-import java.io.OutputStream;
-
-import javax.servlet.http.HttpServletResponse;
-
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
-import fr.openwide.alfresco.app.core.node.binding.OutputStreamRepositoryContentDeserializer;
-import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
+import fr.openwide.alfresco.component.model.node.model.embed.AssociationsNodeScope;
+import fr.openwide.alfresco.component.model.node.model.embed.ContentsNodeScope;
+import fr.openwide.alfresco.component.model.node.model.embed.PermissionsNodeScope;
+import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNodeScope;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class NodeScopeBuilder {
 
 	private NodeScope scope = new NodeScope();
+	private PropertiesNodeScope propertiesNodeScope = new PropertiesNodeScope(this);
+	private AssociationsNodeScope associationsNodeScope = new AssociationsNodeScope(this);
+	private ContentsNodeScope contentsNodeScope = new ContentsNodeScope(this);
+	private PermissionsNodeScope permissionsNodeScope = new PermissionsNodeScope(this);
 
 	public NodeScope getScope() {
 		return scope;
@@ -30,7 +24,7 @@ public class NodeScopeBuilder {
 	public NodeScopeBuilder fromNode(BusinessNode node) {
 		RepositoryNode repositoryNode = node.getRepositoryNode();
 		if (repositoryNode.getType() != null) type();
-		if (node.getRepositoryNode().getPrimaryParentAssociation() != null) primaryParent();
+		if (node.getRepositoryNode().getPrimaryParentAssociation() != null) assocs().primaryParent();
 		
 		scope.getProperties().addAll(repositoryNode.getProperties().keySet());
 		for (NameReference contentProperty : repositoryNode.getContents().keySet()) {
@@ -55,131 +49,37 @@ public class NodeScopeBuilder {
 		return this;
 	}
 
+	@Deprecated
 	public NodeScopeBuilder name() {
-		return property(CmModel.object.name);
+		return properties().name();
 	}
-	public NodeScopeBuilder title() {
-		return property(CmModel.titled.title);
-	}
-	public NodeScopeBuilder description() {
-		return property(CmModel.titled.description);
-	}
+	@Deprecated
 	public NodeScopeBuilder property(PropertyModel<?> propertyModel) {
-		scope.getProperties().add(propertyModel.getNameReference());
-		return this;
+		return properties().set(propertyModel);
 	}
+	@Deprecated
 	public NodeScopeBuilder properties(ContainerModel type) {
-		for (PropertyModel<?> property : type.getProperties().values()) {
-			property(property);
-		}
-		return this;
-	}
-
-	/** Indique que l'on souhaite downloader un fichier. Ici, sous forme de String */
-	public NodeScopeBuilder contentAsString() {
-		return contentWithDeserializer(StringRepositoryContentSerializer.INSTANCE);
-	}
-	public NodeScopeBuilder contentAsByteArray() {
-		return contentWithDeserializer(ByteArrayRepositoryContentSerializer.INSTANCE);
-	}
-	public NodeScopeBuilder contentAsTempFile() {
-		return contentWithDeserializer(TempFileRepositoryContentSerializer.INSTANCE);
-	}
-	public NodeScopeBuilder contentAsFilesInFolder(File destinationFolder) {
-		return contentWithDeserializer(new FolderRepositoryContentSerializer(destinationFolder));
-	}
-	public NodeScopeBuilder contentAsInlineHttpResponse(HttpServletResponse response) {
-		this.name(); // on va avoir besoin du cm:name
-		return contentWithDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, CmModel.object.name.getNameReference(), true));
-	}
-	public NodeScopeBuilder contentAsDownloadHttpResponse(HttpServletResponse response) {
-		this.name(); // on va avoir besoin du cm:name
-		return contentWithDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, CmModel.object.name.getNameReference(), false));
-	}
-	public NodeScopeBuilder contentAsDownloadHttpResponse(HttpServletResponse response, String fileName) {
-		return contentWithDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, fileName, false));
-	}
-	public NodeScopeBuilder contentAsOutputStream(OutputStream outputStream) {
-		return contentWithDeserializer(new OutputStreamRepositoryContentDeserializer(outputStream));
-	}
-	/** Indique que l'on souhaite uploader un fichier. Le format sera pris en fonction du type d'objet. */
-	public NodeScopeBuilder contentForUpload() {
-		return contentAsTempFile();
+		return properties().set(type);
 	}
 	
-	public NodeScopeBuilder contentWithDeserializer(NodeContentDeserializer<?> deserializer) {
-		return contentWithDeserializer(CmModel.content.content, deserializer);
+	public PropertiesNodeScope properties() {
+		return propertiesNodeScope;
 	}
-	public NodeScopeBuilder contentWithDeserializer(PropertyModel<?> propertyModel, NodeContentDeserializer<?> deserializer) {
-		scope.getProperties().add(propertyModel.getNameReference());
-		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
-		return this;
+
+	public AssociationsNodeScope assocs() {
+		return associationsNodeScope;
+	}
+
+	public ContentsNodeScope contents() {
+		return contentsNodeScope;
+	}
+
+	public PermissionsNodeScope permissions() {
+		return permissionsNodeScope;
 	}
 
 	public NodeScopeBuilder aspect(AspectModel aspectModel) {
 		scope.getAspects().add(aspectModel.getNameReference());
-		return this;
-	}
-
-	public NodeScopeBuilder userPermission(RepositoryPermission permission) {
-		scope.getUserPermissions().add(permission);
-		return this;
-	}
-	public NodeScopeBuilder accessPermissions() {
-		scope.setAccessPermissions(true);
-		return this;
-	}
-	
-
-	public NodeScopeBuilder primaryParent() {
-		NodeScopeBuilder primaryParent = new NodeScopeBuilder();
-		scope.setPrimaryParent(primaryParent.scope);
-		return primaryParent;
-	}
-	public NodeScopeBuilder recursivePrimaryParent() {
-		scope.setRecursivePrimaryParent(true);
-		return this;
-	}
-	
-	public NodeScopeBuilder childAssociationContains() {
-		return childAssociation(CmModel.folder.contains);
-	}
-	public NodeScopeBuilder childAssociation(ChildAssociationModel childAssociation) {
-		NodeScopeBuilder other = new NodeScopeBuilder();
-		scope.getChildAssociations().put(childAssociation.getNameReference(), other.getScope());
-		return other;
-	}
-	public NodeScopeBuilder parentAssociationContains() {
-		return parentAssociation(CmModel.folder.contains);
-	}
-	public NodeScopeBuilder parentAssociation(ChildAssociationModel childAssociation) {
-		NodeScopeBuilder other = new NodeScopeBuilder();
-		scope.getParentAssociations().put(childAssociation.getNameReference(), other.getScope());
-		return other;
-	}
-	public NodeScopeBuilder targetAssociation(AssociationModel association) {
-		NodeScopeBuilder other = new NodeScopeBuilder();
-		scope.getTargetAssocs().put(association.getNameReference(), other.getScope());
-		return other;
-	}
-	public NodeScopeBuilder sourceAssociation(AssociationModel association) {
-		NodeScopeBuilder other = new NodeScopeBuilder();
-		scope.getSourceAssocs().put(association.getNameReference(), other.getScope());
-		return other;
-	}
-
-	public NodeScopeBuilder recursiveChildAssociationsContains() {
-		return recursiveChildAssociations(CmModel.folder.contains);
-	}
-	public NodeScopeBuilder recursiveChildAssociations(ChildAssociationModel childAssociation) {
-		scope.getRecursiveChildAssociations().add(childAssociation.getNameReference());
-		return this;
-	}
-	public NodeScopeBuilder recursiveParentAssociationsContains() {
-		return recursiveParentAssociations(CmModel.folder.contains);
-	}
-	public NodeScopeBuilder recursiveParentAssociations(ChildAssociationModel childAssociation) {
-		scope.getRecursiveParentAssociations().add(childAssociation.getNameReference());
 		return this;
 	}
 

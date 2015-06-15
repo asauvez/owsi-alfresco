@@ -24,7 +24,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate) {
 		return getContainedUsers(authority, immediate, new NodeScopeBuilder()
 				.nodeReference()
-				.properties(CmModel.person));
+				.properties().set(CmModel.person));
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate) {
 		return getContainedGroups(authority, immediate, new NodeScopeBuilder()
 				.nodeReference()
-				.properties(CmModel.authorityContainer));
+				.properties().set(CmModel.authorityContainer));
 	}
 
 	@Override
@@ -53,8 +53,8 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {
 		Map<RepositoryAuthority, String> authorities = new LinkedHashMap<>();
 		for (BusinessNode node : groups) {
-			String authorityName = node.getProperty(CmModel.authorityContainer.authorityName);
-			String authorityDisplayName = node.getProperty(CmModel.authorityContainer.authorityDisplayName);
+			String authorityName = node.properties().get(CmModel.authorityContainer.authorityName);
+			String authorityDisplayName = node.properties().get(CmModel.authorityContainer.authorityDisplayName);
 			authorities.put(new RepositoryAuthority(authorityName), authorityDisplayName);
 		}
 		return authorities;

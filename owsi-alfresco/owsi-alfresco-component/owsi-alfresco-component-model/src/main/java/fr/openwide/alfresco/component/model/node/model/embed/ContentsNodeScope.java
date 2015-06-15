@@ -1,0 +1,70 @@
+package fr.openwide.alfresco.component.model.node.model.embed;
+
+import java.io.File;
+import java.io.OutputStream;
+
+import javax.servlet.http.HttpServletResponse;
+
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
+import fr.openwide.alfresco.app.core.node.binding.OutputStreamRepositoryContentDeserializer;
+import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
+import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
+
+public class ContentsNodeScope {
+
+	private final NodeScopeBuilder builder;
+	private final NodeScope scope;
+	
+	public ContentsNodeScope(NodeScopeBuilder builder) {
+		this.builder = builder;
+		this.scope = builder.getScope();
+	}
+	
+	/** Indique que l'on souhaite downloader un fichier. Ici, sous forme de String */
+	public NodeScopeBuilder asString() {
+		return withDeserializer(StringRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder asByteArray() {
+		return withDeserializer(ByteArrayRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder asTempFile() {
+		return withDeserializer(TempFileRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder asFilesInFolder(File destinationFolder) {
+		return withDeserializer(new FolderRepositoryContentSerializer(destinationFolder));
+	}
+	public NodeScopeBuilder asInlineHttpResponse(HttpServletResponse response) {
+		builder.properties().name(); // on va avoir besoin du cm:name
+		return withDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, CmModel.object.name.getNameReference(), true));
+	}
+	public NodeScopeBuilder asDownloadHttpResponse(HttpServletResponse response) {
+		builder.properties().name(); // on va avoir besoin du cm:name
+		return withDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, CmModel.object.name.getNameReference(), false));
+	}
+	public NodeScopeBuilder asDownloadHttpResponse(HttpServletResponse response, String fileName) {
+		return withDeserializer(new HttpServletResponseRepositoryContentDeserializer(response, fileName, false));
+	}
+	public NodeScopeBuilder asOutputStream(OutputStream outputStream) {
+		return withDeserializer(new OutputStreamRepositoryContentDeserializer(outputStream));
+	}
+	/** Indique que l'on souhaite uploader un fichier. Le format sera pris en fonction du type d'objet. */
+	public NodeScopeBuilder forUpload() {
+		return asTempFile();
+	}
+	
+	public NodeScopeBuilder withDeserializer(NodeContentDeserializer<?> deserializer) {
+		return withDeserializer(CmModel.content.content, deserializer);
+	}
+	public NodeScopeBuilder withDeserializer(PropertyModel<?> propertyModel, NodeContentDeserializer<?> deserializer) {
+		scope.getProperties().add(propertyModel.getNameReference());
+		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
+		return builder;
+	}
+}
