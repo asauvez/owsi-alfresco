@@ -11,9 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.acls.domain.PermissionFactory;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Optional;
@@ -33,6 +35,8 @@ public abstract class UserAwarePermissionEvaluator implements PermissionEvaluato
 	private PermissionFactory permissionFactory;
 	@Autowired
 	private IPermissionHierarchy permissionHierarchy;
+	@Autowired
+	private RoleHierarchy roleHierarchy;
 
 	protected abstract boolean hasPermission(UserDetails user, Object targetDomainObject, Permission permission);
 
@@ -125,6 +129,19 @@ public abstract class UserAwarePermissionEvaluator implements PermissionEvaluato
 			throw new IllegalStateException("Unsupported permission: " + permission);
 		}
 		return p;
+	}
+
+	protected boolean hasRole(UserDetails user, String role) {
+		for(GrantedAuthority auth : getAuthorities(user)) {
+			if(auth.getAuthority().equals(role)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected Collection<? extends GrantedAuthority> getAuthorities(UserDetails user) {
+		return roleHierarchy.getReachableGrantedAuthorities(user.getAuthorities());
 	}
 
 }

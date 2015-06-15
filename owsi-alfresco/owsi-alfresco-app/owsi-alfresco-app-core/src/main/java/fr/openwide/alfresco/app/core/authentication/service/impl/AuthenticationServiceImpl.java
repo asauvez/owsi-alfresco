@@ -14,7 +14,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final RepositoryRemoteBinding authenticationRemoteBinding;
 
 	private final String authenticationHeader;
-
+	private final NodeScope defaultUserNodeScope;
+	
 	public AuthenticationServiceImpl(RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding,
 			RepositoryRemoteBinding requiringExplicitTicketRemoteBinding,
 			RepositoryRemoteBinding authenticationRemoteBinding, String authenticationHeader) {
@@ -22,6 +23,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		this.requiringExplicitTicketRemoteBinding = requiringExplicitTicketRemoteBinding;
 		this.authenticationRemoteBinding = authenticationRemoteBinding;
 		this.authenticationHeader = authenticationHeader;
+
+		defaultUserNodeScope = new NodeScope();
+		defaultUserNodeScope.getProperties().add(RepositoryUser.FIRST_NAME);
+		defaultUserNodeScope.getProperties().add(RepositoryUser.LAST_NAME);
+		defaultUserNodeScope.getProperties().add(RepositoryUser.EMAIL);
 	}
 
 	@Override
@@ -40,12 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	
 	@Override
 	public RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException {
-		NodeScope nodeScope = new NodeScope();
-		nodeScope.getProperties().add(RepositoryUser.FIRST_NAME);
-		nodeScope.getProperties().add(RepositoryUser.LAST_NAME);
-		nodeScope.getProperties().add(RepositoryUser.EMAIL);
-		
-		return authenticate(username, password, nodeScope);
+		return authenticate(username, password, defaultUserNodeScope);
 	}
 
 	@Override
@@ -71,4 +72,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			.call();
 	}
 
+	@Override
+	public NodeScope getDefaultUserNodeScope() {
+		return defaultUserNodeScope;
+	}
 }
