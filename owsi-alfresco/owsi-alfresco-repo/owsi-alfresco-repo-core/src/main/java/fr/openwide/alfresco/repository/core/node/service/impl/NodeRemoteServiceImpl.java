@@ -43,7 +43,7 @@ import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteExceptio
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.core.node.web.script.NodeContentCallback;
-import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class NodeRemoteServiceImpl implements NodeRemoteService {

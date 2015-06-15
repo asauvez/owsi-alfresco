@@ -18,7 +18,8 @@ public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUse
 	protected RepositoryUser executeImpl(LOGIN_REQUEST_SERVICE request) {
 		return authenticationRemoteService.authenticate(
 				Objects.requireNonNull(request.username, "Username"), 
-				Objects.requireNonNull(request.password, "Password"));
+				Objects.requireNonNull(request.password, "Password"),
+				Objects.requireNonNull(request.nodeScope, "NodeScope"));
 	}
 
 	@Override

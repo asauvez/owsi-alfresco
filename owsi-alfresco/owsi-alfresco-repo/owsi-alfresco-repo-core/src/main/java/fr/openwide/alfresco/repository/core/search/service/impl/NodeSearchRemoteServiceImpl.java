@@ -16,7 +16,7 @@ import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
-import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {

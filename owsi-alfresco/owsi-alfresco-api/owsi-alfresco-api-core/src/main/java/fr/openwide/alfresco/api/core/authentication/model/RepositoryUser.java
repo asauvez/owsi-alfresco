@@ -6,17 +6,20 @@ import java.util.List;
 import java.util.Objects;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class RepositoryUser implements Serializable {
 
 	private static final long serialVersionUID = 945185331538453155L;
 
+	public static final NameReference FIRST_NAME = NameReference.create("cm", "firstName"); 
+	public static final NameReference LAST_NAME = NameReference.create("cm", "lastName"); 
+	public static final NameReference EMAIL = NameReference.create("cm", "email"); 
+	
 	private UserReference userReference;
 
-	private String firstName;
-	private String lastName;
-	private String email;
-
+	private RepositoryNode userNode;
 	private RepositoryTicket ticket;
 
 	private boolean admin = false;
@@ -29,27 +32,23 @@ public class RepositoryUser implements Serializable {
 		this.userReference = userReference;
 	}
 
+	public RepositoryNode getUserNode() {
+		return userNode;
+	}
+	public void setUserNode(RepositoryNode userNode) {
+		this.userNode = userNode;
+	}
+
 	public String getFirstName() {
-		return firstName;
+		return userNode.getProperty(FIRST_NAME, String.class);
 	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
 	public String getLastName() {
-		return lastName;
+		return userNode.getProperty(LAST_NAME, String.class);
 	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
 	public String getEmail() {
-		return email;
+		return userNode.getProperty(EMAIL, String.class);
 	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
+	
 	public List<RepositoryAuthority> getAuthorities() {
 		return authorities;
 	}

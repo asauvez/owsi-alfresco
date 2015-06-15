@@ -12,11 +12,6 @@
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 
-	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.repository.core.remote.service.impl.ConversionServiceImpl">
-		<property name="namespacePrefixResolver" ref="NamespaceService" />
-		<property name="mimetypeService" ref="MimetypeService" />
-	</bean>
-	
 	<!-- Node webscripts -->
 
 	<bean id="webscript.owsi.node" parent="webscript.owsi.remote" abstract="true">

@@ -7,6 +7,8 @@ import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteExceptio
 
 public interface AuthenticationService extends AuthenticationRemoteService {
 
+	RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException;
+	
 	/**
 	 * Authenticate a pre-authenticated user with its username
 	 */

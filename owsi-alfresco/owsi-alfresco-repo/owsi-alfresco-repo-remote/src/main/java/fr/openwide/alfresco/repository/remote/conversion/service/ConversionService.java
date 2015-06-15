@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.core.remote.service;
+package fr.openwide.alfresco.repository.remote.conversion.service;
 
 import java.io.Serializable;
 

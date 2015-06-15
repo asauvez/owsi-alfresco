@@ -13,7 +13,7 @@ import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
-import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 

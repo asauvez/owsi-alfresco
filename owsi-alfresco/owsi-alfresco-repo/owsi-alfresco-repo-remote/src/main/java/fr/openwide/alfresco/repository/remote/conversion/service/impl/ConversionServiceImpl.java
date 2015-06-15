@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.core.remote.service.impl;
+package fr.openwide.alfresco.repository.remote.conversion.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
-import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class ConversionServiceImpl implements ConversionService {

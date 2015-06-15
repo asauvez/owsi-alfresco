@@ -2,8 +2,8 @@ package fr.openwide.alfresco.api.core.authentication.service;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.GetMethodEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 
 public interface AuthenticationRemoteService {
@@ -15,14 +15,18 @@ public interface AuthenticationRemoteService {
 		public static final PostMethodEndpoint<RepositoryUser> ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/request") {};
 		public String username;
 		public String password;
+		public NodeScope nodeScope;
 	}
-	RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException;
+	RepositoryUser authenticate(String username, String password, NodeScope nodeScope) throws AccessDeniedRemoteException;
 
 	/**
 	 * Retrieve user information from a pre-authenticated user
 	 */
-	GetMethodEndpoint<RepositoryUser> AUTHENTICATED_USER_SERVICE_ENDPOINT = new GetMethodEndpoint<RepositoryUser>("/owsi/authentication/user") {};
-	RepositoryUser getAuthenticatedUser();
+	class AUTHENTICATED_USER_SERVICE {
+		public static final PostMethodEndpoint<RepositoryUser> ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/user") {};
+		public NodeScope nodeScope;
+	}
+	RepositoryUser getAuthenticatedUser(NodeScope nodeScope);
 
 	/**
 	 * Log out an authenticated user
