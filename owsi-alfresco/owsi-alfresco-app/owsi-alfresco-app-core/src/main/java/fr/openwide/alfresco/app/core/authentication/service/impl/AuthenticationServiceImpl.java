@@ -61,6 +61,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
+	public RepositoryUser getAuthenticatedUser() {
+		return getAuthenticatedUser(getDefaultUserNodeScope());
+	}
+	
+	@Override
 	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
 		throw new UnsupportedOperationException("Use authenticate methods");
 	}

@@ -20,6 +20,8 @@ public interface AuthenticationService extends AuthenticationRemoteService {
 	 */
 	RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException;
 
+	RepositoryUser getAuthenticatedUser();
+	
 	NodeScope getDefaultUserNodeScope();
 
 }
