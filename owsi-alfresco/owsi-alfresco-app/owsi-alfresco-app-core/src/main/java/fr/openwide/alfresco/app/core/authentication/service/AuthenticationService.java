@@ -19,8 +19,6 @@ public interface AuthenticationService extends AuthenticationRemoteService {
 	 * Authenticate a pre-authenticated user with its ticket
 	 */
 	RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException;
-
-	RepositoryUser getAuthenticatedUser();
 	
 	NodeScope getDefaultUserNodeScope();
 

@@ -4,6 +4,7 @@ import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.GetMethodEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 
 public interface AuthenticationRemoteService {
@@ -22,11 +23,8 @@ public interface AuthenticationRemoteService {
 	/**
 	 * Retrieve user information from a pre-authenticated user
 	 */
-	class AUTHENTICATED_USER_SERVICE {
-		public static final PostMethodEndpoint<RepositoryUser> ENDPOINT = new PostMethodEndpoint<RepositoryUser>("/owsi/authentication/user") {};
-		public NodeScope nodeScope;
-	}
-	RepositoryUser getAuthenticatedUser(NodeScope nodeScope);
+	 GetMethodEndpoint<RepositoryUser> AUTHENTICATED_USER_SERVICE_ENDPOINT = new GetMethodEndpoint<RepositoryUser>("/owsi/authentication/user") {}; 
+	 RepositoryUser getAuthenticatedUser(); 
 
 	/**
 	 * Log out an authenticated user

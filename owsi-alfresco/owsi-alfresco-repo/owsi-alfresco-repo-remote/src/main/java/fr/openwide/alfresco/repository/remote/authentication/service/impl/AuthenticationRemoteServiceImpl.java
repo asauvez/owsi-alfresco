@@ -48,7 +48,12 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	}
 
 	@Override
-	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
+	public RepositoryUser getAuthenticatedUser() {
+		NodeScope nodeScope = new NodeScope();
+		nodeScope.getProperties().add(RepositoryUser.FIRST_NAME);
+		nodeScope.getProperties().add(RepositoryUser.LAST_NAME);
+		nodeScope.getProperties().add(RepositoryUser.EMAIL);
+		
 		// user should be pre-authenticated at this point
 		return getCurrentUser(nodeScope);
 	}

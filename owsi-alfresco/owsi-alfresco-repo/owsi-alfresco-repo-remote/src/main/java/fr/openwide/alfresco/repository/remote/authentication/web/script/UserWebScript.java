@@ -1,28 +1,21 @@
 package fr.openwide.alfresco.repository.remote.authentication.web.script;
 
-import java.util.Objects;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
+import org.springframework.extensions.webscripts.Cache;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService.AUTHENTICATED_USER_SERVICE;
-import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractMessageRemoteWebScript;
+import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
-public class UserWebScript extends AbstractMessageRemoteWebScript<RepositoryUser, AUTHENTICATED_USER_SERVICE> {
+public class UserWebScript extends AbstractRemoteWebScript<RepositoryUser> {
 
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected RepositoryUser executeImpl(AUTHENTICATED_USER_SERVICE request) {
-		return authenticationRemoteService.getAuthenticatedUser(
-				Objects.requireNonNull(request.nodeScope, "NodeScope"));
-	}
-
-	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(AUTHENTICATED_USER_SERVICE.class);
+	protected RepositoryUser executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) { 
+		return authenticationRemoteService.getAuthenticatedUser(); 
 	}
 
 	public void setAuthenticationRemoteService(AuthenticationRemoteService authenticationRemoteService) {

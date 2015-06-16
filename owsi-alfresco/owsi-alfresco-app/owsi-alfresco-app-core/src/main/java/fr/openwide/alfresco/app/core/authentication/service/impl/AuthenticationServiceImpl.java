@@ -32,14 +32,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public RepositoryUser authenticate(String username) throws AccessDeniedRemoteException {
-		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT)
+		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE_ENDPOINT)
 				.header(authenticationHeader, username)
 				.call();
 	}
 
 	@Override
 	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT)
+		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE_ENDPOINT)
 				.urlVariable(ticket)
 				.call();
 	}
@@ -62,11 +62,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public RepositoryUser getAuthenticatedUser() {
-		return getAuthenticatedUser(getDefaultUserNodeScope());
-	}
-	
-	@Override
-	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
 		throw new UnsupportedOperationException("Use authenticate methods");
 	}
 
