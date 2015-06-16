@@ -85,7 +85,7 @@ public class BusinessNode {
 		return properties().get(propertyModel);
 	}
 	@Deprecated
-	public <C extends Serializable> BusinessNode setProperty(SinglePropertyModel<C> propertyModel, C value) {
+	public <C extends Serializable> BusinessNode property(SinglePropertyModel<C> propertyModel, C value) {
 		return properties().set(propertyModel, value);
 	}
 	public PropertiesNode properties() {
