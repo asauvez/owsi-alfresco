@@ -13,13 +13,17 @@ import fr.openwide.alfresco.component.model.node.model.property.single.SinglePro
 public class BusinessNode {
 
 	private RepositoryNode node;
-	private PropertiesNode propertiesNode = new PropertiesNode(this);
-	private AssociationsNode associationsNode = new AssociationsNode(this);
-	private PermissionsNode permissionsNode = new PermissionsNode(this);
-	private ContentsNode contentsNode = new ContentsNode(this);
+	private PropertiesNode propertiesNode;
+	private AssociationsNode associationsNode;
+	private PermissionsNode permissionsNode;
+	private ContentsNode contentsNode;
 	
 	public BusinessNode() {
 		this(new RepositoryNode());
+		propertiesNode = new PropertiesNode(this);
+		associationsNode = new AssociationsNode(this);
+		permissionsNode = new PermissionsNode(this);
+		contentsNode = new ContentsNode(this);
 	}
 
 	public BusinessNode(RepositoryNode node) {
