@@ -18,16 +18,16 @@ public class BusinessNode {
 	private PermissionsNode permissionsNode;
 	private ContentsNode contentsNode;
 	
-	public BusinessNode() {
-		this(new RepositoryNode());
+	public BusinessNode(RepositoryNode node) {
+		this.node = node;
 		propertiesNode = new PropertiesNode(this);
 		associationsNode = new AssociationsNode(this);
 		permissionsNode = new PermissionsNode(this);
 		contentsNode = new ContentsNode(this);
 	}
 
-	public BusinessNode(RepositoryNode node) {
-		this.node = node;
+	public BusinessNode() {
+		this(new RepositoryNode());
 	}
 
 	/** Constructeur pour faciliter la modification de node. */
