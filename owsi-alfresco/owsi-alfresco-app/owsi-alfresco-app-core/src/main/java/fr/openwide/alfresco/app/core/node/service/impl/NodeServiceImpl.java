@@ -73,6 +73,16 @@ public class NodeServiceImpl implements NodeService {
 			.urlVariable(nodeReference)
 			.call(null, responseExtractor);
 	}
+	
+	@Override
+	public void getNodeThumbnail(NodeReference nodeReference, NameReference property, String thumbnailName,
+			ResponseExtractor<Void> responseExtractor) {
+		repositoryRemoteBinding.builder(GET_NODE_THUMBNAIL_ENDPOINT)
+			.urlVariable(nodeReference)
+			.urlVariable((property != null) ? ";" + property.getFullName() : "")
+			.urlVariable((thumbnailName != null) ? thumbnailName : "imgpreview")
+			.call(null, responseExtractor);
+	}
 
 	@Override
 	public RepositoryContentData getNodeContent(NodeReference nodeReference, NameReference property, final OutputStream out) {

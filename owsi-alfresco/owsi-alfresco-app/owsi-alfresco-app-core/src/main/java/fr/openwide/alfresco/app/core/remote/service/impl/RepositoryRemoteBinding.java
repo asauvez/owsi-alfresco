@@ -102,7 +102,7 @@ public class RepositoryRemoteBinding {
 		return execute(uri, method, null, realRequestCallback, null, responseExtractor);
 	}
 
-	protected void addTicketHeader(HttpHeaders headers) {
+	private void addTicketHeader(HttpHeaders headers) {
 		if (ticketHeader != null && ticketProvider.isPresent()) {
 			// get ticket
 			RepositoryTicket ticket = ticketProvider.get().getTicket();

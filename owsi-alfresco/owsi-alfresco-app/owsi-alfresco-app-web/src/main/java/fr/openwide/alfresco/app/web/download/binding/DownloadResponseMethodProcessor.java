@@ -147,7 +147,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	}
 
 	protected void streamNodeReference(final NodeReferenceDownloadResponse download, final NativeWebRequest webRequest) {
-		nodeService.getNodeContent(download.getNodeReference(), download.getProperty(), new ResponseExtractor<Void>() {
+		ResponseExtractor<Void> responseExtractor = new ResponseExtractor<Void>() {
 			@Override
 			public Void extractData(ClientHttpResponse repositoryResponse) throws IOException {
 				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
@@ -165,7 +165,13 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 				}
 				return null;
 			}
-		});
+		};
+		
+		if (download.getThumbnailName() != null) {
+			nodeService.getNodeThumbnail(download.getNodeReference(), download.getProperty(), download.getThumbnailName(), responseExtractor);
+		} else {
+			nodeService.getNodeContent(download.getNodeReference(), download.getProperty(), responseExtractor);
+		} 
 	}
 
 	/**
@@ -180,6 +186,10 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		String headerValue = MessageFormat.format(HEADER_CONTENT_DISPOSITION_VALUE_PATTERN, 
 				(download.isAttachment() ? "attachment" : "inline"), download.getAttachmentName());
 		response.setHeader(HEADER_CONTENT_DISPOSITION_NAME, headerValue);
+		
+		if (download.isNoCache()) {
+			response.setHeader("Pragma", "no-cache");
+		}
 	}
 
 	protected static void setCookie(NativeWebRequest webRequest) {

@@ -6,6 +6,7 @@ public abstract class DownloadResponse {
 
 	private boolean attachment = true; // force le téléchargement
 	private String attachmentName;
+	private boolean noCache = false;
 
 	private AlertContainer alertContainer = new AlertContainer();
 
@@ -24,12 +25,20 @@ public abstract class DownloadResponse {
 		this.attachment = attachment;
 		return this;
 	}
-
+	
 	public String getAttachmentName() {
 		return attachmentName;
 	}
 	public DownloadResponse attachmentName(String attachmentName) {
 		this.attachmentName = attachmentName;
+		return this;
+	}
+
+	public boolean isNoCache() {
+		return noCache;
+	}
+	public DownloadResponse noCache(boolean noCache) {
+		this.noCache = noCache;
 		return this;
 	}
 

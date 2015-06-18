@@ -47,9 +47,9 @@ public class RepositoryRemoteCallBuilder<R> {
 	public RepositoryRemoteCallBuilder<R> urlVariable(NodeReference nodeReference) {
 		Matcher matcher = NodeReference.PATTERN.matcher(nodeReference.getReference());
 		matcher.matches();
-		urlVariable(matcher.group(1));
-		urlVariable(matcher.group(2));
-		urlVariable(matcher.group(3));
+		urlVariable(matcher.group(NodeReference.PATTERN_WORKSPACE));
+		urlVariable(matcher.group(NodeReference.PATTERN_STORE));
+		urlVariable(matcher.group(NodeReference.PATTERN_UUID));
 		return this;
 	}
 	

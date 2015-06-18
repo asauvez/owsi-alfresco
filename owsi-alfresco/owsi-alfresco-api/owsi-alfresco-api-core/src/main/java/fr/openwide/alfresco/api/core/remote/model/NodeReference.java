@@ -13,6 +13,10 @@ public class NodeReference implements Serializable {
 	private static final long serialVersionUID = -1502875087111354789L;
 
 	public static final Pattern PATTERN = Pattern.compile("((.+)://(.+))/(.+)");
+	public static final int PATTERN_STORE_REFERENCE = 1;
+	public static final int PATTERN_WORKSPACE = 2;
+	public static final int PATTERN_STORE = 3;
+	public static final int PATTERN_UUID = 4;
 
 	private final String reference;
 
@@ -30,12 +34,12 @@ public class NodeReference implements Serializable {
 	public StoreReference getStoreReference() {
 		Matcher matcher = PATTERN.matcher(reference);
 		matcher.matches();
-		return StoreReference.create(matcher.group(1));
+		return StoreReference.create(matcher.group(PATTERN_STORE_REFERENCE));
 	}
 	public UUID getUuid() {
 		Matcher matcher = PATTERN.matcher(reference);
 		matcher.matches();
-		return UUID.fromString(matcher.group(4));
+		return UUID.fromString(matcher.group(PATTERN_UUID));
 	}
 
 	@JsonValue
