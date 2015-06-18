@@ -43,7 +43,7 @@
 	<bean id="webscript.owsi.remote.authentication.logout.post" parent="webscript.owsi.remote.authentication"
 			class="fr.openwide.alfresco.repository.remote.authentication.web.script.LogoutWebScript" />
 
-	<bean id="webscript.owsi.remote.authentication.user.get" parent="webscript.owsi.remote.authentication"
+	<bean id="webscript.owsi.remote.authentication.user.post" parent="webscript.owsi.remote.authentication"
 			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UserWebScript" />
 
 </beans>

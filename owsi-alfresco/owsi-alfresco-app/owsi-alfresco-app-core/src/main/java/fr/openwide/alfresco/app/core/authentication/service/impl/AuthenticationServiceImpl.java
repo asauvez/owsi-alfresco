@@ -32,14 +32,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public RepositoryUser authenticate(String username) throws AccessDeniedRemoteException {
-		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE_ENDPOINT)
+		return authenticate(username, getDefaultUserNodeScope());
+	}
+	
+	@Override
+	public RepositoryUser authenticate(String username, NodeScope nodeScope) throws AccessDeniedRemoteException {
+		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
+		request.nodeScope = nodeScope;
+		
+		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
 				.header(authenticationHeader, username)
 				.call();
 	}
 
 	@Override
 	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE_ENDPOINT)
+		return authenticate(ticket, getDefaultUserNodeScope());
+	}
+
+	@Override
+	public RepositoryUser authenticate(RepositoryTicket ticket, NodeScope nodeScope) throws AccessDeniedRemoteException {
+		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
+		request.nodeScope = nodeScope;
+
+		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
 				.urlVariable(ticket)
 				.call();
 	}
@@ -61,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public RepositoryUser getAuthenticatedUser() {
+	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
 		throw new UnsupportedOperationException("Use authenticate methods");
 	}
 

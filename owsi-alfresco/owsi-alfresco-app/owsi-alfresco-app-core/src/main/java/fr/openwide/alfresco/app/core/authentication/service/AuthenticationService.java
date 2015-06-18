@@ -14,11 +14,13 @@ public interface AuthenticationService extends AuthenticationRemoteService {
 	 * Authenticate a pre-authenticated user with its username
 	 */
 	RepositoryUser authenticate(String username) throws AccessDeniedRemoteException;
+	RepositoryUser authenticate(String username, NodeScope nodeScope) throws AccessDeniedRemoteException;
 
 	/**
 	 * Authenticate a pre-authenticated user with its ticket
 	 */
 	RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException;
+	RepositoryUser authenticate(RepositoryTicket ticket, NodeScope nodeScope) throws AccessDeniedRemoteException;
 	
 	NodeScope getDefaultUserNodeScope();
 
