@@ -2,6 +2,9 @@ package fr.openwide.alfresco.app.core.search.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
@@ -11,6 +14,8 @@ import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 
 public class NodeSearchServiceImpl implements NodeSearchService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(NodeSearchServiceImpl.class);
+	
 	private final NodeService nodeService;
 
 	public NodeSearchServiceImpl(NodeService nodeService) {
@@ -24,6 +29,8 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 
 	@Override
 	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, SearchQueryLanguage language) {
+		LOGGER.debug(query);
+		
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
 		payload.query = query;
 		payload.storeReference = storeReference;
