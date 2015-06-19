@@ -7,8 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.StoreReference;
-import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
+import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 
@@ -23,19 +22,19 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 	}
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope) {
-		return search(query, storeReference, nodeScope, SearchQueryLanguage.FTS_ALFRESCO);
+	public List<RepositoryNode> search(String query, NodeScope nodeScope) {
+		RepositorySearchParameters searchParameters = new RepositorySearchParameters();
+		searchParameters.setQuery(query);
+		return search(searchParameters, nodeScope);
 	}
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, SearchQueryLanguage language) {
-		LOGGER.debug(query);
+	public List<RepositoryNode> search(RepositorySearchParameters searchParameters, NodeScope nodeScope) {
+		LOGGER.debug(searchParameters.getQuery());
 		
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
-		payload.query = query;
-		payload.storeReference = storeReference;
+		payload.searchParameters = searchParameters;
 		payload.nodeScope = nodeScope;
-		payload.language = language;
 		return nodeService.callNodeListSerializer(SEARCH_NODE_SERVICE.ENDPOINT, payload, nodeScope);
 	}
 

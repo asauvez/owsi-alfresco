@@ -18,10 +18,8 @@ public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_S
 	@Override
 	protected List<RepositoryNode> execute(SEARCH_NODE_SERVICE parameter) {
 		return nodeSearchService.search(
-				Objects.requireNonNull(parameter.query, "Query"), 
-				Objects.requireNonNull(parameter.storeReference, "StoreReference"), 
-				Objects.requireNonNull(parameter.nodeScope, "NodeScope"),
-				Objects.requireNonNull(parameter.language, "Language"));
+				Objects.requireNonNull(parameter.searchParameters, "SearchParameters"), 
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override

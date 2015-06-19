@@ -4,11 +4,11 @@ import java.util.List;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.search.SearchBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 
@@ -21,19 +21,18 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	}
 
 	@Override
-	public List<BusinessNode> search(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) {
-		return search(builder, StoreReference.STORE_REF_WORKSPACE_SPACESSTORE, nodeScopeBuilder);
+	public List<BusinessNode> search(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder) {
+		return search(new SearchBuilder()
+				.restriction(restrictionBuilder),
+			nodeScopeBuilder);
 	}
 
 	@Override
-	public List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference,
-			NodeScopeBuilder nodeScopeBuilder) {
+	public List<BusinessNode> search(SearchBuilder searchBuilder, NodeScopeBuilder nodeScopeBuilder) {
 		return new BusinessNodeList(nodeSearchService.search(
-				builder.toQuery(),
-				storeReference,
+				searchBuilder.getSearchParameters(),
 				nodeScopeBuilder.getScope()));
 	}
-
 	@Override
 	public BusinessNode searchUnique(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		List<BusinessNode> list = search(builder, nodeScopeBuilder);
