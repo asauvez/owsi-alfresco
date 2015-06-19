@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -32,6 +28,11 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.web.download.model.ByteArrayDownloadResponse;
 import fr.openwide.alfresco.app.web.download.model.ContentDownloadResponse;
@@ -147,31 +148,30 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	}
 
 	protected void streamNodeReference(final NodeReferenceDownloadResponse download, final NativeWebRequest webRequest) {
-		ResponseExtractor<Void> responseExtractor = new ResponseExtractor<Void>() {
+		if (download.getNodeReference() == null) {
+			throw new IllegalArgumentException("nodeReference is mandatory");
+		}
+
+		NodeScope nodeScope = new NodeScope();
+		nodeScope.setRenditionName(download.getRenditionName());
+		nodeScope.getProperties().add(download.getProperty());
+		nodeScope.getContentDeserializers().put(download.getProperty(), new NodeContentDeserializer<Void>() {
 			@Override
-			public Void extractData(ClientHttpResponse repositoryResponse) throws IOException {
-				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
 				// set cookie (do this before header content-length so that client can deal with it early !)
 				setCookie(webRequest);
-				// recopy headers
-				for (Entry<String, List<String>> entry : repositoryResponse.getHeaders().entrySet()) {
-					for (String value : entry.getValue()) {
-						response.addHeader(entry.getKey(), value);
-					}
-				}
-				// recopy content + override content disposition header
-				try (InputStream body = repositoryResponse.getBody()) {
-					streamInput(download, body, response);
-				}
+
+				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+				RepositoryContentData data = node.getProperty(contentProperty, RepositoryContentData.class);
+				response.setContentType(data.getMimetype());
+				response.setCharacterEncoding(data.getEncoding());
+				response.setContentLength(data.getSize().intValue());
+				
+				streamInput(download, inputStream, response);
 				return null;
 			}
-		};
-		
-		if (download.getThumbnailName() != null) {
-			nodeService.getNodeThumbnail(download.getNodeReference(), download.getProperty(), download.getThumbnailName(), responseExtractor);
-		} else {
-			nodeService.getNodeContent(download.getNodeReference(), download.getProperty(), responseExtractor);
-		} 
+		});
+		nodeService.get(download.getNodeReference(), nodeScope);
 	}
 
 	/**

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
@@ -38,6 +39,7 @@ public class ContentsNodeScope {
 		return withDeserializer(TempFileRepositoryContentSerializer.INSTANCE);
 	}
 	public NodeScopeBuilder asFilesInFolder(File destinationFolder) {
+		builder.properties().name(); // on va avoir besoin du cm:name
 		return withDeserializer(new FolderRepositoryContentSerializer(destinationFolder));
 	}
 	public NodeScopeBuilder asInlineHttpResponse(HttpServletResponse response) {
@@ -65,6 +67,11 @@ public class ContentsNodeScope {
 	public NodeScopeBuilder withDeserializer(PropertyModel<?> propertyModel, NodeContentDeserializer<?> deserializer) {
 		scope.getProperties().add(propertyModel.getNameReference());
 		scope.getContentDeserializers().put(propertyModel.getNameReference(), deserializer);
+		return builder;
+	}
+	
+	public NodeScopeBuilder rendition(NameReference renditionName) {
+		scope.setRenditionName(renditionName);
 		return builder;
 	}
 }

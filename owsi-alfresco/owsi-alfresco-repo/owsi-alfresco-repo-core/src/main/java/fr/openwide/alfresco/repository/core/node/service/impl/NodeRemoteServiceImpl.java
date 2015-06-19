@@ -13,6 +13,7 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -51,6 +52,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private NodeService nodeService;
 	private ContentService contentService;
 	private PermissionService permissionService;
+	private RenditionService renditionService;
 
 	private ConversionService conversionService;
 
@@ -111,7 +113,15 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return res;
 	}
 
-	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
+	protected RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
+		if (scope.getRenditionName() != null) {
+			ChildAssociationRef childRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(scope.getRenditionName()));
+			if (childRef == null) {
+				childRef = renditionService.render(nodeRef, conversionService.getRequired(scope.getRenditionName()));
+			}
+			nodeRef = childRef.getChildRef();
+		}
+		
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
 			throw new NoSuchNodeRemoteException(nodeReference.getReference());
@@ -492,6 +502,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	public void setPermissionService(PermissionService permissionService) {
 		this.permissionService = permissionService;
+	}
+	public void setRenditionService(RenditionService renditionService) {
+		this.renditionService = renditionService;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

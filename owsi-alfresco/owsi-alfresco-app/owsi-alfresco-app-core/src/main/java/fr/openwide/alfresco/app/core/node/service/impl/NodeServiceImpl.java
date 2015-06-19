@@ -1,16 +1,9 @@
 package fr.openwide.alfresco.app.core.node.service.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseExtractor;
 
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
@@ -19,7 +12,6 @@ import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -64,40 +56,6 @@ public class NodeServiceImpl implements NodeService {
 				}, 
 				defaultSerializationParameters, 
 				deserializationParameters);
-	}
-
-	@Override
-	public void getNodeContent(NodeReference nodeReference, NameReference property, ResponseExtractor<Void> responseExtractor) {
-		repositoryRemoteBinding.builder(GET_NODE_CONTENT_ENDPOINT)
-			.urlVariable((property != null) ? ";" + property.getFullName() : "")
-			.urlVariable(nodeReference)
-			.call(null, responseExtractor);
-	}
-	
-	@Override
-	public void getNodeThumbnail(NodeReference nodeReference, NameReference property, String thumbnailName,
-			ResponseExtractor<Void> responseExtractor) {
-		repositoryRemoteBinding.builder(GET_NODE_THUMBNAIL_ENDPOINT)
-			.urlVariable(nodeReference)
-			.urlVariable((property != null) ? ";" + property.getFullName() : "")
-			.urlVariable((thumbnailName != null) ? thumbnailName : "imgpreview")
-			.call(null, responseExtractor);
-	}
-
-	@Override
-	public RepositoryContentData getNodeContent(NodeReference nodeReference, NameReference property, final OutputStream out) {
-		final RepositoryContentData contentData = new RepositoryContentData();
-		getNodeContent(nodeReference, property, new ResponseExtractor<Void>() {
-			@Override
-			public Void extractData(ClientHttpResponse response) throws IOException {
-				HttpHeaders headers = response.getHeaders();
-				contentData.setMimetype(headers.getContentType().toString());
-				contentData.setSize(headers.getContentLength());
-				IOUtils.copy(response.getBody(), out);
-				return null;
-			}
-		});
-		return contentData;
 	}
 
 	@Override

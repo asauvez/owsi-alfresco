@@ -23,9 +23,11 @@ public class NodeScope implements Serializable {
 	private boolean path = false;
 	private boolean type = false;
 	private final Set<NameReference> properties = new LinkedHashSet<>();
-	private final Map<NameReference, NodeContentDeserializer<?>> contentDeserializers = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
-	
+
+	private final Map<NameReference, NodeContentDeserializer<?>> contentDeserializers = new LinkedHashMap<>();
+	private NameReference renditionName;
+
 	private final Map<NameReference, String> extensions = new LinkedHashMap<>();
 
 	private NodeScope primaryParent;
@@ -89,6 +91,14 @@ public class NodeScope implements Serializable {
 	public Map<NameReference, NodeContentDeserializer<?>> getContentDeserializers() {
 		return contentDeserializers;
 	}
+	
+	public NameReference getRenditionName() {
+		return renditionName;
+	}
+	public void setRenditionName(NameReference renditionName) {
+		this.renditionName = renditionName;
+	}
+	
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}

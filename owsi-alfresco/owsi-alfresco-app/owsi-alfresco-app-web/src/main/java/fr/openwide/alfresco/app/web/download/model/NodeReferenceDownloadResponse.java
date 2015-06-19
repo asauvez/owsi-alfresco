@@ -5,11 +5,11 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class NodeReferenceDownloadResponse extends DownloadResponse {
 
-	private static final String THUMBNAIL_WEB_PREVIEW = "webpreview";
+	private static final NameReference DEFAULT_CONTENT_PROPERTY = NameReference.create("cm", "content");
 	
 	private NodeReference nodeReference;
-	private NameReference property;
-	private String thumbnailName;
+	private NameReference property = DEFAULT_CONTENT_PROPERTY;
+	private NameReference renditionName;
 
 	public NodeReference getNodeReference() {
 		return nodeReference;
@@ -27,14 +27,17 @@ public class NodeReferenceDownloadResponse extends DownloadResponse {
 		return this;
 	}
 
-	public String getThumbnailName() {
-		return thumbnailName;
+	public NameReference getRenditionName() {
+		return renditionName;
 	}
-	public NodeReferenceDownloadResponse thumbnailName(String thumbnailName) {
-		this.thumbnailName = thumbnailName;
+	public NodeReferenceDownloadResponse renditionName(String renditionName) {
+		return renditionName(NameReference.create("cm", renditionName));
+	}
+	public NodeReferenceDownloadResponse renditionName(NameReference renditionName) {
+		this.renditionName = renditionName;
 		return this;
 	}
-	public NodeReferenceDownloadResponse thumbnailWebPreview() {
-		return thumbnailName(THUMBNAIL_WEB_PREVIEW);
+	public NodeReferenceDownloadResponse renditionImgPreview() {
+		return renditionName("imgpreview");
 	}
 }

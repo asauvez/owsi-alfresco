@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.component.model.node.service.impl;
 
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,6 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
@@ -35,16 +33,6 @@ public class NodeModelServiceImpl implements NodeModelService {
 	@Override
 	public BusinessNode get(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope()));
-	}
-
-	@Override
-	public RepositoryContentData getNodeContent(NodeReference nodeReference, OutputStream out) {
-		return getNodeContent(nodeReference, CmModel.content.content, out);
-	}
-
-	@Override
-	public RepositoryContentData getNodeContent(NodeReference nodeReference, ContentPropertyModel property, OutputStream out) {
-		return nodeService.getNodeContent(nodeReference, property.getNameReference(), out);
 	}
 
 	@Override
