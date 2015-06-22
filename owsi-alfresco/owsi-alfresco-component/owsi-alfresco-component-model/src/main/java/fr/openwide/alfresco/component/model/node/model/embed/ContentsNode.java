@@ -16,11 +16,13 @@ public class ContentsNode {
 		this.repoNode = node.getRepositoryNode();
 	}
 
-	public Object get() {
-		return get(CmModel.content.content);
+	@SuppressWarnings("unchecked")
+	public <T> T get() {
+		return (T) get(CmModel.content.content);
 	}
-	public Object get(ContentPropertyModel propertyModel) {
-		return repoNode.getContents().get(propertyModel.getNameReference());
+	@SuppressWarnings("unchecked")
+	public <T> T get(ContentPropertyModel propertyModel) {
+		return (T) repoNode.getContents().get(propertyModel.getNameReference());
 	}
 	public BusinessNode set(Object content) {
 		return set(CmModel.content.content, content);
