@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
@@ -43,10 +44,11 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		NodeProjectionBuilder projectionBuilder = createProjectionBuilder(formQuery);
 		NodeScope nodeScope = createNodeScope(projectionBuilder);
 
-		List<RepositoryNode> list = nodeSearchService.search(
-				restrictionBuilder.toQuery(),
-				formQuery.getStoreReference(),
-				nodeScope);
+		RepositorySearchParameters searchParameters = new RepositorySearchParameters();
+		searchParameters.setQuery(restrictionBuilder.toQuery());
+		searchParameters.setStoreReference(formQuery.getStoreReference());
+		
+		List<RepositoryNode> list = nodeSearchService.search(searchParameters, nodeScope);
 
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);
