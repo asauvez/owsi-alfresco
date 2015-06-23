@@ -114,6 +114,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 
 	protected RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
+		if (! nodeService.exists(nodeRef)) {
+			throw new NoSuchNodeRemoteException(conversionService.get(nodeRef).getReference());
+		}
+
 		if (scope.getRenditionName() != null) {
 			ChildAssociationRef childRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(scope.getRenditionName()));
 			if (childRef == null) {
@@ -121,14 +125,15 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			}
 			nodeRef = childRef.getChildRef();
 		}
-		
+		return getRepositoryNodeOrRendition(nodeRef, scope);
+	}
+	
+	protected RepositoryNode getRepositoryNodeOrRendition(NodeRef nodeRef, NodeScope scope) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
-		if (! nodeService.exists(nodeRef)) {
-			throw new NoSuchNodeRemoteException(nodeReference.getReference());
-		}
+		
 		RepositoryNode node = new RepositoryNode();
 		if (scope.isNodeReference()) {
-			node.setNodeReference(conversionService.get(nodeRef));
+			node.setNodeReference(nodeReference);
 		}
 		if (scope.isPath()) {
 			node.setPath(nodeService.getPath(nodeRef).toString());
