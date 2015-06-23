@@ -4,8 +4,10 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthorityContainer;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
@@ -30,6 +32,10 @@ public interface CmModel {
 	CmAuthor author = new CmAuthor();
 	
 	CmWorkingCopy workingCopy = new CmWorkingCopy();
+	
+	CmClassifiable classifiable = new CmClassifiable();
+	
+	CmGeneralClassifiable generalClassifiable = new CmGeneralClassifiable();
 
 	// ---- Types
 
