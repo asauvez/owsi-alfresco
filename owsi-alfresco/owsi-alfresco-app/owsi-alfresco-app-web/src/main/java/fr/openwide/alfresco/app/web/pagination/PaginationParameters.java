@@ -38,11 +38,12 @@ public class PaginationParameters implements Serializable {
 		this.nbPagesToDisplay = nbPagesToDisplay;
 	}
 
-	// Pour hibernate
+	/** @see org.hibernate.Query#setFirstResult(int) */
 	public int getFirstResult() {
 		return (currentPage-1)*nbItemsPerPage;
 	}
-	public int getMaxResult() {
+	/** @see org.hibernate.Query#setMaxResults(int) */
+	public int getMaxResults() {
 		return nbItemsPerPage;
 	}
 
