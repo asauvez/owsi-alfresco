@@ -65,6 +65,10 @@ public class RestrictionBuilder extends Restriction {
 		return add(new AspectRestriction(this, aspect));
 	}
 
+	public IdRestriction id(NodeReference nodeRef) {
+		return add(new IdRestriction(this, nodeRef));
+	}
+
 	/**
 	 * Est-ce que les noeuds retournés sont les fils directes du noeuds en question
 	 */
