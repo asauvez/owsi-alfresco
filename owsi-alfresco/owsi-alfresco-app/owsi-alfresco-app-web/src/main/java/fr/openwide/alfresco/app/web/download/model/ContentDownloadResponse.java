@@ -4,10 +4,16 @@ import java.io.Flushable;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
 public abstract class ContentDownloadResponse extends DownloadResponse implements Flushable, AutoCloseable {
 
 	private String contentType;
 
+	public ContentDownloadResponse(HttpServletResponse httpServletResponse) {
+		super(httpServletResponse);
+	}
+	
 	public abstract OutputStream getOutputStream();
 
 	public abstract long getContentLength();

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.output.CountingOutputStream;
 
 public class ByteArrayDownloadResponse extends ContentDownloadResponse {
@@ -13,9 +15,8 @@ public class ByteArrayDownloadResponse extends ContentDownloadResponse {
 	private ByteArrayOutputStream baos;
 	private CountingOutputStream outputStream;
 
-	public ByteArrayDownloadResponse() {}
-
-	public ByteArrayDownloadResponse(ByteArrayOutputStream baos) {
+	public ByteArrayDownloadResponse(HttpServletResponse httpServletResponse, ByteArrayOutputStream baos) {
+		super(httpServletResponse);
 		this.baos = baos;
 		this.outputStream = new CountingOutputStream(baos);
 	}

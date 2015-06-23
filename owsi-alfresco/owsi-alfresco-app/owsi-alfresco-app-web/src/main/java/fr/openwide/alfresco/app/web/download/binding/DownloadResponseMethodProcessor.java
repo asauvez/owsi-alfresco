@@ -72,19 +72,21 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+		HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+		
 		Class<?> parameterType = parameter.getParameterType();
 		if (ByteArrayDownloadResponse.class.equals(parameterType)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			return new ByteArrayDownloadResponse(baos);
+			return new ByteArrayDownloadResponse(response, baos);
 		} else if (FileDownloadResponse.class.equals(parameterType)) {
 			File tempFile = File.createTempFile("download", Long.toString(System.nanoTime()));
 			OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			// store outputStream if needed during the request lifecycle
 			request.setAttribute(getClass().getName(), outputStream);
-			return new FileDownloadResponse(tempFile, outputStream);
+			return new FileDownloadResponse(response, tempFile, outputStream);
 		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
-			return new NodeReferenceDownloadResponse();
+			return new NodeReferenceDownloadResponse(response);
 		} else {
 			throw new IllegalArgumentException("Invalid type: " + parameterType);
 		}
@@ -153,9 +155,14 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		}
 
 		NodeScope nodeScope = new NodeScope();
-		nodeScope.setRenditionName(download.getRenditionName());
-		nodeScope.getProperties().add(download.getProperty());
-		nodeScope.getContentDeserializers().put(download.getProperty(), new NodeContentDeserializer<Void>() {
+		NodeScope downloadNodeScope = nodeScope;
+		if (download.getRenditionName() != null) {
+			downloadNodeScope = new NodeScope();
+			nodeScope.getRenditions().put(download.getRenditionName(), downloadNodeScope);
+		}
+		
+		downloadNodeScope.getProperties().add(download.getProperty());
+		downloadNodeScope.getContentDeserializers().put(download.getProperty(), new NodeContentDeserializer<Void>() {
 			@Override
 			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
 				// set cookie (do this before header content-length so that client can deal with it early !)
@@ -186,10 +193,6 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		String headerValue = MessageFormat.format(HEADER_CONTENT_DISPOSITION_VALUE_PATTERN, 
 				(download.isAttachment() ? "attachment" : "inline"), download.getAttachmentName());
 		response.setHeader(HEADER_CONTENT_DISPOSITION_NAME, headerValue);
-		
-		if (download.isNoCache()) {
-			response.setHeader("Pragma", "no-cache");
-		}
 	}
 
 	protected static void setCookie(NativeWebRequest webRequest) {

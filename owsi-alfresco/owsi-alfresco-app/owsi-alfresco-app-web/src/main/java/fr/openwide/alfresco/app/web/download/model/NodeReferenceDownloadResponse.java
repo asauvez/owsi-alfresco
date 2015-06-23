@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.app.web.download.model;
 
+import javax.servlet.http.HttpServletResponse;
+
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
@@ -13,6 +15,10 @@ public class NodeReferenceDownloadResponse extends DownloadResponse {
 	private NameReference property = DEFAULT_CONTENT_PROPERTY;
 	private NameReference renditionName;
 
+	public NodeReferenceDownloadResponse(HttpServletResponse httpServletResponse) {
+		super(httpServletResponse);
+	}
+	
 	public NodeReference getNodeReference() {
 		return nodeReference;
 	}
