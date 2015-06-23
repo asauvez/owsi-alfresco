@@ -40,4 +40,8 @@ public class ContentsNode {
 		}
 		return node;
 	}
+	
+	public RepositoryContentData getData() {
+		return node.properties().get(CmModel.content.content);
+	}
 }
