@@ -7,8 +7,6 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.base.Optional;
-
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
@@ -37,15 +35,6 @@ public class NodeModelServiceImpl implements NodeModelService {
 		return new BusinessNode(nodeService.get(nodeReference, nodeScopeBuilder.getScope()));
 	}
 
-	@Override
-	public Optional<BusinessNode> getOptional(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) {
-		try {
-			return Optional.of(get(nodeReference, nodeScopeBuilder));
-		} catch (NoSuchNodeRemoteException ex) {
-			return Optional.absent();
-		}
-	}
-	
 	@Override
 	public List<BusinessNode> getChildren(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder) {
 		return getChildren(nodeReference, CmModel.folder.contains, nodeScopeBuilder);
