@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.node.model.RepositoryNodeVisitor;
+import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class NodeContentSerializationComponent {
@@ -54,7 +54,7 @@ public class NodeContentSerializationComponent {
 			final NodeContentSerializationParameters parameters,
 			OutputStream outputStream) throws IOException {
 
-		RepositoryNodeVisitor visitor1 = new RepositoryNodeVisitor() {
+		RepositoryVisitor<RepositoryNode> visitor1 = new RepositoryVisitor<RepositoryNode>() {
 			private int nextContentId = 0;
 			@Override
 			@SuppressWarnings("unchecked")
@@ -92,7 +92,7 @@ public class NodeContentSerializationComponent {
 		objectMapper.writeValue(NonClosingStreamUtils.nonClosing(zos), remoteCallPayload);
 		zos.closeEntry();
 
-		RepositoryNodeVisitor visitor2 = new RepositoryNodeVisitor() {
+		RepositoryVisitor<RepositoryNode> visitor2 = new RepositoryVisitor<RepositoryNode>() {
 			@Override
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
@@ -161,7 +161,7 @@ public class NodeContentSerializationComponent {
 			LOGGER.debug("Deserializing payload: {}", objectMapper.writeValueAsString(remoteCallPayload));
 		}
 
-		RepositoryNodeVisitor visitor = new RepositoryNodeVisitor() {
+		RepositoryVisitor<RepositoryNode> visitor = new RepositoryVisitor<RepositoryNode>() {
 			@Override
 			@SuppressWarnings("unchecked")
 			public void visit(RepositoryNode node) {
@@ -170,7 +170,10 @@ public class NodeContentSerializationComponent {
 					List<String> contentProperties = (List<String>) node.getExtensions().remove(CONTENT_PROPERTIES);
 					
 					for (int i=0; i<contentIds.size(); i++) {
-						ContentPropertyWrapper wrapper = new ContentPropertyWrapper(node, NameReference.create(contentProperties.get(i)));
+						NameReference property = NameReference.create(contentProperties.get(i));
+						push(property);
+						ContentPropertyWrapper wrapper = new ContentPropertyWrapper(node, property, getCurrentPath());
+						pop(property);
 						wrappers.put(contentIds.get(i), wrapper);
 					}
 				}
@@ -189,11 +192,11 @@ public class NodeContentSerializationComponent {
 			int contentId = Integer.parseInt(zipEntry.getName());
 			ContentPropertyWrapper wrapper = wrappers.get(contentId);
 
-			NodeContentDeserializer<?> serializer = (parameters != null) ? parameters.getDeserializersByProperties().get(wrapper.getContentProperty()) : null;
-			if (serializer == null) {
-				serializer = defaultDeserializer;
+			NodeContentDeserializer<?> deserializer = (parameters != null) ? parameters.getDeserializersByPath().get(wrapper.getPath()) : null;
+			if (deserializer == null) {
+				deserializer = defaultDeserializer;
 			}
-			Object content = serializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), nonClosingZis);
+			Object content = deserializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), nonClosingZis);
 			wrapper.getNode().getContents().put(wrapper.getContentProperty(), content);
 		}
 		return remoteCallPayload;

@@ -17,11 +17,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import fr.openwide.alfresco.api.core.node.binding.NodePropertyDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.NodePropertySerializer;
+import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor.RepositoryVisitable;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 @JsonInclude(Include.NON_EMPTY)
-public class RepositoryNode implements Serializable {
+public class RepositoryNode implements Serializable, RepositoryVisitable<RepositoryNode> {
 
 	private static final long serialVersionUID = 6930653481257487738L;
 
@@ -37,6 +38,7 @@ public class RepositoryNode implements Serializable {
 	
 	private final Map<NameReference, Object> contents = new LinkedHashMap<>();
 
+	private final Map<NameReference, RepositoryNode> renditions = new LinkedHashMap<>();
 	private final Map<NameReference, List<RepositoryNode>> childAssociations = new LinkedHashMap<>();
 	private final Map<NameReference, List<RepositoryNode>> parentAssociations = new LinkedHashMap<>();
 	private final Map<NameReference, List<RepositoryNode>> targetAssocs = new LinkedHashMap<>();
@@ -114,6 +116,10 @@ public class RepositoryNode implements Serializable {
 		return aspects;
 	}
 
+	public Map<NameReference, RepositoryNode> getRenditions() {
+		return renditions;
+	}
+	
 	public Map<NameReference, List<RepositoryNode>> getChildAssociations() {
 		return childAssociations;
 	}
@@ -140,19 +146,15 @@ public class RepositoryNode implements Serializable {
 		return accessControlList;
 	}
 
-	public void visit(RepositoryNodeVisitor visitor) {
+	@Override
+	public void visit(RepositoryVisitor<RepositoryNode> visitor) {
 		visitor.visit(this);
-		visitMap(visitor, childAssociations);
-		visitMap(visitor, parentAssociations);
-		visitMap(visitor, sourceAssocs);
-		visitMap(visitor, targetAssocs);
-	}
-	private void visitMap(RepositoryNodeVisitor visitor, Map<NameReference, List<RepositoryNode>> map) {
-		for (List<RepositoryNode> list : map.values()) {
-			for (RepositoryNode node : list) {
-				node.visit(visitor);
-			}
-		}
+		
+		visitor.visitMap("renditions", renditions);
+		visitor.visitMapList("childAssociations", childAssociations);
+		visitor.visitMapList("parentAssociations", parentAssociations);
+		visitor.visitMapList("sourceAssocs", sourceAssocs);
+		visitor.visitMapList("targetAssocs", targetAssocs);
 	}
 	
 	@Override

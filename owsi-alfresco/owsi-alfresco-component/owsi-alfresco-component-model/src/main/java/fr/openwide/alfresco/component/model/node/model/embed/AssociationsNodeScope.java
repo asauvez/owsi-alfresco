@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model.embed;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
@@ -25,6 +26,12 @@ public class AssociationsNodeScope {
 		scope.setRecursivePrimaryParent(true);
 		return builder;
 	}
+	
+	public NodeScopeBuilder rendition(NameReference renditionName) {
+		NodeScopeBuilder other = new NodeScopeBuilder();
+		scope.getRenditions().put(renditionName, other.getScope());
+		return other;
+	} 
 	
 	public NodeScopeBuilder childContains() {
 		return child(CmModel.folder.contains);

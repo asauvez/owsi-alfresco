@@ -12,10 +12,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor.RepositoryVisitable;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 @JsonInclude(Include.NON_EMPTY)
-public class NodeScope implements Serializable {
+public class NodeScope implements Serializable, RepositoryVisitable<NodeScope> {
 
 	private static final long serialVersionUID = 6930653481257487738L;
 
@@ -26,12 +27,12 @@ public class NodeScope implements Serializable {
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
 
 	private final Map<NameReference, NodeContentDeserializer<?>> contentDeserializers = new LinkedHashMap<>();
-	private NameReference renditionName;
 
 	private final Map<NameReference, String> extensions = new LinkedHashMap<>();
 
 	private NodeScope primaryParent;
 	private boolean recursivePrimaryParent;
+	private final Map<NameReference, NodeScope> renditions = new LinkedHashMap<>();
 	private final Map<NameReference, NodeScope> childAssociations = new LinkedHashMap<>();
 	private final Map<NameReference, NodeScope> parentAssociations = new LinkedHashMap<>();
 	private final Map<NameReference, NodeScope> targetAssocs = new LinkedHashMap<>();
@@ -92,13 +93,6 @@ public class NodeScope implements Serializable {
 		return contentDeserializers;
 	}
 	
-	public NameReference getRenditionName() {
-		return renditionName;
-	}
-	public void setRenditionName(NameReference renditionName) {
-		this.renditionName = renditionName;
-	}
-	
 	public Set<NameReference> getAspects() {
 		return aspects;
 	}
@@ -107,6 +101,9 @@ public class NodeScope implements Serializable {
 		return extensions;
 	}
 
+	public Map<NameReference, NodeScope> getRenditions() {
+		return renditions;
+	}
 	public Map<NameReference, NodeScope> getChildAssociations() {
 		return childAssociations;
 	}
@@ -135,6 +132,17 @@ public class NodeScope implements Serializable {
 	}
 	public void setAccessPermissions(boolean accessPermissions) {
 		this.accessPermissions = accessPermissions;
+	}
+
+	@Override
+	public void visit(RepositoryVisitor<NodeScope> visitor) {
+		visitor.visit(this);
+		
+		visitor.visitMap("renditions", renditions);
+		visitor.visitMap("childAssociations", childAssociations);
+		visitor.visitMap("parentAssociations", parentAssociations);
+		visitor.visitMap("sourceAssocs", sourceAssocs);
+		visitor.visitMap("targetAssocs", targetAssocs);
 	}
 
 }

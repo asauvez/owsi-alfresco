@@ -13,6 +13,7 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -29,6 +30,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.service.transaction.TransactionService;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
@@ -53,6 +55,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	private ContentService contentService;
 	private PermissionService permissionService;
 	private RenditionService renditionService;
+	private TransactionService transactionService;
 
 	private ConversionService conversionService;
 
@@ -113,24 +116,12 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return res;
 	}
 
-	protected RepositoryNode getRepositoryNode(NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
+	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
+		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
-			throw new NoSuchNodeRemoteException(conversionService.get(nodeRef).getReference());
+			throw new NoSuchNodeRemoteException(nodeReference.getReference());
 		}
 
-		if (scope.getRenditionName() != null) {
-			ChildAssociationRef childRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(scope.getRenditionName()));
-			if (childRef == null) {
-				childRef = renditionService.render(nodeRef, conversionService.getRequired(scope.getRenditionName()));
-			}
-			nodeRef = childRef.getChildRef();
-		}
-		return getRepositoryNodeOrRendition(nodeRef, scope);
-	}
-	
-	protected RepositoryNode getRepositoryNodeOrRendition(NodeRef nodeRef, NodeScope scope) {
-		NodeReference nodeReference = conversionService.get(nodeRef);
-		
 		RepositoryNode node = new RepositoryNode();
 		if (scope.isNodeReference()) {
 			node.setNodeReference(nodeReference);
@@ -176,6 +167,21 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 		
 		// get associations
+		for (final Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
+			ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(entry.getKey()));
+			if (renditionRef == null) {
+				// On est dans un read-only. On a donc besoin d'une inner transaction pour générer la rendition
+				renditionRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<ChildAssociationRef>() {
+					@Override
+					public ChildAssociationRef execute() throws Throwable {
+						return renditionService.render(nodeRef, conversionService.getRequired(entry.getKey()));
+					}
+				}, false, true);
+			}
+			node.getRenditions().put(
+					entry.getKey(), 
+					getRepositoryNode(renditionRef.getChildRef(), entry.getValue()));
+		}
 		for (Entry<NameReference, NodeScope> entry : scope.getChildAssociations().entrySet()) {
 			node.getChildAssociations().put(
 					entry.getKey(), 
@@ -510,6 +516,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	}
 	public void setRenditionService(RenditionService renditionService) {
 		this.renditionService = renditionService;
+	}
+	public void setTransactionService(TransactionService transactionService) {
+		this.transactionService = transactionService;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

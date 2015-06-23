@@ -10,6 +10,7 @@
 		<property name="contentService" ref="ContentService" />
 		<property name="permissionService" ref="PermissionService" />
 		<property name="renditionService" ref="RenditionService" />
+		<property name="transactionService" ref="transactionService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 

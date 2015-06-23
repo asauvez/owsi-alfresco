@@ -4,8 +4,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
@@ -13,6 +15,7 @@ import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemote
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
@@ -30,17 +33,30 @@ public class NodeServiceImpl implements NodeService {
 		this.repositoryRemoteBinding = repositoryRemoteBinding;
 	}
 
+	private void initDeserializer(NodeScope nodeScope, final NodeContentDeserializationParameters deserializationParameters) {
+		nodeScope.visit(new RepositoryVisitor<NodeScope>() {
+			@Override
+			public void visit(NodeScope nodeScope) {
+				if (! nodeScope.getContentDeserializers().isEmpty()) {
+					for (Entry<NameReference, NodeContentDeserializer<?>> entry : nodeScope.getContentDeserializers().entrySet()) {
+						push(entry.getKey());
+						deserializationParameters.getDeserializersByPath().put(getCurrentPath(), entry.getValue());
+						pop(entry.getKey());
+					}
+				}
+			}
+			
+		});
+	}
+	
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, final NodeScope nodeScope) {
 		GET_NODE_SERVICE payload = new GET_NODE_SERVICE();
 		payload.nodeReference = nodeReference;
 		payload.nodeScope = nodeScope;
 		
-		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters;
-		if (! nodeScope.getContentDeserializers().isEmpty()) {
-			deserializationParameters = deserializationParameters.clone();
-			deserializationParameters.getDeserializersByProperties().putAll(nodeScope.getContentDeserializers());
-		}
+		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
+		initDeserializer(nodeScope, deserializationParameters);
 		
 		return repositoryRemoteBinding.builderWithSerializer(GET_NODE_SERVICE.ENDPOINT)
 			.callPayloadSerializer(payload, null, 
@@ -64,11 +80,8 @@ public class NodeServiceImpl implements NodeService {
 			Object payload,
 			NodeScope nodeScope) {
 		
-		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters;
-		if (! nodeScope.getContentDeserializers().isEmpty()) {
-			deserializationParameters = deserializationParameters.clone();
-			deserializationParameters.getDeserializersByProperties().putAll(nodeScope.getContentDeserializers());
-		}
+		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
+		initDeserializer(nodeScope, deserializationParameters);
 		
 		return repositoryRemoteBinding.builderWithSerializer(endPoint)
 			.callPayloadSerializer(

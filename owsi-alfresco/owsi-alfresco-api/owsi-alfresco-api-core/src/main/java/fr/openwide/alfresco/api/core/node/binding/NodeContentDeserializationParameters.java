@@ -1,22 +1,21 @@
 package fr.openwide.alfresco.api.core.node.binding;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class NodeContentDeserializationParameters {
 	
-	private Map<NameReference, NodeContentDeserializer<?>> deserializersByProperties = new HashMap<>();
+	private Map<List<Object>, NodeContentDeserializer<?>> deserializersByPath = new HashMap<>();
 	
-	public Map<NameReference, NodeContentDeserializer<?>> getDeserializersByProperties() {
-		return deserializersByProperties;
+	public Map<List<Object>, NodeContentDeserializer<?>> getDeserializersByPath() {
+		return deserializersByPath;
 	}
 	
 	@Override
 	public NodeContentDeserializationParameters clone() {
 		NodeContentDeserializationParameters parameters = new NodeContentDeserializationParameters();
-		parameters.getDeserializersByProperties().putAll(this.getDeserializersByProperties());
+		parameters.getDeserializersByPath().putAll(this.getDeserializersByPath());
 		return parameters;
 	}
 }
