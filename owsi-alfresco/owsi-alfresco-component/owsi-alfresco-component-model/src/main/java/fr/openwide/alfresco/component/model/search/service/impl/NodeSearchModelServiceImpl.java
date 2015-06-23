@@ -2,6 +2,8 @@ package fr.openwide.alfresco.component.model.search.service.impl;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
@@ -33,22 +35,23 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 				searchBuilder.getSearchParameters(),
 				nodeScopeBuilder.getScope()));
 	}
+	
 	@Override
-	public BusinessNode searchUnique(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
-		List<BusinessNode> list = search(builder, nodeScopeBuilder);
+	public Optional<BusinessNode> searchUnique(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
+		List<BusinessNode> list = search(restrictionBuilder, nodeScopeBuilder);
 		if (list.size() > 1) {
-			throw new IllegalStateException("More than one result for " + builder.toQuery());
+			throw new IllegalStateException("More than one result for " + restrictionBuilder.toQuery());
 		} else if (list.isEmpty()) {
-			throw new NoSuchNodeRemoteException(builder.toQuery());
+			return Optional.absent();
 		}
-		return list.get(0);
+		return Optional.of(list.get(0));
 	}
 
 	@Override
-	public NodeReference searchUniqueRef(RestrictionBuilder builder) throws NoSuchNodeRemoteException {
-		BusinessNode node = searchUnique(builder, new NodeScopeBuilder()
+	public Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
+		Optional<BusinessNode> node = searchUnique(restrictionBuilder, new NodeScopeBuilder()
 				.nodeReference());
-		return (node != null) ? node.getNodeReference() : null;
+		return node.isPresent() ? Optional.of(node.get().getNodeReference()) : Optional.fromNullable((NodeReference) null);
 	}
 
 }
