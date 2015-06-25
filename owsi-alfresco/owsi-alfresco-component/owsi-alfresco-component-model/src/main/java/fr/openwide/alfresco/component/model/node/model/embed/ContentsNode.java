@@ -34,6 +34,9 @@ public class ContentsNode {
 		return set(CmModel.content.content, contentData, content);
 	}
 	public BusinessNode set(ContentPropertyModel property, RepositoryContentData contentData, Object content) {
+		if (content == null) {
+			content = new byte[0];
+		}
 		repoNode.getContents().put(property.getNameReference(), content);
 		if (contentData != null) {
 			repoNode.getProperties().put(property.getNameReference(), contentData);
