@@ -10,6 +10,8 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 
 public class RestrictionBuilder extends Restriction {
 
@@ -81,6 +83,10 @@ public class RestrictionBuilder extends Restriction {
 	 */
 	public MatchRestriction<String> match(PropertyModel<String> property, String value) {
 		return add(new MatchRestriction<String>(this, property, value));
+	}
+	public MatchRestriction<String> match(ContentPropertyModel property, String value) {
+		TextPropertyModel textPropertyModel = new TextPropertyModel(property.getType(), property.getNameReference());
+		return add(new MatchRestriction<String>(this, textPropertyModel, value));
 	}
 
 	public <C extends Serializable> MatchRestriction<C> eq(PropertyModel<C> property, C value) {
