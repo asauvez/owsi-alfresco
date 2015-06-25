@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model;
 
+import java.util.Map.Entry;
+
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -27,10 +29,16 @@ public class NodeScopeBuilder {
 		if (node.getRepositoryNode().getPrimaryParentAssociation() != null) assocs().primaryParent();
 		
 		scope.getProperties().addAll(repositoryNode.getProperties().keySet());
+		
 		for (NameReference contentProperty : repositoryNode.getContents().keySet()) {
 			// Le nodeScope sera envoyé à Alfresco sans le deserializer. Donc on peut mettre null.
 			scope.getContentDeserializers().put(contentProperty, null);
 		}
+		
+		if (! repositoryNode.getAccessControlList().isEmpty()) {
+			scope.setAccessPermissions(true);
+		}
+		
 		return this;
 	}
 	
