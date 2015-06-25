@@ -11,6 +11,7 @@ import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSeri
 import fr.openwide.alfresco.app.core.node.binding.FolderRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.HttpServletResponseRepositoryContentDeserializer;
 import fr.openwide.alfresco.app.core.node.binding.OutputStreamRepositoryContentDeserializer;
+import fr.openwide.alfresco.app.core.node.binding.SingleFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
@@ -36,6 +37,9 @@ public class ContentsNodeScope {
 	}
 	public NodeScopeBuilder asTempFile() {
 		return withDeserializer(TempFileRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder asSingleFile(File file) {
+		return withDeserializer(new SingleFileRepositoryContentSerializer(file));
 	}
 	public NodeScopeBuilder asFilesInFolder(File destinationFolder) {
 		builder.properties().name(); // on va avoir besoin du cm:name
