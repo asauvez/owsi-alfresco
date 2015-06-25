@@ -17,7 +17,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class ZipFileRepositoryContentDeSerializer 
-		implements NodeContentDeserializer<String> {
+		implements NodeContentDeserializer<ZipEntry> {
 
 	private NameReference propertyName = NameReference.create("cm", "name");
 	private final ZipOutputStream outputStream;
@@ -37,17 +37,18 @@ public abstract class ZipFileRepositoryContentDeSerializer
 	}
 	
 	@Override
-	public String deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
+	public ZipEntry deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
 		String fileName = node.getProperty(propertyName, String.class);
 		if (fileName == null) {
 			throw new IllegalStateException("Node " + node.getNodeReference() + " doesn't have a " + propertyName);
 		}
 		
-		outputStream.putNextEntry(new ZipEntry(fileName));
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		outputStream.putNextEntry(zipEntry);
 		IOUtils.copy(inputStream, outputStream);
 		outputStream.closeEntry();
 		
-		return fileName;
+		return zipEntry;
 	}
 
 }
