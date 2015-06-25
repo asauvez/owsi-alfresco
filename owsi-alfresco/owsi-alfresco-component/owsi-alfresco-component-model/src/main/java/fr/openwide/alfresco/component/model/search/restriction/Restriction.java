@@ -7,6 +7,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
 
 public abstract class Restriction {
@@ -37,11 +38,10 @@ public abstract class Restriction {
 	protected abstract String toQueryInternal();
 
 	protected static String toLuceneValue(PropertyModel<?> propertyModel, Object value) {
-		if (value instanceof Date) {
-			if (propertyModel instanceof DateTimePropertyModel) {
-				return dateFormat.format((Date) value);
-			}
+		if (propertyModel instanceof DateTimePropertyModel) {
 			return ISO8601Utils.format((Date) value).replace(":", "\\:");
+		} else if (propertyModel instanceof DatePropertyModel) {
+			return dateFormat.format((Date) value);
 		} else if (value instanceof Number) {
 			return value.toString();
 		} else {
