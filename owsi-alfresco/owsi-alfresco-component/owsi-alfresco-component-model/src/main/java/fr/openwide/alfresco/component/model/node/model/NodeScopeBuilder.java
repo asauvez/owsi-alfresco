@@ -1,7 +1,5 @@
 package fr.openwide.alfresco.component.model.node.model;
 
-import java.util.Map.Entry;
-
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
