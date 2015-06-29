@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 
 public class RepositorySearchParameters implements Serializable {
@@ -15,6 +16,7 @@ public class RepositorySearchParameters implements Serializable {
 	private Integer firstResult;
 	private Integer maxResults;
 	
+	private NodeScope nodeScope = new NodeScope();
 	private List<RepositorySortDefinition> sorts = new ArrayList<>();
 	
 	public String getQuery() {
@@ -50,6 +52,13 @@ public class RepositorySearchParameters implements Serializable {
 	}
 	public void setMaxResults(Integer maxResults) {
 		this.maxResults = maxResults;
+	}
+	
+	public NodeScope getNodeScope() {
+		return nodeScope;
+	}
+	public void setNodeScope(NodeScope nodeScope) {
+		this.nodeScope = nodeScope;
 	}
 	
 	public List<RepositorySortDefinition> getSorts() {

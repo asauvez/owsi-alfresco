@@ -10,7 +10,7 @@ import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.component.model.search.SearchBuilder;
+import fr.openwide.alfresco.component.model.search.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 
@@ -24,16 +24,15 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder) {
-		return search(new SearchBuilder()
-				.restriction(restrictionBuilder),
-			nodeScopeBuilder);
+		return search(new SearchQueryBuilder()
+				.restriction(restrictionBuilder)
+				.nodeScopeBuilder(nodeScopeBuilder));
 	}
 
 	@Override
-	public List<BusinessNode> search(SearchBuilder searchBuilder, NodeScopeBuilder nodeScopeBuilder) {
+	public List<BusinessNode> search(SearchQueryBuilder searchBuilder) {
 		return new BusinessNodeList(nodeSearchService.search(
-				searchBuilder.getSearchParameters(),
-				nodeScopeBuilder.getScope()));
+				searchBuilder.getSearchParameters()));
 	}
 	
 	@Override
