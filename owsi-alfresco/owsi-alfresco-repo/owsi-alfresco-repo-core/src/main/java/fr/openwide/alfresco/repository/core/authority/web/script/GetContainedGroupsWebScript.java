@@ -14,9 +14,7 @@ public class GetContainedGroupsWebScript extends AbstractAuthorityWebScript<GET_
 	@Override
 	protected List<RepositoryNode> execute(GET_CONTAINED_GROUPS payload) {
 		return authorityRemoteService.getContainedGroups(
-				Objects.requireNonNull(payload.authority, "Authority"), 
-				payload.immediate, 
-				Objects.requireNonNull(payload.nodeScope, "NodeScope"));
+				Objects.requireNonNull(payload.searchParameters, "SearchParameters"));
 	}
 
 	@Override

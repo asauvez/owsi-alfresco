@@ -1,10 +1,10 @@
-package fr.openwide.alfresco.component.model.search;
+package fr.openwide.alfresco.component.model.search.model;
 
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 
 
 public class SearchQueryBuilder {

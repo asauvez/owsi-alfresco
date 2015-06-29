@@ -2,7 +2,7 @@ package fr.openwide.alfresco.app.core.authority.service.impl;
 
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthoritySearchParameters;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -26,21 +26,17 @@ public class AuthorityServiceImpl implements AuthorityService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScope nodeScope) {
+	public List<RepositoryNode> getContainedUsers(RepositoryAuthoritySearchParameters searchParameters) {
 		GET_CONTAINED_USERS payload = new GET_CONTAINED_USERS();
-		payload.authority = authority;
-		payload.immediate = immediate;
-		payload.nodeScope = nodeScope;
-		return nodeService.callNodeListSerializer(GET_CONTAINED_USERS.ENDPOINT, payload, nodeScope);
+		payload.searchParameters = searchParameters;
+		return nodeService.callNodeListSerializer(GET_CONTAINED_USERS.ENDPOINT, payload, searchParameters.getNodeScope());
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScope nodeScope) {
+	public List<RepositoryNode> getContainedGroups(RepositoryAuthoritySearchParameters searchParameters) {
 		GET_CONTAINED_GROUPS payload = new GET_CONTAINED_GROUPS();
-		payload.authority = authority;
-		payload.immediate = immediate;
-		payload.nodeScope = nodeScope;
-		return nodeService.callNodeListSerializer(GET_CONTAINED_GROUPS.ENDPOINT, payload, nodeScope);
+		payload.searchParameters = searchParameters;
+		return nodeService.callNodeListSerializer(GET_CONTAINED_GROUPS.ENDPOINT, payload, searchParameters.getNodeScope());
 	}
 
 }

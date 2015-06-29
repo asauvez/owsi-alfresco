@@ -3,13 +3,15 @@ package fr.openwide.alfresco.repository.core.authority.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PersonService;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthoritySearchParameters;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
@@ -24,6 +26,7 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 
 	private PersonService personService;
 	private AuthorityService authorityService;
+	private NodeService nodeService;
 
 	@Override
 	public RepositoryNode getUser(String userName, NodeScope nodeScope) throws NoSuchNodeRemoteException {
@@ -35,21 +38,36 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope) {
-		return getContained(repoAuthority, AuthorityType.USER, immediate, nodeScope);
+	public List<RepositoryNode> getContainedUsers(RepositoryAuthoritySearchParameters searchParameters) {
+		return getContained(AuthorityType.USER, searchParameters);
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope) {
-		return getContained(repoAuthority, AuthorityType.GROUP, immediate, nodeScope);
+	public List<RepositoryNode> getContainedGroups(RepositoryAuthoritySearchParameters searchParameters) {
+		return getContained(AuthorityType.GROUP, searchParameters);
 	}
 
-	private List<RepositoryNode> getContained(RepositoryAuthority repoAuthority, AuthorityType type, boolean immediate, NodeScope nodeScope) {
-		Set<String> authorities = authorityService.getContainedAuthorities(type, repoAuthority.getName(), immediate);
+	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthoritySearchParameters searchParameters) {
+		Set<String> authorities = authorityService.getContainedAuthorities(type, 
+				searchParameters.getParentAuthority().getName(), 
+				searchParameters.isImmediate());
+		
+		Pattern pattern = (searchParameters.getFilterValue() != null) 
+				? Pattern.compile(".*\\b" + searchParameters.getFilterValue().toLowerCase() + ".*") : null;
+		
 		List<RepositoryNode> nodes = new ArrayList<RepositoryNode>();
 		for (String authority : authorities) {
 			NodeRef nodeRef = authorityService.getAuthorityNodeRef(authority);
-			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), nodeScope));
+			
+			if (pattern != null) {
+				String nodeName = (String) nodeService.getProperty(nodeRef, 
+						conversionService.getRequired(searchParameters.getFilterProperty()));
+				if (! pattern.matcher(nodeName.toLowerCase()).matches()) {
+					continue;
+				}
+			}
+			
+			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), searchParameters.getNodeScope()));
 		}
 		return nodes;
 	}
@@ -66,5 +84,8 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	}
 	public void setPersonService(PersonService personService) {
 		this.personService = personService;
+	}
+	public void setNodeService(NodeService nodeService) {
+		this.nodeService = nodeService;
 	}
 }

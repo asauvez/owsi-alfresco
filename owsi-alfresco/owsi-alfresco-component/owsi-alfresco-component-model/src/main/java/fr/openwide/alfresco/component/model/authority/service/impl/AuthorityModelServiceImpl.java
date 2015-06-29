@@ -7,6 +7,7 @@ import java.util.Map;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
+import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
@@ -25,37 +26,39 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	public BusinessNode getUser(String userName, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		return new BusinessNode(authorityService.getUser(userName, nodeScopeBuilder.getScope()));
 	}
-
+	
 	@Override
-	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate) {
-		return getContainedUsers(authority, immediate, new NodeScopeBuilder()
+	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
+		if (authorityQueryBuilder.getSearchParameters().getFilterProperty() == null) {
+			authorityQueryBuilder.filterProperty(CmModel.person.lastName);
+		}
+		if (authorityQueryBuilder.getSearchParameters().getNodeScope() == null) {
+			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
 				.nodeReference()
 				.properties().set(CmModel.person));
+		}
+		return new BusinessNodeList(authorityService.getContainedUsers(authorityQueryBuilder.getSearchParameters()));
 	}
-
+	
 	@Override
-	public List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(authorityService.getContainedUsers(authority, immediate, nodeScopeBuilder.getScope()));
-	}
-
-	@Override
-	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate) {
-		return getContainedGroups(authority, immediate, new NodeScopeBuilder()
+	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
+		if (authorityQueryBuilder.getSearchParameters().getFilterProperty() == null) {
+			authorityQueryBuilder.filterProperty(CmModel.authorityContainer.authorityDisplayName);
+		}
+		if (authorityQueryBuilder.getSearchParameters().getNodeScope() == null) {
+			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
 				.nodeReference()
 				.properties().set(CmModel.authorityContainer));
+		}
+		return new BusinessNodeList(authorityService.getContainedGroups(authorityQueryBuilder.getSearchParameters()));
 	}
 
 	@Override
-	public Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(RepositoryAuthority authority, boolean immediate) {
-		List<BusinessNode> groups = getContainedGroups(authority, immediate);
+	public Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder) {
+		List<BusinessNode> groups = getContainedGroups(authorityQueryBuilder);
 		return getAsAuthority(groups);
 	}
 
-	@Override
-	public List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder) {
-		return new BusinessNodeList(authorityService.getContainedGroups(authority, immediate, nodeScopeBuilder.getScope()));
-	}
-	
 	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {
 		Map<RepositoryAuthority, String> authorities = new LinkedHashMap<>();
 		for (BusinessNode node : groups) {

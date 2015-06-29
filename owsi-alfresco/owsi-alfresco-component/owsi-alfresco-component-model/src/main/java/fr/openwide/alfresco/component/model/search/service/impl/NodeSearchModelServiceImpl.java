@@ -10,8 +10,8 @@ import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.component.model.search.SearchQueryBuilder;
-import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 
 public class NodeSearchModelServiceImpl implements NodeSearchModelService {

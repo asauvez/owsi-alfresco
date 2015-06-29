@@ -58,6 +58,7 @@
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="authorityService" ref="AuthorityService" />
 		<property name="personService" ref="PersonService" />
+		<property name="nodeService" ref="NodeService" />
 	</bean>
 
 	<!-- Authority webscripts -->

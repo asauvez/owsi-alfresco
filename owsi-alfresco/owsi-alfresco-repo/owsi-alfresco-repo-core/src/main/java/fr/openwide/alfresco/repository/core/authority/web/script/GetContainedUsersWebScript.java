@@ -14,9 +14,7 @@ public class GetContainedUsersWebScript extends AbstractAuthorityWebScript<GET_C
 	@Override
 	protected List<RepositoryNode> execute(GET_CONTAINED_USERS payload) {
 		return authorityRemoteService.getContainedUsers(
-				Objects.requireNonNull(payload.authority, "Authority"), 
-				payload.immediate,
-				Objects.requireNonNull(payload.nodeScope, "NodeScope"));
+				Objects.requireNonNull(payload.searchParameters, "SearchParameters"));
 	}
 
 	@Override

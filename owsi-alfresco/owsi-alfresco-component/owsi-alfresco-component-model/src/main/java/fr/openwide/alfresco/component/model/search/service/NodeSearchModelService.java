@@ -7,8 +7,8 @@ import com.google.common.base.Optional;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.component.model.search.SearchQueryBuilder;
-import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 
 public interface NodeSearchModelService {
 

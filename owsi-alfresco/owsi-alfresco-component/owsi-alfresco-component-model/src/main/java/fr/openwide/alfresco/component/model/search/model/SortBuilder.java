@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.component.model.search;
+package fr.openwide.alfresco.component.model.search.model;
 
 import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;

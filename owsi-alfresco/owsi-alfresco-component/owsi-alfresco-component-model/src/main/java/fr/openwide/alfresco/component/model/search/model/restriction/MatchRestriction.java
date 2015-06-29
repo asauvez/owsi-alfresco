@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.component.model.search.restriction;
+package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
 
