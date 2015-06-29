@@ -17,7 +17,6 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -348,7 +347,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			for (NameReference propertyName : nodeScope.getProperties()) {
 				Serializable value = node.getProperty(propertyName);
 				if (value != null) {
-					if (! (value instanceof ContentData)) {
+					if (! (value instanceof RepositoryContentData)) {
 						nodeService.setProperty(nodeRef, 
 							conversionService.getRequired(propertyName), 
 							conversionService.getForRepository(value));
