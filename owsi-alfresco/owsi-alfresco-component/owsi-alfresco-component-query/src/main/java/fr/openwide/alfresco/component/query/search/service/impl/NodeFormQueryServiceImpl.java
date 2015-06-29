@@ -13,7 +13,7 @@ import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.query.form.projection.ProjectionVisitor;
 import fr.openwide.alfresco.component.query.form.projection.node.NodeProjectionBuilder;
 import fr.openwide.alfresco.component.query.form.projection.node.NodeScopeInitializer;
@@ -47,8 +47,9 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 		RepositorySearchParameters searchParameters = new RepositorySearchParameters();
 		searchParameters.setQuery(restrictionBuilder.toQuery());
 		searchParameters.setStoreReference(formQuery.getStoreReference());
+		searchParameters.setNodeScope(nodeScope);
 		
-		List<RepositoryNode> list = nodeSearchService.search(searchParameters, nodeScope);
+		List<RepositoryNode> list = nodeSearchService.search(searchParameters);
 
 		FormQueryResult<RepositoryNode> result = createQueryResult(formQuery, projectionBuilder);
 		return initResult(formQuery, result, list);

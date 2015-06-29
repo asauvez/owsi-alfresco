@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.component.query.search.model;
 
-import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 
 public abstract class SearchFormQuery extends NodeFormQuery {
 
