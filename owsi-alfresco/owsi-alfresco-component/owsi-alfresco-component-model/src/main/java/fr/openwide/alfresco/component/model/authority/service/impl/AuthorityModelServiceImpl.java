@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -18,6 +19,11 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	public AuthorityModelServiceImpl(AuthorityService authorityService) {
 		this.authorityService = authorityService;
+	}
+
+	@Override
+	public BusinessNode getUser(String userName, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
+		return new BusinessNode(authorityService.getUser(userName, nodeScopeBuilder.getScope()));
 	}
 
 	@Override

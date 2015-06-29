@@ -22,6 +22,8 @@ public interface NodeService extends NodeRemoteService {
 
 	void delete(NodeReference nodeReference);
 	
+	public RepositoryNode callNodeSerializer(EntityEnclosingRemoteEndpoint<RepositoryNode> endPoint,
+			Object payload, NodeScope nodeScope);
 	public List<RepositoryNode> callNodeListSerializer(EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endPoint,
 			Object payload, NodeScope nodeScope);
 }

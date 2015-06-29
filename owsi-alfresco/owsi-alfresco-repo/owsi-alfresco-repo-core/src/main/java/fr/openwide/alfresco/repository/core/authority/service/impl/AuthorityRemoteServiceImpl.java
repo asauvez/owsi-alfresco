@@ -7,9 +7,11 @@ import java.util.Set;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PersonService;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
@@ -20,8 +22,18 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	private NodeRemoteService nodeRemoteService;
 	private ConversionService conversionService;
 
+	private PersonService personService;
 	private AuthorityService authorityService;
 
+	@Override
+	public RepositoryNode getUser(String userName, NodeScope nodeScope) throws NoSuchNodeRemoteException {
+		NodeRef nodeRef = personService.getPersonOrNull(userName);
+		if (nodeRef == null) {
+			throw new NoSuchNodeRemoteException(userName);
+		}
+		return nodeRemoteService.get(conversionService.get(nodeRef), nodeScope);
+	}
+	
 	@Override
 	public List<RepositoryNode> getContainedUsers(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope) {
 		return getContained(repoAuthority, AuthorityType.USER, immediate, nodeScope);
@@ -51,5 +63,8 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 
 	public void setAuthorityService(AuthorityService authorityService) {
 		this.authorityService = authorityService;
+	}
+	public void setPersonService(PersonService personService) {
+		this.personService = personService;
 	}
 }

@@ -57,6 +57,7 @@
 		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="authorityService" ref="AuthorityService" />
+		<property name="personService" ref="PersonService" />
 	</bean>
 
 	<!-- Authority webscripts -->
@@ -65,6 +66,8 @@
 		<property name="authorityRemoteService" ref="owsi.service.authorityService" />
 	</bean>
 
+	<bean id="webscript.owsi.remote.authority.get-user.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetUserWebScript" />
 	<bean id="webscript.owsi.remote.authority.get-contained-users.post" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedUsersWebScript" />
 	<bean id="webscript.owsi.remote.authority.get-contained-groups.post" parent="webscript.owsi.authority"

@@ -3,6 +3,7 @@ package fr.openwide.alfresco.app.core.authority.service.impl;
 import java.util.List;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
@@ -16,6 +17,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		this.nodeService = nodeService;
 	}
 
+	@Override
+	public RepositoryNode getUser(String userName, NodeScope nodeScope) throws NoSuchNodeRemoteException {
+		GET_USER payload = new GET_USER();
+		payload.userName = userName;
+		payload.nodeScope = nodeScope;
+		return nodeService.callNodeSerializer(GET_USER.ENDPOINT, payload, nodeScope);
+	}
+	
 	@Override
 	public List<RepositoryNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScope nodeScope) {
 		GET_CONTAINED_USERS payload = new GET_CONTAINED_USERS();

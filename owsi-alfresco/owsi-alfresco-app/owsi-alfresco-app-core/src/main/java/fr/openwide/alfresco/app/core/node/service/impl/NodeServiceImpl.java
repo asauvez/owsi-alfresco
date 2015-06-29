@@ -55,10 +55,15 @@ public class NodeServiceImpl implements NodeService {
 		payload.nodeReference = nodeReference;
 		payload.nodeScope = nodeScope;
 		
+		return callNodeSerializer(GET_NODE_SERVICE.ENDPOINT, payload, nodeScope);
+	}
+
+	@Override
+	public RepositoryNode callNodeSerializer(EntityEnclosingRemoteEndpoint<RepositoryNode> endPoint, Object payload, NodeScope nodeScope) {
 		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
 		initDeserializer(nodeScope, deserializationParameters);
 		
-		return repositoryRemoteBinding.builderWithSerializer(GET_NODE_SERVICE.ENDPOINT)
+		return repositoryRemoteBinding.builderWithSerializer(endPoint)
 			.callPayloadSerializer(payload, null, 
 				new NodePayloadCallback<RepositoryNode>() {
 					@Override
@@ -73,7 +78,7 @@ public class NodeServiceImpl implements NodeService {
 				defaultSerializationParameters, 
 				deserializationParameters);
 	}
-
+	
 	@Override
 	public List<RepositoryNode> callNodeListSerializer(
 			EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endPoint,
