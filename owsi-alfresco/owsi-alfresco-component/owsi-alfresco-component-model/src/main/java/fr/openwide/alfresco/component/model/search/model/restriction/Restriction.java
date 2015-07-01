@@ -29,6 +29,11 @@ public abstract class Restriction {
 	public RestrictionBuilder of() {
 		return parent;
 	}
+	
+	@Override
+	public String toString() {
+		return toQuery();
+	}
 
 	public final String toQuery() {
 		String query = toQueryInternal();
