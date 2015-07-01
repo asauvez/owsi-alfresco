@@ -142,6 +142,11 @@ public class RestrictionBuilder extends Restriction {
 	}
 	
 	@Override
+	protected boolean isNeedingParenthesis() {
+		return true;
+	}
+	
+	@Override
 	protected String toQueryInternal() {
 		StringBuilder buf = new StringBuilder();
 		for (Restriction restriction : restrictions) {
@@ -150,9 +155,10 @@ public class RestrictionBuilder extends Restriction {
 				if (buf.length() > 0) {
 					buf.append("\n").append(operator.name()).append(" ");
 				}
-				buf.append("(")
-					.append(query)
-					.append(")");
+				boolean needingParenthesis = restriction.isNeedingParenthesis() && ! query.startsWith("NOT ");
+				if (needingParenthesis) buf.append("(");
+				buf.append(query);
+				if (needingParenthesis) buf.append(")");
 			}
 		}
 		return buf.toString();

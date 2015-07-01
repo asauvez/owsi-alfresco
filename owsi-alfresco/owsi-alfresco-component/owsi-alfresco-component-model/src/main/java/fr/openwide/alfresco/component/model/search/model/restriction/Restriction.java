@@ -37,9 +37,16 @@ public abstract class Restriction {
 
 	public final String toQuery() {
 		String query = toQueryInternal();
-		return (query.length() > 0) ? ((not) ? "NOT (" + query + ")" : query) : "";
+		if (query.isEmpty()) return query;
+		return (not) 
+				? "NOT " + (isNeedingParenthesis() ? "(" + query + ")" : query)  
+				: query;
 	}
 
+	protected boolean isNeedingParenthesis() {
+		return false;
+	}
+	
 	protected abstract String toQueryInternal();
 
 	protected static String toLuceneValue(PropertyModel<?> propertyModel, Object value) {

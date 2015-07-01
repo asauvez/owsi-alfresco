@@ -13,15 +13,19 @@ public class RestrictionBuilderTest {
 	@Test
 	public void testGenerateFTS() throws Exception {
 		assertEquals(
-				"(=cm\\:name:\"toto\")\n" +
-				"AND (cm\\:modified:<2009-02-13T23\\:31\\:30Z TO MAX])\n" +
-				"AND (cm\\:modified:[MIN TO 2009-02-13T23\\:31\\:30Z])\n" +
-				"AND (cm\\:name:<\"abc\" TO \\\\uFFFF])\n" +
-				"AND (cm\\:name:[\\\\u0000 TO \"def\"])\n" +
-				"AND ((=cm\\:name:\"titi\")\n" +
-				"OR (=cm\\:name:\"tata\"))", 
+				"=cm\\:name:\"toto\"\n" +
+				"AND NOT ASPECT:cm\\:workingcopy\n" +
+				"AND cm\\:modified:<2009-02-13T23\\:31\\:30Z TO MAX]\n" +
+				"AND cm\\:modified:[MIN TO 2009-02-13T23\\:31\\:30Z]\n" +
+				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
+				"AND cm\\:name:[\\\\u0000 TO \"def\"]\n" +
+				"AND (=cm\\:name:\"titi\"\n" +
+					"OR =cm\\:name:\"tata\")\n" + 
+				"AND NOT (=cm\\:name:\"titi\"\n" +
+					"OR =cm\\:name:\"tata\")", 
 			new RestrictionBuilder()
 				.eq(CmModel.object.name, "toto").of()
+				.hasAspect(CmModel.workingCopy).not().of()
 				.gt(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.le(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.gt(CmModel.object.name, "abc").of()
@@ -29,6 +33,11 @@ public class RestrictionBuilderTest {
 				.or()
 					.eq(CmModel.object.name, "titi").of()
 					.eq(CmModel.object.name, "tata").of()
+					.of()
+				.or()
+					.eq(CmModel.object.name, "titi").of()
+					.eq(CmModel.object.name, "tata").of()
+					.not()
 					.of()
 				.or()
 					.of()
