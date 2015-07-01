@@ -273,7 +273,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			NodeRef nodeRef = nodeService.createNode(
 					conversionService.getRequired(primaryParent.getParentNode().getNodeReference()), 
 					conversionService.getRequired(primaryParent.getType()), 
-					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()), 
+					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(cmName.toLowerCase())), 
 					conversionService.getRequired(node.getType()), 
 					properties).getChildRef();
 			NodeReference nodeReference = conversionService.get(nodeRef);
