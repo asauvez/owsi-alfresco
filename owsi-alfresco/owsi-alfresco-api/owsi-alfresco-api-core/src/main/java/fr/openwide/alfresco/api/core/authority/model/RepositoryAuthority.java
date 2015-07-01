@@ -9,13 +9,19 @@ public class RepositoryAuthority implements Serializable {
 
 	private static final long serialVersionUID = -5556589719655849321L;
 
-	public static final RepositoryAuthority GROUP_EVERYONE = new RepositoryAuthority("GROUP_EVERYONE");
-	public static final RepositoryAuthority GROUP_ADMINISTRATORS = new RepositoryAuthority("GROUP_ALFRESCO_ADMINISTRATORS");
+	public static final String GROUP_PREFIX = "GROUP_"; 
+	
+	public static final RepositoryAuthority GROUP_EVERYONE = new RepositoryAuthority(GROUP_PREFIX + "EVERYONE");
+	public static final RepositoryAuthority GROUP_ADMINISTRATORS = new RepositoryAuthority(GROUP_PREFIX + "ALFRESCO_ADMINISTRATORS");
 
 	private String name;
 
 	public RepositoryAuthority(String name) {
 		this.name = name;
+	}
+	
+	public static RepositoryAuthority group(String shortName) {
+		return new RepositoryAuthority(GROUP_PREFIX + shortName);
 	}
 
 	@JsonValue

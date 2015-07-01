@@ -3,6 +3,8 @@ package fr.openwide.alfresco.component.model.node.model.constraint;
 import java.io.Serializable;
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+
 public class AuthorityNamePropertyConstraint extends PropertyConstraint {
 
 	public static final AuthorityNamePropertyConstraint INSTANCE = new AuthorityNamePropertyConstraint();
@@ -26,6 +28,6 @@ public class AuthorityNamePropertyConstraint extends PropertyConstraint {
 	}
 
 	private boolean acceptString(String value) {
-		return value.startsWith("GROUP_") || value.startsWith("ROLE_");
+		return value.startsWith(RepositoryAuthority.GROUP_PREFIX) || value.startsWith("ROLE_");
 	}
 }
