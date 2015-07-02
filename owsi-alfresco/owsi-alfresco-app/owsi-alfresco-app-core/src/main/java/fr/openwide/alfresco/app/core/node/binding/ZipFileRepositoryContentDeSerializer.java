@@ -1,9 +1,5 @@
 package fr.openwide.alfresco.app.core.node.binding;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,9 +18,6 @@ public abstract class ZipFileRepositoryContentDeSerializer
 	private NameReference propertyName = NameReference.create("cm", "name");
 	private final ZipOutputStream outputStream;
 	
-	public ZipFileRepositoryContentDeSerializer(File file) throws FileNotFoundException {
-		this(new BufferedOutputStream(new FileOutputStream(file)));
-	}
 	public ZipFileRepositoryContentDeSerializer(OutputStream outputStream) {
 		this(new ZipOutputStream(outputStream));
 	}
