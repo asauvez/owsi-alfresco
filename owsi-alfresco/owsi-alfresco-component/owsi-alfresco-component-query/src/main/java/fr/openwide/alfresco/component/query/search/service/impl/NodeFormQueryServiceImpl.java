@@ -46,7 +46,6 @@ public class NodeFormQueryServiceImpl extends AbstractFormQueryService implement
 
 		RepositorySearchParameters searchParameters = new RepositorySearchParameters();
 		searchParameters.setQuery(restrictionBuilder.toQuery());
-		searchParameters.setStoreReference(formQuery.getStoreReference());
 		searchParameters.setNodeScope(nodeScope);
 		
 		List<RepositoryNode> list = nodeSearchService.search(searchParameters);
