@@ -2,6 +2,7 @@ package fr.openwide.alfresco.api.core.search.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
@@ -10,8 +11,9 @@ import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 public class RepositorySearchParameters implements Serializable {
 
 	private String query;
-	private StoreReference storeReference = StoreReference.STORE_REF_WORKSPACE_SPACESSTORE;
+	private List<StoreReference> storeReferences = new ArrayList<>(Arrays.asList(StoreReference.STORE_REF_WORKSPACE_SPACESSTORE));
 	private SearchQueryLanguage language = SearchQueryLanguage.FTS_ALFRESCO;
+	private RepositoryQueryConsistency queryConsistency = RepositoryQueryConsistency.DEFAULT;
 	
 	private Integer firstResult;
 	private Integer maxResults;
@@ -25,12 +27,11 @@ public class RepositorySearchParameters implements Serializable {
 	public void setQuery(String query) {
 		this.query = query;
 	}
-	
-	public StoreReference getStoreReference() {
-		return storeReference;
+	public List<StoreReference> getStoreReferences() {
+		return storeReferences;
 	}
-	public void setStoreReference(StoreReference storeReference) {
-		this.storeReference = storeReference;
+	public void setStoreReferences(List<StoreReference> storeReferences) {
+		this.storeReferences = storeReferences;
 	}
 	
 	public SearchQueryLanguage getLanguage() {
@@ -59,6 +60,13 @@ public class RepositorySearchParameters implements Serializable {
 	}
 	public void setNodeScope(NodeScope nodeScope) {
 		this.nodeScope = nodeScope;
+	}
+	
+	public RepositoryQueryConsistency getQueryConsistency() {
+		return queryConsistency;
+	}
+	public void setQueryConsistency(RepositoryQueryConsistency queryConsistency) {
+		this.queryConsistency = queryConsistency;
 	}
 	
 	public List<RepositorySortDefinition> getSorts() {

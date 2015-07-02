@@ -1,6 +1,9 @@
 package fr.openwide.alfresco.component.model.search.model;
 
+import java.util.List;
+
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
+import fr.openwide.alfresco.api.core.search.model.RepositoryQueryConsistency;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
@@ -23,8 +26,8 @@ public class SearchQueryBuilder {
 		return this;
 	}
 	
-	public SearchQueryBuilder storeReference(StoreReference storeReference) {
-		searchParameters.setStoreReference(storeReference);
+	public SearchQueryBuilder storeReferences(List<StoreReference> storeReferences) {
+		searchParameters.setStoreReferences(storeReferences);
 		return this;
 	}
 
@@ -41,6 +44,11 @@ public class SearchQueryBuilder {
 
 	public SortBuilder sort() {
 		return sortBuilder;
+	}
+	
+	public SearchQueryBuilder queryConsistency(RepositoryQueryConsistency queryConsistency) {
+		searchParameters.setQueryConsistency(queryConsistency);
+		return this;
 	}
 	
 	public RepositorySearchParameters getSearchParameters() {

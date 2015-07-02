@@ -85,7 +85,7 @@
 		<repository>
 			<id>nexus-owsi-core</id>
 			<name>OWSI Core</name>
-			<url>http://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

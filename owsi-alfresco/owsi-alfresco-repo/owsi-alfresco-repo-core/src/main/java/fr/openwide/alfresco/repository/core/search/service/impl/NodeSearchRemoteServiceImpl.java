@@ -6,6 +6,7 @@ import java.util.List;
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.LimitBy;
+import org.alfresco.service.cmr.search.QueryConsistency;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
@@ -33,10 +35,13 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 		}
 		try {
 			SearchParameters sp = new SearchParameters();
-			sp.addStore(conversionService.getRequired(rsp.getStoreReference()));
+			for (StoreReference storeReference : rsp.getStoreReferences()) {
+				sp.addStore(conversionService.getRequired(storeReference));
+			}
 			sp.setLanguage(rsp.getLanguage().getAlfrescoName());
 			sp.setQuery(rsp.getQuery());
 			sp.excludeDataInTheCurrentTransaction(true);
+			sp.setQueryConsistency(QueryConsistency.valueOf(rsp.getQueryConsistency().name()));
 			
 			if (rsp.getFirstResult() != null) {
 				sp.setSkipCount(rsp.getFirstResult());
