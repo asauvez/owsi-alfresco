@@ -9,7 +9,7 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 public class MatchRestriction<C extends Serializable> extends Restriction {
 
 	private final PropertyModel<C> property;
-	private boolean exact = true;
+	private boolean exact = false;
 	protected C value;
 
 	public MatchRestriction(RestrictionBuilder parent, PropertyModel<C> property, C value) {
