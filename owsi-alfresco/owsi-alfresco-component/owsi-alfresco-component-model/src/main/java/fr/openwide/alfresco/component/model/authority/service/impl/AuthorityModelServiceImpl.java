@@ -55,6 +55,9 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder) {
+		authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
+			.properties().set(CmModel.authorityContainer.authorityName)
+			.properties().set(CmModel.authorityContainer.authorityDisplayName));
 		List<BusinessNode> groups = getContainedGroups(authorityQueryBuilder);
 		return getAsAuthority(groups);
 	}

@@ -23,6 +23,12 @@ public class RepositoryAuthority implements Serializable {
 	public static RepositoryAuthority group(String shortName) {
 		return new RepositoryAuthority(GROUP_PREFIX + shortName);
 	}
+	public String getGroupShortName() {
+		if (! name.startsWith(GROUP_PREFIX)) {
+			throw new IllegalStateException(name);
+		}
+		return name.substring(GROUP_PREFIX.length());
+	}
 
 	@JsonValue
 	public String getName() {
