@@ -27,7 +27,7 @@ public abstract class AbstractFileRepositoryContentSerializer
 	@Override
 	public File deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
 		File file = getFile(node);
-		if (file.exists()) {
+		if (file.exists() && file.length() > 0) {
 			throw new IllegalStateException("The file " + file.getAbsolutePath() + " already exists.");
 		}
 		try (OutputStream outputStream = new FileOutputStream(file)) {
