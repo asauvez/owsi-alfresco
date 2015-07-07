@@ -60,21 +60,13 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> parameterType = parameter.getParameterType();
-		if (ByteArrayDownloadResponse.class.equals(parameterType)) {
-			return true;
-		} else if (FileDownloadResponse.class.equals(parameterType)) {
-			return true;
-		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
-			return true;
-		} else {
-			return false;
-		}
+		return DownloadResponse.class.isAssignableFrom(parameterType);
 	}
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
-		Class<?> paramType = returnType.getParameterType();
-		return DownloadResponse.class.isAssignableFrom(paramType);
+		Class<?> parameterType = returnType.getParameterType();
+		return DownloadResponse.class.isAssignableFrom(parameterType);
 	}
 
 	@Override
