@@ -2,8 +2,6 @@ package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.StringUtils;
-
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 public class MatchRestriction<C extends Serializable> extends Restriction {
@@ -20,7 +18,7 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 
 	@Override
 	protected String toQueryInternal() {
-		if (value instanceof String && StringUtils.isEmpty((String) value)) {
+		if (value instanceof String && ((String) value).isEmpty()) {
 			value = null;
 		}
 		String prefix = exact ? "=" : "@";

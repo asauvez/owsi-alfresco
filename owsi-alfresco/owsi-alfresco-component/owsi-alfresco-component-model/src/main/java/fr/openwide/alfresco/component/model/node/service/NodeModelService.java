@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -30,8 +29,6 @@ public interface NodeModelService {
 
 	NodeReference create(BusinessNode node) throws DuplicateChildNodeNameRemoteException;
 	List<NodeReference> create(List<BusinessNode> nodes) throws DuplicateChildNodeNameRemoteException;
-	NodeReference create(BusinessNode node, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
-	List<NodeReference> create(List<BusinessNode> nodes, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
 
 	void update(BusinessNode node) throws DuplicateChildNodeNameRemoteException;
 	void update(BusinessNode node, NodeScopeBuilder nodeScopeBuilder) throws DuplicateChildNodeNameRemoteException;

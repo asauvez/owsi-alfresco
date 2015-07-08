@@ -7,13 +7,12 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
@@ -24,9 +23,9 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class NodeModelServiceImpl implements NodeModelService {
 
-	private final NodeService nodeService;
+	private final NodeRemoteService nodeService;
 
-	public NodeModelServiceImpl(NodeService nodeService) {
+	public NodeModelServiceImpl(NodeRemoteService nodeService) {
 		this.nodeService = nodeService;
 	}
 
@@ -77,11 +76,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public NodeReference create(BusinessNode node) throws DuplicateChildNodeNameRemoteException {
-		return nodeService.create(node.getRepositoryNode());
-	}
-	@Override
-	public NodeReference create(BusinessNode node, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException {
-		return create(Collections.singletonList(node), parameters).get(0);
+		return nodeService.create(Collections.singletonList(node.getRepositoryNode())).get(0);
 	}
 	@Override
 	public List<NodeReference> create(List<BusinessNode> nodes) throws DuplicateChildNodeNameRemoteException {
@@ -90,14 +85,6 @@ public class NodeModelServiceImpl implements NodeModelService {
 			repoNodes.add(node.getRepositoryNode());
 		}
 		return nodeService.create(repoNodes);
-	}
-	@Override
-	public List<NodeReference> create(List<BusinessNode> nodes, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException {
-		List<RepositoryNode> repoNodes = new ArrayList<>();
-		for (BusinessNode node : nodes) {
-			repoNodes.add(node.getRepositoryNode());
-		}
-		return nodeService.create(repoNodes, parameters);
 	}
 
 	@Override
@@ -108,7 +95,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public void update(BusinessNode node, NodeScopeBuilder scope) throws DuplicateChildNodeNameRemoteException {
-		nodeService.update(node.getRepositoryNode(), scope.getScope());
+		nodeService.update(Collections.singletonList(node.getRepositoryNode()), scope.getScope());
 	}
 	@Override
 	public void update(List<BusinessNode> nodes, NodeScopeBuilder nodeScopeBuilder) throws DuplicateChildNodeNameRemoteException {
@@ -121,7 +108,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public void delete(NodeReference nodeReference) {
-		nodeService.delete(nodeReference);
+		nodeService.delete(Collections.singletonList(nodeReference));
 	}
 	@Override
 	public void delete(List<NodeReference> nodeReferences) {

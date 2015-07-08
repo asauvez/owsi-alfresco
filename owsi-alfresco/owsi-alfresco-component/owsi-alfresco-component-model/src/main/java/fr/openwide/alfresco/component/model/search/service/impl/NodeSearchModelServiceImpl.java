@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
+import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
@@ -16,9 +16,9 @@ import fr.openwide.alfresco.component.model.search.service.NodeSearchModelServic
 
 public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 
-	private final NodeSearchService nodeSearchService;
+	private final NodeSearchRemoteService nodeSearchService;
 
-	public NodeSearchModelServiceImpl(NodeSearchService nodeSearchService) {
+	public NodeSearchModelServiceImpl(NodeSearchRemoteService nodeSearchService) {
 		this.nodeSearchService = nodeSearchService;
 	}
 

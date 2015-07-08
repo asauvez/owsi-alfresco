@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -16,9 +16,9 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class AuthorityModelServiceImpl implements AuthorityModelService {
 
-	private final AuthorityService authorityService;
+	private final AuthorityRemoteService authorityService;
 
-	public AuthorityModelServiceImpl(AuthorityService authorityService) {
+	public AuthorityModelServiceImpl(AuthorityRemoteService authorityService) {
 		this.authorityService = authorityService;
 	}
 
