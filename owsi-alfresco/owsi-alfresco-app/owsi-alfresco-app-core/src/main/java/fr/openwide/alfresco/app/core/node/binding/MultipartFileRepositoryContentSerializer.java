@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 

@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.api.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content;
 
 import java.io.IOException;
 import java.io.OutputStream;

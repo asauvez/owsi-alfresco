@@ -1,5 +1,6 @@
-package fr.openwide.alfresco.app.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content.serializer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,10 +8,8 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
-
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
@@ -33,7 +32,9 @@ public class StringRepositoryContentSerializer implements NodeContentSerializer<
 
 	@Override
 	public String deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-		return IOUtils.toString(inputStream, charset);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		new OutputStreamRepositoryContentDeserializer(outputStream).deserialize(node, contentProperty, inputStream);
+		return new String(outputStream.toByteArray(), charset);
 	}
 
 }

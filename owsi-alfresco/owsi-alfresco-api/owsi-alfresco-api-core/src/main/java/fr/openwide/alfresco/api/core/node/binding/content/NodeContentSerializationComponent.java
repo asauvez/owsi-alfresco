@@ -1,9 +1,11 @@
-package fr.openwide.alfresco.api.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,6 +22,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.ByteArrayRepositoryContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.InputStreamRepositoryContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.ReaderRepositoryContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.StringRepositoryContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -202,4 +210,13 @@ public class NodeContentSerializationComponent {
 		return remoteCallPayload;
 	}
 
+	public static Map<Class<?>, NodeContentSerializer<?>> getDefaultSerializersByClass() {
+		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new HashMap<>();
+		serializersByClass.put(String.class, StringRepositoryContentSerializer.INSTANCE);
+		serializersByClass.put(byte[].class, ByteArrayRepositoryContentSerializer.INSTANCE);
+		serializersByClass.put(File.class, TempFileRepositoryContentSerializer.INSTANCE);
+		serializersByClass.put(InputStream.class, InputStreamRepositoryContentSerializer.INSTANCE);
+		serializersByClass.put(Reader.class, ReaderRepositoryContentSerializer.INSTANCE);
+		return serializersByClass;
+	}
 }

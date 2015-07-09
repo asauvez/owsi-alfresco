@@ -1,8 +1,9 @@
-package fr.openwide.alfresco.api.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content;
 
 import java.util.Collection;
 import java.util.Map;
 
+import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 

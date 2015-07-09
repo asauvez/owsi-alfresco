@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializationParameters;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
-import fr.openwide.alfresco.api.core.node.binding.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;

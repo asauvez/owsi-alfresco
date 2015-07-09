@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import fr.openwide.alfresco.api.core.node.binding.NodePropertyDeserializer;
-import fr.openwide.alfresco.api.core.node.binding.NodePropertySerializer;
+import fr.openwide.alfresco.api.core.node.binding.property.NodePropertyDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.property.NodePropertySerializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor.RepositoryVisitable;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;

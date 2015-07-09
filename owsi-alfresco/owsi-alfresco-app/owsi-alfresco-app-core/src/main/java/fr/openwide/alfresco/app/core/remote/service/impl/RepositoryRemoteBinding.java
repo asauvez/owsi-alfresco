@@ -26,7 +26,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;

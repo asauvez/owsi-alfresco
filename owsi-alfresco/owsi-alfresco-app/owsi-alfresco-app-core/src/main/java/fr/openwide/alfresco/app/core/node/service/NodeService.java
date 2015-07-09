@@ -2,7 +2,7 @@ package fr.openwide.alfresco.app.core.node.service;
 
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;

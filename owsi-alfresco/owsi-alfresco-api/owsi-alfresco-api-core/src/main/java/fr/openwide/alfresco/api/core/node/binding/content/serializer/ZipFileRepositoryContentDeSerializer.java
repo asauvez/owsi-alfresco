@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content.serializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,9 +6,7 @@ import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
-
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
@@ -38,7 +36,7 @@ public abstract class ZipFileRepositoryContentDeSerializer
 		
 		ZipEntry zipEntry = new ZipEntry(fileName);
 		outputStream.putNextEntry(zipEntry);
-		IOUtils.copy(inputStream, outputStream);
+		new OutputStreamRepositoryContentDeserializer(outputStream).deserialize(node, contentProperty, inputStream);
 		outputStream.closeEntry();
 		
 		return zipEntry;

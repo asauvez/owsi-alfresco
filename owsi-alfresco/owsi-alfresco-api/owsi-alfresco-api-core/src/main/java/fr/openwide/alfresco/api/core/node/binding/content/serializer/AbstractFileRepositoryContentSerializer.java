@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content.serializer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,10 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.commons.io.IOUtils;
-
-import fr.openwide.alfresco.api.core.node.binding.NodeContentDeserializer;
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
@@ -20,7 +18,7 @@ public abstract class AbstractFileRepositoryContentSerializer
 	@Override
 	public void serialize(RepositoryNode node, NameReference contentProperty, File content, OutputStream outputStream) throws IOException {
 		try (InputStream inputStream = new FileInputStream(content)) {
-			IOUtils.copy(inputStream, outputStream);
+			new OutputStreamRepositoryContentDeserializer(outputStream).deserialize(node, contentProperty, inputStream);
 		}
 	}
 
@@ -31,7 +29,7 @@ public abstract class AbstractFileRepositoryContentSerializer
 			throw new IllegalStateException("The file " + file.getAbsolutePath() + " already exists.");
 		}
 		try (OutputStream outputStream = new FileOutputStream(file)) {
-			IOUtils.copy(inputStream, outputStream);
+			new OutputStreamRepositoryContentDeserializer(outputStream).deserialize(node, contentProperty, inputStream);
 		}
 		return file;
 	}

@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.repository.core.node.service.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +34,9 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
@@ -50,6 +55,8 @@ import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayload
 
 public class NodeRemoteServiceImpl implements NodeRemoteService {
 
+	private Map<Class<?>, NodeContentSerializer<?>> serializersByClass = NodeContentSerializationComponent.getDefaultSerializersByClass();
+	
 	private NodeService nodeService;
 	private ContentService contentService;
 	private PermissionService permissionService;
@@ -153,10 +160,23 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				node.getProperties().put(property, conversionService.getForApplication(value));
 			}
 		}
-		for (NameReference property : scope.getContentDeserializers().keySet()) {
-			ContentReader reader = contentService.getReader(nodeRef, conversionService.getRequired(property));
+		for (Entry<NameReference, NodeContentDeserializer<?>> entry : scope.getContentDeserializers().entrySet()) {
+			NameReference contentProperty = entry.getKey();
+			ContentReader reader = contentService.getReader(nodeRef, conversionService.getRequired(contentProperty));
 			if (reader != null) {
-				node.getContents().put(property, reader);
+				NodeContentDeserializer<?> deserializer = entry.getValue();
+				if (deserializer == null) {
+					// Appel depuis un WS
+					node.getContents().put(contentProperty, reader);
+				} else {
+					// Appel depuis Alfresco
+					try (InputStream inputStream = reader.getContentInputStream()) {
+						Object value = deserializer.deserialize(node, contentProperty, inputStream);
+						node.getContents().put(contentProperty, value);
+					} catch (IOException e) {
+						throw new IllegalStateException(e);
+					}
+				}
 			}
 		}
 		for (NameReference aspect : scope.getAspects()) {
@@ -455,23 +475,42 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 
 	private void setContents(final NodeRef nodeRef, RepositoryNode node) {
 		for (Entry<NameReference, Object> entry : node.getContents().entrySet()) {
-			final RepositoryContentData contentData = node.getProperty(entry.getKey(), RepositoryContentData.class);
+			NameReference contentProperty = entry.getKey();
+			final RepositoryContentData contentData = node.getProperty(contentProperty, RepositoryContentData.class);
 			
-			entry.setValue(new NodeContentCallback() {
-				@Override
-				public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
-					setContent(nodeRef, contentProperty, 
-							(contentData != null) ? contentData : new RepositoryContentData(), 
-							inputStream);
+			Object contentValue = entry.getValue();
+			if (contentValue instanceof NodeContentCallback) {
+				// Appel depuis un Web Script
+				entry.setValue(new NodeContentCallback() {
+					@Override
+					public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
+						ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
+						writer.putContent(inputStream);
+
+						setContentData(nodeRef, contentProperty, 
+								(contentData != null) ? contentData : new RepositoryContentData(), 
+								writer);
+					}
+				});
+			} else if (contentValue != null) {
+				// Appel depuis Alfresco
+				@SuppressWarnings("unchecked")
+				NodeContentSerializer<Object> serializer = (NodeContentSerializer<Object>) serializersByClass.get(contentValue.getClass());
+				if (serializer == null) {
+					throw new IllegalArgumentException(contentProperty + "/" + contentValue.getClass() +  " has no default serializer.");
 				}
-			});
+				ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
+				try (OutputStream outputStream = writer.getContentOutputStream()) {
+					serializer.serialize(node, contentProperty, contentValue, outputStream);
+				} catch (IOException e) {
+					throw new IllegalStateException(e);
+				}
+				setContentData(nodeRef, contentProperty, contentData, writer);
+			}
 		}
 	}
 
-	protected void setContent(NodeRef nodeRef, NameReference contentProperty, RepositoryContentData contentData, 
-			InputStream contentInputStream) {
-		QName qname = conversionService.getRequired(contentProperty);
-		ContentWriter writer = contentService.getWriter(nodeRef, qname, true);
+	protected void setContentData(NodeRef nodeRef, NameReference contentProperty, RepositoryContentData contentData, ContentWriter writer) {
 		if (contentData.getMimetype() != null) {
 			writer.setMimetype(contentData.getMimetype());
 		}
@@ -481,9 +520,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		if (contentData.getLocale() != null) {
 			writer.setLocale(contentData.getLocale());
 		}
-		
-		writer.putContent(contentInputStream);
-		
+
 		if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
 			if (contentData.getMimetype() == null) {
 				String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
@@ -493,7 +530,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				writer.guessEncoding();
 			}
 			// Nécessaire, car non mis à jour après putContent
-			nodeService.setProperty(nodeRef, qname, writer.getContentData());
+			nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
 		}
 	}
 	

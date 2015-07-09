@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content.serializer;
 
 import java.io.File;
 import java.io.IOException;

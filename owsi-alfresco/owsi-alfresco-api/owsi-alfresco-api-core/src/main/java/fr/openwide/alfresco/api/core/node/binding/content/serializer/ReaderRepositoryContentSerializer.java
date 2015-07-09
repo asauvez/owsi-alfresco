@@ -1,14 +1,13 @@
-package fr.openwide.alfresco.app.core.node.binding;
+package fr.openwide.alfresco.api.core.node.binding.content.serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.input.ReaderInputStream;
-
-import fr.openwide.alfresco.api.core.node.binding.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
@@ -23,11 +22,15 @@ public class ReaderRepositoryContentSerializer implements NodeContentSerializer<
 	}
 
 	@Override
-	public void serialize(RepositoryNode node, NameReference contentProperty, Reader content, OutputStream outputStream)
+	public void serialize(RepositoryNode node, NameReference contentProperty, Reader reader, OutputStream outputStream)
 			throws IOException {
-		InputStreamRepositoryContentSerializer.INSTANCE.serialize(node, contentProperty, 
-				new ReaderInputStream(content, charset), 
-				outputStream);
+		OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
+		char[] buffer = new char[4096];
+		int n = 0;
+		while ((n = reader.read(buffer)) != -1) {
+			writer.write(buffer, 0, n);
+		}
+		writer.flush();
 	}
 
 }
