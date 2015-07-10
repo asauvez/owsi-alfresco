@@ -20,9 +20,9 @@ public class RestrictionBuilderTest {
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
 				"AND cm\\:name:[\\\\u0000 TO \"def\"]\n" +
 				"AND (=cm\\:name:\"titi\"\n" +
-					"OR =cm\\:name:\"tata\")\n" + 
+				"	OR =cm\\:name:\"tata\")\n" + 
 				"AND NOT (=cm\\:name:\"titi\"\n" +
-					"OR =cm\\:name:\"tata\")", 
+				"	OR =cm\\:name:\"tata\")", 
 			new RestrictionBuilder()
 				.eq(CmModel.object.name, "toto").of()
 				.hasAspect(CmModel.workingCopy).not().of()

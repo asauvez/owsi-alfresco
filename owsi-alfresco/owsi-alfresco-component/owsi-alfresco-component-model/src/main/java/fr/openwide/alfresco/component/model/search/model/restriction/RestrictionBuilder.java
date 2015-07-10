@@ -157,7 +157,7 @@ public class RestrictionBuilder extends Restriction {
 				}
 				boolean needingParenthesis = restriction.isNeedingParenthesis() && ! query.startsWith("NOT ");
 				if (needingParenthesis) buf.append("(");
-				buf.append(query);
+				buf.append(query.replace("\n", "\n\t"));
 				if (needingParenthesis) buf.append(")");
 			}
 		}
