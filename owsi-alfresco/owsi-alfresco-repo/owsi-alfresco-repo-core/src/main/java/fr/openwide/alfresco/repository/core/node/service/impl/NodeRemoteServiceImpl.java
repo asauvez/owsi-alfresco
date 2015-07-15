@@ -473,7 +473,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 	}
 
-	private void setContents(final NodeRef nodeRef, RepositoryNode node) {
+	protected void setContents(final NodeRef nodeRef, RepositoryNode node) {
 		for (Entry<NameReference, Object> entry : node.getContents().entrySet()) {
 			NameReference contentProperty = entry.getKey();
 			final RepositoryContentData contentData = node.getProperty(contentProperty, RepositoryContentData.class);
@@ -510,7 +510,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 	}
 
-	protected void setContentData(NodeRef nodeRef, NameReference contentProperty, RepositoryContentData contentData, ContentWriter writer) {
+	private void setContentData(NodeRef nodeRef, NameReference contentProperty, RepositoryContentData contentData, ContentWriter writer) {
 		if (contentData.getMimetype() != null) {
 			writer.setMimetype(contentData.getMimetype());
 		}
