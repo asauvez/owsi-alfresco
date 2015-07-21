@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.component.model.repository.model.RnModel;
-import fr.openwide.alfresco.component.model.repository.model.SysModel;
 
+/**
+ * Permet de tester un model. Génére une liste d'erreurs/warnings.
+ * 
+ * @see ModelCheckerTesth
+ */
 public class ModelChecker {
 	
 	private List<String> errors = new ArrayList<>();
@@ -52,11 +54,4 @@ public class ModelChecker {
 		return errors.toString().replace(", ", "\n").replace("[", "").replace("]", "");
 	}
 	
-	public static void main(String args[]) throws Exception {
-		ModelChecker checker = new ModelChecker();
-		checker.checkModel(SysModel.class);
-		checker.checkModel(CmModel.class);
-		checker.checkModel(RnModel.class);
-		System.out.println(checker.getErrors());
-	}
 }
