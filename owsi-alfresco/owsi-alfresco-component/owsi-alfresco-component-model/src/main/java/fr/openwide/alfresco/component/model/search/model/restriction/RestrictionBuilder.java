@@ -96,6 +96,12 @@ public class RestrictionBuilder extends Restriction {
 	public MatchAllRestriction matchAll(String value) {
 		return add(new MatchAllRestriction(this, value));
 	}
+	/**
+	 * Recherche uniquement dans les propriétés de type d:content
+	 */
+	public MatchTextRestriction matchText(String value) {
+		return add(new MatchTextRestriction(this, value));
+	}
 
 	public <C extends Serializable>  RestrictionBuilder in(PropertyModel<C> property, @SuppressWarnings("unchecked") C ... values) {
 		return in(property, Arrays.asList(values));
