@@ -134,6 +134,10 @@ public class RestrictionBuilder extends Restriction {
 		return between(property, null, value);
 	}
 
+	public TagRestriction tag(String tag) {
+		return add(new TagRestriction(this, tag));
+	}
+
 	public CustomRestriction custom(String customQuery) {
 		return add(new CustomRestriction(this, customQuery));
 	}
