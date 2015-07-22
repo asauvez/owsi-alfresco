@@ -484,12 +484,14 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				entry.setValue(new NodeContentCallback() {
 					@Override
 					public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
-						ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
-						writer.putContent(inputStream);
-
-						setContentData(nodeRef, contentProperty, 
-								(contentData != null) ? contentData : new RepositoryContentData(), 
-								writer);
+						if (nodeService.exists(nodeRef)) {
+							ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
+							writer.putContent(inputStream);
+	
+							setContentData(nodeRef, contentProperty, 
+									(contentData != null) ? contentData : new RepositoryContentData(), 
+									writer);
+						}
 					}
 				});
 			} else if (contentValue != null) {
