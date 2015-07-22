@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+	<bean id="owsi.service.nodeModelService" class="fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl">
+		<constructor-arg ref="owsi.service.nodeService"/>
+	</bean>
+
+	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.component.model.search.service.NodeSearchModelService">
+		<constructor-arg ref="owsi.service.nodeSearchService"/>
+	</bean>
+
+	<bean id="owsi.service.authorityService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
+		<constructor-arg ref="owsi.service.nodeService"/>
+	</bean>
+
+</beans>
