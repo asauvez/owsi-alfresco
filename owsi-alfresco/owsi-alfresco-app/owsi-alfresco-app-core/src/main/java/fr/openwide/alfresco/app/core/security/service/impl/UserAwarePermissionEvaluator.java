@@ -36,7 +36,7 @@ public abstract class UserAwarePermissionEvaluator implements PermissionEvaluato
 	@Autowired
 	private IPermissionHierarchy permissionHierarchy;
 	@Autowired
-	private RoleHierarchy roleHierarchy;
+	private RoleHierarchy dynamicRoleHierarchy;
 
 	protected abstract boolean hasPermission(UserDetails user, Object targetDomainObject, Permission permission);
 
@@ -141,7 +141,7 @@ public abstract class UserAwarePermissionEvaluator implements PermissionEvaluato
 	}
 
 	protected Collection<? extends GrantedAuthority> getAuthorities(UserDetails user) {
-		return roleHierarchy.getReachableGrantedAuthorities(user.getAuthorities());
+		return dynamicRoleHierarchy.getReachableGrantedAuthorities(user.getAuthorities());
 	}
 
 }

@@ -1,14 +1,20 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
+import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.NullRoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.acls.domain.PermissionFactory;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+import org.springframework.security.core.GrantedAuthority;
 
 import fr.openwide.core.jpa.security.hierarchy.IPermissionHierarchy;
 import fr.openwide.core.jpa.security.hierarchy.PermissionHierarchyImpl;
@@ -37,11 +43,26 @@ public abstract class AppCorePermissionConfigurerAdapter extends GlobalMethodSec
 
 	
 	@Bean
-	public RoleHierarchy roleHierarchy() {
+	@Primary
+	public RoleHierarchy dynamicRoleHierarchy() {
+		return new NullRoleHierarchy();
+	}
+	
+	
+	@Bean
+	@Qualifier("loginTimeRoleHierarchy")
+	public RoleHierarchy loginTimeRoleHierarchy() {
 		SecurityHierarchyBuilder builder = new SecurityHierarchyBuilder();
 		addRoleHierarchy(builder);
 		
-		RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+		RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl() {
+			@Override
+			public Collection<GrantedAuthority> getReachableGrantedAuthorities(
+					Collection<? extends GrantedAuthority> authorities) {
+				Collection<GrantedAuthority> grantedAuthorities = super.getReachableGrantedAuthorities(authorities);
+				return getLoginTimeReachableGrantedAuthorities(grantedAuthorities);
+			}
+		};
 		roleHierarchy.setHierarchy(builder.build());
 		return roleHierarchy;
 	}
@@ -49,10 +70,15 @@ public abstract class AppCorePermissionConfigurerAdapter extends GlobalMethodSec
 	protected void addRoleHierarchy(@SuppressWarnings("unused") SecurityHierarchyBuilder builder) {
 	}
 	
+	public Collection<GrantedAuthority> getLoginTimeReachableGrantedAuthorities(Collection<GrantedAuthority> authorities) {
+		return authorities;
+	}
+	
+	
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {
 		MethodSecurityExpressionHandler expressionHandler = super.createExpressionHandler();
-		((DefaultMethodSecurityExpressionHandler) expressionHandler).setRoleHierarchy(roleHierarchy());
+		((DefaultMethodSecurityExpressionHandler) expressionHandler).setRoleHierarchy(dynamicRoleHierarchy());
 		return expressionHandler;
 	}
 }

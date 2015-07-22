@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,9 +32,11 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryAuthenticationUserDetailsServiceImpl.class);
 
 	private AuthenticationService authenticationService;
+	private RoleHierarchy loginTimeRoleHierarchy;
 
-	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService) {
+	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService, RoleHierarchy loginTimeRoleHierarchy) {
 		this.authenticationService = authenticationService;
+		this.loginTimeRoleHierarchy = loginTimeRoleHierarchy;
 	}
 
 	@Override
@@ -87,8 +90,10 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 		for (RepositoryAuthority autority : repositoryUser.getAuthorities()) {
 			authorities.add(new SimpleGrantedAuthority(autority.getName()));
 		}
+
 		// Build user
-		return new NamedUser(repositoryUser, credentials, authorities);
+		return new NamedUser(repositoryUser, credentials, 
+				loginTimeRoleHierarchy.getReachableGrantedAuthorities(authorities));
 	}
 
 	@Override
