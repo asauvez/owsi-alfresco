@@ -11,7 +11,7 @@
 		<constructor-arg ref="owsi.service.nodeSearchService"/>
 	</bean>
 
-	<bean id="owsi.service.authorityService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
+	<bean id="owsi.service.authorityModelService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
 		<constructor-arg ref="owsi.service.authorityService"/>
 	</bean>
 
