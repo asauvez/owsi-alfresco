@@ -12,7 +12,7 @@
 	</bean>
 
 	<bean id="owsi.service.authorityService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
-		<constructor-arg ref="owsi.service.nodeService"/>
+		<constructor-arg ref="owsi.service.authorityService"/>
 	</bean>
 
 </beans>
