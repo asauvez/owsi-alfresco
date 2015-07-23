@@ -7,7 +7,7 @@
 		<constructor-arg ref="owsi.service.nodeService"/>
 	</bean>
 
-	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.component.model.search.service.NodeSearchModelService">
+	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.component.model.search.service.NodeSearchModelServiceImpl">
 		<constructor-arg ref="owsi.service.nodeSearchService"/>
 	</bean>
 
