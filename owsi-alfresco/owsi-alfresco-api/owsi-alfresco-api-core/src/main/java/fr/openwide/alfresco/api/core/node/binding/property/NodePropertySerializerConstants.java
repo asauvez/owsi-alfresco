@@ -1,8 +1,5 @@
 package fr.openwide.alfresco.api.core.node.binding.property;
 
-import java.text.DateFormat;
-
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 public interface NodePropertySerializerConstants {
 
@@ -10,7 +7,6 @@ public interface NodePropertySerializerConstants {
 	String LONG = "long";
 	String DOUBLE = "double";
 	String DATE = "date";
-	DateFormat DATE_FORMAT = new ISO8601DateFormat();
 	String LOCALE = "locale";
 
 	String NODE_REFERENCE = "nodeReference";

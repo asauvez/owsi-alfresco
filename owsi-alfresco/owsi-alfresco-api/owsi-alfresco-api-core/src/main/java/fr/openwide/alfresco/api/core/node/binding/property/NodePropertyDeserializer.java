@@ -3,6 +3,7 @@ package fr.openwide.alfresco.api.core.node.binding.property;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.util.ISO8601Utils;
 import com.google.common.base.Preconditions;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
@@ -63,7 +65,7 @@ public class NodePropertyDeserializer extends JsonDeserializer<Serializable> imp
 		switch (type) {
 		case DATE:
 			try {
-				return DATE_FORMAT.parse(jp.getText());
+				return ISO8601Utils.parse(jp.getText(), new ParsePosition(0));
 			} catch (ParseException e) {
 				throw new IllegalStateException(e);
 			}
