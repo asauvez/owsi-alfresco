@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -48,7 +47,10 @@ public class NodePropertySerializer extends JsonSerializer<Serializable>
 			jgen.writeNumber((Double) value);
 			jgen.writeEndObject();
 		} else if (value instanceof Date) {
-			writeStringObject(jgen, DATE, ISO8601Utils.format((Date) value, true));
+			jgen.writeStartObject();
+			jgen.writeFieldName(DATE);
+			jgen.writeNumber(((Date) value).getTime());
+			jgen.writeEndObject();
 		} else if (value instanceof Locale) {
 			writeStringObject(jgen, LOCALE, ((Locale) value).toLanguageTag());
 		} else if (value instanceof Collection) {
