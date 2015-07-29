@@ -52,7 +52,7 @@ public abstract class Restriction {
 
 	protected static String toLuceneValue(PropertyModel<?> propertyModel, Object value) {
 		if (propertyModel instanceof DateTimePropertyModel) {
-			return ISO8601Utils.format((Date) value, true, TimeZone.getDefault()).replace(":", "\\:");
+			return ISO8601Utils.format((Date) value, false, TimeZone.getDefault()).replace(":", "\\:");
 		} else if (propertyModel instanceof DatePropertyModel) {
 			return dateFormat.format((Date) value);
 		} else if (value instanceof Number) {
