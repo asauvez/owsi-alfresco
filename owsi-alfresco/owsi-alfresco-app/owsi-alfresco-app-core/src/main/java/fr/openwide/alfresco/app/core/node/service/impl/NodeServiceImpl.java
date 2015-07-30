@@ -3,7 +3,6 @@ package fr.openwide.alfresco.app.core.node.service.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
@@ -71,7 +70,7 @@ public class NodeServiceImpl implements NodeService {
 						return Collections.singleton(value);
 					}
 					@Override
-					public void doWithPayload(RemoteCallPayload<RepositoryNode> payload, Map<Integer, ContentPropertyWrapper> wrappers) {
+					public void doWithPayload(RemoteCallPayload<RepositoryNode> payload, Collection<ContentPropertyWrapper> wrappers) {
 						// on récupére la valeur en retour de la fonction
 					}
 				}, 
@@ -97,7 +96,7 @@ public class NodeServiceImpl implements NodeService {
 						return nodes;
 					}
 					@Override
-					public void doWithPayload(RemoteCallPayload<List<RepositoryNode>> payload, Map<Integer, ContentPropertyWrapper> wrappers) {
+					public void doWithPayload(RemoteCallPayload<List<RepositoryNode>> payload, Collection<ContentPropertyWrapper> wrappers) {
 						// on récupére la valeur en retour de la fonction
 					}
 				}, 
