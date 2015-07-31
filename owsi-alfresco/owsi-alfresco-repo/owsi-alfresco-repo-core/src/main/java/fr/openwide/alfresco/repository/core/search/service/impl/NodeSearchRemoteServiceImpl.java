@@ -11,6 +11,8 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -24,6 +26,8 @@ import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayload
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+	
 	private NodeRemoteService nodeRemoteService;
 	private SearchService searchService;
 	private ConversionService conversionService;
@@ -34,6 +38,10 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
 		try {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Searching for query : {}", rsp.getQuery());
+			}
+
 			SearchParameters sp = new SearchParameters();
 			for (StoreReference storeReference : rsp.getStoreReferences()) {
 				sp.addStore(conversionService.getRequired(storeReference));

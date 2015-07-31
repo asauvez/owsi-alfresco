@@ -32,6 +32,8 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
@@ -55,6 +57,8 @@ import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayload
 
 public class NodeRemoteServiceImpl implements NodeRemoteService {
 
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+	
 	private Map<Class<?>, NodeContentSerializer<?>> serializersByClass = NodeContentSerializationComponent.getDefaultSerializersByClass();
 	
 	private NodeService nodeService;
@@ -125,7 +129,13 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("No such node {}", nodeReference);
+			}
 			throw new NoSuchNodeRemoteException(nodeReference.getReference());
+		}
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Loading node {}", nodeReference);
 		}
 
 		RepositoryNode node = new RepositoryNode();
@@ -290,12 +300,17 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
 		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
 		try {
-			NodeRef nodeRef = nodeService.createNode(
-					conversionService.getRequired(primaryParent.getParentNode().getNodeReference()), 
-					conversionService.getRequired(primaryParent.getType()), 
-					QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(cmName.toLowerCase())), 
-					conversionService.getRequired(node.getType()), 
-					properties).getChildRef();
+			NodeRef parentRef = conversionService.getRequired(primaryParent.getParentNode().getNodeReference());
+			QName assocType = conversionService.getRequired(primaryParent.getType());
+			QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(cmName.toLowerCase()));
+			QName type = conversionService.getRequired(node.getType());
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Creating node type {} in {}/{}/{}", type, parentRef, assocType, assocName);
+			}
+			NodeRef nodeRef = nodeService.createNode(parentRef, assocType, assocName, type, properties).getChildRef();
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Created node {}", nodeRef);
+			}
 			NodeReference nodeReference = conversionService.get(nodeRef);
 			node.setNodeReference(nodeReference);
 			
@@ -351,6 +366,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
 		try {
 			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Updating node {}", nodeRef);
+			}
 			if (nodeScope.isType()) {
 				nodeService.setType(nodeRef, conversionService.getRequired(node.getType()));
 			}
@@ -359,10 +377,13 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 				}
 				RepositoryChildAssociation repoPrimaryParent = node.getPrimaryParentAssociation();
-				nodeService.moveNode(nodeRef, 
-						conversionService.getRequired(repoPrimaryParent.getParentNode().getNodeReference()), 
-						conversionService.getRequired(repoPrimaryParent.getType()), 
-						QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase()));
+				NodeRef parentRef = conversionService.getRequired(repoPrimaryParent.getParentNode().getNodeReference());
+				QName assocType = conversionService.getRequired(repoPrimaryParent.getType());
+				QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase());
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Moving node {} to {}/{}/{}", nodeRef, parentRef, assocType, assocName);
+				}
+				nodeService.moveNode(nodeRef, parentRef, assocType, assocName);
 			}
 			for (NameReference propertyName : nodeScope.getProperties()) {
 				Serializable value = node.getProperty(propertyName);
@@ -539,6 +560,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 	@Override
 	public void delete(List<NodeReference> nodeReferences) {
 		for (NodeReference nodeReference : nodeReferences) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Deleting node {}", nodeReference);
+			}
 			nodeService.deleteNode(conversionService.getRequired(nodeReference));
 		}
 	}
