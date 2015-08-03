@@ -15,8 +15,8 @@ public class RestrictionBuilderTest {
 		assertEquals(
 				"=cm\\:name:\"toto\"\n" +
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
-				"AND cm\\:modified:<2009-02-13T23\\:31\\:30Z TO MAX]\n" +
-				"AND cm\\:modified:[MIN TO 2009-02-13T23\\:31\\:30Z]\n" +
+				"AND cm\\:modified:<2009-02-14T00\\:31\\:30+01\\:00 TO MAX]\n" +
+				"AND cm\\:modified:[MIN TO 2009-02-14T00\\:31\\:30+01\\:00]\n" +
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
 				"AND cm\\:name:[\\\\u0000 TO \"def\"]\n" +
 				"AND (=cm\\:name:\"titi\"\n" +
