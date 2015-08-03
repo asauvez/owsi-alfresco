@@ -39,7 +39,7 @@ public class ModelChecker {
 				Object value = field.get(container);
 				if (value instanceof PropertyModel) {
 					PropertyModel<?> property = (PropertyModel<?>) value;
-					if (! container.getNameReference().getNamespace().equals(nameSpace)) {
+					if (! property.getNameReference().getNamespace().equals(nameSpace)) {
 						errors.add(container.getClass().getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the property namespace " + property.getNameReference());
 					}
 					if (! property.getNameReference().getName().equals(field.getName())) {
