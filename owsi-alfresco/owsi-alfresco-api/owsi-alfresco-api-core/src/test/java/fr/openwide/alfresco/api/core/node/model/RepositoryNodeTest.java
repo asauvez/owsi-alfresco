@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.Locale;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
@@ -49,10 +50,15 @@ public class RepositoryNodeTest {
 		node = objectMapper.readValue(s, RepositoryNode.class);
 		System.out.println(node.getProperties());
 		
+		Assert.assertEquals(String.class, node.getProperty(NameReference.create("cm:s")).getClass());
 		Assert.assertEquals(Double.class, node.getProperty(NameReference.create("cm:double")).getClass());
 		Assert.assertEquals(Float.class, node.getProperty(NameReference.create("cm:float")).getClass());
 		Assert.assertEquals(Integer.class, node.getProperty(NameReference.create("cm:int")).getClass());
+		Assert.assertEquals(Long.class, node.getProperty(NameReference.create("cm:long")).getClass());
+		Assert.assertEquals(Date.class, node.getProperty(NameReference.create("cm:date")).getClass());
+		Assert.assertEquals(Boolean.class, node.getProperty(NameReference.create("cm:boolean")).getClass());
 		Assert.assertEquals(NodeReference.class, node.getProperty(NameReference.create("cm:nodeRef")).getClass());
+		Assert.assertEquals(NameReference.class, node.getProperty(NameReference.create("cm:qname")).getClass());
 
 		List<?> multiDate = (List<?>) node.getProperty(NameReference.create("cm:multiDate"));
 		Assert.assertEquals(Date.class, multiDate.get(0).getClass());

@@ -68,7 +68,7 @@ public class NodePropertyDeserializer extends JsonDeserializer<Serializable> imp
 		case SHORT:
 			return jp.readValueAs(Short.class);
 		case LONG:
-			;
+			return jp.readValueAs(Long.class);
 		case DOUBLE:
 			return jp.readValueAs(Double.class);
 		case NODE_REFERENCE:
