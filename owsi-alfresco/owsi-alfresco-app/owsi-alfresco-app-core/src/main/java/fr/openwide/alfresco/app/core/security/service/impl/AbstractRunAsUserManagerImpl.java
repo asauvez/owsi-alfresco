@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.core.jpa.security.runas.CoreRunAsManagerImpl;
@@ -97,6 +98,11 @@ public abstract class AbstractRunAsUserManagerImpl extends RunAsManagerImpl impl
 			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orNull());
 			afterRunAs(runAsAuthentication);
 		}
+	}
+
+	@Override
+	public <T> T runAsSystem(Callable<T> work) throws Exception {
+		return runAsUser(RepositoryAuthority.USER_SYSTEM.getName(), work);
 	}
 
 	protected abstract void afterRunAs(Authentication runAsAuthentication);

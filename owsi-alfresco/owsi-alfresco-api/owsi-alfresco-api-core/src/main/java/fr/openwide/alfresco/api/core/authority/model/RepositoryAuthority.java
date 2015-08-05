@@ -11,6 +11,7 @@ public class RepositoryAuthority implements Serializable {
 
 	public static final String GROUP_PREFIX = "GROUP_"; 
 	
+	public static final RepositoryAuthority USER_SYSTEM = new RepositoryAuthority("System");
 	public static final RepositoryAuthority GROUP_EVERYONE = new RepositoryAuthority(GROUP_PREFIX + "EVERYONE");
 	public static final RepositoryAuthority GROUP_ADMINISTRATORS = new RepositoryAuthority(GROUP_PREFIX + "ALFRESCO_ADMINISTRATORS");
 
