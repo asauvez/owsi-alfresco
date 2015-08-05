@@ -36,6 +36,8 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class NodeContentSerializationComponent {
 
+	private static final String JSON_ZIP_ENTRY_NAME = "json";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(NodeContentSerializationComponent.class);
 	
 	public static final String CONTENT_TYPE = "application/zip";
@@ -93,7 +95,7 @@ public class NodeContentSerializationComponent {
 		remoteCallPayload.setPayload(payload);
 		remoteCallPayload.setRemoteCallParameters(remoteCallParameters);
 		
-		zos.putNextEntry(new ZipEntry("json"));
+		zos.putNextEntry(new ZipEntry(JSON_ZIP_ENTRY_NAME));
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Serializing payload: {}", objectMapper.writeValueAsString(remoteCallPayload));
 		}
@@ -158,9 +160,14 @@ public class NodeContentSerializationComponent {
 		ZipInputStream zis = new ZipInputStream(inputStream);
 		final Map<Integer, ContentPropertyWrapper> wrappers = new HashMap<>();
 		
-		zis.getNextEntry();
+		ZipEntry jsonEntry = zis.getNextEntry();
+		if (jsonEntry == null) {
+			throw new IllegalStateException("Input stream is empty");
+		}
+		if (! JSON_ZIP_ENTRY_NAME.equals(jsonEntry.getName())) {
+			throw new IllegalStateException("Input stream don't start with a json entry but with " + jsonEntry.getName());
+		}
 		InputStream nonClosingZis = NonClosingStreamUtils.nonClosing(zis);
-		
 		
 		JavaType remoteCallPayloadType = objectMapper.getTypeFactory().constructSimpleType(RemoteCallPayload.class, 
 				new JavaType[] { valueType  });
