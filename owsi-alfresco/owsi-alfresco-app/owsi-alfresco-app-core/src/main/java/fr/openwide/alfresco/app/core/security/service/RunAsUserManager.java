@@ -19,6 +19,4 @@ public interface RunAsUserManager {
 
 	<T> T runAsUser(UserDetails user, Callable<T> work) throws Exception;
 
-	<T> T runAsSystem(Callable<T> work) throws Exception;
-
 }
