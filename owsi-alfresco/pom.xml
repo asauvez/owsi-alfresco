@@ -16,7 +16,7 @@
 	<description>Capitalisation des développements utilisés sur les projets Alfresco</description>
 
 	<properties>
-		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5</owsi-alfresco.jgitflow-maven-plugin.version>
+		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
 	</properties>
 
 	<modules>
