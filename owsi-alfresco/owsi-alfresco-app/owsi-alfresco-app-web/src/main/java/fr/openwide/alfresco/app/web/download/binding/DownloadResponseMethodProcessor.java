@@ -170,11 +170,8 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 
 				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 				RepositoryContentData data = node.getProperty(contentProperty, RepositoryContentData.class);
-				response.setContentType(data.getMimetype());
-				response.setCharacterEncoding(data.getEncoding());
-				response.setContentLength(data.getSize().intValue());
+				streamContentData(data, response, download, inputStream);
 				
-				streamInput(download, inputStream, response);
 				return null;
 			}
 		});
@@ -184,6 +181,14 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	/**
 	 * Method can be overriden (not static) to deal with specific input
 	 */
+	protected void streamContentData(RepositoryContentData data, HttpServletResponse response,
+			NodeReferenceDownloadResponse download, InputStream inputStream) throws IOException {
+		response.setContentType(data.getMimetype());
+		response.setCharacterEncoding(data.getEncoding());
+		response.setHeader("Content-Length", Long.toString(data.getSize()));
+		
+		streamInput(download, inputStream, response);
+	}
 	protected void streamInput(DownloadResponse download, InputStream input, HttpServletResponse response) throws IOException {
 		setContentDispositionHeader(download, response);
 		IOUtils.copy(input, response.getOutputStream());
