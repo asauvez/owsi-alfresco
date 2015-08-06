@@ -144,6 +144,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		setCookie(webRequest);
 		// set mimetype and length for the content
 		response.setContentType(download.getContentType());
+		// set content-length manually rather than using setContentLength to allow for size as long
 		response.setHeader("Content-Length", Long.toString(download.getContentLength()));
 		// output downloadable content
 		streamInput(download, download.getWrittableStream(), response);
@@ -185,10 +186,12 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			NodeReferenceDownloadResponse download, InputStream inputStream) throws IOException {
 		response.setContentType(data.getMimetype());
 		response.setCharacterEncoding(data.getEncoding());
+		// set content-length manually rather than using setContentLength to allow for size as long
 		response.setHeader("Content-Length", Long.toString(data.getSize()));
 		
 		streamInput(download, inputStream, response);
 	}
+
 	protected void streamInput(DownloadResponse download, InputStream input, HttpServletResponse response) throws IOException {
 		setContentDispositionHeader(download, response);
 		IOUtils.copy(input, response.getOutputStream());
