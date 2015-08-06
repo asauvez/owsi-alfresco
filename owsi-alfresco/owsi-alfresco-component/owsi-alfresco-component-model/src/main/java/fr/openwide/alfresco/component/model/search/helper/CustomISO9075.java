@@ -21,7 +21,7 @@ import java.util.Arrays;
  * @author asauvez
  * 
  */
-public class ISO9075_special
+public class CustomISO9075
 {
     /*
      * Mask for hex encoding

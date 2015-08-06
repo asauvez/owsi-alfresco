@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
-import fr.openwide.alfresco.component.model.search.helper.ISO9075_special;
+import fr.openwide.alfresco.component.model.search.helper.CustomISO9075;
 
 
 public class PathRestriction extends Restriction {
@@ -43,14 +43,14 @@ public class PathRestriction extends Restriction {
 	 * Ajoute un élement au chemin. L'élément est encodé en ISO 09075. 
 	 */
 	public PathRestriction append(String pathElement) {
-		path += "/" + ISO9075_special.encode(pathElement);
+		path += "/" + CustomISO9075.encode(pathElement);
 		return this;
 	}
 	/** 
 	 * Ajoute un élement au chemin Ajoute "/cm:". 
 	 */
 	public PathRestriction appendCm(String nodeName) {
-		path += "/cm:" + ISO9075_special.encode(nodeName);
+		path += "/cm:" + CustomISO9075.encode(nodeName);
 		return this;
 	}
 	
