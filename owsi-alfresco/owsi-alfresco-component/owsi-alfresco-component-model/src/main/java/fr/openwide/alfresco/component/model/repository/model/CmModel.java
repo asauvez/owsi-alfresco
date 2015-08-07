@@ -8,6 +8,8 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmGeographic;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmIndexControl;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
@@ -37,6 +39,10 @@ public interface CmModel {
 	
 	CmGeneralClassifiable generalClassifiable = new CmGeneralClassifiable();
 
+	CmGeographic geographic = new CmGeographic();
+	
+	CmIndexControl indexControl = new CmIndexControl();
+	
 	// ---- Types
 
 	CmObject object = new CmObject();

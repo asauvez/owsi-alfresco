@@ -1,17 +1,19 @@
 package fr.openwide.alfresco.component.model.node.model.property.single;
 
+import java.util.Date;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public class IntegerPropertyModel extends AbstractNumberPropertyModel<Integer> {
+public abstract class AbstractDatePropertyModel extends SinglePropertyModel<Date> {
 
-	public IntegerPropertyModel(ContainerModel type, NameReference nameReference) {
+	public AbstractDatePropertyModel(ContainerModel type, NameReference nameReference) {
 		super(type, nameReference);
 	}
 
 	@Override
-	public Class<Integer> getValueClass() {
-		return Integer.class;
+	public Class<Date> getValueClass() {
+		return Date.class;
 	}
 
 }

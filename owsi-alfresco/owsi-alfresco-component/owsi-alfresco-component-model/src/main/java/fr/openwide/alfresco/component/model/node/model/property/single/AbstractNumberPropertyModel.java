@@ -3,9 +3,9 @@ package fr.openwide.alfresco.component.model.node.model.property.single;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
-public class DateTimePropertyModel extends AbstractDatePropertyModel {
+public abstract class AbstractNumberPropertyModel<C extends Number> extends SinglePropertyModel<C> {
 
-	public DateTimePropertyModel(ContainerModel type, NameReference nameReference) {
+	public AbstractNumberPropertyModel(ContainerModel type, NameReference nameReference) {
 		super(type, nameReference);
 	}
 
