@@ -34,8 +34,7 @@ import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
-public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R>
-		implements NodeContentDeserializer<Void> {
+public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R> {
 
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
@@ -122,18 +121,19 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			}
 		});
 		
-		serializationComponent = new NodeContentSerializationComponent(objectMapper, serializersByClass, this);
+		NodeContentDeserializer<Void> defaultDeserializer = new NodeContentDeserializer<Void>() {
+			@Override
+			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
+				NodeContentHolder holder = (NodeContentHolder) node.getContents().get(contentProperty);
+				if (holder.getCallback() != null) {
+					holder.getCallback().doWithInputStream(inputStream);
+				}
+				return null;
+			}
+		};
+		serializationComponent = new NodeContentSerializationComponent(objectMapper, serializersByClass, defaultDeserializer);
 	}
 	
-	@Override
-	public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-		NodeContentHolder holder = (NodeContentHolder) node.getContents().get(contentProperty);
-		if (holder.getCallback() != null) {
-			holder.getCallback().doWithInputStream(inputStream);
-		}
-		return null;
-	}
-
 	public void setNodeService(NodeRemoteService nodeService) {
 		this.nodeService = nodeService;
 	}
