@@ -79,6 +79,9 @@ public class ClassificationBuilder {
 	public ClassificationBuilder subFolderProperty(SinglePropertyModel<?> property) {
 		return subFolder(new SubFolderBuilder(property));
 	}
+	public ClassificationBuilder subFolderProperty(SinglePropertyModel<?> property, BusinessNode folderNode) {
+		return subFolder(new SubFolderBuilder(property), folderNode);
+	}
 
 	public ClassificationBuilder subFolderYear() {
 		return subFolder(new SubFolderBuilder(CmModel.auditable.created)
