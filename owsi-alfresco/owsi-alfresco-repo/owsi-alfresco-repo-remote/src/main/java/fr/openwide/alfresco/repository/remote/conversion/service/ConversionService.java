@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repository.remote.conversion.service;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -25,4 +26,6 @@ public interface ConversionService {
 	Serializable getForApplication(Serializable value);
 	Serializable getForRepository(Serializable value);
 
+	Map<NameReference, Serializable> getForApplication(Map<QName, Serializable> properties);
+	Map<QName, Serializable> getForRepository(Map<NameReference, Serializable> properties);
 }

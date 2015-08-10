@@ -2,7 +2,10 @@ package fr.openwide.alfresco.repository.remote.conversion.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.MimetypeService;
@@ -111,6 +114,34 @@ public class ConversionServiceImpl implements ConversionService {
 		return value;
 	}
 
+	@Override
+	public Map<NameReference, Serializable> getForApplication(Map<QName, Serializable> properties) {
+		Map<NameReference, Serializable> map = new LinkedHashMap<>();
+		for (Entry<QName, Serializable> property : properties.entrySet()) {
+			Serializable value = property.getValue();
+			if (! (value instanceof ContentData)) {
+				map.put(
+					get(property.getKey()), 
+					getForApplication(value));
+			}
+		}
+		return map;
+	}
+	
+	@Override
+	public Map<QName, Serializable> getForRepository(Map<NameReference, Serializable> properties) {
+		Map<QName, Serializable> map = new LinkedHashMap<>();
+		for (Entry<NameReference, Serializable> property : properties.entrySet()) {
+			Serializable value = property.getValue();
+			if (! (value instanceof RepositoryContentData)) {
+				map.put(
+					getRequired(property.getKey()), 
+					getForRepository(value));
+			}
+		}
+		return map;
+	}
+	
 	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
 		this.namespacePrefixResolver = namespacePrefixResolver;
 	}
