@@ -499,7 +499,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 	}
 
-	protected void setContents(final NodeRef nodeRef, RepositoryNode node, Set<NameReference> contentProperties) {
+	private void setContents(final NodeRef nodeRef, RepositoryNode node, Set<NameReference> contentProperties) {
 		for (final NameReference contentProperty : contentProperties) {
 			final RepositoryContentData contentData = node.getProperty(contentProperty, RepositoryContentData.class);
 			
