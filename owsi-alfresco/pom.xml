@@ -75,6 +75,8 @@
 						<noDeploy>true</noDeploy>
 						<pullDevelop>true</pullDevelop>
 						<pullMaster>true</pullMaster>
+						<allowSnapshots>true</allowSnapshots>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
 					</configuration>
 				</plugin>
 			</plugins>
