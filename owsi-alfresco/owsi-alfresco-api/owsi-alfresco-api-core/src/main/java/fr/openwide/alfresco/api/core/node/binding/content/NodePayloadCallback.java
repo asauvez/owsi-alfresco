@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.api.core.node.binding.content;
 
 import java.util.Collection;
-import java.util.Map;
 
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
@@ -11,6 +10,6 @@ public interface NodePayloadCallback<P> {
 
 	Collection<RepositoryNode> extractNodes(P payload);
 
-	void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Map<Integer, ContentPropertyWrapper> wrappers);
+	void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers);
 
 }

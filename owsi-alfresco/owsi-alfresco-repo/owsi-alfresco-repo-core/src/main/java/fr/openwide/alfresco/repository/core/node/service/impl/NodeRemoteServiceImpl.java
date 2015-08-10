@@ -52,6 +52,7 @@ import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteExceptio
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.core.node.web.script.NodeContentCallback;
+import fr.openwide.alfresco.repository.core.node.web.script.NodeContentHolder;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
@@ -176,7 +177,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			if (reader != null) {
 				NodeContentDeserializer<?> deserializer = entry.getValue();
 				if (deserializer == null) {
-					// Appel depuis un WS
+					// Appel depuis un Web Script
 					node.getContents().put(contentProperty, reader);
 				} else {
 					// Appel depuis Alfresco
@@ -317,7 +318,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			for (NameReference aspectName : node.getAspects()) {
 				nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
 			}
-			setContents(nodeRef, node);
+			setContents(nodeRef, node, node.getContents().keySet());
 			setPermissions(nodeRef, node);
 			
 			for (Entry<NameReference, List<RepositoryNode>> entry : node.getChildAssociations().entrySet()) {
@@ -429,9 +430,13 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				}
 			}
 
-			setContents(nodeRef, node);
+			setContents(nodeRef, node, nodeScope.getContentDeserializers().keySet());
+			
 			if (nodeScope.isAccessPermissions()) {
 				setPermissions(nodeRef, node);
+			}
+			if (! nodeScope.getUserPermissions().isEmpty()) {
+				throw new IllegalStateException("You can't update the permissions of the current user on the node (userPermissions). To modify the node permissions for everyone, use accessPermissions");
 			}
 		} catch (DuplicateChildNodeNameException e) {
 			throw new DuplicateChildNodeNameRemoteException(cmName, e);
@@ -494,17 +499,16 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		}
 	}
 
-	protected void setContents(final NodeRef nodeRef, RepositoryNode node) {
-		for (Entry<NameReference, Object> entry : node.getContents().entrySet()) {
-			NameReference contentProperty = entry.getKey();
+	protected void setContents(final NodeRef nodeRef, RepositoryNode node, Set<NameReference> contentProperties) {
+		for (final NameReference contentProperty : contentProperties) {
 			final RepositoryContentData contentData = node.getProperty(contentProperty, RepositoryContentData.class);
 			
-			Object contentValue = entry.getValue();
-			if (contentValue instanceof NodeContentCallback) {
+			Object contentValue = node.getContents().get(contentProperty);
+			if (contentValue instanceof NodeContentHolder) {
 				// Appel depuis un Web Script
-				entry.setValue(new NodeContentCallback() {
+				((NodeContentHolder) contentValue).setContentCallback(new NodeContentCallback() {
 					@Override
-					public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
+					public void doWithInputStream(InputStream inputStream) {
 						if (nodeService.exists(nodeRef)) {
 							ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
 							writer.putContent(inputStream);
@@ -529,6 +533,9 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 					throw new IllegalStateException(e);
 				}
 				setContentData(nodeRef, contentProperty, contentData, writer);
+			} else {
+				ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
+				writer.putContent("");
 			}
 		}
 	}

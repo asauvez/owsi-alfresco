@@ -37,12 +37,6 @@ import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemot
 public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R>
 		implements NodeContentDeserializer<Void> {
 
-	private static NodeContentCallback NOOP_CONTENT_CALLBACK = new NodeContentCallback() {
-		@Override
-		public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
-		}
-	};
-	
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
 
@@ -74,16 +68,18 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 				return getInputNodes(payload);
 			}
 			@Override
-			public void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Map<Integer, ContentPropertyWrapper> wrappers) {
-				for (ContentPropertyWrapper wrapper : wrappers.values()) {
-					// va être surchargé par le service
-					wrapper.getNode().getContents().put(wrapper.getContentProperty(), NOOP_CONTENT_CALLBACK);
+			public void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers) {
+				for (ContentPropertyWrapper wrapper : wrappers) {
+					// va être renseigné par le service
+					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentHolder(wrapper));
 				}
+				// Vrai appel du Service
 				R result = execute(remoteCallPayload.getPayload());
 				resultRef.set(result);
 			}
 		};
 		
+		// L'appel du service se fait dans le callback
 		RemoteCallPayload<P> remoteCallPayload = serializationComponent.deserialize(
 				getParameterType(), payloadCallback, defaultDeserializationParameters,
 				request.getContent().getInputStream());
@@ -92,7 +88,6 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 		
 		// generate output
 		response.setContentType(NodeContentSerializationComponent.CONTENT_TYPE);
-		
 		final Collection<RepositoryNode> outputNodes = getOutputNodes(result);
 		RemoteCallParameters.execute(remoteCallPayload.getRemoteCallParameters(), new Callable<Void>() {
 			@Override
@@ -112,9 +107,6 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 		// noop : déjà traité plus haut
 	}
 
-	public void setNodeService(NodeRemoteService nodeService) {
-		this.nodeService = nodeService;
-	}
 	@Override
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		super.setObjectMapper(objectMapper);
@@ -135,9 +127,15 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	
 	@Override
 	public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-		NodeContentCallback callback = (NodeContentCallback) node.getContents().get(contentProperty);
-		callback.doWithInputStream(contentProperty, inputStream);
+		NodeContentHolder holder = (NodeContentHolder) node.getContents().get(contentProperty);
+		if (holder.getCallback() != null) {
+			holder.getCallback().doWithInputStream(inputStream);
+		}
 		return null;
+	}
+
+	public void setNodeService(NodeRemoteService nodeService) {
+		this.nodeService = nodeService;
 	}
 
 }
