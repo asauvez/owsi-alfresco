@@ -24,10 +24,12 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationPolicy;
+import fr.openwide.alfresco.repo.dictionary.classification.model.SubFolderBuilder;
 import fr.openwide.alfresco.repo.dictionary.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.dictionary.model.OwsiModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
@@ -83,28 +85,18 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return;
 		}
 		
-		NodeReference originalParentRef = node.assocs().primaryParent().getNodeReference();
 		ClassificationBuilder builder = new ClassificationBuilder(this, node);
 		policy.classify(builder, model, node, update);
-		NodeReference destinationFolder = builder.getDestinationFolder();
-		
-		if (destinationFolder != null && ! destinationFolder.equals(originalParentRef)) {
-			switch (builder.getMode()) {
-			case MOVE:
-				nodeModelService.moveNode(node.getNodeReference(), destinationFolder);
-				break;
-			case COPY:
-				nodeModelService.copy(node.getNodeReference(), destinationFolder);
-				break;
-			case LINK:
-				nodeModelService.addChild(destinationFolder, node.getNodeReference());
-				break;
-			case MOVE_AND_LINK_BACK:
-				nodeModelService.moveNode(node.getNodeReference(), destinationFolder);
-				nodeModelService.addChild(originalParentRef, node.getNodeReference());
-				break;
-			}
-		}
+	}
+	
+	public void moveNode(NodeReference node, NodeReference destinationFolder) {
+		nodeModelService.moveNode(node, destinationFolder);
+	}
+	public void copyNode(NodeReference node, NodeReference destinationFolder) {
+		nodeModelService.copy(node, destinationFolder);
+	}
+	public void createLink(NodeReference node, NodeReference destinationFolder) {
+		nodeModelService.addChild(node, destinationFolder);
 	}
 	
 	private NameReference getPolicy(NodeReference nodeReference) {
@@ -201,18 +193,23 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	
-//	private void toto() {
-//		addClassification(CmModel.content, new ClassificationPolicy<CmContent>() {
-//			@Override
-//			public void classify(ClassificationBuilder builder, CmContent model, BusinessNode node, boolean update) {
-//				builder
-//					.rootFolderIdentifier(NameReference.create("metier", "rootFolder"))
-//					.subFolder("toto")
-//					.subFolder(new SubFolderBuilder(model.auditable.creator))
-//					.subFolderYear()
-//					.subFolderMonth();
-//			}
-//		});
-//	}
+	private void toto() {
+		addClassification(CmModel.content, new ClassificationPolicy<CmContent>() {
+			@Override
+			public void classify(ClassificationBuilder builder, CmContent model, BusinessNode node, boolean update) {
+				builder
+					.rootFolderIdentifier(NameReference.create("metier", "archives"))
+					.createLink();
+				
+				builder
+					.rootFolderIdentifier(NameReference.create("metier", "rootFolder"))
+					.subFolder("toto")
+					.subFolder(new SubFolderBuilder(model.auditable.creator))
+					.subFolderYear()
+					.subFolderMonth()
+					.moveNode();
+			}
+		});
+	}
 	
 }
