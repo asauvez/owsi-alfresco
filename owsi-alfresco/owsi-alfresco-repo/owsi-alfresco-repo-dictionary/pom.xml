@@ -10,6 +10,10 @@
 
 	<name>OWSI Alfresco - Repository - Dictionary</name>
 
+	<properties>
+		<alfresco.module.name>owsi-alfresco-repo-dictionary</alfresco.module.name>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
@@ -19,6 +23,25 @@
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-repository</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/config</directory>
+				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+	
 </project>

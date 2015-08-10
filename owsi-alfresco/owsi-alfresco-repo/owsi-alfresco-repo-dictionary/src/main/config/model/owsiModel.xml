@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="owsi:owsiModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+	<!--
+		REMARQUE IMPORTANTE : Ce fichier sera à remplacer par celui issu du projet ONDE quand ce dernier
+		sera livré. 
+	 -->
+
+	<imports>
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+		<import uri="http://www.alfresco.org/model/bpm/1.0" prefix="bpm" />
+	</imports>
+
+	<namespaces>
+		<namespace uri="http://openwide.fr/modele/owsi" prefix="owsi" />
+	</namespaces>
+
+	<aspects>
+		<aspect name="owsi:classifiable">
+			<title>OWSI Classifiable</title>
+			<description>Ajouter à un noeud ou déclarer en mandatory-aspect, indique qu'il faut classer le document</description>
+		</aspect>
+
+		<aspect name="owsi:identifiable">
+			<title>OWSI Identifiable</title>
+			<properties>
+				<property name="owsi:identifier">
+					<type>d:qname</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>true</stored>
+						<tokenised>false</tokenised>
+					</index>
+				</property>
+			</properties>
+		</aspect>
+	</aspects>
+</model>
+
+
