@@ -12,6 +12,7 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -21,6 +22,11 @@ public interface NodeModelRepositoryService extends NodeModelService {
 
 	boolean exists(NodeReference nodeReference);
 	void moveNode(NodeReference nodeReference, NodeReference newParentRef);
+	void copy(NodeReference nodeReference, NodeReference newParentRef);
+
+	void addChild(NodeReference parentRef, NodeReference childRef);
+	void addChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType);
+	void addChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
 
 	NameReference getType(NodeReference nodeReference);
 	void setType(NodeReference nodeReference, NameReference type);
@@ -45,6 +51,8 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	<C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value);
 
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName);
+	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
+	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
 
 	void bindClassBehaviour(ContainerModel type, ClassPolicy policy, NotificationFrequency frequency);
 }

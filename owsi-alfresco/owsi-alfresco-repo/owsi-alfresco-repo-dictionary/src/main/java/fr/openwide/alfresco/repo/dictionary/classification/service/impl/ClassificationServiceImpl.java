@@ -20,15 +20,14 @@ import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationPolicy;
-import fr.openwide.alfresco.repo.dictionary.classification.model.SubFolderBuilder;
 import fr.openwide.alfresco.repo.dictionary.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.dictionary.model.OwsiModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
@@ -84,12 +83,27 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return;
 		}
 		
+		NodeReference originalParentRef = node.assocs().primaryParent().getNodeReference();
 		ClassificationBuilder builder = new ClassificationBuilder(this, node);
 		policy.classify(builder, model, node, update);
 		NodeReference destinationFolder = builder.getDestinationFolder();
 		
-		if (destinationFolder != null && ! destinationFolder.equals(node.assocs().primaryParent().getNodeReference())) {
-			nodeModelService.moveNode(node.getNodeReference(), destinationFolder);
+		if (destinationFolder != null && ! destinationFolder.equals(originalParentRef)) {
+			switch (builder.getMode()) {
+			case MOVE:
+				nodeModelService.moveNode(node.getNodeReference(), destinationFolder);
+				break;
+			case COPY:
+				nodeModelService.copy(node.getNodeReference(), destinationFolder);
+				break;
+			case LINK:
+				nodeModelService.addChild(destinationFolder, node.getNodeReference());
+				break;
+			case MOVE_AND_LINK_BACK:
+				nodeModelService.moveNode(node.getNodeReference(), destinationFolder);
+				nodeModelService.addChild(originalParentRef, node.getNodeReference());
+				break;
+			}
 		}
 	}
 	
@@ -121,8 +135,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	public NodeReference subFolder(final BusinessNode folderNode, NodeReference destinationFolder) {
+		ChildAssociationModel associationType = CmModel.folder.contains;
+		
 		String folderName = folderNode.properties().getName();
-		Optional<NodeReference> subFolderRef = nodeModelService.getChildByName(destinationFolder, folderName);
+		Optional<NodeReference> subFolderRef = nodeModelService.getChildByName(destinationFolder, folderName, associationType);
 		if (subFolderRef.isPresent()) {
 			return subFolderRef.get();
 		} else {
@@ -132,7 +148,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			if (folderNode.properties().getTitle() == null) {
 				folderNode.properties().title(folderName);
 			}
-			folderNode.assocs().primaryParent().nodeReference(destinationFolder);
+			folderNode.assocs().primaryParent(associationType).nodeReference(destinationFolder);
 			try {
 				// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
 				return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeReference>() {
@@ -143,7 +159,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				}, false, true);
 			} catch (DuplicateChildNodeNameException ex) {
 				// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-				return nodeModelService.getChildByName(destinationFolder, folderName).get();
+				return nodeModelService.getChildByName(destinationFolder, folderName, associationType).get();
 			}
 		}
 	} 
@@ -185,18 +201,18 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	
-	private void toto() {
-		addClassification(CmModel.content, new ClassificationPolicy<CmContent>() {
-			@Override
-			public void classify(ClassificationBuilder builder, CmContent model, BusinessNode node, boolean update) {
-				builder
-					.rootFolderIdentifier(NameReference.create("metier", "rootFolder"))
-					.subFolder("toto")
-					.subFolder(new SubFolderBuilder(model.auditable.creator))
-					.subFolderYear()
-					.subFolderMonth();
-			}
-		});
-	}
+//	private void toto() {
+//		addClassification(CmModel.content, new ClassificationPolicy<CmContent>() {
+//			@Override
+//			public void classify(ClassificationBuilder builder, CmContent model, BusinessNode node, boolean update) {
+//				builder
+//					.rootFolderIdentifier(NameReference.create("metier", "rootFolder"))
+//					.subFolder("toto")
+//					.subFolder(new SubFolderBuilder(model.auditable.creator))
+//					.subFolderYear()
+//					.subFolderMonth();
+//			}
+//		});
+//	}
 	
 }

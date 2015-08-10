@@ -6,6 +6,7 @@
 	<bean id="owsi.service.nodeModelService" class="fr.openwide.alfresco.repo.dictionary.node.service.impl.NodeModelRepositoryServiceImpl">
 		<constructor-arg ref="owsi.service.nodeService"/>
 		<property name="nodeService" ref="NodeService"/>
+		<property name="copyService" ref="CopyService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="policyComponent" ref="policyComponent" />
 	</bean>

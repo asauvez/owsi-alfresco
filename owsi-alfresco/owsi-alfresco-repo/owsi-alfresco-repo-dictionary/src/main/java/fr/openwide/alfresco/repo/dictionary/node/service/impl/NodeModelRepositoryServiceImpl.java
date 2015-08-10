@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -21,6 +21,7 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -34,6 +35,7 @@ public class NodeModelRepositoryServiceImpl
 	implements NodeModelRepositoryService {
 
 	private NodeService nodeService;
+	private CopyService copyService;
 	private PolicyComponent policyComponent;
 
 	private ConversionService conversionService;
@@ -56,6 +58,11 @@ public class NodeModelRepositoryServiceImpl
 				QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, nodeName.toLowerCase()));
 	}
 
+	@Override
+	public void copy(NodeReference nodeReference, NodeReference newParentRef) {
+		copyService.copy(conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(newParentRef));
+	}
 
 	@Override
 	public NameReference getType(NodeReference nodeReference) {
@@ -148,12 +155,38 @@ public class NodeModelRepositoryServiceImpl
 
 	@Override
 	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName) {
+		return getChildByName(nodeReference, childName, CmModel.folder.contains);
+	}
+	@Override
+	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType) {
+		return getChildByName(nodeReference, childName, associationType.getNameReference());
+	}
+
+	@Override
+	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType) {
 		NodeRef subNodeRef = nodeService.getChildByName(
 				conversionService.getRequired(nodeReference), 
-				ContentModel.ASSOC_CONTAINS, 
+				conversionService.getRequired(associationType), 
 				QName.createValidLocalName(childName));
 		NodeReference subnodeReference = (subNodeRef != null) ? conversionService.get(subNodeRef) : null;
 		return Optional.fromNullable(subnodeReference);
+	}
+	
+	@Override
+	public void addChild(NodeReference parentRef, NodeReference childRef) {
+		addChild(parentRef, childRef, CmModel.folder.contains);
+	}
+	@Override
+	public void addChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType) {
+		addChild(parentRef, childRef, assocType.getNameReference());
+	}
+	@Override
+	public void addChild(NodeReference parentRef, NodeReference childRef, NameReference assocType) {
+		String childName = getProperty(childRef, CmModel.object.name);
+		nodeService.addChild(conversionService.getRequired(parentRef), 
+				conversionService.getRequired(childRef), 
+				conversionService.getRequired(assocType), 
+				QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(childName.toLowerCase())));
 	}
 
 	@Override
@@ -171,6 +204,9 @@ public class NodeModelRepositoryServiceImpl
 
 	public void setNodeService(NodeService nodeService) {
 		this.nodeService = nodeService;
+	}
+	public void setCopyService(CopyService copyService) {
+		this.copyService = copyService;
 	}
 	public void setPolicyComponent(PolicyComponent policyComponent) {
 		this.policyComponent = policyComponent;

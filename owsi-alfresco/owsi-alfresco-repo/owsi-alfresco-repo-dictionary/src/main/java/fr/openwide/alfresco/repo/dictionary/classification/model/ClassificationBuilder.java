@@ -19,10 +19,17 @@ public class ClassificationBuilder {
 	private final BusinessNode node;
 	private NodeReference destinationFolder;
 
+	private ClassificationMode mode = ClassificationMode.MOVE;
+
 	public ClassificationBuilder(ClassificationServiceImpl service, BusinessNode node) {
 		this.service = service;
 		this.node = node;
 		this.destinationFolder = node.assocs().primaryParent().getNodeReference();
+	}
+	
+	public ClassificationBuilder mode(ClassificationMode mode) {
+		this.mode = mode;
+		return this;
 	}
 
 	public ClassificationBuilder rootFolder(NodeReference destinationFolder) {
@@ -88,6 +95,9 @@ public class ClassificationBuilder {
 	
 	public NodeReference getDestinationFolder() {
 		return destinationFolder;
+	}
+	public ClassificationMode getMode() {
+		return mode;
 	}
 	
 }
