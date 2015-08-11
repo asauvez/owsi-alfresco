@@ -26,7 +26,8 @@ import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayload
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+	private final Logger LOGGER = LoggerFactory.getLogger(NodeSearchRemoteServiceImpl.class);
+	private final Logger LOGGER_AUDIT = LoggerFactory.getLogger(NodeSearchRemoteServiceImpl.class.getName() + "_Audit");
 	
 	private NodeRemoteService nodeRemoteService;
 	private SearchService searchService;
@@ -38,6 +39,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
 		try {
+			long before = System.currentTimeMillis();
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Searching for query : {}", rsp.getQuery());
 			}
@@ -72,6 +74,12 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 				} catch (NoSuchNodeRemoteException e) {
 					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
 				}
+			}
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Returning {} result(s)", res.size());
+			}
+			if (LOGGER_AUDIT.isInfoEnabled()) {
+				LOGGER.info("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
 			}
 			return res;
 		} catch (FTSQueryException ex) {

@@ -40,6 +40,7 @@ import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 public class RepositoryRemoteBinding {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
+	private static final Logger LOGGER_AUDIT = LoggerFactory.getLogger(RepositoryRemoteBinding.class.getName() + "_audit");
 
 	private final RestTemplate restTemplate;
 	private final NodeContentSerializationComponent serializationComponent;
@@ -115,6 +116,7 @@ public class RepositoryRemoteBinding {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Executing {} method with uri: {}", method, getProtectedURI(uri));
 		}
+		long before = System.currentTimeMillis();
 		HttpMethod httpMethod = HttpMethod.valueOf(method.name());
 		try {
 			if (responseExtractor != null) {
@@ -135,6 +137,10 @@ public class RepositoryRemoteBinding {
 				LOGGER.debug("Unexpected exception on " + method + " method with uri: " + getProtectedURI(uri), e);
 			}
 			throw new IllegalStateException(e);
+		} finally {
+			if (LOGGER_AUDIT.isInfoEnabled()) {
+				LOGGER_AUDIT.info("{} : {} ms", getProtectedURI(uri), System.currentTimeMillis() - before);
+			}
 		}
 	}
 	
