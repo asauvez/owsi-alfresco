@@ -29,33 +29,29 @@ public class AppCoreRemoteBindingConfig {
 
 	@Bean
 	@Primary
-	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding( 
-			NodeContentSerializationComponent serializationComponent, RepositoryTicketProvider ticketProvider) {
+	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RepositoryTicketProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
-		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent, repositoryUri, ticketName, null, ticketProvider);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, ticketName, null, ticketProvider);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding( 
-			NodeContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding() {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
-		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent, repositoryUri);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding(
-			NodeContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding() {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
-		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent, repositoryUri, ticketName);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, ticketName);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding authenticationRemoteBinding(
-			NodeContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding authenticationRemoteBinding() {
 		String authenticationUri = environment.getRequiredProperty("application.authentication.repository.root.uri");
-		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent, authenticationUri);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), authenticationUri);
 	}
 
 	@Bean

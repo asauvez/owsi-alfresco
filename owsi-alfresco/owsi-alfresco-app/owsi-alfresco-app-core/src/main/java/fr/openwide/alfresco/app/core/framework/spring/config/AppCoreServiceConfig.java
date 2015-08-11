@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -22,25 +21,19 @@ import fr.openwide.alfresco.app.core.search.service.impl.NodeSearchServiceImpl;
 public class AppCoreServiceConfig {
 
 	@Autowired
-	@Qualifier("unauthenticatedRepositoryRemoteBinding")
-	private RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding;
-
-	@Autowired
-	@Qualifier("requiringExplicitTicketRemoteBinding")
-	private RepositoryRemoteBinding requiringExplicitTicketRemoteBinding;
-
-	@Autowired
-	@Qualifier("authenticationRemoteBinding")
-	private RepositoryRemoteBinding authenticationRemoteBinding;
-
+	private AppCoreRemoteBindingConfig appCoreRemoteBindingConfig;
+	
 	@Autowired
 	private Environment environment;
 
 	@Bean
 	public AuthenticationService authenticationService() {
 		String authenticationHeader = environment.getRequiredProperty("application.authentication.repository.header.name");
-		return new AuthenticationServiceImpl(unauthenticatedRepositoryRemoteBinding, requiringExplicitTicketRemoteBinding,
-				authenticationRemoteBinding, authenticationHeader);
+		return new AuthenticationServiceImpl(
+				appCoreRemoteBindingConfig.unauthenticatedRepositoryRemoteBinding(), 
+				appCoreRemoteBindingConfig.requiringExplicitTicketRemoteBinding(),
+				appCoreRemoteBindingConfig.authenticationRemoteBinding(), 
+				authenticationHeader);
 	}
 
 	@Bean

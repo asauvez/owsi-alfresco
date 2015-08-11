@@ -16,9 +16,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final String authenticationHeader;
 	private final NodeScope defaultUserNodeScope;
 	
-	public AuthenticationServiceImpl(RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding,
+	public AuthenticationServiceImpl(
+			RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding,
 			RepositoryRemoteBinding requiringExplicitTicketRemoteBinding,
-			RepositoryRemoteBinding authenticationRemoteBinding, String authenticationHeader) {
+			RepositoryRemoteBinding authenticationRemoteBinding, 
+			String authenticationHeader) {
 		this.unauthenticatedRepositoryRemoteBinding = unauthenticatedRepositoryRemoteBinding;
 		this.requiringExplicitTicketRemoteBinding = requiringExplicitTicketRemoteBinding;
 		this.authenticationRemoteBinding = authenticationRemoteBinding;
