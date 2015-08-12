@@ -1,10 +1,11 @@
 package fr.openwide.alfresco.repo.dictionary.node.service;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.ClassPolicy;
 
 import com.google.common.base.Optional;
 
@@ -15,7 +16,8 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
-import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 
 public interface NodeModelRepositoryService extends NodeModelService {
@@ -45,14 +47,16 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	void removeAspect(NodeReference nodeReference, AspectModel aspect);
 	
 	<C extends Serializable> C getProperty(NodeReference nodeReference, NameReference property);
-	<C extends Serializable> C getProperty(NodeReference nodeReference, PropertyModel<C> property);
+	<C extends Serializable> C getProperty(NodeReference nodeReference, SinglePropertyModel<C> property);
+	<C extends Serializable> List<C> getProperty(NodeReference nodeReference, MultiPropertyModel<C> property);
 	
-	<C extends Serializable> void setProperty(NodeReference nodeReference, PropertyModel<C> property, C value);
+	<C extends Serializable> void setProperty(NodeReference nodeReference, SinglePropertyModel<C> property, C value);
+	<C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value);
 	<C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value);
 
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
 
-	void bindClassBehaviour(ContainerModel type, ClassPolicy policy, NotificationFrequency frequency);
+	<T extends ClassPolicy> void bindClassBehaviour(ContainerModel type, NotificationFrequency frequency, Class<T> eventType, T policy);
 }

@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -11,7 +12,6 @@ import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
 import com.google.common.base.Optional;
@@ -24,10 +24,12 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
-import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class NodeModelRepositoryServiceImpl 
@@ -55,7 +57,7 @@ public class NodeModelRepositoryServiceImpl
 		nodeService.moveNode(conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(newParentRef), 
 				conversionService.getRequired(CmModel.folder.contains.getNameReference()), 
-				QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, nodeName.toLowerCase()));
+				NodeRemoteServiceImpl.createAssociationName(nodeName));
 	}
 
 	@Override
@@ -136,13 +138,22 @@ public class NodeModelRepositoryServiceImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(NodeReference nodeReference, PropertyModel<C> property) {
+	public <C extends Serializable> C getProperty(NodeReference nodeReference, SinglePropertyModel<C> property) {
 		return (C) getProperty(nodeReference, property.getNameReference());
+	}
+	@Override
+	@SuppressWarnings("unchecked")
+	public <C extends Serializable> List<C> getProperty(NodeReference nodeReference, MultiPropertyModel<C> property) {
+		return (List<C>) getProperty(nodeReference, property.getNameReference());
 	}
 
 	@Override
-	public <C extends Serializable> void setProperty(NodeReference nodeReference, PropertyModel<C> property, C value) {
+	public <C extends Serializable> void setProperty(NodeReference nodeReference, SinglePropertyModel<C> property, C value) {
 		setProperty(nodeReference, property.getNameReference(), value);
+	}
+	@Override
+	public <C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value) {
+		setProperty(nodeReference, property.getNameReference(), (Serializable) value);
 	}
 
 	@Override
@@ -186,13 +197,14 @@ public class NodeModelRepositoryServiceImpl
 		nodeService.addChild(conversionService.getRequired(parentRef), 
 				conversionService.getRequired(childRef), 
 				conversionService.getRequired(assocType), 
-				QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(childName.toLowerCase())));
+				NodeRemoteServiceImpl.createAssociationName(childName));
 	}
 
 	@Override
-	public void bindClassBehaviour(ContainerModel type, ClassPolicy policy, NotificationFrequency frequency) {
+	public <T extends ClassPolicy> void bindClassBehaviour(ContainerModel type, NotificationFrequency frequency,
+			Class<T> eventType, T policy) {
 		try {
-			QName policyQName = (QName) policy.getClass().getField("QNAME").get(null);
+			QName policyQName = (QName) eventType.getField("QNAME").get(null);
 			policyComponent.bindClassBehaviour(policyQName, 
 					conversionService.getRequired(type.getNameReference()), 
 					new JavaBehaviour(policy, policyQName.getLocalName(), frequency));
