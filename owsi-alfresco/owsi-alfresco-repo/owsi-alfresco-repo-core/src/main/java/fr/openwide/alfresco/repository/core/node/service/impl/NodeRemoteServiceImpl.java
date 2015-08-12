@@ -285,6 +285,10 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return nodesReferences;
 	}
 	
+	public static QName createAssociationName(String nodeName) {
+		return QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(nodeName));
+	}
+	
 	protected NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
 		validateCreate(node);
 		
@@ -302,7 +306,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		try {
 			NodeRef parentRef = conversionService.getRequired(primaryParent.getParentNode().getNodeReference());
 			QName assocType = conversionService.getRequired(primaryParent.getType());
-			QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(cmName.toLowerCase()));
+			QName assocName = createAssociationName(cmName);
 			QName type = conversionService.getRequired(node.getType());
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Creating node type {} in {}/{}/{}", type, parentRef, assocType, assocName);
@@ -379,7 +383,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				RepositoryChildAssociation repoPrimaryParent = node.getPrimaryParentAssociation();
 				NodeRef parentRef = conversionService.getRequired(repoPrimaryParent.getParentNode().getNodeReference());
 				QName assocType = conversionService.getRequired(repoPrimaryParent.getType());
-				QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase());
+				QName assocName = createAssociationName(cmName);
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Moving node {} to {}/{}/{}", nodeRef, parentRef, assocType, assocName);
 				}
