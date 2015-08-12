@@ -12,7 +12,7 @@
 	</imports>
 
 	<namespaces>
-		<namespace uri="http://openwide.fr/modele/owsi" prefix="owsi" />
+		<namespace uri="http://openwide.fr/model/owsi" prefix="owsi" />
 	</namespaces>
 
 	<aspects>
