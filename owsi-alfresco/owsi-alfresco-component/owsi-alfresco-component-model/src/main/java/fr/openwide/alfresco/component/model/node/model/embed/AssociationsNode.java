@@ -37,11 +37,12 @@ public class AssociationsNode {
 		return primaryParent(CmModel.folder.contains);
 	}
 	public BusinessNode primaryParent(ChildAssociationModel childAssociationModel) {
-		BusinessNode primaryParent = new BusinessNode();
-		repoNode.setPrimaryParentAssociation(new RepositoryChildAssociation(
-				primaryParent.getRepositoryNode(), 
-				childAssociationModel.getNameReference()));
-		return primaryParent;
+		if (repoNode.getPrimaryParentAssociation() == null) {
+			repoNode.setPrimaryParentAssociation(new RepositoryChildAssociation(
+					new RepositoryNode(), 
+					childAssociationModel.getNameReference()));
+		}
+		return new BusinessNode(repoNode.getPrimaryParentAssociation().getParentNode());
 	}
 	public boolean isPrimaryParentAssociation(ChildAssociationModel childAssociationModel) {
 		return childAssociationModel.getNameReference().equals(repoNode.getPrimaryParentAssociation().getType());
