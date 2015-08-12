@@ -17,12 +17,14 @@ public class ClassificationBuilder {
 
 	private final ClassificationServiceImpl service;
 	private final BusinessNode node;
+	private final NodeReference originalParentFolder;
 	private NodeReference destinationFolder;
 
 	public ClassificationBuilder(ClassificationServiceImpl service, BusinessNode node) {
 		this.service = service;
 		this.node = node;
-		this.destinationFolder = node.assocs().primaryParent().getNodeReference();
+		this.originalParentFolder = node.assocs().primaryParent().getNodeReference();
+		this.destinationFolder = originalParentFolder;
 	}
 	
 	public ClassificationBuilder rootFolder(NodeReference destinationFolder) {
@@ -94,11 +96,15 @@ public class ClassificationBuilder {
 	}
 	
 	public ClassificationBuilder moveNode() {
-		service.moveNode(node.getNodeReference(), destinationFolder);
+		if (! originalParentFolder.equals(destinationFolder)) {
+			service.moveNode(node.getNodeReference(), destinationFolder);
+		}
 		return this;
 	}
 	public ClassificationBuilder copyNode() {
-		service.copyNode(node.getNodeReference(), destinationFolder);
+		if (! originalParentFolder.equals(destinationFolder)) {
+			service.copyNode(node.getNodeReference(), destinationFolder);
+		}
 		return this;
 	}
 	public ClassificationBuilder createLink() {

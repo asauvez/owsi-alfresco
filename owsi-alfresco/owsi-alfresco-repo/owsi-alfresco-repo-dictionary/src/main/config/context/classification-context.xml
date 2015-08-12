@@ -9,6 +9,7 @@
 		<property name="nodeSearchModelService" ref="owsi.service.nodeSearchModelService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="transactionService" ref="transactionService" />
+		<property name="dictionaryService" ref="DictionaryService" />
 	</bean>
 
 </beans>

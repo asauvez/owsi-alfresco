@@ -5,13 +5,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.alfresco.repo.node.NodeServicePolicies;
+import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.google.common.base.Optional;
@@ -24,108 +29,158 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationPolicy;
-import fr.openwide.alfresco.repo.dictionary.classification.model.SubFolderBuilder;
 import fr.openwide.alfresco.repo.dictionary.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.dictionary.model.OwsiModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
-public class ClassificationServiceImpl implements ClassificationService, InitializingBean {
+public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
+		OnAddAspectPolicy, OnUpdatePropertiesPolicy {
+	
+	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
 	private NodeModelRepositoryService nodeModelService;
 	private NodeSearchModelService nodeSearchModelService;
+	
 	private ConversionService conversionService;
 	private TransactionService transactionService;
+	private DictionaryService dictionaryService; 
 
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
-	
+
 	private Map<String, NodeReference> queryCache = new ConcurrentHashMap<>();
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, new NodeServicePolicies.OnAddAspectPolicy() {
-			@Override
-			public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
-				fileDocument(nodeRef, true);
-			}
-		}, NotificationFrequency.EVERY_EVENT);
-		
-		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, new NodeServicePolicies.OnUpdatePropertiesPolicy() {
-			@Override
-			public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
-				fileDocument(nodeRef, true);
-			}
-		}, NotificationFrequency.EVERY_EVENT);
-	}
-	
-	@Override
 	public <T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Add classification for {}.", model.getNameReference());
+		}
 		ClassificationPolicy<?> old = policies.put(model.getNameReference(), policy);
 		if (old != null) {
 			throw new IllegalStateException("There is at least two policies for " + model.getNameReference());
 		}
 		models.put(model.getNameReference(), model);
 	}
-	
-	private void fileDocument(NodeRef nodeRef, boolean update) {
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, OnAddAspectPolicy.class, this);
+		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, OnUpdatePropertiesPolicy.class, this);
+	}
+
+	@Override
+	public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
+		classify(nodeRef, false);
+	}
+	@Override
+	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
+		// Appeler à la création. Sera gérer par onAddAspect()
+		if (! before.isEmpty()) {
+			classify(nodeRef, true);
+		}
+	}
+
+	private void classify(NodeRef nodeRef, boolean update) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		NameReference type = getPolicy(nodeReference);
+		if (type == null) {
+			throw new IllegalStateException("Can't find a policy to classify " + type);
+		}
+
 		@SuppressWarnings("unchecked")
 		ClassificationPolicy<ContainerModel> policy = (ClassificationPolicy<ContainerModel>) policies.get(type);
 		ContainerModel model = models.get(type);
 		
-		BusinessNode node = getNode(nodeRef, model);
-		if (node == null) {
-			return;
+		if (logger.isDebugEnabled()) {
+			logger.debug("Begin classification of node {} with policy for {}.", nodeReference, model.getNameReference());
 		}
 		
+		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
+				.nodeReference()
+				.properties().set(CmModel.object)
+				.properties().set(model);
+		nodeScopeBuilder.assocs().primaryParent().nodeReference();
+		
+		policy.initNodeScopeBuilder(nodeScopeBuilder);
+			
+		BusinessNode node;
+		try {
+			node = nodeModelService.get(nodeReference, nodeScopeBuilder);
+		} catch (NoSuchNodeRemoteException ex) {
+			logger.warn("Node {} no longer exists. Ignoring.", nodeReference);
+			return;
+		}
+
 		ClassificationBuilder builder = new ClassificationBuilder(this, node);
-		policy.classify(builder, model, node, update);
+		try {
+			policy.classify(builder, model, node, update);
+		} catch (RuntimeException ex) {
+			logger.error("Error during classify of " + nodeReference + " of type " + type, ex);
+			throw ex;
+		}
 	}
 	
+	private String getPath(NodeReference nodeReference) {
+		return nodeModelService.get(nodeReference, new NodeScopeBuilder().path()).getPath();
+	}
+
 	public void moveNode(NodeReference node, NodeReference destinationFolder) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Move node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
+		}
 		nodeModelService.moveNode(node, destinationFolder);
 	}
 	public void copyNode(NodeReference node, NodeReference destinationFolder) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Copy node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
+		}
 		nodeModelService.copy(node, destinationFolder);
 	}
 	public void createLink(NodeReference node, NodeReference destinationFolder) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Add link from node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
+		}
 		nodeModelService.addChild(node, destinationFolder);
 	}
-	
+
 	private NameReference getPolicy(NodeReference nodeReference) {
+		NameReference result = null;
+
 		NameReference type = nodeModelService.getType(nodeReference);
-		ClassificationPolicy<?> policy = policies.get(type);
-		if (policy != null) {
-			return type;
+		QName typeQName = conversionService.getRequired(type);
+		
+		// Cherche parmi les super types
+		ClassDefinition superType = dictionaryService.getType(typeQName);
+		while (superType != null) {
+			ClassificationPolicy<?> policy = policies.get(conversionService.get(superType.getName()));
+			if (policy != null) {
+				result = setResult(nodeReference, result, conversionService.get(superType.getName()));
+			}
+			superType = superType.getParentClassDefinition();
 		}
+		
+		// Cherche parmi les aspects
 		for (NameReference aspect : policies.keySet()) {
 			if (nodeModelService.hasAspect(nodeReference, aspect)) {
-				return aspect;
+				result = setResult(nodeReference, result, aspect);
 			}
 		}
-		throw new IllegalStateException("Can't find a policy to classify " + type);
+		return result;
 	}
 	
-	private BusinessNode getNode(NodeRef nodeRef, ContainerModel model) {
-		try {
-			NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
-					.nodeReference()
-					.properties().set(CmModel.object)
-					.properties().set(model);
-			nodeScopeBuilder.assocs().primaryParent().nodeReference();
-			return nodeModelService.get(conversionService.get(nodeRef), nodeScopeBuilder);
-		} catch (NoSuchNodeRemoteException ex) {
-			return null;
+	private NameReference setResult(NodeReference nodeReference, NameReference previousResult, NameReference newResult) {
+		if (previousResult != null) {
+			logger.warn("Ambigious classification policies: Node {} match for {} and {}. Using first one.", nodeReference, previousResult, newResult);
+			return previousResult;
 		}
+		return newResult;
 	}
-	
+
 	public NodeReference subFolder(final BusinessNode folderNode, NodeReference destinationFolder) {
 		ChildAssociationModel associationType = CmModel.folder.contains;
 		
@@ -178,7 +233,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return Optional.of(nodeReference);
 		}
 	}
-	
+
 	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
 		this.nodeModelService = nodeModelService; 
 	}
@@ -191,25 +246,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setTransactionService(TransactionService transactionService) {
 		this.transactionService = transactionService;
 	}
-	
-	
-	private void toto() {
-		addClassification(CmModel.content, new ClassificationPolicy<CmContent>() {
-			@Override
-			public void classify(ClassificationBuilder builder, CmContent model, BusinessNode node, boolean update) {
-				builder
-					.rootFolderIdentifier(NameReference.create("metier", "archives"))
-					.createLink();
-				
-				builder
-					.rootFolderIdentifier(NameReference.create("metier", "rootFolder"))
-					.subFolder("toto")
-					.subFolder(new SubFolderBuilder(model.auditable.creator))
-					.subFolderYear()
-					.subFolderMonth()
-					.moveNode();
-			}
-		});
+	public void setDictionaryService(DictionaryService dictionaryService) {
+		this.dictionaryService = dictionaryService;
 	}
-	
+
 }
