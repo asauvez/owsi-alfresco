@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.node.model.property;
 
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiBooleanPropertyModel;
@@ -17,6 +18,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.ContentPr
 import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DoublePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.FloatPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.IntegerPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.LocalePropertyModel;
@@ -24,7 +26,6 @@ import fr.openwide.alfresco.component.model.node.model.property.single.LongPrope
 import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public final class PropertyModels {
 
@@ -40,6 +41,10 @@ public final class PropertyModels {
 	}
 	public static MultiTextPropertyModel newMultiText(ContainerModel type, String namespace, String name) {
 		return new MultiTextPropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static <E extends Enum<E>> EnumTextPropertyModel<E> newTextEnum(ContainerModel type, String namespace, String name, 
+			Class<E> enumClass, PropertyConstraint ... constraints) {
+		return addConstraints(new EnumTextPropertyModel<E>(type, NameReference.create(namespace, name), enumClass), constraints);
 	}
 
 	public static DatePropertyModel newDate(ContainerModel type, String namespace, String name) {
