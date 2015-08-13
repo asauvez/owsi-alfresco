@@ -7,15 +7,20 @@ import org.springframework.security.core.userdetails.User;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 
 public class NamedUser extends User implements RepositoryUserProvider {
 
 	private static final long serialVersionUID = 336652943037329710L;
 
+	private RepositoryAuthenticationUserDetailsService userDetailsService;
 	private RepositoryUser repositoryUser;
 
-	public NamedUser(RepositoryUser repositoryUser, String password, Collection<? extends GrantedAuthority> authorities) {
+	public NamedUser(RepositoryAuthenticationUserDetailsService userDetailsService,
+			RepositoryUser repositoryUser, String password, 
+			Collection<? extends GrantedAuthority> authorities) {
 		super(repositoryUser.getUserReference().getUsername(), password != null ? password : "N/A", authorities);
+		this.userDetailsService = userDetailsService;
 		this.repositoryUser = repositoryUser;
 	}
 
@@ -44,4 +49,7 @@ public class NamedUser extends User implements RepositoryUserProvider {
 		return sb.toString();
 	}
 
+	public void renewsTicket() {
+		userDetailsService.renewsTicket(repositoryUser);
+	}
 }

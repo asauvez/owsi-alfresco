@@ -9,4 +9,6 @@ public interface RepositoryTicketProvider {
 
 	RepositoryUser getTicketOwner();
 
+	void renewsTicket();
+
 }

@@ -44,4 +44,8 @@ public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserSe
 		return getCurrentUser().getRepositoryUser();
 	}
 
+	@Override
+	public void renewsTicket() {
+		getCurrentUser().renewsTicket();
+	}
 }
