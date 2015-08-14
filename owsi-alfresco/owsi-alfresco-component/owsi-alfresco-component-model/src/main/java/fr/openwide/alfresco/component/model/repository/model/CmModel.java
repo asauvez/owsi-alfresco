@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
+import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
@@ -19,7 +20,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
 
 public interface CmModel {
 
-	String NAMESPACE = "cm";
+	NamespaceReference NAMESPACE = NamespaceReference.create("cm", "http://www.alfresco.org/model/content/1.0");
 
 	// ---- Aspects
 

@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
+import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.repository.model.rn.CmThumbnail;
 import fr.openwide.alfresco.component.model.repository.model.rn.RnHiddenRendition;
 import fr.openwide.alfresco.component.model.repository.model.rn.RnPreventRenditions;
@@ -9,7 +10,7 @@ import fr.openwide.alfresco.component.model.repository.model.rn.RnVisibleRenditi
 
 public interface RnModel {
 
-	String NAMESPACE = "rn";
+	NamespaceReference NAMESPACE = NamespaceReference.create("rn", "rn://www.alfresco.org/model/rendition/1.0");
 
 	// ---- Aspects
 

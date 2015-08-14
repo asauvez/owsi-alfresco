@@ -7,9 +7,11 @@ import org.apache.commons.lang3.time.FastDateFormat;
 
 import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
 
 public abstract class Restriction {
 
@@ -57,6 +59,8 @@ public abstract class Restriction {
 			return dateFormat.format((Date) value);
 		} else if (value instanceof Number) {
 			return value.toString();
+		} else if (propertyModel instanceof NameReferencePropertyModel && value instanceof NameReference) {
+			return "\"" + ((NameReference) value).getFullyQualified().replace("\"", "\\\"") + "\"";
 		} else {
 			return "\"" + value.toString().replace("\"", "\\\"") + "\"";
 		}

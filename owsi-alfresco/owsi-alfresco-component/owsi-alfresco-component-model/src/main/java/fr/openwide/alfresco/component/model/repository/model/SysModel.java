@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
+import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysArchived;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysBase;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysLocalized;
@@ -9,7 +10,7 @@ import fr.openwide.alfresco.component.model.repository.model.sys.SysTemporary;
 public interface SysModel {
 
 	// https://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/model/systemModel.xml
-	String NAMESPACE = "sys";
+	NamespaceReference NAMESPACE = NamespaceReference.create("sys", "http://www.alfresco.org/model/system/1.0");
 
 	// ---- Aspects
 
