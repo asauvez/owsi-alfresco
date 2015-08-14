@@ -6,10 +6,12 @@
 	<bean id="owsi.service.classificationService" class="fr.openwide.alfresco.repo.dictionary.classification.service.impl.ClassificationServiceImpl"
 			depends-on="owsi.dictionaryBootstrap">
 		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
+		<property name="nodeRepositoryService" ref="owsi.service.nodeService"/>
 		<property name="nodeSearchModelService" ref="owsi.service.nodeSearchModelService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="transactionService" ref="transactionService" />
 		<property name="dictionaryService" ref="DictionaryService" />
+		<property name="personService" ref="PersonService" />
 	</bean>
 
 </beans>

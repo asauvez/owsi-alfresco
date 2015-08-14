@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.classification.model;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
@@ -51,6 +53,14 @@ public class ClassificationBuilder {
 	public ClassificationBuilder rootFolderIdentifier(NameReference identifier) {
 		return rootFolder(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of(), true);
+	}
+	public ClassificationBuilder rootHomeFolder() {
+		NodeReference homeFolder = service.getHomeFolder();
+		if (homeFolder == null) {
+			throw new IllegalStateException("User " + AuthenticationUtil.getRunAsUser() + " does not have a home folder.");
+		}
+		rootFolder(homeFolder);
+		return this;
 	}
 	
 	public ClassificationBuilder subFolder(String folderName) {

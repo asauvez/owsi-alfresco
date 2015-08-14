@@ -8,11 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.slf4j.Logger;
@@ -22,6 +26,8 @@ import org.springframework.beans.factory.InitializingBean;
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -36,19 +42,23 @@ import fr.openwide.alfresco.repo.dictionary.classification.model.ClassificationP
 import fr.openwide.alfresco.repo.dictionary.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.dictionary.model.OwsiModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repository.core.node.model.PreNodeCreationCallback;
+import fr.openwide.alfresco.repository.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
-		OnAddAspectPolicy, OnUpdatePropertiesPolicy {
+		OnAddAspectPolicy, OnUpdatePropertiesPolicy, PreNodeCreationCallback {
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
 	private NodeModelRepositoryService nodeModelService;
+	private NodeRepositoryService nodeRepositoryService;
 	private NodeSearchModelService nodeSearchModelService;
 	
 	private ConversionService conversionService;
 	private TransactionService transactionService;
-	private DictionaryService dictionaryService; 
+	private DictionaryService dictionaryService;
+	private PersonService personService;
 
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
@@ -71,6 +81,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void afterPropertiesSet() throws Exception {
 		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, OnAddAspectPolicy.class, this);
 		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, OnUpdatePropertiesPolicy.class, this);
+		
+		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
 
 	@Override
@@ -84,7 +96,43 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			classify(nodeRef, true);
 		}
 	}
+	@Override
+	public void onPreNodeCreationCallback(RepositoryNode node) {
+		if (node.getPrimaryParentAssociation() == null) {
+			TypeDefinition type = dictionaryService.getType(conversionService.getRequired(node.getType()));
+			boolean isclassifiable = node.getAspects().contains(OwsiModel.classifiable);
+			QName classifiable = conversionService.getRequired(OwsiModel.classifiable.getNameReference());
+			if (! isclassifiable) {
+				for (AspectDefinition aspect : type.getDefaultAspects(true)) {
+					if (classifiable.equals(aspect.getName())) {
+						isclassifiable = true;
+						break;
+					}
+				}
+			}
+			if (isclassifiable) {
+				NodeReference homeFolder = getHomeFolder();
+				if (homeFolder != null) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Node without parent is assigned to current user {} home folder. "
+								+ "Will then be moved then to the classify folder.", AuthenticationUtil.getRunAsUser());
+					}
+					node.setPrimaryParentAssociation(new RepositoryChildAssociation(
+							new RepositoryNode(homeFolder), 
+							CmModel.folder.contains.getNameReference()));
+				} else {
+					logger.error("Node without parent has aspect {}, but user {} does not have a home folder.", 
+							OwsiModel.classifiable, AuthenticationUtil.getRunAsUser());
+				}
+			}
+		}
+	}
 
+	public NodeReference getHomeFolder() {
+		NodeRef person = personService.getPerson(AuthenticationUtil.getRunAsUser());
+		return nodeModelService.getProperty(conversionService.get(person), CmModel.person.homeFolder);
+	}
+	
 	private void classify(NodeRef nodeRef, boolean update) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		NameReference type = getPolicy(nodeReference);
@@ -237,6 +285,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
 		this.nodeModelService = nodeModelService; 
 	}
+	public void setNodeRepositoryService(NodeRepositoryService nodeRepositoryService) {
+		this.nodeRepositoryService = nodeRepositoryService;
+	}
 	public void setNodeSearchModelService(NodeSearchModelService nodeSearchModelService) {
 		this.nodeSearchModelService = nodeSearchModelService;
 	}
@@ -248,6 +299,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public void setDictionaryService(DictionaryService dictionaryService) {
 		this.dictionaryService = dictionaryService;
+	}
+	public void setPersonService(PersonService personService) {
+		this.personService = personService;
 	}
 
 }
