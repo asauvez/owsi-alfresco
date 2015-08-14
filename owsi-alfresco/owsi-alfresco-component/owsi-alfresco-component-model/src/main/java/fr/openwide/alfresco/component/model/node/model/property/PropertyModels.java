@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model.property;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiBooleanPropertyModel;
@@ -36,82 +37,82 @@ public final class PropertyModels {
 		return propertyModel;
 	}
 	
-	public static TextPropertyModel newText(ContainerModel type, String namespace, String name, PropertyConstraint ... constraints) {
+	public static TextPropertyModel newText(ContainerModel type, NamespaceReference namespace, String name, PropertyConstraint ... constraints) {
 		return addConstraints(new TextPropertyModel(type, NameReference.create(namespace, name)), constraints);
 	}
-	public static MultiTextPropertyModel newMultiText(ContainerModel type, String namespace, String name) {
+	public static MultiTextPropertyModel newMultiText(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiTextPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static <E extends Enum<E>> EnumTextPropertyModel<E> newTextEnum(ContainerModel type, String namespace, String name, 
+	public static <E extends Enum<E>> EnumTextPropertyModel<E> newTextEnum(ContainerModel type, NamespaceReference namespace, String name, 
 			Class<E> enumClass, PropertyConstraint ... constraints) {
 		return addConstraints(new EnumTextPropertyModel<E>(type, NameReference.create(namespace, name), enumClass), constraints);
 	}
 
-	public static DatePropertyModel newDate(ContainerModel type, String namespace, String name) {
+	public static DatePropertyModel newDate(ContainerModel type, NamespaceReference namespace, String name) {
 		return new DatePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiDatePropertyModel newMultiDate(ContainerModel type, String namespace, String name) {
+	public static MultiDatePropertyModel newMultiDate(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiDatePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static DateTimePropertyModel newDateTime(ContainerModel type, String namespace, String name, PropertyConstraint ... constraints) {
+	public static DateTimePropertyModel newDateTime(ContainerModel type, NamespaceReference namespace, String name, PropertyConstraint ... constraints) {
 		return addConstraints(new DateTimePropertyModel(type, NameReference.create(namespace, name)), constraints);
 	}
-	public static MultiDateTimePropertyModel newMultiDateTime(ContainerModel type, String namespace, String name) {
+	public static MultiDateTimePropertyModel newMultiDateTime(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiDateTimePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static LocalePropertyModel newLocale(ContainerModel type, String namespace, String name) {
+	public static LocalePropertyModel newLocale(ContainerModel type, NamespaceReference namespace, String name) {
 		return new LocalePropertyModel(type, NameReference.create(namespace, name));
 	}
 
-	public static IntegerPropertyModel newInteger(ContainerModel type, String namespace, String name) {
+	public static IntegerPropertyModel newInteger(ContainerModel type, NamespaceReference namespace, String name) {
 		return new IntegerPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiIntegerPropertyModel newMultiInteger(ContainerModel type, String namespace, String name) {
+	public static MultiIntegerPropertyModel newMultiInteger(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiIntegerPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static LongPropertyModel newLong(ContainerModel type, String namespace, String name) {
+	public static LongPropertyModel newLong(ContainerModel type, NamespaceReference namespace, String name) {
 		return new LongPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static LongPropertyModel newLong(ContainerModel type, String namespace, String name, PropertyConstraint ... constraints) {
+	public static LongPropertyModel newLong(ContainerModel type, NamespaceReference namespace, String name, PropertyConstraint ... constraints) {
 		return addConstraints(new LongPropertyModel(type, NameReference.create(namespace, name)), constraints);
 	}
-	public static MultiLongPropertyModel newMultiLong(ContainerModel type, String namespace, String name) {
+	public static MultiLongPropertyModel newMultiLong(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiLongPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static FloatPropertyModel newFloat(ContainerModel type, String namespace, String name) {
+	public static FloatPropertyModel newFloat(ContainerModel type, NamespaceReference namespace, String name) {
 		return new FloatPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiFloatPropertyModel newMultiFloat(ContainerModel type, String namespace, String name) {
+	public static MultiFloatPropertyModel newMultiFloat(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiFloatPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static DoublePropertyModel newDouble(ContainerModel type, String namespace, String name) {
+	public static DoublePropertyModel newDouble(ContainerModel type, NamespaceReference namespace, String name) {
 		return new DoublePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiDoublePropertyModel newMultiDouble(ContainerModel type, String namespace, String name) {
+	public static MultiDoublePropertyModel newMultiDouble(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiDoublePropertyModel(type, NameReference.create(namespace, name));
 	}
 
-	public static BooleanPropertyModel newBoolean(ContainerModel type, String namespace, String name) {
+	public static BooleanPropertyModel newBoolean(ContainerModel type, NamespaceReference namespace, String name) {
 		return new BooleanPropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiBooleanPropertyModel newMultiBoolean(ContainerModel type, String namespace, String name) {
+	public static MultiBooleanPropertyModel newMultiBoolean(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiBooleanPropertyModel(type, NameReference.create(namespace, name));
 	}
 
-	public static ContentPropertyModel newContent(ContainerModel type, String namespace, String name) {
+	public static ContentPropertyModel newContent(ContainerModel type, NamespaceReference namespace, String name) {
 		return new ContentPropertyModel(type, NameReference.create(namespace, name));
 	}
 
-	public static NodeReferencePropertyModel newNodeReference(ContainerModel type, String namespace, String name) {
+	public static NodeReferencePropertyModel newNodeReference(ContainerModel type, NamespaceReference namespace, String name) {
 		return new NodeReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiNodeReferencePropertyModel newMultiNodeReference(ContainerModel type, String namespace, String name) {
+	public static MultiNodeReferencePropertyModel newMultiNodeReference(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiNodeReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static NameReferencePropertyModel newNameReference(ContainerModel type, String namespace, String name) {
+	public static NameReferencePropertyModel newNameReference(ContainerModel type, NamespaceReference namespace, String name) {
 		return new NameReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
-	public static MultiNameReferencePropertyModel newMultiNameReference(ContainerModel type, String namespace, String name) {
+	public static MultiNameReferencePropertyModel newMultiNameReference(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiNameReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
 

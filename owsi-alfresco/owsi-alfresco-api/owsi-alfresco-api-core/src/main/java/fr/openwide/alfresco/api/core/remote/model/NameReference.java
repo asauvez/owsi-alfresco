@@ -31,6 +31,9 @@ public class NameReference implements Serializable {
 		this.name = name;
 	}
 
+	public static NameReference create(NamespaceReference namespace, String name) {
+		return create(namespace.getPrefix(), name);
+	}
 	public static NameReference create(String namespace, String name) {
 		return new NameReference(namespace, name);
 	}
@@ -49,6 +52,10 @@ public class NameReference implements Serializable {
 	@JsonValue
 	public String getFullName() {
 		return fullName; 
+	}
+	public String getFullyQualified() {
+		String uri = NamespaceReference.getUriByPrefix(getNamespace());
+		return "{" + uri + "}" + getName();
 	}
 
 	@Override
