@@ -97,7 +97,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 		}
 
 		// Build user
-		return new NamedUser(this, repositoryUser, credentials, 
+		return new NamedUser(repositoryUser, credentials, 
 				loginTimeRoleHierarchy.getReachableGrantedAuthorities(authorities));
 	}
 
