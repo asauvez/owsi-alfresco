@@ -11,7 +11,7 @@ public class TagRestriction extends Restriction {
 
 	@Override
 	protected String toQueryInternal() {
-		return (value != null) ? "TAG:" + toLuceneValue(null, value) : "";
+		return (value != null) ? "TAG:" + toLuceneValue(value) : "";
 	}
 
 }

@@ -56,7 +56,7 @@ public class PathRestriction extends Restriction {
 	
 	@Override
 	protected String toQueryInternal() {
-		return "PATH:" + toLuceneValue(null, path + suffix);
+		return "PATH:" + toLuceneValue(path + suffix);
 	}
 
 }

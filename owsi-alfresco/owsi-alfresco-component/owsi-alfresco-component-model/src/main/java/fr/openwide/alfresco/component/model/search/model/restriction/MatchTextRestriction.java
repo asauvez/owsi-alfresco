@@ -11,7 +11,7 @@ public class MatchTextRestriction extends Restriction {
 
 	@Override
 	protected String toQueryInternal() {
-		return (value != null) ? "TEXT:" + toLuceneValue(null, value) : "";
+		return (value != null) ? "TEXT:" + toLuceneValue(value) : "";
 	}
 
 }
