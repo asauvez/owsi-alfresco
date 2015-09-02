@@ -65,7 +65,7 @@
 												<c:out value="Unknown view '${inputField.view}' !"/>
 											</c:otherwise>
 										</c:choose>
-										<c:out value="${fieldError}" escapeXml="false"/>											
+										<c:out value="${fieldError}" escapeXml="false"/>
 										<c:if test="${not empty inputField.description}">
 											<p class="help-block">
 												<spring:message message="${inputField.description}"/>
