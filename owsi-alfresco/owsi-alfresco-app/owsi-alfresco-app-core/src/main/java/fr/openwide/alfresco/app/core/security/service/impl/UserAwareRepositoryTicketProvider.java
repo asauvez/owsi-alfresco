@@ -7,15 +7,18 @@ import com.google.common.base.Optional;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 
 public class UserAwareRepositoryTicketProvider implements RepositoryTicketProvider {
 
 	private UserService userService;
+	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
 
-	public UserAwareRepositoryTicketProvider(UserService userService) {
+	public UserAwareRepositoryTicketProvider(UserService userService, RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService) {
 		this.userService = userService;
+		this.repositoryAuthenticationUserDetailsService = repositoryAuthenticationUserDetailsService;
 	}
 
 	@Override
@@ -40,4 +43,8 @@ public class UserAwareRepositoryTicketProvider implements RepositoryTicketProvid
 		}
 	}
 
+	@Override
+	public void renewsTicket() {
+		repositoryAuthenticationUserDetailsService.renewsTicket(getTicketOwner());
+	}
 }

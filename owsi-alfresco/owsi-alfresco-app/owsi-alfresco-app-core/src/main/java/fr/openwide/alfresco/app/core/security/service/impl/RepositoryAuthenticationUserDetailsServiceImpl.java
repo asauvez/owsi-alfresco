@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.google.common.base.Strings;
@@ -21,6 +20,7 @@ import com.google.common.base.Strings;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
@@ -45,7 +45,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	}
 
 	@Override
-	public UserDetails loadUserDetails(UsernamePasswordAuthenticationToken token) throws UsernameNotFoundException {
+	public NamedUser loadUserDetails(UsernamePasswordAuthenticationToken token) throws UsernameNotFoundException {
 		String username = token != null ? (String) token.getName() : null;
 		String credentials = token != null ? (String) token.getCredentials() : null;
 		if (LOGGER.isDebugEnabled()) {
@@ -66,7 +66,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public NamedUser loadUserByUsername(String username) throws UsernameNotFoundException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Authenticating user: {}", username);
 		}
@@ -83,7 +83,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 		}
 	}
 
-	private UserDetails buildUserDetails(RepositoryUser repositoryUser, String credentials) {
+	private NamedUser buildUserDetails(RepositoryUser repositoryUser, String credentials) {
 		// Build authority list
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		// Check for Admin role
@@ -110,6 +110,20 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 		} else {
 			throw new IllegalStateException("Invalid authentication principal: " + principal);
 		}
+	}
+	
+
+	@Override
+	public void renewsTicket(RepositoryUser repositoryUser) {
+		try {
+			authenticationService.logout(repositoryUser.getTicket());
+		} catch (UnauthorizedRemoteException ex) {
+			// nop
+		}
+		
+		String userName = repositoryUser.getUserReference().getUsername();
+		NamedUser userDetails = loadUserByUsername(userName);
+		repositoryUser.setTicket(userDetails.getRepositoryUser().getTicket());
 	}
 
 }

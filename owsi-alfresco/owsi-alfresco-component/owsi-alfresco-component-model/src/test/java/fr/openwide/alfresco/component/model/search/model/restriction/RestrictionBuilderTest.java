@@ -7,6 +7,7 @@ import java.util.Date;
 import org.junit.Test;
 
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.repository.model.RnModel;
 
 public class RestrictionBuilderTest {
 	
@@ -15,6 +16,7 @@ public class RestrictionBuilderTest {
 		assertEquals(
 				"=cm\\:name:\"toto\"\n" +
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
+				"AND =cm\\:contentPropertyName:\"{http://www.alfresco.org/model/content/1.0}content\"\n" +
 				"AND cm\\:modified:<2009-02-14T00\\:31\\:30+01\\:00 TO MAX]\n" +
 				"AND cm\\:modified:[MIN TO 2009-02-14T00\\:31\\:30+01\\:00]\n" +
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
@@ -26,6 +28,7 @@ public class RestrictionBuilderTest {
 			new RestrictionBuilder()
 				.eq(CmModel.object.name, "toto").of()
 				.hasAspect(CmModel.workingCopy).not().of()
+				.eq(RnModel.thumbnail.contentPropertyName, CmModel.content.content.getNameReference()).of()
 				.gt(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.le(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.gt(CmModel.object.name, "abc").of()

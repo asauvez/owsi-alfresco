@@ -28,6 +28,7 @@ import com.google.common.collect.ObjectArrays;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
@@ -89,8 +90,6 @@ public class RepositoryRemoteBinding {
 	public <T> T exchange(String path, RemoteEndpointMethod method, final HttpHeaders headers, 
 			final RequestCallback requestCallback, ResponseExtractor<T> responseExtractor, 
 			Object... urlVariables) {
-		URI uri = getURI(path, urlVariables);
-		addTicketHeader(headers);
 		RequestCallback realRequestCallback = new RequestCallback() {
 			@Override
 			public void doWithRequest(ClientHttpRequest request) throws IOException {
@@ -100,7 +99,20 @@ public class RepositoryRemoteBinding {
 				}
 			}
 		};
-		return execute(uri, method, null, realRequestCallback, null, responseExtractor);
+		
+		for (int essai=0; ; essai++) {
+			try {
+				URI uri = getURI(path, urlVariables);
+				addTicketHeader(headers);
+				return execute(uri, method, null, realRequestCallback, null, responseExtractor);
+			} catch (UnauthorizedRemoteException e) {
+				if (ticketProvider.isPresent() && essai < 2) {
+					ticketProvider.get().renewsTicket();
+				} else {
+					throw e;
+				}
+			}
+		}
 	}
 
 	private void addTicketHeader(HttpHeaders headers) {
@@ -111,7 +123,7 @@ public class RepositoryRemoteBinding {
 		}
 	}
 
-	protected <T> T execute(URI uri, RemoteEndpointMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
+	private <T> T execute(URI uri, RemoteEndpointMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
 			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Executing {} method with uri: {}", method, getProtectedURI(uri));

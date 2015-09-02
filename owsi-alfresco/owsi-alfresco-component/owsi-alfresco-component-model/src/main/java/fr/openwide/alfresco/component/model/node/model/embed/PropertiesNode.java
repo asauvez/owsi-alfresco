@@ -7,7 +7,9 @@ import java.util.List;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyEnumeration;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
@@ -49,6 +51,46 @@ public class PropertiesNode {
 	public <C extends Serializable> BusinessNode set(SinglePropertyModel<C> propertyModel, C value) {
 		repoNode.getProperties().put(propertyModel.getNameReference(), value);
 		return node;
+	}
+
+	public <E extends Enum<E>> E get(EnumTextPropertyModel<E> propertyModel) {
+		String code = (String) repoNode.getProperty(propertyModel.getNameReference());
+		if (code == null) {
+			return null;
+		}
+		
+		Class<E> enumClass = propertyModel.getEnumClass();
+		if (PropertyEnumeration.class.isAssignableFrom(enumClass)) {
+			E otherValue = null;
+			for (E e : enumClass.getEnumConstants()) {
+				String enumCode = ((PropertyEnumeration) e).getCode();
+				if (code.equals(enumCode)) {
+					return e;
+				}
+				if (PropertyEnumeration.OTHER_VALUES.equals(enumCode)) {
+					otherValue = e;
+				}
+			}
+			if (otherValue != null) {
+				return otherValue;
+			}
+		} else {
+			for (E e : enumClass.getEnumConstants()) {
+				if (code.equals(e.name())) {
+					return e;
+				}
+			}
+		}
+		throw new IllegalStateException("Can't find value for '" + code + "' in enum " + enumClass.getName());
+	}
+	public <E extends Enum<E>> BusinessNode set(EnumTextPropertyModel<E> propertyModel, E e) {
+		String code = (e instanceof PropertyEnumeration) 
+				? ((PropertyEnumeration) e).getCode() 
+				: e.name();
+		if (PropertyEnumeration.OTHER_VALUES.equals(code)) {
+			throw new IllegalStateException("You can't set back the OTHER_VALUES.");
+		}
+		return set(propertyModel, code);
 	}
 
 	@SuppressWarnings("unchecked")

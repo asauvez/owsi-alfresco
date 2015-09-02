@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 /**
@@ -16,7 +17,7 @@ public class ModelChecker {
 	private List<String> errors = new ArrayList<>();
 	
 	public void checkModel(Class<?> model) throws Exception {
-		String nameSpace = (String) model.getField("NAMESPACE").get(null);
+		String nameSpace = ((NamespaceReference) model.getField("NAMESPACE").get(null)).getPrefix();
 		
 		for (Field field : model.getFields()) {
 			Object value = field.get(null);

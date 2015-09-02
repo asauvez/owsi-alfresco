@@ -12,18 +12,21 @@ public class NameReference implements Serializable {
 
 	private static final long serialVersionUID = -1010067410648716413L;
 
+	private final String fullName;
 	private final String namespace;
 	private final String name;
 
 	private NameReference(String qname) {
 		Iterator<String> it = Splitter.on(":").split(qname).iterator();
-		namespace = it.next();
-		name = it.next();
+		this.fullName = qname;
+		this.namespace = it.next();
+		this.name = it.next();
 	}
 
 	private NameReference(String namespace, String name) {
 		Objects.requireNonNull(namespace, "namespace");
 		Objects.requireNonNull(name, "name");
+		this.fullName = Joiner.on(":").join(namespace, name);
 		this.namespace = namespace;
 		this.name = name;
 	}
@@ -48,7 +51,7 @@ public class NameReference implements Serializable {
 
 	@JsonValue
 	public String getFullName() {
-		return Joiner.on(":").join(namespace, name); 
+		return fullName; 
 	}
 	public String getFullyQualified() {
 		String uri = NamespaceReference.getUriByPrefix(getNamespace());

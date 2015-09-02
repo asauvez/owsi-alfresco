@@ -19,7 +19,7 @@ public class NamedUserAppCoreSecurityConfig extends AbstractAppCoreSecurityConfi
 
 	@Bean
 	public NamedUserService userService() {
-		return new NamedUserServiceImpl();
+		return new NamedUserServiceImpl(repositoryAuthenticationUserDetailsService);
 	}
 
 	@Bean

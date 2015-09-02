@@ -9,8 +9,15 @@ import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.NamedUserService;
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 
 public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserService {
+
+	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
+	
+	public NamedUserServiceImpl(RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService) {
+		this.repositoryAuthenticationUserDetailsService = repositoryAuthenticationUserDetailsService;
+	}
 
 	@Override
 	public NamedUser getUser(Authentication authentication) {
@@ -44,4 +51,8 @@ public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserSe
 		return getCurrentUser().getRepositoryUser();
 	}
 
+	@Override
+	public void renewsTicket() {
+		repositoryAuthenticationUserDetailsService.renewsTicket(getTicketOwner());
+	}
 }

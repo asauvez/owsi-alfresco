@@ -17,6 +17,7 @@
 		<module>owsi-alfresco-app-core</module>
 		<module>owsi-alfresco-app-web</module>
 		<module>owsi-alfresco-app-dictionary</module>
+		<module>owsi-alfresco-app-module</module>
 	</modules>
 
 </project>

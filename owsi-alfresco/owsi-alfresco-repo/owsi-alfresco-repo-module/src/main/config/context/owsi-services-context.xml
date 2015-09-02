@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+	<bean id="owsi.service.classificationService" class="fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl"
+			depends-on="owsi.dictionaryBootstrap">
+		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
+		<property name="nodeRepositoryService" ref="owsi.service.nodeService"/>
+		<property name="nodeSearchModelService" ref="owsi.service.nodeSearchModelService"/>
+		<property name="conversionService" ref="owsi.service.conversionService" />
+		<property name="transactionService" ref="transactionService" />
+		<property name="dictionaryService" ref="DictionaryService" />
+		<property name="personService" ref="PersonService" />
+	</bean>
+
+	<bean id="owsi.service.identificationService" class="fr.openwide.alfresco.api.module.identification.service.impl.IdentificationServiceImpl">
+		<constructor-arg ref="owsi.service.nodeSearchModelService"/>
+		<constructor-arg ref="owsi.service.nodeModelService"/>
+	</bean>
+
+</beans>

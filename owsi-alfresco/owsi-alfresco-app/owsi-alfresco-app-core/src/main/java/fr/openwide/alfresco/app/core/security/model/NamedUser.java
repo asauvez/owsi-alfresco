@@ -14,7 +14,8 @@ public class NamedUser extends User implements RepositoryUserProvider {
 
 	private RepositoryUser repositoryUser;
 
-	public NamedUser(RepositoryUser repositoryUser, String password, Collection<? extends GrantedAuthority> authorities) {
+	public NamedUser(RepositoryUser repositoryUser, String password, 
+			Collection<? extends GrantedAuthority> authorities) {
 		super(repositoryUser.getUserReference().getUsername(), password != null ? password : "N/A", authorities);
 		this.repositoryUser = repositoryUser;
 	}

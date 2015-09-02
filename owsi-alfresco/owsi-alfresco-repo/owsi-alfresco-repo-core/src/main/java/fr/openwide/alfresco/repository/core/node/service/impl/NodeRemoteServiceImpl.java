@@ -47,20 +47,22 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
-import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.repository.core.node.model.PreNodeCreationCallback;
+import fr.openwide.alfresco.repository.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repository.core.node.web.script.NodeContentCallback;
 import fr.openwide.alfresco.repository.core.node.web.script.NodeContentHolder;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
-public class NodeRemoteServiceImpl implements NodeRemoteService {
+public class NodeRemoteServiceImpl implements NodeRepositoryService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
 	private Map<Class<?>, NodeContentSerializer<?>> serializersByClass = NodeContentSerializationComponent.getDefaultSerializersByClass();
+	private List<PreNodeCreationCallback> preNodeCreationCallbacks = new ArrayList<>();
 	
 	private NodeService nodeService;
 	private ContentService contentService;
@@ -276,7 +278,12 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 			throw new InvalidPayloadException("Property is required: " + conversionService.get(ContentModel.PROP_NAME));
 		}
 	}
-	
+
+	@Override
+	public void addPreNodeCreationCallback(PreNodeCreationCallback callback) {
+		preNodeCreationCallbacks.add(callback);
+	}
+
 	@Override
 	public List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException {
 		List<NodeReference> nodesReferences = new ArrayList<>();
@@ -286,7 +293,15 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		return nodesReferences;
 	}
 	
+	public static QName createAssociationName(String nodeName) {
+		return QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(nodeName));
+	}
+	
 	protected NodeReference create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
+		for (PreNodeCreationCallback callback : preNodeCreationCallbacks) {
+			callback.onPreNodeCreationCallback(node);
+		}
+		
 		validateCreate(node);
 		
 		Map<QName, Serializable> properties = new LinkedHashMap<>();
@@ -303,7 +318,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 		try {
 			NodeRef parentRef = conversionService.getRequired(primaryParent.getParentNode().getNodeReference());
 			QName assocType = conversionService.getRequired(primaryParent.getType());
-			QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(cmName.toLowerCase()));
+			QName assocName = createAssociationName(cmName);
 			QName type = conversionService.getRequired(node.getType());
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Creating node type {} in {}/{}/{}", type, parentRef, assocType, assocName);
@@ -380,7 +395,7 @@ public class NodeRemoteServiceImpl implements NodeRemoteService {
 				RepositoryChildAssociation repoPrimaryParent = node.getPrimaryParentAssociation();
 				NodeRef parentRef = conversionService.getRequired(repoPrimaryParent.getParentNode().getNodeReference());
 				QName assocType = conversionService.getRequired(repoPrimaryParent.getType());
-				QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, cmName.toLowerCase());
+				QName assocName = createAssociationName(cmName);
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Moving node {} to {}/{}/{}", nodeRef, parentRef, assocType, assocName);
 				}
