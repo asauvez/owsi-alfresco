@@ -46,6 +46,8 @@
 		<owsi-alfresco.repo.stax-ex.version>1.2</owsi-alfresco.repo.stax-ex.version>
 		<owsi-alfresco.repo.stax-api.version>1.0-2</owsi-alfresco.repo.stax-api.version>
 		<owsi-alfresco.repo.spring-social.version>1.0.3.RELEASE</owsi-alfresco.repo.spring-social.version>
+		
+		<owsi-alfresco.build-helper-maven-plugin.version>1.9.1</owsi-alfresco.build-helper-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -344,6 +346,59 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>${owsi-alfresco.build-helper-maven-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>regex-property</id>
+							<goals>
+								<goal>regex-property</goal>
+							</goals>
+							<configuration>
+								<name>alfresco.module.version</name>
+								<value>${project.version}</value>
+								<regex>-SNAPSHOT</regex>
+								<replacement></replacement>
+								<failIfNoMatch>false</failIfNoMatch>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>build-helper-maven-plugin</artifactId>
+										<versionRange>[${owsi-alfresco.build-helper-maven-plugin.version},)</versionRange>
+										<goals>
+											<goal>regex-property</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnIncremental>true</runOnIncremental>
+										</execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
 	<repositories>
 		<repository>
