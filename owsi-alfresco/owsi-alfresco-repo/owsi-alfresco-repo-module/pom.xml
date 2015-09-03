@@ -7,9 +7,8 @@
 		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-repo-module</artifactId>
-	
-	<name>OWSI Alfresco Module repository</name>
-	<description>Module OWSI coté Alfresco</description>
+
+	<name>OWSI Alfresco - Repository - Module</name>
 
 	<properties>
 		<alfresco.module.name>owsi-alfresco</alfresco.module.name>
