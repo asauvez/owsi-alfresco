@@ -107,7 +107,7 @@ public class RepositoryRemoteBinding {
 				return execute(uri, method, null, realRequestCallback, null, responseExtractor);
 			} catch (UnauthorizedRemoteException e) {
 				if (ticketProvider.isPresent() && essai < 2) {
-					ticketProvider.get().renewsTicket();
+					ticketProvider.get().renewTicket();
 				} else {
 					throw e;
 				}

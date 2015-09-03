@@ -52,7 +52,7 @@ public class NamedUserServiceImpl extends UserServiceImpl implements NamedUserSe
 	}
 
 	@Override
-	public void renewsTicket() {
-		repositoryAuthenticationUserDetailsService.renewsTicket(getTicketOwner());
+	public void renewTicket() {
+		repositoryAuthenticationUserDetailsService.renewTicket(getTicketOwner());
 	}
 }

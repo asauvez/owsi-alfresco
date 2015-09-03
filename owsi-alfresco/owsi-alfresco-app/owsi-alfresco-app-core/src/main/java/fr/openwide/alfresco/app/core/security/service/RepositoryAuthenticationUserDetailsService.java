@@ -11,5 +11,5 @@ public interface RepositoryAuthenticationUserDetailsService extends Authenticati
 
 	void logout(Authentication authentication);
 	
-	void renewsTicket(RepositoryUser repositoryUser);
+	void renewTicket(RepositoryUser repositoryUser);
 }

@@ -44,7 +44,7 @@ public class UserAwareRepositoryTicketProvider implements RepositoryTicketProvid
 	}
 
 	@Override
-	public void renewsTicket() {
-		repositoryAuthenticationUserDetailsService.renewsTicket(getTicketOwner());
+	public void renewTicket() {
+		repositoryAuthenticationUserDetailsService.renewTicket(getTicketOwner());
 	}
 }

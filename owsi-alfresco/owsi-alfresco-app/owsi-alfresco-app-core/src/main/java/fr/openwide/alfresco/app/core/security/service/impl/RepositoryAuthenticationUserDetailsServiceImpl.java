@@ -114,7 +114,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	
 
 	@Override
-	public void renewsTicket(RepositoryUser repositoryUser) {
+	public void renewTicket(RepositoryUser repositoryUser) {
 		try {
 			authenticationService.logout(repositoryUser.getTicket());
 		} catch (UnauthorizedRemoteException ex) {
