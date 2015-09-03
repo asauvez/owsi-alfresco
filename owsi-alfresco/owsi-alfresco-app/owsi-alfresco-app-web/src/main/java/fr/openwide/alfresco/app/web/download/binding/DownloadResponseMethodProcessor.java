@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -145,7 +146,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		// set mimetype and length for the content
 		response.setContentType(download.getContentType());
 		// set content-length manually rather than using setContentLength to allow for size as long
-		response.setHeader("Content-Length", Long.toString(download.getContentLength()));
+		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(download.getContentLength()));
 		// output downloadable content
 		streamInput(download, download.getWrittableStream(), response);
 	}
@@ -187,7 +188,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		response.setContentType(data.getMimetype());
 		response.setCharacterEncoding(data.getEncoding());
 		// set content-length manually rather than using setContentLength to allow for size as long
-		response.setHeader("Content-Length", Long.toString(data.getSize()));
+		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(data.getSize()));
 		
 		streamInput(download, inputStream, response);
 	}
