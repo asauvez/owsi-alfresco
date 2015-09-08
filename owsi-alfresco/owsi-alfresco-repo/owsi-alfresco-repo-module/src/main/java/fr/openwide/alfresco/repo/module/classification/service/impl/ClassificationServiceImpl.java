@@ -40,6 +40,8 @@ import fr.openwide.alfresco.component.model.search.model.restriction.Restriction
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
+import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repository.core.node.model.PreNodeCreationCallback;
@@ -87,13 +89,13 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	@Override
 	public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
-		classify(nodeRef, false);
+		classify(nodeRef, ClassificationMode.CREATE);
 	}
 	@Override
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
-			classify(nodeRef, true);
+			classify(nodeRef, ClassificationMode.UPDATE);
 		}
 	}
 	@Override
@@ -133,7 +135,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return nodeModelService.getProperty(conversionService.get(person), CmModel.person.homeFolder);
 	}
 	
-	private void classify(NodeRef nodeRef, boolean update) {
+	private void classify(NodeRef nodeRef, ClassificationMode mode) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		NameReference type = getPolicy(nodeReference);
 		if (type == null) {
@@ -165,8 +167,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 
 		ClassificationBuilder builder = new ClassificationBuilder(this, node);
+		ClassificationEvent event = new ClassificationEvent(node, mode, model);
 		try {
-			policy.classify(builder, model, node, update);
+			policy.classify(builder, model, event);
 		} catch (RuntimeException ex) {
 			logger.error("Error during classify of " + nodeReference + " of type " + type, ex);
 			throw ex;

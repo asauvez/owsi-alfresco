@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.repo.module.classification.model;
 
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
@@ -20,6 +19,6 @@ public interface ClassificationPolicy<T extends ContainerModel> {
 	 * @param node La node concernée avec les informations demandé dans le NodeScopeBuilder.
 	 * @param update Vrai si la node était déjà classé.
 	 */
-	void classify(ClassificationBuilder builder, T model, BusinessNode node, boolean update);
+	void classify(ClassificationBuilder builder, T model, ClassificationEvent event);
 
 }
