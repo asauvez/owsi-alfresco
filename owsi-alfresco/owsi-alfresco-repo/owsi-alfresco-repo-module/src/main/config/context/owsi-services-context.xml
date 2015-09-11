@@ -8,10 +8,10 @@
 		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
 		<property name="nodeRepositoryService" ref="owsi.service.nodeService"/>
 		<property name="nodeSearchModelService" ref="owsi.service.nodeSearchModelService"/>
+		<property name="policyRepositoryService" ref="owsi.service.policyService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="transactionService" ref="transactionService" />
 		<property name="dictionaryService" ref="DictionaryService" />
-		<property name="personService" ref="PersonService" />
 	</bean>
 
 	<bean id="owsi.service.identificationService" class="fr.openwide.alfresco.api.module.identification.service.impl.IdentificationServiceImpl">

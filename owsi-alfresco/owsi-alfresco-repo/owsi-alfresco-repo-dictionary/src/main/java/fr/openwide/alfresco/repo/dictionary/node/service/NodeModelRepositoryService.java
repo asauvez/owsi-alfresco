@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.repo.policy.ClassPolicy;
-
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -14,7 +11,6 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -58,5 +54,9 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
 
-	<T extends ClassPolicy> void bindClassBehaviour(ContainerModel type, NotificationFrequency frequency, Class<T> eventType, T policy);
+	NodeReference getCompanyHome();
+	Optional<NodeReference> getUserHome();
+	
+	Optional<NodeReference> getByNamedPath(String ... names);
+	
 }

@@ -8,7 +8,7 @@
 		<property name="nodeService" ref="NodeService"/>
 		<property name="copyService" ref="CopyService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
-		<property name="policyComponent" ref="policyComponent" />
+		<property name="repositoryHelper" ref="repositoryHelper" />
 	</bean>
 
 	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl">
@@ -17,6 +17,11 @@
 
 	<bean id="owsi.service.authorityModelService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
 		<constructor-arg ref="owsi.service.authorityService"/>
+	</bean>
+
+	<bean id="owsi.service.policyService" class="fr.openwide.alfresco.repo.dictionary.policy.service.impl.PolicyRepositoryServiceImpl">
+		<property name="policyComponent" ref="policyComponent" />
+		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 
 </beans>

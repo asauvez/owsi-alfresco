@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.module.classification.model;
 
+import java.util.Arrays;
+
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 
 import com.google.common.base.Optional;
@@ -50,16 +52,28 @@ public class ClassificationBuilder {
 		return rootFolder(new RestrictionBuilder()
 				.path(path).of(), true);
 	}
+	public ClassificationBuilder rootFolderNamedPath(String ... names) {
+		return rootFolderNamedPath(true, names);
+	}
+	public ClassificationBuilder rootFolderNamedPath(boolean cached, String ... names) {
+		Optional<NodeReference> optional = (cached) 
+				? service.getByNamedPathCached(names)
+				: service.getByNamedPath(names);
+		if (! optional.isPresent()) {
+			throw new NoSuchNodeRemoteException(Arrays.toString(names));
+		}
+		return rootFolder(optional.get());
+	}
 	public ClassificationBuilder rootFolderIdentifier(NameReference identifier) {
 		return rootFolder(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of(), true);
 	}
 	public ClassificationBuilder rootHomeFolder() {
-		NodeReference homeFolder = service.getHomeFolder();
-		if (homeFolder == null) {
+		Optional<NodeReference> homeFolder = service.getHomeFolder();
+		if (! homeFolder.isPresent()) {
 			throw new IllegalStateException("User " + AuthenticationUtil.getRunAsUser() + " does not have a home folder.");
 		}
-		rootFolder(homeFolder);
+		rootFolder(homeFolder.get());
 		return this;
 	}
 	

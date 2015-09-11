@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repo.module.classification.service.impl;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,6 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.slf4j.Logger;
@@ -39,6 +39,7 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
@@ -56,16 +57,17 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private NodeModelRepositoryService nodeModelService;
 	private NodeRepositoryService nodeRepositoryService;
 	private NodeSearchModelService nodeSearchModelService;
+	private PolicyRepositoryService policyRepositoryService;
 	
 	private ConversionService conversionService;
 	private TransactionService transactionService;
 	private DictionaryService dictionaryService;
-	private PersonService personService;
 
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
 
 	private Map<String, NodeReference> queryCache = new ConcurrentHashMap<>();
+	private Map<String, NodeReference> pathCache = new ConcurrentHashMap<>();
 
 	@Override
 	public <T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy) {
@@ -81,8 +83,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, OnAddAspectPolicy.class, this);
-		nodeModelService.bindClassBehaviour(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, OnUpdatePropertiesPolicy.class, this);
+		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
@@ -113,14 +115,14 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				}
 			}
 			if (isclassifiable) {
-				NodeReference homeFolder = getHomeFolder();
-				if (homeFolder != null) {
+				Optional<NodeReference> homeFolder = getHomeFolder();
+				if (homeFolder.isPresent()) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Node without parent is assigned to current user {} home folder. "
 								+ "Will then be moved then to the classify folder.", AuthenticationUtil.getRunAsUser());
 					}
 					node.setPrimaryParentAssociation(new RepositoryChildAssociation(
-							new RepositoryNode(homeFolder), 
+							new RepositoryNode(homeFolder.get()), 
 							CmModel.folder.contains.getNameReference()));
 				} else {
 					logger.error("Node without parent has aspect {}, but user {} does not have a home folder.", 
@@ -130,9 +132,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 	}
 
-	public NodeReference getHomeFolder() {
-		NodeRef person = personService.getPerson(AuthenticationUtil.getRunAsUser());
-		return nodeModelService.getProperty(conversionService.get(person), CmModel.person.homeFolder);
+	public Optional<NodeReference> getHomeFolder() {
+		return nodeModelService.getUserHome();
 	}
 	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
@@ -285,6 +286,28 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 	}
 
+	public Optional<NodeReference> getByNamedPath(String ... names) {
+		return nodeModelService.getByNamedPath(names);
+	}
+	public Optional<NodeReference> getByNamedPathCached(String ... names) {
+		String cacheKey = Arrays.toString(names);
+		NodeReference nodeReference = pathCache.get(cacheKey);
+		if (nodeReference == null) {
+			Optional<NodeReference> optional = getByNamedPath(names);
+			if (optional.isPresent()) {
+				pathCache.put(cacheKey, optional.get());
+			}
+			return optional;
+		} else {
+			// Vérifie juste que la node existe toujours
+			if (! nodeModelService.exists(nodeReference)) {
+				pathCache.remove(cacheKey);
+				return Optional.absent();
+			}
+			return Optional.of(nodeReference);
+		}
+	}
+	
 	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
 		this.nodeModelService = nodeModelService; 
 	}
@@ -303,8 +326,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setDictionaryService(DictionaryService dictionaryService) {
 		this.dictionaryService = dictionaryService;
 	}
-	public void setPersonService(PersonService personService) {
-		this.personService = personService;
+	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
+		this.policyRepositoryService = policyRepositoryService;
 	}
 
 }

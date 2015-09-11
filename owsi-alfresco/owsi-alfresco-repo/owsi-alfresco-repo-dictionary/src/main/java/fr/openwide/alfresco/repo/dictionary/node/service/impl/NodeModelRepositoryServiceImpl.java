@@ -5,10 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.repo.policy.ClassPolicy;
-import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.model.Repository;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -22,7 +19,6 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -38,7 +34,7 @@ public class NodeModelRepositoryServiceImpl
 
 	private NodeService nodeService;
 	private CopyService copyService;
-	private PolicyComponent policyComponent;
+	private Repository repositoryHelper;
 
 	private ConversionService conversionService;
 	
@@ -199,20 +195,37 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(assocType), 
 				NodeRemoteServiceImpl.createAssociationName(childName));
 	}
-
+	
 	@Override
-	public <T extends ClassPolicy> void bindClassBehaviour(ContainerModel type, NotificationFrequency frequency,
-			Class<T> eventType, T policy) {
-		try {
-			QName policyQName = (QName) eventType.getField("QNAME").get(null);
-			policyComponent.bindClassBehaviour(policyQName, 
-					conversionService.getRequired(type.getNameReference()), 
-					new JavaBehaviour(policy, policyQName.getLocalName(), frequency));
-		} catch (IllegalAccessException | NoSuchFieldException ex) {
-			throw new IllegalStateException(ex);
-		}
+	public NodeReference getCompanyHome() {
+		return conversionService.get(repositoryHelper.getCompanyHome());
 	}
 	
+	@Override
+	public Optional<NodeReference> getUserHome() {
+		NodeRef person = repositoryHelper.getFullyAuthenticatedPerson();
+		NodeRef userHome = repositoryHelper.getUserHome(person);
+		if (userHome != null) {
+			return Optional.of(conversionService.get(userHome));
+		} else {
+			return Optional.absent();
+		}
+	}
+
+	@Override
+	public Optional<NodeReference> getByNamedPath(String ... names) {
+		NodeReference nodeReference = conversionService.get(repositoryHelper.getCompanyHome());
+		for (String name : names) {
+			if (! name.isEmpty()) {
+				Optional<NodeReference> optional = getChildByName(nodeReference, name);
+				if (! optional.isPresent()) {
+					return optional;
+				}
+				nodeReference = optional.get();
+			}
+		}
+		return Optional.of(nodeReference);
+	}
 
 	public void setNodeService(NodeService nodeService) {
 		this.nodeService = nodeService;
@@ -220,8 +233,8 @@ public class NodeModelRepositoryServiceImpl
 	public void setCopyService(CopyService copyService) {
 		this.copyService = copyService;
 	}
-	public void setPolicyComponent(PolicyComponent policyComponent) {
-		this.policyComponent = policyComponent;
+	public void setRepositoryHelper(Repository repositoryHelper) {
+		this.repositoryHelper = repositoryHelper;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
