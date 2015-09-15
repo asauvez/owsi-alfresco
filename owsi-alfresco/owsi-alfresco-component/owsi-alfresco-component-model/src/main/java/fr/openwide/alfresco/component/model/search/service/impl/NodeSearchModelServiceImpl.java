@@ -32,7 +32,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	@Override
 	public List<BusinessNode> search(SearchQueryBuilder searchBuilder) {
 		return new BusinessNodeList(nodeSearchService.search(
-				searchBuilder.getSearchParameters()));
+				searchBuilder.getParameters()));
 	}
 	
 	@Override

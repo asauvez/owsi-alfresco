@@ -2,7 +2,7 @@ package fr.openwide.alfresco.api.core.authority.service;
 
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthoritySearchParameters;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -19,13 +19,13 @@ public interface AuthorityRemoteService {
 
 	class GET_CONTAINED_USERS {
 		public static PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/authority/get-contained-users") {};
-		public RepositoryAuthoritySearchParameters searchParameters;
+		public RepositoryAuthorityQueryParameters searchParameters;
 	}
-	List<RepositoryNode> getContainedUsers(RepositoryAuthoritySearchParameters searchParameters);
+	List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters);
 
 	class GET_CONTAINED_GROUPS {
 		public static PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/authority/get-contained-groups") {};
-		public RepositoryAuthoritySearchParameters searchParameters;
+		public RepositoryAuthorityQueryParameters searchParameters;
 	}
-	List<RepositoryNode> getContainedGroups(RepositoryAuthoritySearchParameters searchParameters);
+	List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters);
 }

@@ -1,45 +1,34 @@
 package fr.openwide.alfresco.component.model.authority.model;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthoritySearchParameters;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
+import fr.openwide.alfresco.component.model.node.model.builder.AbstractQueryBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 
-public class AuthorityQueryBuilder {
+public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBuilder, RepositoryAuthorityQueryParameters, AuthoritySortBuilder> {
 
-	private RepositoryAuthoritySearchParameters searchParameters = new RepositoryAuthoritySearchParameters();
-	private AuthoritySortBuilder sortBuilder = new AuthoritySortBuilder(this);
+	public AuthorityQueryBuilder() {
+		super(new RepositoryAuthorityQueryParameters(), new AuthoritySortBuilder());
+	}
 	
 	public AuthorityQueryBuilder parentAuthority(RepositoryAuthority parentAuthority) {
-		this.searchParameters.setParentAuthority(parentAuthority);
+		getParameters().setParentAuthority(parentAuthority);
 		return this;
 	}
 	public AuthorityQueryBuilder parentAuthorityImmediate(RepositoryAuthority parentAuthority) {
-		this.searchParameters.setParentAuthority(parentAuthority);
-		this.searchParameters.setImmediate(true);
+		getParameters().setParentAuthority(parentAuthority);
+		getParameters().setImmediate(true);
 		return this;
 	}
-	
+
 	public AuthorityQueryBuilder filterProperty(PropertyModel<String> filterProperty) {
-		this.searchParameters.setFilterProperty(filterProperty.getNameReference());
+		getParameters().setFilterProperty(filterProperty.getNameReference());
 		return this;
 	}
 	public AuthorityQueryBuilder filterValue(String filterValue) {
-		this.searchParameters.setFilterValue(filterValue);
+		getParameters().setFilterValue(filterValue);
 		return this;
-	}
-	
-	public AuthorityQueryBuilder nodeScopeBuilder(NodeScopeBuilder nodeScopeBuilder) {
-		this.searchParameters.setNodeScope(nodeScopeBuilder.getScope());
-		return this;
-	}
-	
-	public RepositoryAuthoritySearchParameters getSearchParameters() {
-		return searchParameters;
 	}
 
-	public AuthoritySortBuilder sort() {
-		return sortBuilder;
-	}
 }

@@ -15,7 +15,7 @@ import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthoritySearchParameters;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
@@ -43,16 +43,16 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthoritySearchParameters searchParameters) {
+	public List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters) {
 		return getContained(AuthorityType.USER, searchParameters);
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthoritySearchParameters searchParameters) {
+	public List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters) {
 		return getContained(AuthorityType.GROUP, searchParameters);
 	}
 
-	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthoritySearchParameters searchParameters) {
+	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthorityQueryParameters searchParameters) {
 		Set<String> authorities = authorityService.getContainedAuthorities(type, 
 				searchParameters.getParentAuthority().getName(), 
 				searchParameters.isImmediate());

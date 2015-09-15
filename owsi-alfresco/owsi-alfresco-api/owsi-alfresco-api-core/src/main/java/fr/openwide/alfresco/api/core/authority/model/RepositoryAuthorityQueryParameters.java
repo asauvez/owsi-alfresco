@@ -1,14 +1,9 @@
 package fr.openwide.alfresco.api.core.authority.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.AbstractQueryParameters;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
 
-public class RepositoryAuthoritySearchParameters implements Serializable {
+public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters {
 	
 	private RepositoryAuthority parentAuthority;
 
@@ -16,8 +11,6 @@ public class RepositoryAuthoritySearchParameters implements Serializable {
 	private String filterValue;
 	
 	private boolean immediate;
-	private NodeScope nodeScope;
-	private List<RepositorySortDefinition> sorts = new ArrayList<>();
 
 	public RepositoryAuthority getParentAuthority() {
 		return parentAuthority;
@@ -46,14 +39,4 @@ public class RepositoryAuthoritySearchParameters implements Serializable {
 		this.immediate = immediate;
 	}
 	
-	public NodeScope getNodeScope() {
-		return nodeScope;
-	}
-	public void setNodeScope(NodeScope nodeScope) {
-		this.nodeScope = nodeScope;
-	}
-
-	public List<RepositorySortDefinition> getSorts() {
-		return sorts;
-	}
 }

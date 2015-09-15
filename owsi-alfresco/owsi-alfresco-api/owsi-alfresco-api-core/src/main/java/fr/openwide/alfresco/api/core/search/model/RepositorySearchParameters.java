@@ -1,14 +1,13 @@
 package fr.openwide.alfresco.api.core.search.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.AbstractQueryParameters;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 
-public class RepositorySearchParameters implements Serializable {
+public class RepositorySearchParameters extends AbstractQueryParameters {
 
 	private String query;
 	private List<StoreReference> storeReferences = new ArrayList<>(Arrays.asList(StoreReference.STORE_REF_WORKSPACE_SPACESSTORE));
@@ -17,9 +16,6 @@ public class RepositorySearchParameters implements Serializable {
 	
 	private Integer firstResult;
 	private Integer maxResults;
-	
-	private NodeScope nodeScope = new NodeScope();
-	private List<RepositorySortDefinition> sorts = new ArrayList<>();
 	
 	public String getQuery() {
 		return query;
@@ -54,22 +50,12 @@ public class RepositorySearchParameters implements Serializable {
 	public void setMaxResults(Integer maxResults) {
 		this.maxResults = maxResults;
 	}
-	
-	public NodeScope getNodeScope() {
-		return nodeScope;
-	}
-	public void setNodeScope(NodeScope nodeScope) {
-		this.nodeScope = nodeScope;
-	}
-	
+
 	public RepositoryQueryConsistency getQueryConsistency() {
 		return queryConsistency;
 	}
 	public void setQueryConsistency(RepositoryQueryConsistency queryConsistency) {
 		this.queryConsistency = queryConsistency;
 	}
-	
-	public List<RepositorySortDefinition> getSorts() {
-		return sorts;
-	}
+
 }

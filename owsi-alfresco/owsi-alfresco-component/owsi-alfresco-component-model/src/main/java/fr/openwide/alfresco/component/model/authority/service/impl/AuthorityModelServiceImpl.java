@@ -29,28 +29,28 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	
 	@Override
 	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
-		if (authorityQueryBuilder.getSearchParameters().getFilterProperty() == null) {
+		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.person.lastName);
 		}
-		if (authorityQueryBuilder.getSearchParameters().getNodeScope() == null) {
+		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
 			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
 				.nodeReference()
 				.properties().set(CmModel.person));
 		}
-		return new BusinessNodeList(authorityService.getContainedUsers(authorityQueryBuilder.getSearchParameters()));
+		return new BusinessNodeList(authorityService.getContainedUsers(authorityQueryBuilder.getParameters()));
 	}
 	
 	@Override
 	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
-		if (authorityQueryBuilder.getSearchParameters().getFilterProperty() == null) {
+		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.authorityContainer.authorityDisplayName);
 		}
-		if (authorityQueryBuilder.getSearchParameters().getNodeScope() == null) {
+		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
 			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
 				.nodeReference()
 				.properties().set(CmModel.authorityContainer));
 		}
-		return new BusinessNodeList(authorityService.getContainedGroups(authorityQueryBuilder.getSearchParameters()));
+		return new BusinessNodeList(authorityService.getContainedGroups(authorityQueryBuilder.getParameters()));
 	}
 
 	@Override
