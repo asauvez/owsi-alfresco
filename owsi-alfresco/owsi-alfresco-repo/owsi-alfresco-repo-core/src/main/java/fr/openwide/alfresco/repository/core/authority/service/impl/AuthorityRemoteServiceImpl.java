@@ -1,15 +1,19 @@
 package fr.openwide.alfresco.repository.core.authority.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthoritySearchParameters;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
@@ -39,15 +43,21 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	
 	@Override
 	public List<RepositoryNode> getContainedUsers(RepositoryAuthoritySearchParameters searchParameters) {
-		return getContained(AuthorityType.USER, searchParameters);
+		return getContained(AuthorityType.USER, searchParameters, 
+				ContentModel.PROP_LASTNAME, 
+				ContentModel.PROP_FIRSTNAME,
+				ContentModel.PROP_USERNAME);
 	}
 
 	@Override
 	public List<RepositoryNode> getContainedGroups(RepositoryAuthoritySearchParameters searchParameters) {
-		return getContained(AuthorityType.GROUP, searchParameters);
+		return getContained(AuthorityType.GROUP, searchParameters,
+				ContentModel.PROP_AUTHORITY_DISPLAY_NAME,
+				ContentModel.PROP_AUTHORITY_NAME);
 	}
 
-	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthoritySearchParameters searchParameters) {
+	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthoritySearchParameters searchParameters, 
+			final QName ... sortBy) {
 		Set<String> authorities = authorityService.getContainedAuthorities(type, 
 				searchParameters.getParentAuthority().getName(), 
 				searchParameters.isImmediate());
@@ -69,6 +79,28 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 			
 			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), searchParameters.getNodeScope()));
 		}
+		
+		Collections.sort(nodes, new Comparator<RepositoryNode>() {
+			@Override
+			public int compare(RepositoryNode o1, RepositoryNode o2) {
+				for (QName property : sortBy) {
+					String value1 = (String) nodeService.getProperty(conversionService.getRequired(o1.getNodeReference()), property);
+					String value2 = (String) nodeService.getProperty(conversionService.getRequired(o2.getNodeReference()), property);
+					if (value1 != null && value2 != null) {
+						int diff = value1.compareToIgnoreCase(value2);
+						if (diff != 0) {
+							return diff;
+						}
+					} else if (value1 != null) {
+						return -1;
+					} else if (value2 != null) {
+						return +1;
+					}
+				}
+				return 0;
+			}
+		});
+		
 		return nodes;
 	}
 	
