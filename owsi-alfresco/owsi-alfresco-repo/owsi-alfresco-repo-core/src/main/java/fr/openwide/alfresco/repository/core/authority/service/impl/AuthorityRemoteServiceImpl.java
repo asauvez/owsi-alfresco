@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repository.core.authority.service.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -21,6 +21,7 @@ import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
@@ -43,21 +44,15 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	
 	@Override
 	public List<RepositoryNode> getContainedUsers(RepositoryAuthoritySearchParameters searchParameters) {
-		return getContained(AuthorityType.USER, searchParameters, 
-				ContentModel.PROP_LASTNAME, 
-				ContentModel.PROP_FIRSTNAME,
-				ContentModel.PROP_USERNAME);
+		return getContained(AuthorityType.USER, searchParameters);
 	}
 
 	@Override
 	public List<RepositoryNode> getContainedGroups(RepositoryAuthoritySearchParameters searchParameters) {
-		return getContained(AuthorityType.GROUP, searchParameters,
-				ContentModel.PROP_AUTHORITY_DISPLAY_NAME,
-				ContentModel.PROP_AUTHORITY_NAME);
+		return getContained(AuthorityType.GROUP, searchParameters);
 	}
 
-	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthoritySearchParameters searchParameters, 
-			final QName ... sortBy) {
+	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthoritySearchParameters searchParameters) {
 		Set<String> authorities = authorityService.getContainedAuthorities(type, 
 				searchParameters.getParentAuthority().getName(), 
 				searchParameters.isImmediate());
@@ -80,26 +75,38 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), searchParameters.getNodeScope()));
 		}
 		
-		Collections.sort(nodes, new Comparator<RepositoryNode>() {
-			@Override
-			public int compare(RepositoryNode o1, RepositoryNode o2) {
-				for (QName property : sortBy) {
-					String value1 = (String) nodeService.getProperty(conversionService.getRequired(o1.getNodeReference()), property);
-					String value2 = (String) nodeService.getProperty(conversionService.getRequired(o2.getNodeReference()), property);
-					if (value1 != null && value2 != null) {
-						int diff = value1.compareToIgnoreCase(value2);
-						if (diff != 0) {
-							return diff;
+		final List<RepositorySortDefinition> sorts = searchParameters.getSorts();
+		if (! sorts.isEmpty()) {
+			Collections.sort(nodes, new Comparator<RepositoryNode>() {
+				@Override
+				public int compare(RepositoryNode o1, RepositoryNode o2) {
+					for (RepositorySortDefinition sort : sorts) {
+						QName property = conversionService.getRequired(sort.getProperty());
+						int factor = sort.isAscending() ? 1 : -1;
+						Serializable value1 = nodeService.getProperty(conversionService.getRequired(o1.getNodeReference()), property);
+						Serializable value2 = nodeService.getProperty(conversionService.getRequired(o2.getNodeReference()), property);
+						
+						if (value1 instanceof String && value2 instanceof String) {
+							int diff = ((String) value1).compareToIgnoreCase((String) value2);
+							if (diff != 0) {
+								return factor * diff;
+							}
+						} else if (value1 instanceof Comparable && value2 instanceof Comparable) {
+							@SuppressWarnings("unchecked")
+							int diff = ((Comparable<Object>) value1).compareTo(value2);
+							if (diff != 0) {
+								return factor * diff;
+							}
+						} else if (value1 != null) {
+							return factor * -1;
+						} else if (value2 != null) {
+							return factor;
 						}
-					} else if (value1 != null) {
-						return -1;
-					} else if (value2 != null) {
-						return +1;
 					}
+					return 0;
 				}
-				return 0;
-			}
-		});
+			});
+		}
 		
 		return nodes;
 	}

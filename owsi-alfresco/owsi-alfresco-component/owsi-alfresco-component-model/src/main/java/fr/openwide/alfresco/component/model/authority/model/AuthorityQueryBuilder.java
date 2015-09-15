@@ -9,6 +9,7 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 public class AuthorityQueryBuilder {
 
 	private RepositoryAuthoritySearchParameters searchParameters = new RepositoryAuthoritySearchParameters();
+	private AuthoritySortBuilder sortBuilder = new AuthoritySortBuilder(this);
 	
 	public AuthorityQueryBuilder parentAuthority(RepositoryAuthority parentAuthority) {
 		this.searchParameters.setParentAuthority(parentAuthority);
@@ -38,4 +39,7 @@ public class AuthorityQueryBuilder {
 		return searchParameters;
 	}
 
+	public AuthoritySortBuilder sort() {
+		return sortBuilder;
+	}
 }
