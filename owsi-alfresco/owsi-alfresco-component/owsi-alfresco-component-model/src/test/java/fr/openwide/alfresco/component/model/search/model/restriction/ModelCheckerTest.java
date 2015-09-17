@@ -23,6 +23,7 @@ public class ModelCheckerTest {
 				+ "SysReferenceable : Field name storeIdentifier is not the same as the property name store-identifier\n"
 				+ "SysReferenceable : Field name nodeUuid is not the same as the property name node-uuid\n"
 				+ "SysReferenceable : Field name nodeDbid is not the same as the property name node-dbid\n"
+				+ "CmModel : Field name copiedFrom is not the same as the container name copiedfrom\n"
 				+ "CmModel : Field name workingCopy is not the same as the container name workingcopy\n"
 				+ "CmModel : Field name generalClassifiable is not the same as the container name generalclassifiable\n"
 				+ "CmModel : Field name object is not the same as the container name cmobject\n"
