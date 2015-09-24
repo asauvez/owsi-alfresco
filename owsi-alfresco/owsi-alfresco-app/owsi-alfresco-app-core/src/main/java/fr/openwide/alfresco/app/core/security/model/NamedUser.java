@@ -5,8 +5,8 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
 
 public class NamedUser extends User implements RepositoryUserProvider {
 
@@ -14,7 +14,8 @@ public class NamedUser extends User implements RepositoryUserProvider {
 
 	private RepositoryUser repositoryUser;
 
-	public NamedUser(RepositoryUser repositoryUser, String password, Collection<? extends GrantedAuthority> authorities) {
+	public NamedUser(RepositoryUser repositoryUser, String password, 
+			Collection<? extends GrantedAuthority> authorities) {
 		super(repositoryUser.getUserReference().getUsername(), password != null ? password : "N/A", authorities);
 		this.repositoryUser = repositoryUser;
 	}
@@ -34,6 +35,14 @@ public class NamedUser extends User implements RepositoryUserProvider {
 	@Override
 	public RepositoryUser getRepositoryUser() {
 		return repositoryUser;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(super.toString()).append("; ");
+		sb.append("RepositoryUser: ").append(repositoryUser);
+		return sb.toString();
 	}
 
 }

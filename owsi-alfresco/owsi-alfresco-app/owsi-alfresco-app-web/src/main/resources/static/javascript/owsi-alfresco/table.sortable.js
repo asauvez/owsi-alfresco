@@ -2,8 +2,25 @@
  * Dépendence : jquery.ba-bbq.js
  */
 (function( $ ){
-	$.extend($.fn, {
-		tableSortable: function() {
+	$.fn.extend({
+		tableSortable: function(options) {
+			
+			options = $.extend({
+				asc: 'ASC',
+				desc: 'DESC',
+				ascSortedOrder: function(column, a) {
+					column.append(' <i class="glyphicon glyphicon-sort-by-attributes"></i>');
+				},
+				descSortedOrder: function(column, a) {
+					column.append(' <i class="glyphicon glyphicon-sort-by-attributes-alt"></i>');
+				},
+				doDisplay: function(me, column, newState, a) {
+					a.attr("href", "#" + $.param(newState));
+					a.html(column.html());
+					column.html(a);
+				}
+			}, options);
+			
 			this.each(function() {
 				var me = $(this);
 				
@@ -34,19 +51,17 @@
 					widgetState["sort.property"] = columnId;
 					var a = $(document.createElement("a"));
 					if (columnId == sortedBy) {
-						if (sortedOrder == "ASC") {
-							column.append(' <i class="glyphicon glyphicon-sort-by-attributes"></i>');
-							widgetState["sort.direction"] = "DESC";
+						if (sortedOrder == options.asc) {
+							options.ascSortedOrder(column, a);
+							widgetState["sort.direction"] = options.desc;
 						} else {
-							column.append(' <i class="glyphicon glyphicon-sort-by-attributes-alt"></i>');
-							widgetState["sort.direction"] = "ASC";
+							options.descSortedOrder(column, a);
+							widgetState["sort.direction"] = options.asc;
 						}
 					} else {
-						widgetState["sort.direction"] = "ASC";
+						widgetState["sort.direction"] = options.asc;
 					}
-					a.attr("href", "#" + $.param(newState));
-					a.html(column.html());
-					column.html(a);
+					options.doDisplay(me, column, newState, a);
 				});
 			});
 			// chainage jquery

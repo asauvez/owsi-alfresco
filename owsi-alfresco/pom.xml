@@ -9,17 +9,22 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.0</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco</name>
 	<description>Capitalisation des développements utilisés sur les projets Alfresco</description>
 
+	<properties>
+		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
+	</properties>
+
 	<modules>
 		<module>owsi-alfresco-parent</module>
+		<module>owsi-alfresco-api</module>
 		<module>owsi-alfresco-app</module>
-		<module>owsi-alfresco-component</module>
 		<module>owsi-alfresco-repo</module>
+		<module>owsi-alfresco-component</module>
 	</modules>
 
 	<distributionManagement>
@@ -48,17 +53,29 @@
 	<scm>
 		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools</developerConnection>
 		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/browser/owsi-alfresco</url>
-		<tag>HEAD</tag>
+		<tag>owsi-alfresco-0.2.0</tag>
 	</scm>
 
 	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
+					<groupId>external.atlassian.jgitflow</groupId>
+					<artifactId>jgitflow-maven-plugin</artifactId>
+					<version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
 					<configuration>
-						<proc>none</proc>
+						<flowInitContext>
+							<masterBranchName>master</masterBranchName>
+							<developBranchName>dev</developBranchName>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+							<versionTagPrefix>v</versionTagPrefix>
+						</flowInitContext>
+						<noDeploy>true</noDeploy>
+						<pullDevelop>true</pullDevelop>
+						<pullMaster>true</pullMaster>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -69,7 +86,7 @@
 		<repository>
 			<id>nexus-owsi-core</id>
 			<name>OWSI Core</name>
-			<url>http://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

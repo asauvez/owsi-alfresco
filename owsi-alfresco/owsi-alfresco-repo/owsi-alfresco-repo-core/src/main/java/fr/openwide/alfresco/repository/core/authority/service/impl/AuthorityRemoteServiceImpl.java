@@ -1,45 +1,113 @@
 package fr.openwide.alfresco.repository.core.authority.service.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.QName;
 
-import fr.openwide.alfresco.repository.api.authority.service.AuthorityRemoteService;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
-import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
+import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 
 	private NodeRemoteService nodeRemoteService;
 	private ConversionService conversionService;
 
+	private PersonService personService;
 	private AuthorityService authorityService;
+	private NodeService nodeService;
 
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
-		return getContained(repoAuthority, AuthorityType.USER, immediate, nodeScope, remoteCallParameters);
+	public RepositoryNode getUser(String userName, NodeScope nodeScope) throws NoSuchNodeRemoteException {
+		NodeRef nodeRef = personService.getPersonOrNull(userName);
+		if (nodeRef == null) {
+			throw new NoSuchNodeRemoteException(userName);
+		}
+		return nodeRemoteService.get(conversionService.get(nodeRef), nodeScope);
+	}
+	
+	@Override
+	public List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters) {
+		return getContained(AuthorityType.USER, searchParameters);
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthority repoAuthority, boolean immediate, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
-		return getContained(repoAuthority, AuthorityType.GROUP, immediate, nodeScope, remoteCallParameters);
+	public List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters) {
+		return getContained(AuthorityType.GROUP, searchParameters);
 	}
 
-	private List<RepositoryNode> getContained(RepositoryAuthority repoAuthority, AuthorityType type, boolean immediate, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
-		Set<String> authorities = authorityService.getContainedAuthorities(type, repoAuthority.getName(), immediate);
+	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthorityQueryParameters searchParameters) {
+		Set<String> authorities = authorityService.getContainedAuthorities(type, 
+				searchParameters.getParentAuthority().getName(), 
+				searchParameters.isImmediate());
+		
+		Pattern pattern = (searchParameters.getFilterValue() != null) 
+				? Pattern.compile(".*\\b" + searchParameters.getFilterValue().toLowerCase() + ".*") : null;
+		
 		List<RepositoryNode> nodes = new ArrayList<RepositoryNode>();
 		for (String authority : authorities) {
 			NodeRef nodeRef = authorityService.getAuthorityNodeRef(authority);
-			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), nodeScope, remoteCallParameters));
+			
+			if (pattern != null) {
+				String nodeName = (String) nodeService.getProperty(nodeRef, 
+						conversionService.getRequired(searchParameters.getFilterProperty()));
+				if (! pattern.matcher(nodeName.toLowerCase()).matches()) {
+					continue;
+				}
+			}
+			
+			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), searchParameters.getNodeScope()));
 		}
+		
+		final List<RepositorySortDefinition> sorts = searchParameters.getSorts();
+		if (! sorts.isEmpty()) {
+			Collections.sort(nodes, new Comparator<RepositoryNode>() {
+				@Override
+				public int compare(RepositoryNode o1, RepositoryNode o2) {
+					for (RepositorySortDefinition sort : sorts) {
+						QName property = conversionService.getRequired(sort.getProperty());
+						int factor = sort.isAscending() ? 1 : -1;
+						Serializable value1 = nodeService.getProperty(conversionService.getRequired(o1.getNodeReference()), property);
+						Serializable value2 = nodeService.getProperty(conversionService.getRequired(o2.getNodeReference()), property);
+						
+						if (value1 instanceof String && value2 instanceof String) {
+							int diff = ((String) value1).compareToIgnoreCase((String) value2);
+							if (diff != 0) {
+								return factor * diff;
+							}
+						} else if (value1 instanceof Comparable && value2 instanceof Comparable) {
+							@SuppressWarnings("unchecked")
+							int diff = ((Comparable<Object>) value1).compareTo(value2);
+							if (diff != 0) {
+								return factor * diff;
+							}
+						} else if (value1 != null) {
+							return factor * -1;
+						} else if (value2 != null) {
+							return factor;
+						}
+					}
+					return 0;
+				}
+			});
+		}
+		
 		return nodes;
 	}
 	
@@ -52,5 +120,11 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 
 	public void setAuthorityService(AuthorityService authorityService) {
 		this.authorityService = authorityService;
+	}
+	public void setPersonService(PersonService personService) {
+		this.personService = personService;
+	}
+	public void setNodeService(NodeService nodeService) {
+		this.nodeService = nodeService;
 	}
 }

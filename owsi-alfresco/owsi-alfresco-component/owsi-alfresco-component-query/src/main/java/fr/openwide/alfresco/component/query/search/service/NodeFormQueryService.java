@@ -7,8 +7,8 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.query.form.result.FormQueryResult;
 import fr.openwide.alfresco.component.query.search.model.NodeFormQuery;
 import fr.openwide.alfresco.component.query.search.model.SearchFormQuery;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public interface NodeFormQueryService {
 

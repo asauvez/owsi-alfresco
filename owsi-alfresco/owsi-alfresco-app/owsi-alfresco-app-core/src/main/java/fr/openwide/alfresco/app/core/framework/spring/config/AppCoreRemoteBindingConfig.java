@@ -1,15 +1,9 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
@@ -19,29 +13,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.openwide.alfresco.app.core.AlfrescoAppCorePackage;
-import fr.openwide.alfresco.app.core.node.binding.ByteArrayRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.InputStreamRepositoryContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.ReaderRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.StringRepositoryContentSerializer;
-import fr.openwide.alfresco.app.core.node.binding.TempFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
 
 @Configuration
-@ComponentScan(
-	basePackageClasses = {
-		AlfrescoAppCorePackage.class
-	},
-	// https://jira.springsource.org/browse/SPR-8808
-	// on veut charger de manière explicite le contexte ; de ce fait,
-	// on ignore l'annotation @Configuration sur le scan de package.
-	excludeFilters = @Filter(Configuration.class)
-)
 public class AppCoreRemoteBindingConfig {
 
 	@Autowired
@@ -49,33 +29,29 @@ public class AppCoreRemoteBindingConfig {
 
 	@Bean
 	@Primary
-	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RestTemplate restTemplate, 
-			NodeContentSerializationComponent serializationComponent, RepositoryTicketProvider ticketProvider) {
+	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RepositoryTicketProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
-		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName, null, ticketProvider);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, ticketName, null, ticketProvider);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding(RestTemplate restTemplate, 
-			NodeContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding() {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
-		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding(RestTemplate restTemplate, 
-			NodeContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding requiringExplicitTicketRemoteBinding() {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
-		return new RepositoryRemoteBinding(restTemplate, serializationComponent, repositoryUri, ticketName);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, ticketName);
 	}
 
 	@Bean
-	public RepositoryRemoteBinding authenticationRemoteBinding(RestTemplate restTemplate, 
-			NodeContentSerializationComponent serializationComponent) {
+	public RepositoryRemoteBinding authenticationRemoteBinding() {
 		String authenticationUri = environment.getRequiredProperty("application.authentication.repository.root.uri");
-		return new RepositoryRemoteBinding(restTemplate, serializationComponent, authenticationUri);
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), authenticationUri);
 	}
 
 	@Bean
@@ -89,14 +65,9 @@ public class AppCoreRemoteBindingConfig {
 
 	@Bean
 	public NodeContentSerializationComponent serializationComponent() {
-		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new HashMap<>();
-		serializersByClass.put(String.class, StringRepositoryContentSerializer.INSTANCE);
-		serializersByClass.put(byte[].class, ByteArrayRepositoryContentSerializer.INSTANCE);
-		serializersByClass.put(File.class, TempFileRepositoryContentSerializer.INSTANCE);
+		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = NodeContentSerializationComponent.getDefaultSerializersByClass();
 		serializersByClass.put(MultipartFile.class, MultipartFileRepositoryContentSerializer.INSTANCE);
-		serializersByClass.put(InputStream.class, InputStreamRepositoryContentSerializer.INSTANCE);
-		serializersByClass.put(Reader.class, ReaderRepositoryContentSerializer.INSTANCE);
-		
+
 		return new NodeContentSerializationComponent(
 				new ObjectMapper(), 
 				serializersByClass, 

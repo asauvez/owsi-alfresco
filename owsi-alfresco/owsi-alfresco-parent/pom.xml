@@ -10,18 +10,19 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.0</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
 	<description>Définition des dépendances et plugins partagées par les autres projets et modules</description>
 
 	<properties>
-		<owsi-alfresco.alfresco.version>4.2.4</owsi-alfresco.alfresco.version>
+		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
 	</properties>
 
 	<modules>
 		<module>owsi-alfresco-parent-bom</module>
+		<module>owsi-alfresco-parent-api</module>
 		<module>owsi-alfresco-parent-app</module>
 		<module>owsi-alfresco-parent-repo</module>
 	</modules>
@@ -53,10 +54,21 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
+					<groupId>external.atlassian.jgitflow</groupId>
+					<artifactId>jgitflow-maven-plugin</artifactId>
+					<version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
 					<configuration>
-						<proc>none</proc>
+						<flowInitContext>
+							<masterBranchName>master</masterBranchName>
+							<developBranchName>dev</developBranchName>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+							<versionTagPrefix>v</versionTagPrefix>
+						</flowInitContext>
+						<noDeploy>true</noDeploy>
+						<pullDevelop>true</pullDevelop>
+						<pullMaster>true</pullMaster>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -67,7 +79,7 @@
 		<repository>
 			<id>nexus-owsi-core</id>
 			<name>OWSI Core</name>
-			<url>http://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -79,14 +91,6 @@
 			<releases>
 				<enabled>false</enabled>
 			</releases>
-		</repository>
-		<repository>
-			<id>alfresco-enterprise</id>
-			<name>Alfresco Enterprise Artifacts</name>
-			<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
 		</repository>
 	</repositories>
 

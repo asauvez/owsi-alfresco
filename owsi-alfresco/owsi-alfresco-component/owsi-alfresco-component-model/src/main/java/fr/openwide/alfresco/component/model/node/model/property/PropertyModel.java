@@ -8,7 +8,7 @@ import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.Model;
 import fr.openwide.alfresco.component.model.node.model.constraint.ConstraintException;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class PropertyModel<C extends Serializable> extends Model {
 
@@ -20,12 +20,7 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 		this.type = type;
 		type.addProperty(this);
 	}
-
-	@Override
-	public String toLucene() {
-		return "@" + super.toLucene();
-	}
-
+	
 	public abstract Class<C> getValueClass();
 
 	public ContainerModel getType() {

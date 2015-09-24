@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
@@ -19,7 +19,7 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 
 	@Autowired
 	@Qualifier("runAsUserDetailsService")
-	private UserDetailsService userDetailsService;
+	private RepositoryAuthenticationUserDetailsService userDetailsService;
 
 	@Bean
 	public UserService userService() {
@@ -28,7 +28,7 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 
 	@Bean
 	public RepositoryTicketProvider ticketProvider() {
-		return new UserAwareRepositoryTicketProvider(userService());
+		return new UserAwareRepositoryTicketProvider(userService(), userDetailsService);
 	}
 
 	@Bean

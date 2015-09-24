@@ -6,7 +6,7 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmVersionable extends AspectModel {
 

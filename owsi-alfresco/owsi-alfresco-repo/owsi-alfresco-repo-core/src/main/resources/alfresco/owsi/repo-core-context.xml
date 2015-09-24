@@ -9,14 +9,11 @@
 		<property name="nodeService" ref="NodeService" />
 		<property name="contentService" ref="ContentService" />
 		<property name="permissionService" ref="PermissionService" />
+		<property name="renditionService" ref="RenditionService" />
+		<property name="transactionService" ref="transactionService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 
-	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.repository.core.remote.service.impl.ConversionServiceImpl">
-		<property name="namespacePrefixResolver" ref="NamespaceService" />
-		<property name="mimetypeService" ref="MimetypeService" />
-	</bean>
-	
 	<!-- Node webscripts -->
 
 	<bean id="webscript.owsi.node" parent="webscript.owsi.remote" abstract="true">
@@ -60,6 +57,8 @@
 		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="authorityService" ref="AuthorityService" />
+		<property name="personService" ref="PersonService" />
+		<property name="nodeService" ref="NodeService" />
 	</bean>
 
 	<!-- Authority webscripts -->
@@ -68,6 +67,8 @@
 		<property name="authorityRemoteService" ref="owsi.service.authorityService" />
 	</bean>
 
+	<bean id="webscript.owsi.remote.authority.get-user.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetUserWebScript" />
 	<bean id="webscript.owsi.remote.authority.get-contained-users.post" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedUsersWebScript" />
 	<bean id="webscript.owsi.remote.authority.get-contained-groups.post" parent="webscript.owsi.authority"

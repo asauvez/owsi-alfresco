@@ -4,19 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 
 /**
  * Wrappe une liste de RepositoryNode dans une liste de BusinessNode.
- * 
- * Les modifications sur cette liste seront repris sur la list wrappé.
- * 
- * @author asauvez
+ * Les modifications sur cette liste seront repris sur la liste wrappée.
  */
 public class BusinessNodeList extends ArrayList<BusinessNode> {
-	
+
+	private static final long serialVersionUID = -578237060645959563L;
+
 	private final List<RepositoryNode> nodes;
-	
+
 	public BusinessNodeList(List<RepositoryNode> nodes) {
 		this.nodes = nodes;
 		for (RepositoryNode node : nodes) {

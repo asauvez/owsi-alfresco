@@ -2,37 +2,40 @@ package fr.openwide.alfresco.app.core.search.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
-import fr.openwide.alfresco.repository.api.search.service.SearchQueryLanguage;
 
-@Service
 public class NodeSearchServiceImpl implements NodeSearchService {
 
-	@Autowired
-	private NodeService nodeService;
+	private static final Logger LOGGER = LoggerFactory.getLogger(NodeSearchServiceImpl.class);
+	
+	private final NodeService nodeService;
 
-	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, RemoteCallParameters remoteCallParameters) {
-		return search(query, storeReference, nodeScope, remoteCallParameters, SearchQueryLanguage.FTS_ALFRESCO);
+	public NodeSearchServiceImpl(NodeService nodeService) {
+		this.nodeService = nodeService;
 	}
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope nodeScope, RemoteCallParameters remoteCallParameters, SearchQueryLanguage language) {
+	public List<RepositoryNode> search(String query, NodeScope nodeScope) {
+		RepositorySearchParameters searchParameters = new RepositorySearchParameters();
+		searchParameters.setQuery(query);
+		searchParameters.setNodeScope(nodeScope);
+		return search(searchParameters);
+	}
+
+	@Override
+	public List<RepositoryNode> search(RepositorySearchParameters searchParameters) {
+		LOGGER.debug(searchParameters.getQuery());
+		
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
-		payload.query = query;
-		payload.storeReference = storeReference;
-		payload.nodeScope = nodeScope;
-		payload.remoteCallParameters = remoteCallParameters;
-		payload.language = language;
-		return nodeService.callNodeListSerializer(SEARCH_NODE_SERVICE.ENDPOINT, payload, nodeScope);
+		payload.searchParameters = searchParameters;
+		return nodeService.callNodeListSerializer(SEARCH_NODE_SERVICE.ENDPOINT, payload, searchParameters.getNodeScope());
 	}
 
 }

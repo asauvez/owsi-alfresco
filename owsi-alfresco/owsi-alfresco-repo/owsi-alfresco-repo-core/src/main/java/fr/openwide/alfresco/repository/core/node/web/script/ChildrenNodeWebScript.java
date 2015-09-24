@@ -6,9 +6,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService.CHILDREN_NODE_SERVICE;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.CHILDREN_NODE_SERVICE;
 
 public class ChildrenNodeWebScript extends AbstractNodeListWebScript<CHILDREN_NODE_SERVICE> {
 
@@ -17,8 +16,7 @@ public class ChildrenNodeWebScript extends AbstractNodeListWebScript<CHILDREN_NO
 		return nodeService.getChildren(
 				Objects.requireNonNull(parameter.nodeReference, "NodeReference"), 
 				Objects.requireNonNull(parameter.childAssocTypeName, "ChildAssocTypeName"), 
-				Objects.requireNonNull(parameter.nodeScope, "NodeScope"),
-				Objects.requireNonNull(parameter.remoteCallParameters, "RemoteCallParameters"));
+				Objects.requireNonNull(parameter.nodeScope, "NodeScope"));
 	}
 
 	@Override
@@ -26,8 +24,4 @@ public class ChildrenNodeWebScript extends AbstractNodeListWebScript<CHILDREN_NO
 		return SimpleType.construct(CHILDREN_NODE_SERVICE.class);
 	}
 
-	@Override
-	protected RemoteCallParameters getRemoteCallParameters(CHILDREN_NODE_SERVICE payload) {
-		return payload.remoteCallParameters;
-	}
 }

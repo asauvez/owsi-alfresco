@@ -3,20 +3,19 @@ package fr.openwide.alfresco.component.model.authority.service;
 import java.util.List;
 import java.util.Map;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
 
-/**
- * @author asauvez
- */
 public interface AuthorityModelService {
 
-	List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate);
-	List<BusinessNode> getContainedUsers(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder);
+	BusinessNode getUser(String userName, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException;
+	
+	List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder);
 
-	List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate);
-	Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(RepositoryAuthority authority, boolean immediate);
-	List<BusinessNode> getContainedGroups(RepositoryAuthority authority, boolean immediate, NodeScopeBuilder nodeScopeBuilder);
+	List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder);
+	Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder);
 
 }

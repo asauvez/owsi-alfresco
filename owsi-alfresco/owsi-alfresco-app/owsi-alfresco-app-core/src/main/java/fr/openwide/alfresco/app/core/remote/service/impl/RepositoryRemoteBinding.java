@@ -25,20 +25,23 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
-import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
+import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.remote.exception.RepositoryRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.EntityEnclosingRestEndpoint;
-import fr.openwide.alfresco.repository.api.remote.model.endpoint.RestEndpoint;
 
 public class RepositoryRemoteBinding {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
+	private static final Logger LOGGER_AUDIT = LoggerFactory.getLogger(RepositoryRemoteBinding.class.getName() + "_audit");
 
 	private final RestTemplate restTemplate;
 	private final NodeContentSerializationComponent serializationComponent;
@@ -67,28 +70,26 @@ public class RepositoryRemoteBinding {
 		this.ticketProvider = Optional.fromNullable(ticketProvider);
 	}
 
-	public <R> RepositoryRemoteCallBuilder<R> builder(RestEndpoint<R> restCall) {
+	public <R> RepositoryRemoteCallBuilder<R> builder(RemoteEndpoint<R> restCall) {
 		return new RepositoryRemoteCallBuilder<R>(this, restCall);
 	}
-	public <R> RepositoryRemoteCallBuilder<R> builder(EntityEnclosingRestEndpoint<R> restCall, Object content) {
+	public <R> RepositoryRemoteCallBuilder<R> builder(EntityEnclosingRemoteEndpoint<R> restCall, Object content) {
 		return new RepositoryRemoteCallBuilder<R>(this, restCall, content);
 	}
-	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(EntityEnclosingRestEndpoint<R> restCall) {
+	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(EntityEnclosingRemoteEndpoint<R> restCall) {
 		return new RepositoryNodeRemoteCallBuilder<R>(this, restCall, serializationComponent);
 	}
 
-	public <T> T exchange(String path, HttpMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
+	public <T> T exchange(String path, RemoteEndpointMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
 		URI uri = getURI(path, urlVariables);
 		addTicketHeader(headers);
 		HttpEntity<Object> requestEntity = new HttpEntity<Object>(request, headers);
 		return execute(uri, method, requestEntity, null, responseType, null);
 	}
 
-	public <T> T exchange(String path, HttpMethod method, final HttpHeaders headers, 
+	public <T> T exchange(String path, RemoteEndpointMethod method, final HttpHeaders headers, 
 			final RequestCallback requestCallback, ResponseExtractor<T> responseExtractor, 
 			Object... urlVariables) {
-		URI uri = getURI(path, urlVariables);
-		addTicketHeader(headers);
 		RequestCallback realRequestCallback = new RequestCallback() {
 			@Override
 			public void doWithRequest(ClientHttpRequest request) throws IOException {
@@ -98,10 +99,23 @@ public class RepositoryRemoteBinding {
 				}
 			}
 		};
-		return execute(uri, method, null, realRequestCallback, null, responseExtractor);
+		
+		for (int essai=0; ; essai++) {
+			try {
+				URI uri = getURI(path, urlVariables);
+				addTicketHeader(headers);
+				return execute(uri, method, null, realRequestCallback, null, responseExtractor);
+			} catch (UnauthorizedRemoteException e) {
+				if (ticketProvider.isPresent() && essai < 2) {
+					ticketProvider.get().renewTicket();
+				} else {
+					throw e;
+				}
+			}
+		}
 	}
 
-	protected void addTicketHeader(HttpHeaders headers) {
+	private void addTicketHeader(HttpHeaders headers) {
 		if (ticketHeader != null && ticketProvider.isPresent()) {
 			// get ticket
 			RepositoryTicket ticket = ticketProvider.get().getTicket();
@@ -109,31 +123,42 @@ public class RepositoryRemoteBinding {
 		}
 	}
 
-	protected <T> T execute(URI uri, HttpMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
+	private <T> T execute(URI uri, RemoteEndpointMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
 			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Executing {} method with uri: {}", method, uri);
+			LOGGER.debug("Executing {} method with uri: {}", method, getProtectedURI(uri));
 		}
+		long before = System.currentTimeMillis();
+		HttpMethod httpMethod = HttpMethod.valueOf(method.name());
 		try {
 			if (responseExtractor != null) {
-				return restTemplate.execute(uri, method, requestCallback, responseExtractor);
+				return restTemplate.execute(uri, httpMethod, requestCallback, responseExtractor);
 			} else {
-				ResponseEntity<T> exchange = restTemplate.exchange(uri, method, requestEntity, responseType);
+				ResponseEntity<T> exchange = restTemplate.exchange(uri, httpMethod, requestEntity, responseType);
 				return exchange.getBody();
 			}
 		} catch (ResourceAccessException e) {
 			// log to debug, target exception should be logged by the caller/framework
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Exception on " + method + " method with uri: " + uri, e);
+				LOGGER.debug("Exception on " + method + " method with uri: " + getProtectedURI(uri), e);
 			}
 			throw mapResourceAccessException(e);
 		} catch (Exception e) {
 			// log to debug, target exception should be logged by the caller/framework
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Unexpected exception on " + method + " method with uri: " + uri, e);
+				LOGGER.debug("Unexpected exception on " + method + " method with uri: " + getProtectedURI(uri), e);
 			}
 			throw new IllegalStateException(e);
+		} finally {
+			if (LOGGER_AUDIT.isInfoEnabled()) {
+				LOGGER_AUDIT.info("{} : {} ms", getProtectedURI(uri), System.currentTimeMillis() - before);
+			}
 		}
+	}
+	
+	private URI getProtectedURI(URI uri) {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri);
+		return (builder.build().getQueryParams().get(ticketParam) != null) ? builder.replaceQueryParam(ticketParam, "[PROTECTED]").build().toUri() : uri;
 	}
 
 	protected URI getURI(String path, Object... uriVars) {

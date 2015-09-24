@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -18,19 +19,19 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializationParameters;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentDeserializer;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationComponent;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializationParameters;
-import fr.openwide.alfresco.repository.api.node.binding.NodeContentSerializer;
-import fr.openwide.alfresco.repository.api.node.binding.NodePayloadCallback;
-import fr.openwide.alfresco.repository.api.node.model.ContentPropertyWrapper;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.NodePayloadCallback;
+import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
 public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R> {
@@ -49,19 +50,16 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	protected Collection<RepositoryNode> getOutputNodes(@SuppressWarnings("unused") R result) {
 		return Collections.emptySet();
 	}
-	protected RemoteCallParameters getRemoteCallParameters(@SuppressWarnings("unused") P payload) {
-		return null;
-	}
 
 	/**
-	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and null is passed
+	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and nu
+			public Collection<RepositoryNode> extractNodes(P payload) {ll is passed
 	 * as the payload to {@link AbstractRemoteWebScript#executeImpl(WebScriptRequest, WebScriptResponse, Status, Cache)}
 	 */
 	protected abstract JavaType getParameterType();
 
 	@Override
-	protected R executeImpl(WebScriptRequest request, WebScriptResponse response, Status status, Cache cache) throws IOException {
-		final AtomicReference<P> payloadRef = new AtomicReference<>();
+	protected R executeImpl(WebScriptRequest request, final WebScriptResponse response, Status status, Cache cache) throws IOException {
 		final AtomicReference<R> resultRef = new AtomicReference<>();
 		NodePayloadCallback<P> payloadCallback = new NodePayloadCallback<P>() {
 			@Override
@@ -69,40 +67,36 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 				return getInputNodes(payload);
 			}
 			@Override
-			public void doWithPayload(P payload, Map<Integer, ContentPropertyWrapper> wrappers) {
-				payloadRef.set(payload);
-				
-				for (ContentPropertyWrapper wrapper : wrappers.values()) {
-					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentCallback() {
-						@Override
-						public void doWithInputStream(NameReference contentProperty, InputStream inputStream) {
-							// va être surchargé par le service
-						}
-					});
+			public void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers) {
+				for (ContentPropertyWrapper wrapper : wrappers) {
+					// va être renseigné par le service
+					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentHolder(wrapper));
 				}
-				R result = execute(payload);
+				// Vrai appel du Service
+				R result = execute(remoteCallPayload.getPayload());
 				resultRef.set(result);
 			}
 		};
 		
-		serializationComponent.deserialize(
+		// L'appel du service se fait dans le callback
+		RemoteCallPayload<P> remoteCallPayload = serializationComponent.deserialize(
 				getParameterType(), payloadCallback, defaultDeserializationParameters,
 				request.getContent().getInputStream());
 		
-		P payload = payloadRef.get();
-		R result = resultRef.get();
+		final R result = resultRef.get();
 		
 		// generate output
 		response.setContentType(NodeContentSerializationComponent.CONTENT_TYPE);
-		
-		NodeContentSerializationParameters parameters = defaultSerializationParameters;
-		RemoteCallParameters remoteCallParameters = getRemoteCallParameters(payload);
-		if (remoteCallParameters != null && remoteCallParameters.getCompressionLevel() != null) {
-			parameters = parameters.clone();
-			parameters.setCompressionLevel(Optional.fromNullable(remoteCallParameters.getCompressionLevel()));
-		}
-		Collection<RepositoryNode> outputNodes = getOutputNodes(result);
-		serializationComponent.serialize(result, outputNodes, parameters, response.getOutputStream());
+		final Collection<RepositoryNode> outputNodes = getOutputNodes(result);
+		RemoteCallParameters.execute(remoteCallPayload.getRemoteCallParameters(), new Callable<Void>() {
+			@Override
+			public Void call() throws IOException {
+				try (OutputStream outputStream = response.getOutputStream()) {
+					serializationComponent.serialize(result, outputNodes, defaultSerializationParameters, outputStream);
+					return null;
+				}
+			}
+		});
 		
 		return resultRef.get();
 	}
@@ -112,9 +106,6 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 		// noop : déjà traité plus haut
 	}
 
-	public void setNodeService(NodeRemoteService nodeService) {
-		this.nodeService = nodeService;
-	}
 	@Override
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		super.setObjectMapper(objectMapper);
@@ -130,16 +121,21 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			}
 		});
 		
-		NodeContentDeserializer<?> defaultDeserializer = new NodeContentDeserializer<Void>() {
+		NodeContentDeserializer<Void> defaultDeserializer = new NodeContentDeserializer<Void>() {
 			@Override
 			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
-				NodeContentCallback callback = (NodeContentCallback) node.getContents().get(contentProperty);
-				callback.doWithInputStream(contentProperty, inputStream);
+				NodeContentHolder holder = (NodeContentHolder) node.getContents().get(contentProperty);
+				if (holder.getCallback() != null) {
+					holder.getCallback().doWithInputStream(inputStream);
+				}
 				return null;
 			}
 		};
-		
 		serializationComponent = new NodeContentSerializationComponent(objectMapper, serializersByClass, defaultDeserializer);
+	}
+	
+	public void setNodeService(NodeRemoteService nodeService) {
+		this.nodeService = nodeService;
 	}
 
 }

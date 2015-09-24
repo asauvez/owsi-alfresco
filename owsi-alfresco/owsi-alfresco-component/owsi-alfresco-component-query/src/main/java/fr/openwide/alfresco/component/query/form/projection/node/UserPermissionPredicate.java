@@ -2,9 +2,9 @@ package fr.openwide.alfresco.component.query.form.projection.node;
 
 import com.google.common.base.Predicate;
 
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 
 public class UserPermissionPredicate implements Predicate<RepositoryNode>, NodeScopeInitializer {
 

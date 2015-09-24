@@ -3,19 +3,20 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<artifactId>owsi-alfresco-parent</artifactId>
+		<version>0.2.0</version>
+		<relativePath>../owsi-alfresco-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-component</artifactId>
 	<packaging>pom</packaging>
 
-	<name>OWSI Alfresco - Query</name>
-	<description>Requêteur de noeuds dans Alfresco : génération de requêtes et de formulaires</description>
+	<name>OWSI Alfresco - Component</name>
+	<description>Composants optionnels pouvant être intégrés ou dans Alfresco ou dans l'application spécifique sur Alfresco</description>
 
 	<modules>
 		<module>owsi-alfresco-component-model</module>
-		<module>owsi-alfresco-component-query</module>
 		<module>owsi-alfresco-component-kerberos</module>
+		<module>owsi-alfresco-component-query</module>
 	</modules>
 
 </project>

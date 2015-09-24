@@ -1,5 +1,5 @@
 (function( $ ){
-	$.extend($.fn, {
+	$.fn.extend({
 		displayAlert: function(type, message) {
 			this.each(function() {
 				var element = $(this);
@@ -15,6 +15,74 @@
 			return this;
 		},
 		
+		getGlobalAlertContainer: function() {
+			var form = $(this);
+			if (form.find(".alert-container").length > 0) {
+				return form.find(".alert-container").first();
+			}
+			else {
+				var alertContainer = $(document.createElement("div")).addClass("alert-container");
+				if (form.find(".form-group").length > 0) {
+					alertContainer.prependTo(form.find(".form-group").first().closest(".panel-body,.modal-body"));
+				} else {
+					alertContainer.prependTo(form.find(".panel-body,.modal-body").first());
+				}
+				return alertContainer;
+			}
+		},
+		
+		applicationMessage: function(messageCode) {
+			return APPLICATION_MESSAGES[messageCode];
+		},
+		
+		handleResponseStatusError: function(form, xhr) {
+			var alertElement = $(document.createElement("div")).displayAlert("error", xhr.status + " - " + $.fn.applicationMessage("exception.generic.message"));
+			form.getGlobalAlertContainer().append(alertElement).show();
+		},
+		
+		displayGlobalAlert: function(form, globalAlert) {
+			var alertElement = $(document.createElement("div")).displayAlert(globalAlert.type, globalAlert.message);
+			form.getGlobalAlertContainer().append(alertElement);
+			
+			if (globalAlert.details) {
+				// popover en dessous de l'Alert
+				alertElement.addClass("display-popover");
+				alertElement.attr("title", "Exception");
+				alertElement.data("content", globalAlert.details);
+				alertElement.popover({
+					animation: false,
+					placement: "bottom",
+					trigger: "click",
+					beforeShow: function(popover) {
+						popover.addClass("popover-exception");
+					},
+					closable: true
+				});
+			}
+			
+			form.getGlobalAlertContainer().show();
+		},
+		
+		getInputFromFieldError: function(fieldError) {
+			return $(this).find("[name='" + fieldError.field + "']");
+		},
+		
+		displayFieldError: function(form, item) {
+			var input = form.getInputFromFieldError(item);
+			var formGroup = input.closest(".form-group");
+			formGroup.addClass("has-warning");
+			
+			var errorPicto = $(document.createElement("span")).html("!").addClass("warning-picto");
+			formGroup.find("label.control-label").prepend(errorPicto);
+			
+			var helpBlock = formGroup.find(".help-block");
+			if (helpBlock.length == 0) {
+				// Ajout du conteneur de message d'erreur
+				helpBlock = $(document.createElement("span")).addClass("help-block").insertAfter(input);
+			}
+			helpBlock.html(item.message).show();
+		},
+		
 		formBindClearErrors: function() {
 			this.each(function() {
 				var form = $(this);
@@ -22,30 +90,23 @@
 				form.find('.help-block').hide();
 				form.find('.error-picto').remove();
 				form.find('.warning-picto').remove();
+				form.find('.alert-container .alert').not('.keep').remove();
 				form.find(".form-group").first().closest(".panel-body, .modal-body").find('.alert').not('.keep').remove();
 				form.find(".panel-body, .modal-body").find('.alert').not('.keep').remove();
 
-				var globalAlertContainer = $(".global-alerts");
+				var globalAlertContainer = form.getGlobalAlertContainer();
 				globalAlertContainer.hide();
 				globalAlertContainer.find('.alert').remove();
 			});
 		},
 		
-		formBindManageJsonErrors : function(xhr) {
+		formBindManageJsonErrors: function(xhr) {
 			this.each(function() {
 				var form = $(this);
-
-				var displayAlert = function(alertElement) {
-					if (form.find(".form-group").length > 0) {
-						form.find(".form-group").first().closest(".panel-body,.modal-body").prepend(alertElement);
-					} else {
-						form.find(".panel-body,.modal-body").first().prepend(alertElement);
-					}
-				};
+				form.trigger("aftersubmit");
 				
 				if (xhr.status != 200 && xhr.status != 500) {
-					var alertElement = $(document.createElement("div")).displayAlert("error", xhr.status + " - " + APPLICATION_MESSAGES["exception.generic.message"]);
-					displayAlert(alertElement);
+					$.fn.handleResponseStatusError(form, xhr);
 					return;
 				}
 				
@@ -53,42 +114,12 @@
 				
 				for (var i = 0; i < response.globalAlerts.length; i++) {
 					var globalAlert = response.globalAlerts[i];
-					var alertElement = $(document.createElement("div")).displayAlert(globalAlert.type, globalAlert.message);
-					displayAlert(alertElement);
-					
-					if (globalAlert.details) {
-						// popover en dessous de l'Alert
-						alertElement.addClass("display-popover");
-						alertElement.attr("title", "Exception");
-						alertElement.data("content", globalAlert.details);
-						alertElement.popover({
-							animation: false,
-							placement: "bottom",
-							trigger: "click",
-							beforeShow: function(popover) {
-								popover.addClass("popover-exception");
-							},
-							closable: true
-						});
-					}
+					$.fn.displayGlobalAlert(form, globalAlert);
 				}
 				
 				for (var i = 0; i < response.fieldErrors.length; i++) {
 					var item = response.fieldErrors[i];
-					
-					var input = form.find("[name='" + item.field + "']");
-					var formGroup = input.closest(".form-group");
-					formGroup.addClass("has-warning");
-					
-					var errorPicto = $(document.createElement("span")).html("!").addClass("warning-picto");
-					formGroup.find("label.control-label").prepend(errorPicto);
-					
-					var helpBlock = formGroup.find(".help-block");
-					if (helpBlock.length == 0) {
-						// Ajout du conteneur de message d'erreur
-						helpBlock = $(document.createElement("span")).addClass("help-block").insertAfter(input);
-					}
-					helpBlock.html(item.message).show();
+					$.fn.displayFieldError(form, item);
 				}
 			});
 		},
@@ -98,23 +129,15 @@
 				return location.pathname + location.search + location.hash;
 			};
 			options = $.extend({
-					onSuccess : function(form, html) {
+					onSuccess : function(form, data) {
 						// Par defaut, on recharge la page en cas de succes
+						// Pas de form.trigger("aftersubmit"); car on recharge la page
 						location.reload();
 					},
-					targetRequestPath : defaultTargetRequestPath
-				}, options);
-			
-			this.each(function() {
-				var form = $(this);
-				form.submitOnce();
-				
-				form.on("aftersubmit.formBindAjaxPost", function() {
-					form.formBindClearErrors();
-				});
-				
-				form.ajaxForm({
-					beforeSend: function (request) {
+					
+					targetRequestPath : defaultTargetRequestPath,
+					
+					beforeSend: function(form, request) {
 						// le set du header est fait ici car sa valeur peut dependre de valeurs modifiees dans le formulaire
 						targetRequestPath = options.targetRequestPath;
 						if (typeof targetRequestPath == "function") {
@@ -122,17 +145,34 @@
 						}
 						request.setRequestHeader("targetRequestPath", targetRequestPath);
 					},
+					
+					beforeSubmit: function(form, data) {
+						// On ne fait rien par défaut
+					},
+					
+					submitOnceOptions: {}
+					
+				}, options);
+			
+			this.each(function() {
+				var form = $(this);
+				form.submitOnce(options.submitOnceOptions);
+				
+				form.on("aftersubmit.formBindAjaxPost", function() {
+					form.formBindClearErrors();
+				});
+				
+				form.ajaxForm({
+					beforeSend: function (request) {
+						options.beforeSend(form, request);
+					},
 					beforeSubmit: function(data) {
-						// $(window).trigger("showloading");
+						options.beforeSubmit(form, data);
 					},
 					success: function(data) {
-						form.trigger("aftersubmit");
 						options.onSuccess(form, data);
 					},
 					error: function(xhr) {
-						// $(window).trigger("hideloading");
-						form.trigger("aftersubmit");
-						
 						form.formBindManageJsonErrors(xhr);
 					}
 				});

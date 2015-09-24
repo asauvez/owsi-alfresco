@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-repo</artifactId>
+		<version>0.2.0</version>
+	</parent>
+	<artifactId>owsi-alfresco-repo-module</artifactId>
+
+	<name>OWSI Alfresco - Repository - Module</name>
+
+	<properties>
+		<alfresco.module.name>owsi-alfresco</alfresco.module.name>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-api-module</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-dictionary</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-web-client</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/config</directory>
+				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<!-- Pour définir alfresco.module.version -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>

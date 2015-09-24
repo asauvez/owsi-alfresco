@@ -1,9 +1,17 @@
 /**
- * Dépendence : jquery.cookies.2.2.0.min.js
+ * Dépendence : js-cookie
  */
 (function( $ ){
-	$.extend($.fn, {
-		fileDownload: function() {
+	$.fn.extend({
+		fileDownload: function(options) {
+			
+			options = $.extend({
+				cookieTimerInterval: 500,
+				cookieName: "fileDownloadToken",
+				tokenInput: "fileDownloadToken",
+				pathInput: "fileDownloadPath"
+			}, options);
+			
 			$(this).each(function() {
 				var me = $(this);
 				
@@ -23,8 +31,8 @@
 					}
 					
 					var formS = '<form action="' + url + '" method="GET">' +
-							'<input type="hidden" name="fileDownloadToken" value="' + salt + '"/>' +
-							'<input type="hidden" name="fileDownloadPath" value="' + path + '"/>';
+							'<input type="hidden" name="' + options.tokenInput + '" value="' + salt + '"/>' +
+							'<input type="hidden" name="' + options.pathInput + '" value="' + path + '"/>';
 					
 					var hashes = url.slice(url.indexOf('?') + 1).split('&');
 					for(var i = 0; i < hashes.length; i++) {
@@ -37,14 +45,21 @@
 					form.submit();
 					
 					var timerId = setInterval(function() {
-						var value = $.cookie("fileDownloadToken");
+//						var value = $.cookie(options.cookieName);
+//						if (value && parseInt(value) == salt) {
+//							clearInterval(timerId);
+//							$.removeCookie(options.cookieName, { path: path });
+//							$(window).trigger("hideloading");
+//							return;
+//						}
+						var value = Cookies.get(options.cookieName);
 						if (value && parseInt(value) == salt) {
 							clearInterval(timerId);
-							$.removeCookie("fileDownloadToken", { path: path });
+							Cookies.remove(options.cookieName, { path: path });
 							$(window).trigger("hideloading");
 							return;
 						}
-					}, 500); // makes this code execute every 500ms
+					}, options.cookieTimerInterval); // makes this code execute every "options.cookieTimerInterval" ms
 				};
 				
 				me.on("click", function(event) {

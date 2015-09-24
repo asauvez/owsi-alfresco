@@ -1,9 +1,9 @@
 package fr.openwide.alfresco.component.model.node.model.property.single;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public class FloatPropertyModel extends SinglePropertyModel<Float> {
+public class FloatPropertyModel extends AbstractNumberPropertyModel<Float> {
 
 	public FloatPropertyModel(ContainerModel type, NameReference nameReference) {
 		super(type, nameReference);

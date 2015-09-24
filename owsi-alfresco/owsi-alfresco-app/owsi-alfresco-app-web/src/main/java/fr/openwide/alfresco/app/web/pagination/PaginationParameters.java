@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class PaginationParameters implements Serializable {
 
+	private static final long serialVersionUID = 555065374685286649L;
+
 	private SortParameters sort = new SortParameters();
 
 	private int currentPage = 1;
@@ -36,11 +38,12 @@ public class PaginationParameters implements Serializable {
 		this.nbPagesToDisplay = nbPagesToDisplay;
 	}
 
-	// Pour hibernate
+	/** @see org.hibernate.Query#setFirstResult(int) */
 	public int getFirstResult() {
 		return (currentPage-1)*nbItemsPerPage;
 	}
-	public int getMaxResult() {
+	/** @see org.hibernate.Query#setMaxResults(int) */
+	public int getMaxResults() {
 		return nbItemsPerPage;
 	}
 

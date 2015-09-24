@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.app.web.download.model;
 
+import javax.servlet.http.HttpServletResponse;
+
 import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
 
 public abstract class DownloadResponse {
@@ -8,7 +10,16 @@ public abstract class DownloadResponse {
 	private String attachmentName;
 
 	private AlertContainer alertContainer = new AlertContainer();
+	private HttpServletResponse httpServletResponse;
 
+	public DownloadResponse(HttpServletResponse httpServletResponse) {
+		this.httpServletResponse = httpServletResponse;
+	}
+
+	public HttpServletResponse getServletResponse() {
+		return httpServletResponse;
+	}
+	
 	public AlertContainer getAlertContainer() {
 		return alertContainer;
 	}
@@ -24,7 +35,7 @@ public abstract class DownloadResponse {
 		this.attachment = attachment;
 		return this;
 	}
-
+	
 	public String getAttachmentName() {
 		return attachmentName;
 	}

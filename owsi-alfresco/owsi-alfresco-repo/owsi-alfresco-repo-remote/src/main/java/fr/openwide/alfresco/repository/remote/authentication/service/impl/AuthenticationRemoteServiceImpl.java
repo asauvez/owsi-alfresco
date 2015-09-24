@@ -1,45 +1,45 @@
 package fr.openwide.alfresco.repository.remote.authentication.service.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.TicketComponent;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.namespace.QName;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.authentication.model.UserReference;
-import fr.openwide.alfresco.repository.api.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryAuthority;
-import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.authentication.model.UserReference;
+import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteService {
 
 	private AuthenticationService authenticationService;
 	private TicketComponent ticketComponent;
 	private PersonService personService;
-	private NodeService nodeService;
+	private NodeRemoteService nodeRemoteService;
 	private AuthorityService authorityService;
+	private ConversionService conversionService;
 
 	@Override
-	public RepositoryUser authenticate(String username, String password) {
+	public RepositoryUser authenticate(String username, String password, NodeScope nodeScope) {
 		try {
 			authenticationService.authenticate(username, password.toCharArray());
-			return getCurrentUser();
+			return getCurrentUser(nodeScope);
 		} catch (AuthenticationException e) {
 			throw new AccessDeniedRemoteException(e);
 		} finally {
@@ -48,12 +48,12 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	}
 
 	@Override
-	public RepositoryUser getAuthenticatedUser() {
+	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
 		// user should be pre-authenticated at this point
-		return getCurrentUser();
+		return getCurrentUser(nodeScope);
 	}
 
-	private RepositoryUser getCurrentUser() {
+	private RepositoryUser getCurrentUser(NodeScope nodeScope) {
 		// build ticket
 		RepositoryTicket ticket = new RepositoryTicket(authenticationService.getCurrentTicket());
 		final String userTicket = ticketComponent.getAuthorityForTicket(ticket.getTicket());
@@ -69,7 +69,8 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 		} catch (NoSuchPersonException e) {
 			throw new AccessDeniedRemoteException(e);
 		}
-		Map<QName, Serializable> userProps = nodeService.getProperties(userNodeRef);
+		RepositoryNode userNode = nodeRemoteService.get(conversionService.get(userNodeRef), nodeScope);
+		
 		// get user authorities
 		Set<String> userAuthorities = AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Set<String>>() {
 			@Override
@@ -85,9 +86,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 		RepositoryUser user = new RepositoryUser();
 		user.setUserReference(userReference);
 		user.setTicket(ticket);
-		user.setFirstName((String) userProps.get(ContentModel.PROP_FIRSTNAME));
-		user.setLastName((String) userProps.get(ContentModel.PROP_LASTNAME));
-		user.setEmail((String) userProps.get(ContentModel.PROP_EMAIL));
+		user.setUserNode(userNode);
 		user.getAuthorities().addAll(Lists.transform(new ArrayList<>(userAuthorities), new Function<String, RepositoryAuthority>() {
 			@Override
 			public RepositoryAuthority apply(String autority) {
@@ -125,8 +124,11 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	public void setPersonService(PersonService personService) {
 		this.personService = personService;
 	}
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
+	public void setNodeRemoteService(NodeRemoteService nodeRemoteService) {
+		this.nodeRemoteService = nodeRemoteService;
+	}
+	public void setConversionService(ConversionService conversionService) {
+		this.conversionService = conversionService;
 	}
 	public void setAuthorityService(AuthorityService authorityService) {
 		this.authorityService = authorityService;

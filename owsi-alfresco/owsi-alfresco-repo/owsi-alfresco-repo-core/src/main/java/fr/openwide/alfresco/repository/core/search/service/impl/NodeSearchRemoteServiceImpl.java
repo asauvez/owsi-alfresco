@@ -5,49 +5,85 @@ import java.util.List;
 
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.LimitBy;
+import org.alfresco.service.cmr.search.QueryConsistency;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RemoteCallParameters;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.node.service.NodeRemoteService;
-import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
-import fr.openwide.alfresco.repository.api.search.service.NodeSearchRemoteService;
-import fr.openwide.alfresco.repository.api.search.service.SearchQueryLanguage;
-import fr.openwide.alfresco.repository.core.remote.service.ConversionService;
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.model.StoreReference;
+import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
+import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
+import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
+import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 
 public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
+	private final Logger LOGGER = LoggerFactory.getLogger(NodeSearchRemoteServiceImpl.class);
+	private final Logger LOGGER_AUDIT = LoggerFactory.getLogger(NodeSearchRemoteServiceImpl.class.getName() + "_Audit");
+	
 	private NodeRemoteService nodeRemoteService;
 	private SearchService searchService;
 	private ConversionService conversionService;
 
 	@Override
-	public List<RepositoryNode> search(String query, StoreReference storeReference, NodeScope scope, RemoteCallParameters remoteCallParameters,
-			SearchQueryLanguage language) {
-		if (StringUtils.isBlank(query)) {
+	public List<RepositoryNode> search(RepositorySearchParameters rsp) {
+		if (StringUtils.isBlank(rsp.getQuery())) {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
 		try {
-			ResultSet resultSet = searchService.query(
-					conversionService.getRequired(storeReference), 
-					language.getAlfrescoName(), 
-					query);
+			long before = System.currentTimeMillis();
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Searching for query : {}", rsp.getQuery());
+			}
+
+			SearchParameters sp = new SearchParameters();
+			for (StoreReference storeReference : rsp.getStoreReferences()) {
+				sp.addStore(conversionService.getRequired(storeReference));
+			}
+			sp.setLanguage(rsp.getLanguage().getAlfrescoName());
+			sp.setQuery(rsp.getQuery());
+			sp.excludeDataInTheCurrentTransaction(true);
+			sp.setQueryConsistency(QueryConsistency.valueOf(rsp.getQueryConsistency().name()));
+			
+			if (rsp.getFirstResult() != null) {
+				sp.setSkipCount(rsp.getFirstResult());
+				sp.setLimitBy(LimitBy.FINAL_SIZE);
+			}
+			if (rsp.getMaxResults() != null) {
+				sp.setMaxItems(rsp.getMaxResults());
+				sp.setLimitBy(LimitBy.FINAL_SIZE);
+			}
+			
+			for (RepositorySortDefinition sd : rsp.getSorts()) {
+				sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
+			}
+			
+			ResultSet resultSet = searchService.query(sp);
 			List<RepositoryNode> res = new ArrayList<>();
 			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
 				try {
-					res.add(nodeRemoteService.get(conversionService.get(nodeRef), scope, remoteCallParameters));
+					res.add(nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope()));
 				} catch (NoSuchNodeRemoteException e) {
 					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
 				}
 			}
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Returning {} result(s)", res.size());
+			}
+			if (LOGGER_AUDIT.isInfoEnabled()) {
+				LOGGER.info("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
+			}
 			return res;
 		} catch (FTSQueryException ex) {
-			throw new InvalidPayloadException(query, ex);
+			throw new InvalidPayloadException(rsp.getQuery(), ex);
 		}
 	}
 

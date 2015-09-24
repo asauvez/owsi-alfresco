@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -32,6 +29,11 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.web.download.model.ByteArrayDownloadResponse;
 import fr.openwide.alfresco.app.web.download.model.ContentDownloadResponse;
@@ -58,32 +60,34 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
-		Class<?> paramType = parameter.getParameterType();
-		return DownloadResponse.class.isAssignableFrom(paramType);
+		Class<?> parameterType = parameter.getParameterType();
+		return DownloadResponse.class.isAssignableFrom(parameterType);
 	}
 
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
-		Class<?> paramType = returnType.getParameterType();
-		return DownloadResponse.class.isAssignableFrom(paramType);
+		Class<?> parameterType = returnType.getParameterType();
+		return DownloadResponse.class.isAssignableFrom(parameterType);
 	}
 
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+		HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+		
 		Class<?> parameterType = parameter.getParameterType();
 		if (ByteArrayDownloadResponse.class.equals(parameterType)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			return new ByteArrayDownloadResponse(baos);
+			return new ByteArrayDownloadResponse(response, baos);
 		} else if (FileDownloadResponse.class.equals(parameterType)) {
 			File tempFile = File.createTempFile("download", Long.toString(System.nanoTime()));
 			OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			// store outputStream if needed during the request lifecycle
 			request.setAttribute(getClass().getName(), outputStream);
-			return new FileDownloadResponse(tempFile, outputStream);
+			return new FileDownloadResponse(response, tempFile, outputStream);
 		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
-			return new NodeReferenceDownloadResponse();
+			return new NodeReferenceDownloadResponse(response);
 		} else {
 			throw new IllegalArgumentException("Invalid type: " + parameterType);
 		}
@@ -141,36 +145,54 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		setCookie(webRequest);
 		// set mimetype and length for the content
 		response.setContentType(download.getContentType());
-		response.setHeader("Content-Length", Long.toString(download.getContentLength()));
+		// set content-length manually rather than using setContentLength to allow for size as long
+		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(download.getContentLength()));
 		// output downloadable content
 		streamInput(download, download.getWrittableStream(), response);
 	}
 
 	protected void streamNodeReference(final NodeReferenceDownloadResponse download, final NativeWebRequest webRequest) {
-		nodeService.getNodeContent(download.getNodeReference(), download.getProperty(), new ResponseExtractor<Void>() {
+		if (download.getNodeReference() == null) {
+			throw new IllegalArgumentException("nodeReference is mandatory");
+		}
+
+		NodeScope nodeScope = new NodeScope();
+		NodeScope downloadNodeScope = nodeScope;
+		if (download.getRenditionName() != null) {
+			downloadNodeScope = new NodeScope();
+			nodeScope.getRenditions().put(download.getRenditionName(), downloadNodeScope);
+		}
+		
+		downloadNodeScope.getProperties().add(download.getProperty());
+		downloadNodeScope.getContentDeserializers().put(download.getProperty(), new NodeContentDeserializer<Void>() {
 			@Override
-			public Void extractData(ClientHttpResponse repositoryResponse) throws IOException {
-				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+			public Void deserialize(RepositoryNode node, NameReference contentProperty, InputStream inputStream) throws IOException {
 				// set cookie (do this before header content-length so that client can deal with it early !)
 				setCookie(webRequest);
-				// recopy headers
-				for (Entry<String, List<String>> entry : repositoryResponse.getHeaders().entrySet()) {
-					for (String value : entry.getValue()) {
-						response.addHeader(entry.getKey(), value);
-					}
-				}
-				// recopy content + override content disposition header
-				try (InputStream body = repositoryResponse.getBody()) {
-					streamInput(download, body, response);
-				}
+
+				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+				RepositoryContentData data = node.getProperty(contentProperty, RepositoryContentData.class);
+				streamContentData(data, response, download, inputStream);
+				
 				return null;
 			}
 		});
+		nodeService.get(download.getNodeReference(), nodeScope);
 	}
 
 	/**
 	 * Method can be overriden (not static) to deal with specific input
 	 */
+	protected void streamContentData(RepositoryContentData data, HttpServletResponse response,
+			NodeReferenceDownloadResponse download, InputStream inputStream) throws IOException {
+		response.setContentType(data.getMimetype());
+		response.setCharacterEncoding(data.getEncoding());
+		// set content-length manually rather than using setContentLength to allow for size as long
+		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(data.getSize()));
+		
+		streamInput(download, inputStream, response);
+	}
+
 	protected void streamInput(DownloadResponse download, InputStream input, HttpServletResponse response) throws IOException {
 		setContentDispositionHeader(download, response);
 		IOUtils.copy(input, response.getOutputStream());

@@ -2,26 +2,20 @@ package fr.openwide.alfresco.component.model.search.service;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
-import fr.openwide.alfresco.component.model.search.restriction.RestrictionBuilder;
-import fr.openwide.alfresco.repository.api.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.repository.api.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.api.remote.model.StoreReference;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 
-/**
- * Permet de faire des recherches de noeuds.
- * 
- * @author asauvez
- */
 public interface NodeSearchModelService {
 
-	List<BusinessNode> search(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder);
-	
-	List<BusinessNode> search(RestrictionBuilder builder, StoreReference storeReference, NodeScopeBuilder nodeScopeBuilder);
+	List<BusinessNode> search(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder);
+	List<BusinessNode> search(SearchQueryBuilder searchBuilder);
 
-	BusinessNode searchUnique(RestrictionBuilder builder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException;
-
-	NodeReference searchUniqueRef(RestrictionBuilder builder) throws NoSuchNodeRemoteException;
+	Optional<BusinessNode> searchUnique(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder);
+	Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder);
 
 }

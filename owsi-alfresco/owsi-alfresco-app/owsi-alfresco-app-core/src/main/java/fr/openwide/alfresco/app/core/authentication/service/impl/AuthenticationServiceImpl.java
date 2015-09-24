@@ -1,69 +1,85 @@
 package fr.openwide.alfresco.app.core.authentication.service.impl;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryTicket;
-import fr.openwide.alfresco.repository.api.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.repository.api.remote.exception.AccessDeniedRemoteException;
 
-@Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-	@Autowired
-	@Qualifier("unauthenticatedRepositoryRemoteBinding")
-	private RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding;
+	private final RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding;
+	private final RepositoryRemoteBinding requiringExplicitTicketRemoteBinding;
+	private final RepositoryRemoteBinding authenticationRemoteBinding;
 
-	@Autowired
-	@Qualifier("requiringExplicitTicketRemoteBinding")
-	private RepositoryRemoteBinding requiringExplicitTicketRemoteBinding;
+	private final String authenticationHeader;
+	private final NodeScope defaultUserNodeScope;
+	
+	public AuthenticationServiceImpl(
+			RepositoryRemoteBinding unauthenticatedRepositoryRemoteBinding,
+			RepositoryRemoteBinding requiringExplicitTicketRemoteBinding,
+			RepositoryRemoteBinding authenticationRemoteBinding, 
+			String authenticationHeader) {
+		this.unauthenticatedRepositoryRemoteBinding = unauthenticatedRepositoryRemoteBinding;
+		this.requiringExplicitTicketRemoteBinding = requiringExplicitTicketRemoteBinding;
+		this.authenticationRemoteBinding = authenticationRemoteBinding;
+		this.authenticationHeader = authenticationHeader;
 
-	@Autowired
-	@Qualifier("authenticationRemoteBinding")
-	private RepositoryRemoteBinding authenticationRemoteBinding;
-
-	@Autowired
-	private Environment environment;
-
-	private String authenticationHeader;
-
-	@PostConstruct
-	private void initFromEnvironment() {
-		authenticationHeader = environment.getRequiredProperty("application.authentication.repository.header.name");
+		defaultUserNodeScope = new NodeScope();
+		defaultUserNodeScope.getProperties().add(RepositoryUser.FIRST_NAME);
+		defaultUserNodeScope.getProperties().add(RepositoryUser.LAST_NAME);
+		defaultUserNodeScope.getProperties().add(RepositoryUser.EMAIL);
 	}
 
 	@Override
 	public RepositoryUser authenticate(String username) throws AccessDeniedRemoteException {
-		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE_ENDPOINT)
+		return authenticate(username, getDefaultUserNodeScope());
+	}
+	
+	@Override
+	public RepositoryUser authenticate(String username, NodeScope nodeScope) throws AccessDeniedRemoteException {
+		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
+		request.nodeScope = nodeScope;
+		
+		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
 				.header(authenticationHeader, username)
 				.call();
 	}
 
 	@Override
 	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE_ENDPOINT)
-				.urlVariable(ticket)
-				.call();
+		return authenticate(ticket, getDefaultUserNodeScope());
 	}
 
 	@Override
+	public RepositoryUser authenticate(RepositoryTicket ticket, NodeScope nodeScope) throws AccessDeniedRemoteException {
+		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
+		request.nodeScope = nodeScope;
+
+		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
+				.urlVariable(ticket)
+				.call();
+	}
+	
+	@Override
 	public RepositoryUser authenticate(String username, String password) throws AccessDeniedRemoteException {
+		return authenticate(username, password, defaultUserNodeScope);
+	}
+
+	@Override
+	public RepositoryUser authenticate(String username, String password, NodeScope nodeScope) throws AccessDeniedRemoteException {
 		LOGIN_REQUEST_SERVICE request = new LOGIN_REQUEST_SERVICE();
 		request.username = username;
 		request.password = password;
+		request.nodeScope = nodeScope;
 		
 		return unauthenticatedRepositoryRemoteBinding.builder(LOGIN_REQUEST_SERVICE.ENDPOINT, request)
 				.call();
 	}
 
 	@Override
-	public RepositoryUser getAuthenticatedUser() {
+	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
 		throw new UnsupportedOperationException("Use authenticate methods");
 	}
 
@@ -74,4 +90,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			.call();
 	}
 
+	@Override
+	public NodeScope getDefaultUserNodeScope() {
+		return defaultUserNodeScope;
+	}
 }

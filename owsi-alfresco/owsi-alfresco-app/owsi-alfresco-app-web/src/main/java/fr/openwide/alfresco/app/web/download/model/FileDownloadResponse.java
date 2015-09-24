@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
 public class FileDownloadResponse extends ContentDownloadResponse {
 
 	private File file;
@@ -14,9 +16,9 @@ public class FileDownloadResponse extends ContentDownloadResponse {
 
 	private InputStream inputStream;
 
-	public FileDownloadResponse() {}
-
-	public FileDownloadResponse(File file, OutputStream outputStream) {
+	public FileDownloadResponse(HttpServletResponse httpServletResponse, File file, OutputStream outputStream) {
+		super(httpServletResponse);
+		
 		this.file = file;
 		this.outputStream = outputStream;
 	}

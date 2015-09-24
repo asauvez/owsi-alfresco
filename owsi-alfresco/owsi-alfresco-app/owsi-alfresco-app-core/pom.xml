@@ -4,16 +4,16 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-app</artifactId>
-		<version>0.2.0-SNAPSHOT</version>
+		<version>0.2.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-app-core</artifactId>
 
-	<name>OWSI Alfresco - App - Core</name>
+	<name>OWSI Alfresco - Application - Core</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-api</artifactId>
+			<artifactId>owsi-alfresco-api-core</artifactId>
 		</dependency>
 		
 		<dependency>
@@ -25,11 +25,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>

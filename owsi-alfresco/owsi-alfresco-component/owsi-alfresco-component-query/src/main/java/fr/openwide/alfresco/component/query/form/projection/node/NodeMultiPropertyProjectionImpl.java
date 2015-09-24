@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
-import fr.openwide.alfresco.repository.api.node.model.NodeScope;
-import fr.openwide.alfresco.repository.api.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.api.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class NodeMultiPropertyProjectionImpl<P extends Serializable> extends AbstractNodeProjectionImpl<List<P>> {
 
