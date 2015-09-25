@@ -16,7 +16,9 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl;
 
-
+/**
+ * Utilitaire permettant de construire la classification.
+ */
 public class ClassificationBuilder {
 
 	private final ClassificationServiceImpl service;
@@ -31,14 +33,24 @@ public class ClassificationBuilder {
 		this.destinationFolder = actualParentFolder;
 	}
 	
+	/** 
+	 * Défini un noeud racine de la classification. 
+	 * Si on ne défini pas de noeud racine, la classification se fait à partir de l'emplacement actuel.
+	 */
 	public ClassificationBuilder rootFolder(NodeReference destinationFolder) {
 		this.destinationFolder = destinationFolder;
 		return this;
 	}
+	/**
+	 * Défini le noeud racine comme étant le résultat unique que renvoi la requête fournie.
+	 */
 	public ClassificationBuilder rootFolder(RestrictionBuilder restrictionBuilder) {
 		return rootFolder(restrictionBuilder, false);
 	}
 	
+	/**
+	 * @param cached Si vrai, alors mets en cache mémoire le résultat de la recherche.
+	 */
 	public ClassificationBuilder rootFolder(RestrictionBuilder restrictionBuilder, boolean cached) {
 		Optional<NodeReference> optional = (cached) 
 				? service.searchUniqueReferenceCached(restrictionBuilder) 
@@ -48,10 +60,16 @@ public class ClassificationBuilder {
 		}
 		return rootFolder(optional.get());
 	}
+	
 	public ClassificationBuilder rootFolderPath(String path) {
 		return rootFolder(new RestrictionBuilder()
 				.path(path).of(), true);
 	}
+
+	/**
+	 * Recherche un noeud racine à partir d'un chemin. Le chemin est défini en dessous de "Company Home",
+	 * avec une liste de cm:name. 
+	 */
 	public ClassificationBuilder rootFolderNamedPath(String ... names) {
 		return rootFolderNamedPath(true, names);
 	}
@@ -64,10 +82,18 @@ public class ClassificationBuilder {
 		}
 		return rootFolder(optional.get());
 	}
+	
+	/**
+	 * Recherche un noeud racine identifié par un owsi:identifiable. 
+	 */
 	public ClassificationBuilder rootFolderIdentifier(NameReference identifier) {
 		return rootFolder(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of(), true);
 	}
+	
+	/** 
+	 * Défini le noeud racine de la classification comme étant le home folder de l'utilisateur en cours. 
+	 */
 	public ClassificationBuilder rootHomeFolder() {
 		Optional<NodeReference> homeFolder = service.getHomeFolder();
 		if (! homeFolder.isPresent()) {
@@ -77,10 +103,17 @@ public class ClassificationBuilder {
 		return this;
 	}
 	
+	/**
+	 * Créer un sous dossier par rapport au noeud en cours, si ce dossier n'existe pas encore.
+	 */
 	public ClassificationBuilder subFolder(String folderName) {
 		return subFolder(new BusinessNode()
 			.properties().name(folderName));
 	}
+	/**
+	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
+	 * du noeud fourni.
+	 */
 	public ClassificationBuilder subFolder(BusinessNode folderNode) {
 		destinationFolder = service.subFolder(folderNode, destinationFolder);
 		return this;
@@ -95,6 +128,9 @@ public class ClassificationBuilder {
 				.properties().name(folderName));
 	}
 
+	/**
+	 * Créer un sous dossier avec comme nom la valeur d'une propriété du noeud à classer.
+	 */
 	public ClassificationBuilder subFolderProperty(SinglePropertyModel<?> property) {
 		return subFolder(new SubFolderBuilder(property));
 	}
@@ -119,6 +155,9 @@ public class ClassificationBuilder {
 		return destinationFolder;
 	}
 	
+	/**
+	 * Déplace le noeud dans le répertoire de destination. 
+	 */
 	public ClassificationBuilder moveNode() {
 		if (! actualParentFolder.equals(destinationFolder)) {
 			service.moveNode(node.getNodeReference(), destinationFolder);
@@ -126,12 +165,18 @@ public class ClassificationBuilder {
 		}
 		return this;
 	}
+	/**
+	 * Copie le noeud dans le répertoire de destination. 
+	 */
 	public ClassificationBuilder copyNode() {
 		if (! actualParentFolder.equals(destinationFolder)) {
 			service.copyNode(node.getNodeReference(), destinationFolder);
 		}
 		return this;
 	}
+	/**
+	 * Créer un lien secondaire dans le répertoire de destination.
+	 */
 	public ClassificationBuilder createLink() {
 		service.createLink(node.getNodeReference(), destinationFolder);
 		return this;

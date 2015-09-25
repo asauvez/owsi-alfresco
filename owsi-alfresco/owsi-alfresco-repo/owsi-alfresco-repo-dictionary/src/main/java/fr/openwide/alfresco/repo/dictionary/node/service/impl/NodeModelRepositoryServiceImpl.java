@@ -201,6 +201,10 @@ public class NodeModelRepositoryServiceImpl
 		return conversionService.get(repositoryHelper.getCompanyHome());
 	}
 	
+	/**
+	 * Retourne le home folder de l'utilisateur en cours. 
+	 * Cela ne tient pas compte de possible runAs.
+	 */
 	@Override
 	public Optional<NodeReference> getUserHome() {
 		NodeRef person = repositoryHelper.getFullyAuthenticatedPerson();
@@ -212,6 +216,11 @@ public class NodeModelRepositoryServiceImpl
 		}
 	}
 
+	/**
+	 * Recherche un noeud à partir d'un chemin. Le chemin est défini en dessous de "Company Home",
+	 * avec une liste de cm:name. 
+	 * Cette méthode n'utilise pas de recherche Lucene.
+	 */
 	@Override
 	public Optional<NodeReference> getByNamedPath(String ... names) {
 		NodeReference nodeReference = conversionService.get(repositoryHelper.getCompanyHome());

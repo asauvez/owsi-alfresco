@@ -100,6 +100,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			classify(nodeRef, ClassificationMode.UPDATE);
 		}
 	}
+	
+	/** 
+	 * Si un service demande à créer un noeud sans spécifier de parent et qu'une politique de classement est défini
+	 * pour son type, on le copie dans le home folder puis on le classe.
+	 */
 	@Override
 	public void onPreNodeCreationCallback(RepositoryNode node) {
 		if (node.getPrimaryParentAssociation() == null) {
