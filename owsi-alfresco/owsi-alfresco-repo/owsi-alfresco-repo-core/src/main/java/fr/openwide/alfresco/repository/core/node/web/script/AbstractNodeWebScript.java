@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.apache.commons.io.IOUtils;
 import org.springframework.extensions.webscripts.Cache;
@@ -20,6 +22,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
@@ -67,13 +70,24 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 				return getInputNodes(payload);
 			}
 			@Override
-			public void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers) {
+			public void doWithPayload(final RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers) {
 				for (ContentPropertyWrapper wrapper : wrappers) {
 					// va être renseigné par le service
 					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentHolder(wrapper));
 				}
 				// Vrai appel du Service
-				R result = execute(remoteCallPayload.getPayload());
+				UserReference runAs = remoteCallPayload.getRemoteCallParameters().getRunAs();
+				R result;
+				if (runAs == null) {
+					result = execute(remoteCallPayload.getPayload());
+				} else {
+					result = AuthenticationUtil.runAs(new RunAsWork<R>() {
+						@Override
+						public R doWork() throws Exception {
+							return execute(remoteCallPayload.getPayload());
+						}
+					}, runAs.getUsername());
+				}
 				resultRef.set(result);
 			}
 		};
