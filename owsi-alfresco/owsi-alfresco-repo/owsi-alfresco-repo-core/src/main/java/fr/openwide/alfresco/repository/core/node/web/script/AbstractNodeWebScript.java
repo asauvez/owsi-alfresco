@@ -42,6 +42,8 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
 
+	private boolean authorizeRunAs;
+
 	private NodeContentSerializationParameters defaultSerializationParameters = new NodeContentSerializationParameters();
 	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
 
@@ -81,6 +83,9 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 				if (runAs == null) {
 					result = execute(remoteCallPayload.getPayload());
 				} else {
+					if (! authorizeRunAs) {
+						throw new IllegalStateException("Can't specify a runAs userName because 'owsi-alfresco.authorizeRunAs' is set to false.");
+					}
 					result = AuthenticationUtil.runAs(new RunAsWork<R>() {
 						@Override
 						public R doWork() throws Exception {
@@ -150,6 +155,9 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	
 	public void setNodeService(NodeRemoteService nodeService) {
 		this.nodeService = nodeService;
+	}
+	public void setAuthorizeRunAs(boolean authorizeRunAs) {
+		this.authorizeRunAs = authorizeRunAs;
 	}
 
 }
