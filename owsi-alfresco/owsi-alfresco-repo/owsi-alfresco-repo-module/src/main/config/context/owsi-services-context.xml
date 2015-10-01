@@ -19,4 +19,12 @@
 		<constructor-arg ref="owsi.service.nodeModelService"/>
 	</bean>
 
+	<bean id="owsi.service.boostrapService" class="fr.openwide.alfresco.repo.module.bootstrap.service.impl.BootstrapServiceImpl"
+			depends-on="owsi.dictionaryBootstrap">
+		<property name="conversionService" ref="owsi.service.conversionService" />
+		<property name="personService" ref="PersonService"/>
+		<property name="authorityService" ref="AuthorityService"/>
+		<property name="authenticationService" ref="AuthenticationService"/>
+	</bean>
+
 </beans>
