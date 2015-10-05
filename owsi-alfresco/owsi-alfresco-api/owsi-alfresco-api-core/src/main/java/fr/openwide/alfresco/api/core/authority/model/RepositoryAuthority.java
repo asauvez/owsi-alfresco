@@ -27,6 +27,9 @@ public class RepositoryAuthority implements Serializable {
 	public static RepositoryAuthority group(String shortName) {
 		return new RepositoryAuthority(GROUP_PREFIX + shortName);
 	}
+	public static RepositoryAuthority authority(String authorityName) {
+		return new RepositoryAuthority(authorityName);
+	}
 	public String getGroupShortName() {
 		if (! name.startsWith(GROUP_PREFIX)) {
 			throw new IllegalStateException(name);
