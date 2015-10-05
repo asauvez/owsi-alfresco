@@ -16,6 +16,6 @@ public interface BootstrapService {
 	NodeReference createCategory(NodeReference parentCategory, String categoryName);
 
 	NodeReference importFileFromClassPath(NodeReference parentRef, String fileName);
-	void importView(NodeReference parentRef, String fileName);
+	void importView(NodeReference parentRef, String viewFileName, String messageFileName);
 
 }

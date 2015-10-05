@@ -119,15 +119,16 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 	
 	@Override
-	public void importView(NodeReference parentRef, String fileName) {
-		logger.debug("Import view "  + fileName);
+	public void importView(NodeReference parentRef, String viewFileName, String messageFileName) {
+		logger.debug("Import view "  + viewFileName);
 		
 		String path = nodeModelService.getPath(parentRef);
 		
 		List<Properties> bootstrapViews = new ArrayList<Properties>(1);
 		Properties bootstrapView = new Properties();
 		bootstrapView.setProperty(ImporterBootstrap.VIEW_PATH_PROPERTY, path);
-		bootstrapView.setProperty(ImporterBootstrap.VIEW_LOCATION_VIEW, fileName);
+		bootstrapView.setProperty(ImporterBootstrap.VIEW_LOCATION_VIEW, viewFileName);
+		bootstrapView.setProperty(ImporterBootstrap.VIEW_MESSAGES_PROPERTY, messageFileName);
 		bootstrapView.setProperty(ImporterBootstrap.VIEW_ENCODING, "UTF-8");
 		
 		bootstrapViews.add(bootstrapView);
