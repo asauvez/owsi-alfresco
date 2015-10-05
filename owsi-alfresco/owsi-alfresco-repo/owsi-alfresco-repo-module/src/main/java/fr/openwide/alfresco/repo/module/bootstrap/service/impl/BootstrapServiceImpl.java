@@ -46,29 +46,25 @@ public class BootstrapServiceImpl implements BootstrapService {
 	private ImporterBootstrap importerBootstrap;
 
 	@Override
-	public RepositoryAuthority createGroup(RepositoryAuthority group, RepositoryAuthority ... parentGroups) {
+	public RepositoryAuthority createGroup(RepositoryAuthority group, RepositoryAuthority ... parentAuthorities) {
 		logger.debug("Create group " + group);
 		
 		authorityService.createAuthority(AuthorityType.GROUP, group.getGroupShortName());
-		
-		if (parentGroups.length > 0) {
-			authorityService.addAuthority(toAuthorityNames(parentGroups), group.getName());
-		}
-		
+		addAuthority(parentAuthorities, group);
 		return group;
 	}
 	@Override
-	public RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentGroups) {
-		return createGroup(RepositoryAuthority.group(groupName));
+	public RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentAuthorities) {
+		return createGroup(RepositoryAuthority.group(groupName), parentAuthorities);
 	}
 
 	@Override
-	public RepositoryAuthority createTestUser(String username, RepositoryAuthority ... parentGroups) {
-		return createUser(username, "Test", username, username + "@test.fr", username);
+	public RepositoryAuthority createTestUser(String username, RepositoryAuthority ... parentAuthorities) {
+		return createUser(username, "Test", username, username + "@test.fr", username, parentAuthorities);
 	}
 	
 	@Override
-	public RepositoryAuthority createUser(String username, String firstName, String lastName, String email, String password, RepositoryAuthority ... parentGroups) {
+	public RepositoryAuthority createUser(String username, String firstName, String lastName, String email, String password, RepositoryAuthority ... parentAuthorities) {
 		logger.debug("Create user " + username);
 		
 		Map<QName, Serializable> user = new HashMap<QName, Serializable>();
@@ -80,19 +76,19 @@ public class BootstrapServiceImpl implements BootstrapService {
 		
 		authenticationService.createAuthentication(username, password.toCharArray());
 		
-		if (parentGroups.length > 0) {
-			authorityService.addAuthority(toAuthorityNames(parentGroups), username);
-		}
-		
-		return RepositoryAuthority.user(username);
+		RepositoryAuthority authority = RepositoryAuthority.user(username);
+		addAuthority(parentAuthorities, authority);
+		return authority;
 	}
 	
-	private List<String> toAuthorityNames(RepositoryAuthority[] authorities) {
-		List<String> list = new ArrayList<>();
-		for (RepositoryAuthority authority : authorities) {
-			list.add(authority.getName());
+	private void addAuthority(RepositoryAuthority[] parentAuthorities, RepositoryAuthority authority) {
+		if (parentAuthorities.length > 0) {
+			List<String> list = new ArrayList<>();
+			for (RepositoryAuthority parentAuthority : parentAuthorities) {
+				list.add(parentAuthority.getName());
+			}
+			authorityService.addAuthority(list, authority.getName());
 		}
-		return list;
 	}
 
 	@Override

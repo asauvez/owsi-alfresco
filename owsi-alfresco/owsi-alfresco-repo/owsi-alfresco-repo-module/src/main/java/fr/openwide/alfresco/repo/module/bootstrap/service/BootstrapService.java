@@ -6,11 +6,11 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public interface BootstrapService {
 
-	RepositoryAuthority createGroup(RepositoryAuthority group, RepositoryAuthority ... parentGroups);
-	RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentGroups);
+	RepositoryAuthority createGroup(RepositoryAuthority group, RepositoryAuthority ... parentAuthorities);
+	RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentAuthorities);
 
-	RepositoryAuthority createUser(String username, String firstName, String lastName, String email, String password, RepositoryAuthority ... parentGroups);
-	RepositoryAuthority createTestUser(String username, RepositoryAuthority ... parentGroups);
+	RepositoryAuthority createUser(String username, String firstName, String lastName, String email, String password, RepositoryAuthority ... parentAuthorities);
+	RepositoryAuthority createTestUser(String username, RepositoryAuthority ... parentAuthorities);
 
 	NodeReference createRootCategory(String categoryName);
 	NodeReference createCategory(NodeReference parentCategory, String categoryName);
