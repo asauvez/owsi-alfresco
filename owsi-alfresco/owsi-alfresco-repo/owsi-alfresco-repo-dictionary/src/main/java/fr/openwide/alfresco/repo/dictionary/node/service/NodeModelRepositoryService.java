@@ -50,13 +50,17 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	<C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value);
 	<C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value);
 
+	Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName);
+
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
 
 	NodeReference getCompanyHome();
+	NodeReference getDataDictionary();
 	Optional<NodeReference> getUserHome();
 	
 	Optional<NodeReference> getByNamedPath(String ... names);
+	String getPath(NodeReference nodeReference);
 	
 }

@@ -5,7 +5,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -19,6 +23,7 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -37,6 +42,10 @@ public class NodeModelRepositoryServiceImpl
 	private Repository repositoryHelper;
 
 	private ConversionService conversionService;
+	
+	private String dataDictionaryChildName;
+	private SimpleCache<String, NodeReference> singletonCache; // eg. for dataDictionaryNodeRef
+	private final String KEY_DATADICTIONARY_NODEREF = "owsi.key.datadictionary.noderef";
 	
 	public NodeModelRepositoryServiceImpl(NodeRemoteService nodeService) {
 		super(nodeService);
@@ -161,6 +170,16 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
+	public Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName) {
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(associationType.getNameReference()), 
+				conversionService.getRequired(assocName));
+		return Optional.fromNullable((children.isEmpty()) 
+				? null
+				: conversionService.get(children.get(0).getChildRef()));
+	}
+	@Override
 	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName) {
 		return getChildByName(nodeReference, childName, CmModel.folder.contains);
 	}
@@ -200,6 +219,22 @@ public class NodeModelRepositoryServiceImpl
 	public NodeReference getCompanyHome() {
 		return conversionService.get(repositoryHelper.getCompanyHome());
 	}
+	@Override
+	public NodeReference getDataDictionary() {
+		NodeReference dataDictionaryRef = singletonCache.get(KEY_DATADICTIONARY_NODEREF);
+		if (dataDictionaryRef == null) {
+			dataDictionaryRef = AuthenticationUtil.runAs(new RunAsWork<NodeReference>() {
+				@Override
+				public NodeReference doWork() throws Exception {
+					NodeReference parent = getCompanyHome();
+					return getChildAssocs(parent, CmModel.folder.contains, NameReference.create(dataDictionaryChildName)).get();
+				}
+			}, AuthenticationUtil.getSystemUserName());
+
+			singletonCache.put(KEY_DATADICTIONARY_NODEREF, dataDictionaryRef);
+		}
+		return dataDictionaryRef;
+	}
 	
 	/**
 	 * Retourne le home folder de l'utilisateur en cours. 
@@ -236,6 +271,11 @@ public class NodeModelRepositoryServiceImpl
 		return Optional.of(nodeReference);
 	}
 
+	@Override
+	public String getPath(NodeReference nodeReference) {
+		return get(nodeReference, new NodeScopeBuilder().path()).getPath();
+	}
+
 	public void setNodeService(NodeService nodeService) {
 		this.nodeService = nodeService;
 	}
@@ -244,6 +284,9 @@ public class NodeModelRepositoryServiceImpl
 	}
 	public void setRepositoryHelper(Repository repositoryHelper) {
 		this.repositoryHelper = repositoryHelper;
+	}
+	public void setDataDictionaryChildName(String dataDictionaryChildName) {
+		this.dataDictionaryChildName = dataDictionaryChildName;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

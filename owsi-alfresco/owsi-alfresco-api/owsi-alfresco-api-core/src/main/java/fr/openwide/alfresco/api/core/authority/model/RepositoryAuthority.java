@@ -21,6 +21,9 @@ public class RepositoryAuthority implements Serializable {
 		this.name = name;
 	}
 	
+	public static RepositoryAuthority user(String username) {
+		return new RepositoryAuthority(username);
+	}
 	public static RepositoryAuthority group(String shortName) {
 		return new RepositoryAuthority(GROUP_PREFIX + shortName);
 	}

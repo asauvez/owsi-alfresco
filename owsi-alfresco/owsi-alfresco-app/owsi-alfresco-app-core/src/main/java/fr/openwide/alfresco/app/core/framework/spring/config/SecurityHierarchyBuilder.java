@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+
 public class SecurityHierarchyBuilder {
 
 	private StringBuilder sb = new StringBuilder();
@@ -7,6 +9,12 @@ public class SecurityHierarchyBuilder {
 	public SecurityHierarchyBuilder add(String ifRole, String ... thenRoles) {
 		for (String thenRole : thenRoles) {
 			sb.append(ifRole).append(" > ").append(thenRole).append("\n");
+		}
+		return this;
+	}
+	public SecurityHierarchyBuilder add(RepositoryAuthority ifRole, RepositoryAuthority ... thenRoles) {
+		for (RepositoryAuthority thenRole : thenRoles) {
+			sb.append(ifRole.getName()).append(" > ").append(thenRole.getName()).append("\n");
 		}
 		return this;
 	}

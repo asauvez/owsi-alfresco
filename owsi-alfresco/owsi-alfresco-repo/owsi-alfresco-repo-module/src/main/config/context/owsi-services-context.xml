@@ -21,10 +21,24 @@
 
 	<bean id="owsi.service.boostrapService" class="fr.openwide.alfresco.repo.module.bootstrap.service.impl.BootstrapServiceImpl"
 			depends-on="owsi.dictionaryBootstrap">
+		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="personService" ref="PersonService"/>
 		<property name="authorityService" ref="AuthorityService"/>
 		<property name="authenticationService" ref="AuthenticationService"/>
+		<property name="categoryService" ref="CategoryService"/>
+		<property name="importerBootstrap" ref="spacesBootstrap" />
 	</bean>
+
+	<bean id="abstract.bootstrap.patch" abstract="true" parent="module.baseComponent">
+		<property name="boostrapService" ref="owsi.service.boostrapService" />
+		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
+		<property name="identificationService" ref="owsi.service.identificationService"/>
+	</bean>
+	<!-- Pour déclarer un patch en XML :
+	<bean id="[...]" class="[... extends AbstractBootstrapPatch]" parent="abstract.bootstrap.patch">
+		<property name="moduleId" value="${alfresco.module.name}" />
+	</bean>
+	 -->
 
 </beans>

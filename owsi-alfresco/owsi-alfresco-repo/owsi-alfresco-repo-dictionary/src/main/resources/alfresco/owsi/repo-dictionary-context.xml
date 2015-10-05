@@ -9,6 +9,8 @@
 		<property name="copyService" ref="CopyService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="repositoryHelper" ref="repositoryHelper" />
+		<property name="singletonCache" ref="immutableSingletonCache" />
+		<property name="dataDictionaryChildName"><value>${spaces.dictionary.childname}</value></property>
 	</bean>
 
 	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl">

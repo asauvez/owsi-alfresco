@@ -158,6 +158,63 @@
 			</dependency>
 			
 			<dependency>
+				<groupId>org.alfresco</groupId>
+				<artifactId>alfresco-repository</artifactId>
+				<version>${owsi-alfresco.repo.alfresco.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-twitter</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-facebook</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.activiti</groupId>
+						<artifactId>activiti-spring</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.extensions.surf</groupId>
+						<artifactId>spring-webscripts</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.myfaces.core</groupId>
+						<artifactId>myfaces-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.myfaces.core</groupId>
+						<artifactId>myfaces-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>rhino</groupId>
+						<artifactId>js</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>cglib</groupId>
+						<artifactId>cglib</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			
+			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>${owsi-alfresco.repo.postgresql.version}</version>
