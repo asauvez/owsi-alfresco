@@ -52,7 +52,15 @@ public class AssociationsNode {
 		RepositoryNode renditionNode = repoNode.getRenditions().get(renditionName);
 		return (renditionNode != null) ? new BusinessNode(renditionNode) : null;
 	}
-	
+
+	public BusinessNode addChild(BusinessNode node) {
+		return addChild(CmModel.folder.contains, node);
+	}
+	public BusinessNode addChild(ChildAssociationModel childAssociation, BusinessNode node) {
+		getChildAssociation(childAssociation).add(node);
+		return node;
+	}
+
 	public List<BusinessNode> getChildAssociationContains() {
 		return getChildAssociation(CmModel.folder.contains);
 	}
