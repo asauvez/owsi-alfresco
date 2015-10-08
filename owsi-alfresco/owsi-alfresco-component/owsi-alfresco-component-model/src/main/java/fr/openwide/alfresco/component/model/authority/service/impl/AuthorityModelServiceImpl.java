@@ -67,7 +67,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		for (BusinessNode node : groups) {
 			String authorityName = node.properties().get(CmModel.authorityContainer.authorityName);
 			String authorityDisplayName = node.properties().get(CmModel.authorityContainer.authorityDisplayName);
-			authorities.put(new RepositoryAuthority(authorityName), authorityDisplayName);
+			authorities.put(RepositoryAuthority.authority(authorityName), authorityDisplayName);
 		}
 		return authorities;
 	}

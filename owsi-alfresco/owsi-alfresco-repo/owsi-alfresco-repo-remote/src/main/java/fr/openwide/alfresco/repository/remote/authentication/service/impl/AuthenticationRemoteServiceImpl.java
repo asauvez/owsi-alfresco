@@ -90,7 +90,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 		user.getAuthorities().addAll(Lists.transform(new ArrayList<>(userAuthorities), new Function<String, RepositoryAuthority>() {
 			@Override
 			public RepositoryAuthority apply(String autority) {
-				return new RepositoryAuthority(autority);
+				return RepositoryAuthority.authority(autority);
 			}
 		}));
 		user.setAdmin(userAdmin);
