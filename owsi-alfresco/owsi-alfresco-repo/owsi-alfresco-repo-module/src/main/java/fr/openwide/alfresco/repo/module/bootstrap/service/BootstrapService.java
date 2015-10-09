@@ -8,6 +8,7 @@ public interface BootstrapService {
 
 	RepositoryAuthority createGroup(RepositoryAuthority group, RepositoryAuthority ... parentAuthorities);
 	RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentAuthorities);
+	void importGroupsFile(String fileName);
 
 	RepositoryAuthority createUser(String username, String firstName, String lastName, String email, String password, RepositoryAuthority ... parentAuthorities);
 	RepositoryAuthority createTestUser(String username, RepositoryAuthority ... parentAuthorities);

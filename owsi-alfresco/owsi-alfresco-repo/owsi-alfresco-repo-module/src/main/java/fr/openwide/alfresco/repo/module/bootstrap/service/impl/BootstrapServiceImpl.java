@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.repo.module.bootstrap.service.impl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +58,32 @@ public class BootstrapServiceImpl implements BootstrapService {
 	@Override
 	public RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentAuthorities) {
 		return createGroup(RepositoryAuthority.group(groupName), parentAuthorities);
+	}
+
+	@Override
+	public void importGroupsFile(String fileName) {
+		try (BufferedReader content = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(fileName)))) {
+			String line = content.readLine(); // header
+			while ((line = content.readLine()) != null) {
+				if (line.trim().length() > 0) {
+					String[] split = line.split(",");
+					String groupName = split[0].trim();
+					//String description = split[1].trim();
+					//String OU = split[2].trim();
+					
+					List<String> list = new ArrayList<>();
+					if (split.length > 3) {
+						for (String parentAuthority : split[3].trim().split("/")) {
+							list.add(RepositoryAuthority.GROUP_PREFIX + parentAuthority.trim());
+						}
+					}
+					RepositoryAuthority authority = createGroup(groupName);
+					authorityService.addAuthority(list, authority.getName());
+				}
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override
