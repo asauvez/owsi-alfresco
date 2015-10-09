@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repo.module.classification.service.impl;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,11 +32,15 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.repository.model.SysModel;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
@@ -79,6 +84,49 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			throw new IllegalStateException("There is at least two policies for " + model.getNameReference());
 		}
 		models.put(model.getNameReference(), model);
+	}
+
+	@Override
+	public void reclassify(ContainerModel model) {
+		reclassify(model, 100);
+	}
+	
+	@Override
+	public void reclassify(ContainerModel model, final int batchSize) {
+		final RestrictionBuilder restriction = new RestrictionBuilder();
+		if (model instanceof TypeModel) {
+			restriction.isType((TypeModel) model);
+		} else {
+			restriction.hasAspect((AspectModel) model);
+		}
+		
+		logger.info("Begin reclassify of " + model);
+		
+		for (int batchNumber = 0; ; batchNumber ++) {
+			logger.info("*** Reclassify batch " + batchNumber + " ***");
+			final int firstResult = batchNumber * batchSize;
+			int listSize = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Integer>() {
+				@Override
+				public Integer execute() {
+					List<BusinessNode> list = nodeSearchModelService.search(new SearchQueryBuilder()
+							.restriction(restriction)
+							.firstResult(firstResult)
+							.maxResults(batchSize)
+							.nodeScopeBuilder(new NodeScopeBuilder().nodeReference())
+							.sort().asc(SysModel.referenceable.nodeUuid));
+					int nodeNumber = 0;
+					for (BusinessNode node : list) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Reclassify node " + (nodeNumber ++) + " / " + list.size());
+						}
+						classify(conversionService.getRequired(node.getNodeReference()), ClassificationMode.RECLASSIFY);
+					}
+					return list.size();
+				}
+			}, false, true);
+			
+			if (listSize < batchSize) break;
+		}
 	}
 
 	@Override
