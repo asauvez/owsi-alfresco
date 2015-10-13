@@ -291,5 +291,8 @@ public class NodeModelRepositoryServiceImpl
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}
+	public void setSingletonCache(SimpleCache<String, NodeReference> singletonCache) {
+		this.singletonCache = singletonCache;
+	}
 
 }
