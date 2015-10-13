@@ -30,13 +30,12 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.impl.NodeModelRepositoryServiceImpl;
 import fr.openwide.alfresco.repo.module.bootstrap.service.BootstrapService;
-import fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 
 public class BootstrapServiceImpl implements BootstrapService {
 
-	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(BootstrapServiceImpl.class);
 	
 	private NodeModelRepositoryServiceImpl nodeModelService;
 	private ConversionService conversionService;
