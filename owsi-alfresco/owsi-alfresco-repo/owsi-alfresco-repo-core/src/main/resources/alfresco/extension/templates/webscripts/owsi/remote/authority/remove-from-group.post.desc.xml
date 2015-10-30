@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>remove-from-group</shortname>
+	<description>Remove an authority from a group</description>
+	<url>/owsi/authority/remove-from-group</url>
+	<format default="json" />
+	<authentication>user</authentication>
+	<transaction>required</transaction>
+	<family>OWSI</family>
+</webscript>

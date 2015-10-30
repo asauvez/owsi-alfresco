@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>delete-group</shortname>
+	<description>Delete a group</description>
+	<url>/owsi/authority/delete-group</url>
+	<format default="json" />
+	<authentication>admin</authentication>
+	<transaction>required</transaction>
+	<family>OWSI</family>
+</webscript>

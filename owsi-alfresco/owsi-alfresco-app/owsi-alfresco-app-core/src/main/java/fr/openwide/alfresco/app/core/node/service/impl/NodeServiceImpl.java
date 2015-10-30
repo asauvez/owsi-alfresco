@@ -58,11 +58,11 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public RepositoryNode callNodeSerializer(EntityEnclosingRemoteEndpoint<RepositoryNode> endPoint, Object payload, NodeScope nodeScope) {
+	public RepositoryNode callNodeSerializer(EntityEnclosingRemoteEndpoint<RepositoryNode> endpoint, Object payload, NodeScope nodeScope) {
 		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
 		initDeserializer(nodeScope, deserializationParameters);
 		
-		return repositoryRemoteBinding.builderWithSerializer(endPoint)
+		return repositoryRemoteBinding.builderWithSerializer(endpoint)
 			.callPayloadSerializer(payload, null, 
 				new NodePayloadCallback<RepositoryNode>() {
 					@Override
@@ -80,14 +80,14 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public List<RepositoryNode> callNodeListSerializer(
-			EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endPoint,
+			EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endpoint,
 			Object payload,
 			NodeScope nodeScope) {
 		
 		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
 		initDeserializer(nodeScope, deserializationParameters);
 		
-		return repositoryRemoteBinding.builderWithSerializer(endPoint)
+		return repositoryRemoteBinding.builderWithSerializer(endpoint)
 			.callPayloadSerializer(
 				payload, null, 
 				new NodePayloadCallback<List<RepositoryNode>>() {
@@ -147,13 +147,14 @@ public class NodeServiceImpl implements NodeService {
 		return list.get(0);
 	}
 
-	private <R> R callNodeUploadSerializer(
-			EntityEnclosingRemoteEndpoint<R> endPoint,
+	@Override
+	public <R> R callNodeUploadSerializer(
+			EntityEnclosingRemoteEndpoint<R> endpoint,
 			Object payload,
 			List<RepositoryNode> nodes,
 			NodeContentSerializationParameters serializationParameters,
 			NodeContentDeserializationParameters deserializationParameters) {
-		return repositoryRemoteBinding.builderWithSerializer(endPoint)
+		return repositoryRemoteBinding.builderWithSerializer(endpoint)
 			.callPayloadSerializer(payload, nodes, null, serializationParameters, deserializationParameters);
 	}
 	
