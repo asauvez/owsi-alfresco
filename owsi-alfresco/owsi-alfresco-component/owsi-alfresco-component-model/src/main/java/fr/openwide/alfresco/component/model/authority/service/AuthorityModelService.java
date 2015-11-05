@@ -18,4 +18,6 @@ public interface AuthorityModelService {
 	List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder);
 	Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder);
 
+	List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder);
+
 }

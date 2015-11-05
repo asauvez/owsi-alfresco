@@ -71,10 +71,8 @@
 
 	<bean id="webscript.owsi.remote.authority.get-user.post" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.GetUserWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-contained-users.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedUsersWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-contained-groups.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedGroupsWebScript" />
+	<bean id="webscript.owsi.remote.authority.get-contained-authorities.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedAuthoritiesWebScript" />
 	<bean id="webscript.owsi.remote.authority.create-user.post" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.CreateUserWebScript" />
 	<bean id="webscript.owsi.remote.authority.delete-user.post" parent="webscript.owsi.authority"

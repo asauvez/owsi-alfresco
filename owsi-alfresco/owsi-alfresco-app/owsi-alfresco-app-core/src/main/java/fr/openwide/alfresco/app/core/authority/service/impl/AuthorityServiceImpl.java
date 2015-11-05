@@ -56,17 +56,10 @@ public class AuthorityServiceImpl implements AuthorityService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters) {
-		GET_CONTAINED_USERS payload = new GET_CONTAINED_USERS();
+	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
+		GET_CONTAINED_AUTHORITIES payload = new GET_CONTAINED_AUTHORITIES();
 		payload.searchParameters = searchParameters;
-		return nodeService.callNodeListSerializer(GET_CONTAINED_USERS.ENDPOINT, payload, searchParameters.getNodeScope());
-	}
-	
-	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters) {
-		GET_CONTAINED_GROUPS payload = new GET_CONTAINED_GROUPS();
-		payload.searchParameters = searchParameters;
-		return nodeService.callNodeListSerializer(GET_CONTAINED_GROUPS.ENDPOINT, payload, searchParameters.getNodeScope());
+		return nodeService.callNodeListSerializer(GET_CONTAINED_AUTHORITIES.ENDPOINT, payload, searchParameters.getNodeScope());
 	}
 	
 	@Override

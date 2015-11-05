@@ -42,17 +42,11 @@ public interface AuthorityRemoteService {
 	}
 	void updateUserPassword(String userName, String newPassword) throws NoSuchNodeRemoteException;
 
-	class GET_CONTAINED_USERS {
-		public static PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/authority/get-contained-users") {};
+	class GET_CONTAINED_AUTHORITIES {
+		public static PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/authority/get-contained-authorities") {};
 		public RepositoryAuthorityQueryParameters searchParameters;
 	}
-	List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters);
-
-	class GET_CONTAINED_GROUPS {
-		public static PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/authority/get-contained-groups") {};
-		public RepositoryAuthorityQueryParameters searchParameters;
-	}
-	List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters);
+	List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters);
 
 	class GET_GROUP {
 		public static PostMethodEndpoint<RepositoryNode> ENDPOINT = new PostMethodEndpoint<RepositoryNode>("/owsi/authority/get-group") {};

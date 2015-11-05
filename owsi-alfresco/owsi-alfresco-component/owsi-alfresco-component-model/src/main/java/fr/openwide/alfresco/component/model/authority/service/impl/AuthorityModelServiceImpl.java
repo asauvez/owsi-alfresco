@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityType;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
@@ -29,6 +30,8 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	
 	@Override
 	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
+		authorityQueryBuilder.type(RepositoryAuthorityType.USER);
+		
 		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.person.lastName);
 		}
@@ -37,11 +40,13 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 				.nodeReference()
 				.properties().set(CmModel.person));
 		}
-		return new BusinessNodeList(authorityService.getContainedUsers(authorityQueryBuilder.getParameters()));
+		return getContainedAuthorities(authorityQueryBuilder);
 	}
 	
 	@Override
 	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
+		authorityQueryBuilder.type(RepositoryAuthorityType.GROUP);
+		
 		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.authorityContainer.authorityDisplayName);
 		}
@@ -50,7 +55,18 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 				.nodeReference()
 				.properties().set(CmModel.authorityContainer));
 		}
-		return new BusinessNodeList(authorityService.getContainedGroups(authorityQueryBuilder.getParameters()));
+		return getContainedAuthorities(authorityQueryBuilder);
+	}
+	
+	@Override
+	public List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder) {
+		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
+			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
+				.nodeReference()
+				.properties().set(CmModel.person)
+				.properties().set(CmModel.authorityContainer));
+		}
+		return new BusinessNodeList(authorityService.getContainedAuthorities(authorityQueryBuilder.getParameters()));
 	}
 
 	@Override

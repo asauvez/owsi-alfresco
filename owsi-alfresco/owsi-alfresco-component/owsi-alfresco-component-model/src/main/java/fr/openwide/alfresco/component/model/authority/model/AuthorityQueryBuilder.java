@@ -2,6 +2,7 @@ package fr.openwide.alfresco.component.model.authority.model;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityType;
 import fr.openwide.alfresco.component.model.node.model.builder.AbstractQueryBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
@@ -19,6 +20,11 @@ public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBu
 	public AuthorityQueryBuilder parentAuthorityImmediate(RepositoryAuthority parentAuthority) {
 		getParameters().setParentAuthority(parentAuthority);
 		getParameters().setImmediate(true);
+		return this;
+	}
+
+	public AuthorityQueryBuilder type(RepositoryAuthorityType type) {
+		getParameters().setAuthorityType(type);
 		return this;
 	}
 

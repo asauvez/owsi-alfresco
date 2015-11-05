@@ -94,17 +94,9 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters) {
-		return getContained(AuthorityType.USER, searchParameters);
-	}
-
-	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters) {
-		return getContained(AuthorityType.GROUP, searchParameters);
-	}
-
-	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthorityQueryParameters searchParameters) {
-		Set<String> authorities = authorityService.getContainedAuthorities(type, 
+	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
+		AuthorityType authorityType = (searchParameters.getAuthorityType() != null) ? AuthorityType.valueOf(searchParameters.getAuthorityType().name()) : null;
+		Set<String> authorities = authorityService.getContainedAuthorities(authorityType, 
 				searchParameters.getParentAuthority().getName(), 
 				searchParameters.isImmediate());
 		
