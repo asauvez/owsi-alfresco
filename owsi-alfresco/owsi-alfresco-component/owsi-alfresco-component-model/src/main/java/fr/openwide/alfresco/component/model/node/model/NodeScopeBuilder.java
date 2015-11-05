@@ -7,7 +7,6 @@ import fr.openwide.alfresco.component.model.node.model.embed.AssociationsNodeSco
 import fr.openwide.alfresco.component.model.node.model.embed.ContentsNodeScope;
 import fr.openwide.alfresco.component.model.node.model.embed.PermissionsNodeScope;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNodeScope;
-import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 public class NodeScopeBuilder {
 
@@ -55,19 +54,6 @@ public class NodeScopeBuilder {
 		return this;
 	}
 
-	@Deprecated
-	public NodeScopeBuilder name() {
-		return properties().name();
-	}
-	@Deprecated
-	public NodeScopeBuilder property(PropertyModel<?> propertyModel) {
-		return properties().set(propertyModel);
-	}
-	@Deprecated
-	public NodeScopeBuilder properties(ContainerModel type) {
-		return properties().set(type);
-	}
-	
 	public PropertiesNodeScope properties() {
 		return propertiesNodeScope;
 	}

@@ -1,14 +1,11 @@
 package fr.openwide.alfresco.component.model.node.model;
 
-import java.io.Serializable;
-
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.embed.AssociationsNode;
 import fr.openwide.alfresco.component.model.node.model.embed.ContentsNode;
 import fr.openwide.alfresco.component.model.node.model.embed.PermissionsNode;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
-import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 
 public class BusinessNode {
 
@@ -76,38 +73,14 @@ public class BusinessNode {
 		return this;
 	}
 
-	@Deprecated
-	public String getName() {
-		return properties().getName();
-	}
-	@Deprecated
-	public BusinessNode name(String name) {
-		return properties().name(name);
-	}
-	@Deprecated
-	public <C extends Serializable> C getProperty(SinglePropertyModel<C> propertyModel) {
-		return properties().get(propertyModel);
-	}
-	@Deprecated
-	public <C extends Serializable> BusinessNode property(SinglePropertyModel<C> propertyModel, C value) {
-		return properties().set(propertyModel, value);
-	}
 	public PropertiesNode properties() {
 		return propertiesNode;
 	}
 	
-	@Deprecated
-	public BusinessNode primaryParentRef(NodeReference parentRef) {
-		return assocs().primaryParentRef(parentRef);
-	}
 	public AssociationsNode assocs() {
 		return associationsNode;
 	}
 
-	@Deprecated
-	public BusinessNode content(Object content) {
-		return contents().set(content);
-	}
 	public ContentsNode contents() {
 		return contentsNode;
 	}
