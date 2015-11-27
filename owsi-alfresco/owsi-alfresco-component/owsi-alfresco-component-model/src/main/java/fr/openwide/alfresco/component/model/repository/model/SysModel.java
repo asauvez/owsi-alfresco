@@ -3,6 +3,7 @@ package fr.openwide.alfresco.component.model.repository.model;
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysArchived;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysBase;
+import fr.openwide.alfresco.component.model.repository.model.sys.SysContainer;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysLocalized;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysReferenceable;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysTemporary;
@@ -25,5 +26,7 @@ public interface SysModel {
 	// ---- Types
 
 	SysBase base = new SysBase();
+	
+	SysContainer container = new SysContainer();
 
 }

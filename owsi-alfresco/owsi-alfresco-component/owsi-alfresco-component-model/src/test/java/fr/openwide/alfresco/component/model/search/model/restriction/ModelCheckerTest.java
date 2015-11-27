@@ -27,6 +27,7 @@ public class ModelCheckerTest {
 				+ "CmModel : Field name workingCopy is not the same as the container name workingcopy\n"
 				+ "CmModel : Field name generalClassifiable is not the same as the container name generalclassifiable\n"
 				+ "CmModel : Field name object is not the same as the container name cmobject\n"
+				+ "CmModel : Field name categoryRoot is not the same as the container name category_root\n"
 				+ "RnModel : Field NAMESPACE rn is not the same as the container namespace cm:thumbnail\n"
 				+ "CmThumbnail : Field NAMESPACE rn is not the same as the property namespace cm:thumbnailName\n"
 				+ "CmThumbnail : Field NAMESPACE rn is not the same as the property namespace cm:contentPropertyName", 
