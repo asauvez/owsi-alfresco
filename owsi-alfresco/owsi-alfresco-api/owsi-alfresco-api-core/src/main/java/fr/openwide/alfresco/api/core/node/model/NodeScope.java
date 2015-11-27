@@ -15,7 +15,7 @@ import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserialize
 import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor.RepositoryVisitable;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_DEFAULT)
 public class NodeScope implements Serializable, RepositoryVisitable<NodeScope> {
 
 	private static final long serialVersionUID = 6930653481257487738L;
