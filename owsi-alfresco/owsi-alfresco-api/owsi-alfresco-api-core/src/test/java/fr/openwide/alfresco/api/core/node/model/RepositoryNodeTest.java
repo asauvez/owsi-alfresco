@@ -22,8 +22,7 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 public class RepositoryNodeTest {
 
 	@Test
-	public void testSerialization() throws IOException {
-		
+	public void testSerializationNode() throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		
@@ -45,6 +44,7 @@ public class RepositoryNodeTest {
 		node.getProperties().put(NameReference.create("cm:s"), "ABC");
 		node.getProperties().put(NameReference.create("cm:date"), new Date());
 		String s = objectMapper.writeValueAsString(node);
+		System.out.println("Node : ");
 		System.out.println(s);
 		
 		node = objectMapper.readValue(s, RepositoryNode.class);
@@ -65,5 +65,24 @@ public class RepositoryNodeTest {
 		
 		RepositoryContentData contentData = (RepositoryContentData) node.getProperty(NameReference.create("cm:content"));
 		Assert.assertEquals("text/plain", contentData.getMimetype());
+	}
+
+	@Test
+	public void testSerializationNodeScope() throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		
+		NodeScope scope = new NodeScope();
+		scope.setPath(true);
+		scope.setType(false);
+				
+		String s = objectMapper.writeValueAsString(scope);
+		System.out.println("Scope : ");
+		System.out.println(s);
+		
+		scope = objectMapper.readValue(s, NodeScope.class);
+		Assert.assertEquals(true, scope.isNodeReference());
+		Assert.assertEquals(true, scope.isPath());
+		Assert.assertEquals(false, scope.isType());
 	}
 }
