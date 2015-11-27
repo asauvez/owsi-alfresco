@@ -12,6 +12,7 @@ public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters 
 	private String filterValue;
 	
 	private boolean immediate;
+	private boolean includingParent;
 
 	public RepositoryAuthority getParentAuthority() {
 		return parentAuthority;
@@ -25,7 +26,6 @@ public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters 
 	public void setAuthorityType(RepositoryAuthorityType authorityType) {
 		this.authorityType = authorityType;
 	}
-
 	public NameReference getFilterProperty() {
 		return filterProperty;
 	}
@@ -44,6 +44,13 @@ public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters 
 	}
 	public void setImmediate(boolean immediate) {
 		this.immediate = immediate;
+	}
+	
+	public boolean isIncludingParent() {
+		return includingParent;
+	}
+	public void setIncludingParent(boolean includingParent) {
+		this.includingParent = includingParent;
 	}
 	
 }

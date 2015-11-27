@@ -100,6 +100,10 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 				searchParameters.getParentAuthority().getName(), 
 				searchParameters.isImmediate());
 		
+		if (searchParameters.isIncludingParent()) {
+			authorities.add(searchParameters.getParentAuthority().getName());
+		}
+		
 		Pattern pattern = (searchParameters.getFilterValue() != null) 
 				? Pattern.compile(".*\\b" + searchParameters.getFilterValue().toLowerCase() + ".*") : null;
 		

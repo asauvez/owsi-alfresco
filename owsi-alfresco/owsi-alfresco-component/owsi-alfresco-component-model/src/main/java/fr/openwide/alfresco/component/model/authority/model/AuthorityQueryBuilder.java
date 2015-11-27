@@ -22,6 +22,10 @@ public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBu
 		getParameters().setImmediate(true);
 		return this;
 	}
+	public AuthorityQueryBuilder includingParent() {
+		getParameters().setIncludingParent(true);
+		return this;
+	}
 
 	public AuthorityQueryBuilder type(RepositoryAuthorityType type) {
 		getParameters().setAuthorityType(type);
