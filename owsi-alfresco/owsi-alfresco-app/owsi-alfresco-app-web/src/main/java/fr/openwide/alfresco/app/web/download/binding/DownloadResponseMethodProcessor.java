@@ -158,9 +158,10 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 
 		NodeScope nodeScope = new NodeScope();
 		NodeScope downloadNodeScope = nodeScope;
-		if (download.getRenditionName() != null) {
+		NameReference renditionName = download.rendition().getName();
+		if (renditionName != null) {
 			downloadNodeScope = new NodeScope();
-			nodeScope.getRenditions().put(download.getRenditionName(), downloadNodeScope);
+			nodeScope.getRenditions().put(renditionName, downloadNodeScope);
 		}
 		
 		downloadNodeScope.getProperties().add(download.getProperty());

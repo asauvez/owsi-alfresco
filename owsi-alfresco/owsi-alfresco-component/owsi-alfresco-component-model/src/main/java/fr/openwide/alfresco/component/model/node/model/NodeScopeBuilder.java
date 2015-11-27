@@ -7,6 +7,7 @@ import fr.openwide.alfresco.component.model.node.model.embed.AssociationsNodeSco
 import fr.openwide.alfresco.component.model.node.model.embed.ContentsNodeScope;
 import fr.openwide.alfresco.component.model.node.model.embed.PermissionsNodeScope;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNodeScope;
+import fr.openwide.alfresco.component.model.node.model.embed.RenditionsNodeScope;
 
 public class NodeScopeBuilder {
 
@@ -14,6 +15,7 @@ public class NodeScopeBuilder {
 	private PropertiesNodeScope propertiesNodeScope = new PropertiesNodeScope(this);
 	private AssociationsNodeScope associationsNodeScope = new AssociationsNodeScope(this);
 	private ContentsNodeScope contentsNodeScope = new ContentsNodeScope(this);
+	private RenditionsNodeScope renditionsNodeScope = new RenditionsNodeScope(this);
 	private PermissionsNodeScope permissionsNodeScope = new PermissionsNodeScope(this);
 
 	public NodeScope getScope() {
@@ -64,6 +66,9 @@ public class NodeScopeBuilder {
 
 	public ContentsNodeScope contents() {
 		return contentsNodeScope;
+	}
+	public RenditionsNodeScope renditions() {
+		return renditionsNodeScope;
 	}
 
 	public PermissionsNodeScope permissions() {
