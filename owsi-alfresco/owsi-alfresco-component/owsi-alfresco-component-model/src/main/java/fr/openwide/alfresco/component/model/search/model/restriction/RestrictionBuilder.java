@@ -147,10 +147,6 @@ public class RestrictionBuilder extends Restriction {
 		return restriction;
 	}
 
-	public boolean isEmpty() {
-		return restrictions.isEmpty();
-	}
-	
 	@Override
 	protected boolean isNeedingParenthesis() {
 		return true;
