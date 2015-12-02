@@ -30,13 +30,13 @@
 		<property name="importerBootstrap" ref="spacesBootstrap" />
 	</bean>
 
-	<bean id="abstract.bootstrap.patch" abstract="true" parent="module.baseComponent">
+	<bean id="owsi.patch.parent" abstract="true" parent="module.baseComponent">
 		<property name="boostrapService" ref="owsi.service.boostrapService" />
 		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
 		<property name="identificationService" ref="owsi.service.identificationService"/>
 	</bean>
 	<!-- Pour déclarer un patch en XML :
-	<bean id="[...]" class="[... extends AbstractBootstrapPatch]" parent="abstract.bootstrap.patch">
+	<bean id="[...]" class="[... extends AbstractBootstrapPatch]" parent="owsi.patch.parent">
 		<property name="moduleId" value="${alfresco.module.name}" />
 	</bean>
 	 -->

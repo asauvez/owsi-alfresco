@@ -12,7 +12,7 @@ import fr.openwide.alfresco.repo.module.bootstrap.service.BootstrapService;
  * Base des patchs utilisant BootstrapService.
  * 
  * Pour déclarer un patch en XML :
- * <bean id="[...]" class="[...]" parent="abstract.bootstrap.patch">
+ * <bean id="[...]" class="[...]" parent="owsi.patch.parent">
  * 		<property name="moduleId" value="${alfresco.module.name}" />
  * </bean>
  */
