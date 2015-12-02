@@ -202,7 +202,11 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			};
 			boolean readonly = TransactionCapability.readonly.equals(transaction.getCapability());
 			boolean requiresNew = RequiredTransaction.requiresnew.equals(transaction.getRequired());
-			return transactionService.getRetryingTransactionHelper().doInTransaction(work, readonly, requiresNew);
+			
+			RetryingTransactionHelper retryingTransactionHelper = transactionService.getRetryingTransactionHelper();
+			// On ne peut pas rejouer le script car on consomme le flux de la requête.
+			retryingTransactionHelper.setMaxRetries(0);
+			return retryingTransactionHelper.doInTransaction(work, readonly, requiresNew);
 		}
 	}
 
