@@ -17,15 +17,15 @@ public class RepositoryAuthority implements Serializable {
 
 	private String name;
 
-	public RepositoryAuthority(String name) {
+	private RepositoryAuthority(String name) {
 		this.name = name;
 	}
 	
 	public static RepositoryAuthority user(String username) {
-		return RepositoryAuthority.authority(username);
+		return authority(username);
 	}
 	public static RepositoryAuthority group(String shortName) {
-		return RepositoryAuthority.authority(GROUP_PREFIX + shortName);
+		return authority(GROUP_PREFIX + shortName);
 	}
 	public static RepositoryAuthority authority(String authorityName) {
 		return new RepositoryAuthority(authorityName);
