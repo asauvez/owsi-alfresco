@@ -180,9 +180,9 @@
 										<exclude>javassist:javassist</exclude>
 										<exclude>xml-apis:xml-apis</exclude>
 										<exclude>apache-xerces:xml-apis</exclude>
-										<exclude>javax.servlet:servlet-api</exclude>
+										<exclude>javax.servlet:servlet-api</exclude> <!-- Replace by javax.servlet:javax.servlet-api -->
 										<exclude>net.sf.ehcache:ehcache-core</exclude>
-										<exclude>postgresql:postgresql</exclude>
+										<exclude>postgresql:postgresql</exclude> <!-- Replace by org.postgresql:postgresql -->
 									</excludes>
 								</bannedDependencies>
 								<requireMavenVersion>
