@@ -17,7 +17,7 @@
 		<alfresco.webapp.name>alfresco</alfresco.webapp.name>
 		<share.webapp.name>share</share.webapp.name>
 		
-		<owsi-alfresco.repo.alfresco.version>4.2.4</owsi-alfresco.repo.alfresco.version>
+		<owsi-alfresco.repo.alfresco.version>4.2.5.1</owsi-alfresco.repo.alfresco.version>
 		
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		
