@@ -69,6 +69,7 @@
 						<noDeploy>true</noDeploy>
 						<pullDevelop>true</pullDevelop>
 						<pullMaster>true</pullMaster>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
 					</configuration>
 				</plugin>
 			</plugins>
