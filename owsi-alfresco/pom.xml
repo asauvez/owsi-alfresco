@@ -41,8 +41,8 @@
 	</distributionManagement>
 
 	<issueManagement>
-		<system>Trac</system>
-		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/report</url>
+		<system>GitLab</system>
+		<url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi/issues</url>
 	</issueManagement>
 
 	<ciManagement>
@@ -51,8 +51,8 @@
 	</ciManagement>
 
 	<scm>
-		<developerConnection>scm:git:ssh://git.projects.openwide.fr/gitroot/alfresco-tools</developerConnection>
-		<url>https://projects.openwide.fr/services/git/trac/alfresco-tools/browser/owsi-alfresco</url>
+		<developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
+		<url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi</url>
 		<tag>HEAD</tag>
 	</scm>
 
