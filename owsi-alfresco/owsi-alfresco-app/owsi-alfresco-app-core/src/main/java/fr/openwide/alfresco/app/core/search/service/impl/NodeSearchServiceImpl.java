@@ -31,7 +31,7 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 
 	@Override
 	public List<RepositoryNode> search(RepositorySearchParameters searchParameters) {
-		LOGGER.debug(searchParameters.getQuery());
+		LOGGER.debug(searchParameters.getQuery().replace("\n", " "));
 		
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
 		payload.searchParameters = searchParameters;

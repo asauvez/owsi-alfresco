@@ -41,7 +41,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 		try {
 			long before = System.currentTimeMillis();
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Searching for query : {}", rsp.getQuery());
+				LOGGER.debug("Searching for query : {}", rsp.getQuery().replace("\n", " "));
 			}
 
 			SearchParameters sp = new SearchParameters();
