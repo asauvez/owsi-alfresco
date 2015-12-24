@@ -75,6 +75,13 @@
 				<type>war</type>
 				<scope>runtime</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.alfresco</groupId>
+				<artifactId>share</artifactId>
+				<version>${owsi-alfresco.repo.alfresco.version}</version>
+				<type>war</type>
+				<scope>runtime</scope>
+			</dependency>
 			
 			<dependency>
 				<groupId>org.alfresco</groupId>
