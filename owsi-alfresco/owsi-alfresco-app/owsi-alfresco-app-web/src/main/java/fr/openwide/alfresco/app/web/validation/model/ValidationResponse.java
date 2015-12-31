@@ -3,6 +3,8 @@ package fr.openwide.alfresco.app.web.validation.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.validation.BindingResult;
@@ -136,6 +138,15 @@ public class ValidationResponse {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+				.append("globalAlerts", globalAlerts)
+				.append("fieldErrors", fieldErrors)
+				.append("viewName", viewName)
+				.toString();
 	}
 
 	public List<FieldMessage> getFieldErrors() {

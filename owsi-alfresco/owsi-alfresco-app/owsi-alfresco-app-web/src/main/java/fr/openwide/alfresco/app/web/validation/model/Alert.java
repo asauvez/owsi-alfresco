@@ -1,5 +1,8 @@
 package fr.openwide.alfresco.app.web.validation.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Alert {
@@ -30,6 +33,15 @@ public class Alert {
 
 	public static Alert newInfo(String message, String details, Object ... args) {
 		return new Alert(AlertType.info, message, details, args);
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SIMPLE_STYLE)
+			.append("type", type)
+			.append("message", message)
+			.append("args", args)
+			.toString();
 	}
 
 	public AlertType getType() {
