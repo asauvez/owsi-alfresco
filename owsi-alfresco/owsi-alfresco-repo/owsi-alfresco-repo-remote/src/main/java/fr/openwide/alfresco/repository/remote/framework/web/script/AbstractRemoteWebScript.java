@@ -26,7 +26,6 @@ import org.springframework.extensions.webscripts.Description.TransactionCapabili
 import org.springframework.extensions.webscripts.DescriptionImpl;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.TransactionParameters;
-import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.util.StringUtils;
@@ -98,14 +97,12 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		P payload = extractPayload(req);
 		
 		// construct model for script / template
-		Status status = new Status();
-		Cache cache = new Cache(getDescription().getRequiredCache());
 		R resValue = null;
 		Exception resException = null;
 		int statusCode;
 		try {
 			resValue = transactionedExecute(payload);
-			statusCode = status.getCode();
+			statusCode = (resValue != null) ? Status.STATUS_OK : Status.STATUS_NO_CONTENT;
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
 			LOGGER.warn("Could not get access", e);
 			resException = e;
@@ -139,38 +136,16 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 			resException = new IllegalStateRemoteException(message, e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		}
-		if (resValue == null && statusCode == Status.STATUS_OK) {
-			status.setCode(Status.STATUS_NO_CONTENT);
-		}
-		// is a redirect to a status specific template required?
-		if (status.getRedirect()) {
-			throw new WebScriptException("Web Script redirection is not supported");
+		// apply status code
+		res.setStatus(statusCode);
+		// apply cache
+		res.setCache(new Cache(getDescription().getRequiredCache()));
+		// render response according to model
+		if (resException == null) {
+			handleResult(res, resValue);
 		} else {
-			// force status
-			if (statusCode != Status.STATUS_OK && ! req.forceSuccessStatus()) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Force success status header in response: {}", req.forceSuccessStatus());
-					LOGGER.debug("Setting status: {}", statusCode);
-				}
-				res.setStatus(statusCode);
-			}
-			// apply location
-			String location = status.getLocation();
-			if (location != null && location.length() > 0) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Setting location to: {}", location);
-				}
-				res.setHeader(WebScriptResponse.HEADER_LOCATION, location);
-			}
-			// apply cache
-			res.setCache(cache);
-			// render response according to model
-			if (resException == null) {
-				handleResult(res, resValue);
-			} else {
-				setExceptionHeader(res, resException);
-				objectMapper.writeValue(res.getOutputStream(), resException);
-			}
+			setExceptionHeader(res, resException);
+			objectMapper.writeValue(res.getOutputStream(), resException);
 		}
 	}
 
