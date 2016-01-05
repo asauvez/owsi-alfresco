@@ -31,6 +31,7 @@ import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
@@ -93,7 +94,7 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			responsePayload.setRemoteCallParameters(requestPayload.getRemoteCallParameters());
 			return responsePayload;
 		} catch (IOException e) {
-			throw new IllegalStateException(e);
+			throw new InvalidMessageRemoteException(e);
 		}
 		
 	}
