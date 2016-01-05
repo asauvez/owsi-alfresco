@@ -15,9 +15,8 @@ public class UserWebScript extends AbstractMessageRemoteWebScript<RepositoryUser
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected RepositoryUser executeImpl(AUTHENTICATED_USER_SERVICE request) { 
-		return authenticationRemoteService.getAuthenticatedUser( 
-			Objects.requireNonNull(request.nodeScope, "NodeScope")); 
+	protected RepositoryUser execute(AUTHENTICATED_USER_SERVICE request) { 
+		return authenticationRemoteService.getAuthenticatedUser(Objects.requireNonNull(request.nodeScope, "NodeScope"));
 	}
 	
 	@Override 

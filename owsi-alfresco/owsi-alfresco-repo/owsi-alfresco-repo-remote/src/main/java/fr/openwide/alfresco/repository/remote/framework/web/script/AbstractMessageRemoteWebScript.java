@@ -2,6 +2,8 @@ package fr.openwide.alfresco.repository.remote.framework.web.script;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
@@ -15,14 +17,11 @@ import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteExcept
  * Base class for web services that provide automatic one argument handling. Payload must be a unique object in message body,
  * serialized with Jackson and of type « P »
  */
-public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemoteWebScript<R> {
+public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemoteWebScript<R, P> {
+
+	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	@Override
-	protected R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) {
-		P payload = extractPayload(req);
-		return executeImpl(payload);
-	}
-
 	protected P extractPayload(WebScriptRequest req) {
 		P parameter;
 		try {
@@ -38,11 +37,25 @@ public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemot
 		}
 	}
 
+	@Override
+	protected R executeImpl(P payload) {
+		return execute(payload);
+	}
+
+	protected abstract R execute(P payload);
+
+	@Override
+	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
+		res.setContentType("application/json;charset=UTF-8");
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Serializing result: {}", objectMapper.writeValueAsString(resValue));
+		}
+		objectMapper.writeValue(res.getOutputStream(), resValue);
+	}
+
 	protected String getRawPayload(WebScriptRequest req) throws IOException {
 		return req.getContent().getContent();
 	}
-
-	protected abstract R executeImpl(P payload);
 
 	/**
 	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and null is passed

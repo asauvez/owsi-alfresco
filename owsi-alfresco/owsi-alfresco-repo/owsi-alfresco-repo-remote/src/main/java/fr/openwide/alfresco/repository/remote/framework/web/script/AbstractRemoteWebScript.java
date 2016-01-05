@@ -26,7 +26,6 @@ import org.springframework.extensions.webscripts.Description.TransactionCapabili
 import org.springframework.extensions.webscripts.DescriptionImpl;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.TransactionParameters;
-import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.util.StringUtils;
@@ -60,7 +59,7 @@ import fr.openwide.alfresco.repository.remote.framework.model.InnerTransactionPa
  * {@see org.alfresco.repo.web.scripts.RepositoryContainer}
  * {@see org.springframework.extensions.webscripts.DescriptionImpl#parse(org.dom4j.Element)}
  */
-public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
+public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	private static final String KEY_INNER_TRANSACTION = "innerTransaction";
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -95,15 +94,15 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			LOGGER.debug("Executing {} method with uri: {}", getDescription().getMethod(), req.getPathInfo());
 		}
 		
+		P payload = extractPayload(req);
+		
 		// construct model for script / template
-		Status status = new Status();
-		Cache cache = new Cache(getDescription().getRequiredCache());
 		R resValue = null;
 		Exception resException = null;
 		int statusCode;
 		try {
-			resValue = transactionedExecute(req, res, status, cache);
-			statusCode = status.getCode();
+			resValue = transactionedExecute(payload);
+			statusCode = (resValue != null) ? Status.STATUS_OK : Status.STATUS_NO_CONTENT;
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
 			LOGGER.warn("Could not get access", e);
 			resException = e;
@@ -137,55 +136,32 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			resException = new IllegalStateRemoteException(message, e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		}
-		if (resValue == null && statusCode == Status.STATUS_OK) {
-			status.setCode(Status.STATUS_NO_CONTENT);
-		}
-		// is a redirect to a status specific template required?
-		if (status.getRedirect()) {
-			throw new WebScriptException("Web Script redirection is not supported");
+		// apply status code
+		res.setStatus(statusCode);
+		// apply cache
+		res.setCache(new Cache(getDescription().getRequiredCache()));
+		// render response according to model
+		if (resException == null) {
+			handleResult(res, resValue);
 		} else {
-			// force status
-			if (statusCode != Status.STATUS_OK && ! req.forceSuccessStatus()) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Force success status header in response: {}", req.forceSuccessStatus());
-					LOGGER.debug("Setting status: {}", statusCode);
-				}
-				res.setStatus(statusCode);
-			}
-			// apply location
-			String location = status.getLocation();
-			if (location != null && location.length() > 0) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Setting location to: {}", location);
-				}
-				res.setHeader(WebScriptResponse.HEADER_LOCATION, location);
-			}
-			// apply cache
-			res.setCache(cache);
-			// render response according to model
-			if (resException == null) {
-				handleResult(res, resValue);
-			} else {
-				setExceptionHeader(res, resException);
-				objectMapper.writeValue(res.getOutputStream(), resException);
-			}
+			setExceptionHeader(res, resException);
+			objectMapper.writeValue(res.getOutputStream(), resException);
 		}
 	}
 
-	protected R transactionedExecute(final WebScriptRequest req, final WebScriptResponse res, 
-			final Status status, final Cache cache) throws Exception {
+	protected R transactionedExecute(final P parameter) throws Exception {
 		RequiredTransactionParameters transaction = 
 				(RequiredTransactionParameters) getDescription().getExtensions().get(KEY_INNER_TRANSACTION);
 		if (RequiredTransaction.none.equals(transaction.getRequired())) {
 			// no transaction
-			return executeImpl(req, res, status, cache);
+			return executeImpl(parameter);
 		} else {
 			// do in transaction
 			RetryingTransactionCallback<R> work = new RetryingTransactionCallback<R>() {
 				@Override
 				public R execute() throws Exception {
 					try {
-						return executeImpl(req, res, status, cache);
+						return executeImpl(parameter);
 					} catch (Exception e) {
 						UserTransaction txn = RetryingTransactionHelper.getActiveUserTransaction();
 						if (txn != null && txn.getStatus() != javax.transaction.Status.STATUS_MARKED_ROLLBACK) {
@@ -210,15 +186,9 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		}
 	}
 
-	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws IOException;
-
-	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
-		res.setContentType("application/json;charset=UTF-8");
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Serializing result: {}", objectMapper.writeValueAsString(resValue));
-		}
-		objectMapper.writeValue(res.getOutputStream(), resValue);
-	}
+	protected abstract P extractPayload(WebScriptRequest req);
+	protected abstract R executeImpl(P payload);
+	protected abstract void handleResult(WebScriptResponse res, R resValue) throws IOException;
 
 	protected static void setExceptionHeader(WebScriptResponse res, Exception e) {
 		res.setContentType("application/json;charset=UTF-8");
