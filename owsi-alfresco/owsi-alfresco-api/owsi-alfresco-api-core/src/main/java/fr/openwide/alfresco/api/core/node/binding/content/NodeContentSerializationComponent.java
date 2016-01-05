@@ -94,9 +94,7 @@ public class NodeContentSerializationComponent {
 		zos.setLevel(remoteCallParameters.getCompressionLevel());
 		
 		// Ecrit le JSon
-		RemoteCallPayload<Object> remoteCallPayload = new RemoteCallPayload<>();
-		remoteCallPayload.setPayload(payload);
-		remoteCallPayload.setRemoteCallParameters(remoteCallParameters);
+		RemoteCallPayload<Object> remoteCallPayload = new RemoteCallPayload<>(payload, remoteCallParameters);
 		
 		zos.putNextEntry(new ZipEntry(JSON_ZIP_ENTRY_NAME));
 		if (LOGGER.isDebugEnabled()) {

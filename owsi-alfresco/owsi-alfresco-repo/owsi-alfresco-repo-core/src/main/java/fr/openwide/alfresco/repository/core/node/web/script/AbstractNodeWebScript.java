@@ -108,10 +108,7 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			RemoteCallPayload<P> requestPayload = serializationComponent.deserialize(
 					getParameterType(), payloadCallback, defaultDeserializationParameters,
 					payload);
-			RemoteCallPayload<R> responsePayload = new RemoteCallPayload<R>();
-			responsePayload.setPayload(resultRef.get());
-			responsePayload.setRemoteCallParameters(requestPayload.getRemoteCallParameters());
-			return responsePayload;
+			return new RemoteCallPayload<R>(resultRef.get(), requestPayload.getRemoteCallParameters());
 		} catch (IOException e) {
 			throw new InvalidMessageRemoteException(e);
 		}
