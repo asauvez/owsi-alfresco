@@ -14,9 +14,8 @@ public class LogoutWebScript extends AbstractMessageRemoteWebScript<Void, Reposi
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected Void executeImpl(RepositoryTicket ticket) {
-		authenticationRemoteService.logout(
-				Objects.requireNonNull(ticket, "RepositoryTicket"));
+	protected Void execute(RepositoryTicket ticket) {
+		authenticationRemoteService.logout(Objects.requireNonNull(ticket, "RepositoryTicket"));
 		return null;
 	}
 

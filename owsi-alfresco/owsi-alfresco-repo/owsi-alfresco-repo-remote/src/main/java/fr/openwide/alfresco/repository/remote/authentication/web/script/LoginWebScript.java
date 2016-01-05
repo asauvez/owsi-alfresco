@@ -15,7 +15,7 @@ public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUse
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
-	protected RepositoryUser executeImpl(LOGIN_REQUEST_SERVICE request) {
+	protected RepositoryUser execute(LOGIN_REQUEST_SERVICE request) {
 		return authenticationRemoteService.authenticate(
 				Objects.requireNonNull(request.username, "Username"), 
 				Objects.requireNonNull(request.password, "Password"),

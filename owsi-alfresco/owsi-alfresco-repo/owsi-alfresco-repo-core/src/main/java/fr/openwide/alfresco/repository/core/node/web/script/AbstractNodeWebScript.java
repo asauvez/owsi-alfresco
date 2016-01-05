@@ -31,10 +31,11 @@ import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
-public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<R> {
+public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<RemoteCallPayload<R>, InputStream> {
 
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
@@ -59,7 +60,12 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	protected abstract JavaType getParameterType();
 
 	@Override
-	protected R executeImpl(WebScriptRequest request, final WebScriptResponse response, Status status, Cache cache) throws IOException {
+	protected InputStream extractPayload(WebScriptRequest req) {
+		return req.getContent().getInputStream();
+	}
+	
+	@Override
+	protected RemoteCallPayload<R> executeImpl(InputStream payload) {
 		final AtomicReference<R> resultRef = new AtomicReference<>();
 		NodePayloadCallback<P> payloadCallback = new NodePayloadCallback<P>() {
 			@Override
@@ -78,32 +84,35 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			}
 		};
 		
-		// L'appel du service se fait dans le callback
-		RemoteCallPayload<P> remoteCallPayload = serializationComponent.deserialize(
-				getParameterType(), payloadCallback, defaultDeserializationParameters,
-				request.getContent().getInputStream());
+		try {
+			// L'appel du service se fait dans le callback
+			RemoteCallPayload<P> requestPayload = serializationComponent.deserialize(
+					getParameterType(), payloadCallback, defaultDeserializationParameters,
+					payload);
+			RemoteCallPayload<R> responsePayload = new RemoteCallPayload<R>();
+			responsePayload.setPayload(resultRef.get());
+			responsePayload.setRemoteCallParameters(requestPayload.getRemoteCallParameters());
+			return responsePayload;
+		} catch (IOException e) {
+			throw new InvalidMessageRemoteException(e);
+		}
 		
-		final R result = resultRef.get();
-		
-		// generate output
-		response.setContentType(NodeContentSerializationComponent.CONTENT_TYPE);
-		final Collection<RepositoryNode> outputNodes = getOutputNodes(result);
-		RemoteCallParameters.execute(remoteCallPayload.getRemoteCallParameters(), new Callable<Void>() {
-			@Override
-			public Void call() throws IOException {
-				try (OutputStream outputStream = response.getOutputStream()) {
-					serializationComponent.serialize(result, outputNodes, defaultSerializationParameters, outputStream);
-					return null;
-				}
-			}
-		});
-		
-		return resultRef.get();
 	}
 
 	@Override
-	protected void handleResult(WebScriptResponse response, R result) throws IOException {
-		// noop : déjà traité plus haut
+	protected void handleResult(final WebScriptResponse response, final RemoteCallPayload<R> result) throws IOException {
+		response.setContentType(NodeContentSerializationComponent.CONTENT_TYPE);
+		final Collection<RepositoryNode> outputNodes = getOutputNodes(result.getPayload());
+		RemoteCallParameters.execute(result.getRemoteCallParameters(), new Callable<Void>() {
+			@Override
+			public Void call() throws IOException {
+				serializationComponent.serialize(result.getPayload(),
+						outputNodes,
+						defaultSerializationParameters,
+						response.getOutputStream());
+				return null;
+			}
+		});
 	}
 
 	@Override
