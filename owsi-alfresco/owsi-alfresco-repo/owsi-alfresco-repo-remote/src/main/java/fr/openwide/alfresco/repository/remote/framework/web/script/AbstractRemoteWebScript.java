@@ -60,7 +60,7 @@ import fr.openwide.alfresco.repository.remote.framework.model.InnerTransactionPa
  * {@see org.alfresco.repo.web.scripts.RepositoryContainer}
  * {@see org.springframework.extensions.webscripts.DescriptionImpl#parse(org.dom4j.Element)}
  */
-public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
+public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	private static final String KEY_INNER_TRANSACTION = "innerTransaction";
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -95,6 +95,8 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 			LOGGER.debug("Executing {} method with uri: {}", getDescription().getMethod(), req.getPathInfo());
 		}
 		
+		P payload = extractPayload(req);
+		
 		// construct model for script / template
 		Status status = new Status();
 		Cache cache = new Cache(getDescription().getRequiredCache());
@@ -102,7 +104,7 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		Exception resException = null;
 		int statusCode;
 		try {
-			resValue = transactionedExecute(req, res, status, cache);
+			resValue = transactionedExecute(payload);
 			statusCode = status.getCode();
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
 			LOGGER.warn("Could not get access", e);
@@ -172,20 +174,19 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		}
 	}
 
-	protected R transactionedExecute(final WebScriptRequest req, final WebScriptResponse res, 
-			final Status status, final Cache cache) throws Exception {
+	protected R transactionedExecute(final P parameter) throws Exception {
 		RequiredTransactionParameters transaction = 
 				(RequiredTransactionParameters) getDescription().getExtensions().get(KEY_INNER_TRANSACTION);
 		if (RequiredTransaction.none.equals(transaction.getRequired())) {
 			// no transaction
-			return executeImpl(req, res, status, cache);
+			return executeImpl(parameter);
 		} else {
 			// do in transaction
 			RetryingTransactionCallback<R> work = new RetryingTransactionCallback<R>() {
 				@Override
 				public R execute() throws Exception {
 					try {
-						return executeImpl(req, res, status, cache);
+						return executeImpl(parameter);
 					} catch (Exception e) {
 						UserTransaction txn = RetryingTransactionHelper.getActiveUserTransaction();
 						if (txn != null && txn.getStatus() != javax.transaction.Status.STATUS_MARKED_ROLLBACK) {
@@ -210,15 +211,9 @@ public abstract class AbstractRemoteWebScript<R> extends AbstractWebScript {
 		}
 	}
 
-	protected abstract R executeImpl(WebScriptRequest req, WebScriptResponse res, Status status, Cache cache) throws IOException;
-
-	protected void handleResult(WebScriptResponse res, R resValue) throws IOException {
-		res.setContentType("application/json;charset=UTF-8");
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Serializing result: {}", objectMapper.writeValueAsString(resValue));
-		}
-		objectMapper.writeValue(res.getOutputStream(), resValue);
-	}
+	protected abstract P extractPayload(WebScriptRequest req);
+	protected abstract R executeImpl(P payload);
+	protected abstract void handleResult(WebScriptResponse res, R resValue) throws IOException;
 
 	protected static void setExceptionHeader(WebScriptResponse res, Exception e) {
 		res.setContentType("application/json;charset=UTF-8");
