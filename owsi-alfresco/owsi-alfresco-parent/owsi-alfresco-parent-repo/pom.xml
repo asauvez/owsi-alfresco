@@ -18,7 +18,7 @@
 		<share.webapp.name>share</share.webapp.name>
 		
 		<owsi-alfresco.repo.alfresco.version>4.2.5.1</owsi-alfresco.repo.alfresco.version>
-		
+		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		
 		<owsi-alfresco.repo.quartz.version>1.8.3-alfresco-patched</owsi-alfresco.repo.quartz.version>
@@ -459,6 +459,18 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<dependencies>
+						<dependency>
+							<!-- Pour utilisation https://artifacts.alfresco.com/nexus/content/repositories/alfresco-docs/alfresco-sdk-aggregator/latest/plugins/alfresco-maven-plugin/advanced-usage.html -->
+							<groupId>org.alfresco.maven.plugin</groupId>
+							<artifactId>alfresco-maven-plugin</artifactId>
+							<version>${owsi-alfresco.alfresco-maven-plugin.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 			</plugins>
 		</pluginManagement>
