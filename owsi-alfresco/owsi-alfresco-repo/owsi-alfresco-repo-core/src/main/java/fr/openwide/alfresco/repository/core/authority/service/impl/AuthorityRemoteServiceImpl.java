@@ -65,9 +65,9 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 			NodeRef nodeRef = authorityService.getAuthorityNodeRef(authority);
 			
 			if (pattern != null) {
-				String nodeName = (String) nodeService.getProperty(nodeRef, 
+				Object nodeName = nodeService.getProperty(nodeRef, 
 						conversionService.getRequired(searchParameters.getFilterProperty()));
-				if (! pattern.matcher(nodeName.toLowerCase()).matches()) {
+				if (nodeName != null && ! pattern.matcher(nodeName.toString().toLowerCase()).matches()) {
 					continue;
 				}
 			}
