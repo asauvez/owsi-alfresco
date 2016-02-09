@@ -114,7 +114,7 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 			if (pattern != null) {
 				Object nodeName = nodeService.getProperty(nodeRef, 
 						conversionService.getRequired(searchParameters.getFilterProperty()));
-				if (nodeName != null && ! pattern.matcher(nodeName.toString().toLowerCase()).matches()) {
+				if (nodeName == null || ! pattern.matcher(nodeName.toString().toLowerCase()).matches()) {
 					continue;
 				}
 			}
@@ -122,7 +122,12 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), searchParameters.getNodeScope()));
 		}
 		
-		final List<RepositorySortDefinition> sorts = searchParameters.getSorts();
+		sortNodes(nodes, searchParameters.getSorts());
+		
+		return nodes;
+	}
+
+	private void sortNodes(List<RepositoryNode> nodes, final List<RepositorySortDefinition> sorts) {
 		if (! sorts.isEmpty()) {
 			Collections.sort(nodes, new Comparator<RepositoryNode>() {
 				@Override
@@ -154,8 +159,6 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 				}
 			});
 		}
-		
-		return nodes;
 	}
 
 	@Override
