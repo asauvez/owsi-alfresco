@@ -1,8 +1,8 @@
 package fr.openwide.alfresco.component.model.node.model.embed;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RenditionsSetter;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.app.core.node.model.RenditionsSetter;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
 public class RenditionsNodeScope extends RenditionsSetter<NodeScopeBuilder> {

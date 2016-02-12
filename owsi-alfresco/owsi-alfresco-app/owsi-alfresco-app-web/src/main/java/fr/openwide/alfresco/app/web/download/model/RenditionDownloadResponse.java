@@ -1,7 +1,7 @@
 package fr.openwide.alfresco.app.web.download.model;
 
+import fr.openwide.alfresco.api.core.node.model.RenditionsSetter;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.app.core.node.model.RenditionsSetter;
 
 
 public class RenditionDownloadResponse extends RenditionsSetter<NodeReferenceDownloadResponse> {

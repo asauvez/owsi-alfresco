@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.node.model;
+package fr.openwide.alfresco.api.core.node.model;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
