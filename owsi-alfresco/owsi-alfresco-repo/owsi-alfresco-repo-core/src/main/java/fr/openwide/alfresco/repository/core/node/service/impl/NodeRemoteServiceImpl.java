@@ -48,6 +48,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.core.node.model.PreNodeCreationCallback;
@@ -187,7 +188,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 						Object value = deserializer.deserialize(node, contentProperty, inputStream);
 						node.getContents().put(contentProperty, value);
 					} catch (IOException e) {
-						throw new IllegalStateException(e);
+						throw new IllegalStateRemoteException(e);
 					}
 				}
 			}
@@ -451,7 +452,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				setPermissions(nodeRef, node);
 			}
 			if (! nodeScope.getUserPermissions().isEmpty()) {
-				throw new IllegalStateException("You can't update the permissions of the current user on the node (userPermissions). To modify the node permissions for everyone, use accessPermissions");
+				throw new IllegalStateRemoteException("You can't update the permissions of the current user on the node (userPermissions). To modify the node permissions for everyone, use accessPermissions");
 			}
 		} catch (DuplicateChildNodeNameException e) {
 			throw new DuplicateChildNodeNameRemoteException(cmName, e);
@@ -545,7 +546,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				try (OutputStream outputStream = writer.getContentOutputStream()) {
 					serializer.serialize(node, contentProperty, contentValue, outputStream);
 				} catch (IOException e) {
-					throw new IllegalStateException(e);
+					throw new IllegalStateRemoteException(e);
 				}
 				setContentData(nodeRef, contentProperty, contentData, writer);
 			} else {
