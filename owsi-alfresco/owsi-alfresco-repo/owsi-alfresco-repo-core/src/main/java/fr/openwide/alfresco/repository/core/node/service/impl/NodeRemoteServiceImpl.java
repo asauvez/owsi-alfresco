@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -64,6 +66,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	
 	private Map<Class<?>, NodeContentSerializer<?>> serializersByClass = NodeContentSerializationComponent.getDefaultSerializersByClass();
 	private List<PreNodeCreationCallback> preNodeCreationCallbacks = new ArrayList<>();
+	private ConcurrentMap<NodeRef, NodeRef> renditionLocks = new ConcurrentHashMap<>();
 	
 	private NodeService nodeService;
 	private ContentService contentService;
@@ -207,13 +210,25 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		for (final Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
 			ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(entry.getKey()));
 			if (renditionRef == null) {
-				// On est dans un read-only. On a donc besoin d'une inner transaction pour générer la rendition
-				renditionRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<ChildAssociationRef>() {
-					@Override
-					public ChildAssociationRef execute() throws Throwable {
-						return renditionService.render(nodeRef, conversionService.getRequired(entry.getKey()));
+				// On vérouille sur un nodeRef donné pour éviter de risquer la même rendition dans plusieurs threads.
+				NodeRef lock = renditionLocks.putIfAbsent(nodeRef, nodeRef);
+				try {
+					synchronized ((lock != null) ? lock : nodeRef) {
+						// On est dans un read-only. On a donc besoin d'une inner transaction pour générer la rendition
+						renditionRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<ChildAssociationRef>() {
+							@Override
+							public ChildAssociationRef execute() throws Throwable {
+								ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(entry.getKey()));
+								if (renditionRef == null) {
+									renditionRef = renditionService.render(nodeRef, conversionService.getRequired(entry.getKey()));
+								}
+								return renditionRef;
+							}
+						}, false, true);
 					}
-				}, false, true);
+				} finally {
+					renditionLocks.remove(nodeReference);
+				}
 			}
 			node.getRenditions().put(
 					entry.getKey(), 
