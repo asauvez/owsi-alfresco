@@ -168,10 +168,14 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			}
 		}
 		
-		for (NameReference property : scope.getProperties()) {
-			Serializable value = nodeService.getProperty(nodeRef, conversionService.getRequired(property));
-			if (value != null) {
-				node.getProperties().put(property, conversionService.getForApplication(value));
+		if (! scope.getProperties().isEmpty()) {
+			// On récupére toutes les propriétés d'un coup pour éviter d'avoir à faire trop d'appels qui évaluent les transactions, ACL, etc.
+			Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+			for (NameReference property : scope.getProperties()) {
+				Serializable value = properties.get(conversionService.getRequired(property));
+				if (value != null) {
+					node.getProperties().put(property, conversionService.getForApplication(value));
+				}
 			}
 		}
 		for (Entry<NameReference, NodeContentDeserializer<?>> entry : scope.getContentDeserializers().entrySet()) {
