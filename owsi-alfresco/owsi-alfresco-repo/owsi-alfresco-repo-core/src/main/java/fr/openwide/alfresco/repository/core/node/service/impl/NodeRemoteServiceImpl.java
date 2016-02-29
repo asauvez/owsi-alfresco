@@ -48,6 +48,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.repository.core.node.model.PreNodeCreationCallback;
@@ -63,6 +64,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	
 	private Map<Class<?>, NodeContentSerializer<?>> serializersByClass = NodeContentSerializationComponent.getDefaultSerializersByClass();
 	private List<PreNodeCreationCallback> preNodeCreationCallbacks = new ArrayList<>();
+	//private ConcurrentMap<NodeRef, NodeRef> renditionLocks = new ConcurrentHashMap<>();
 	
 	private NodeService nodeService;
 	private ContentService contentService;
@@ -167,10 +169,14 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			}
 		}
 		
-		for (NameReference property : scope.getProperties()) {
-			Serializable value = nodeService.getProperty(nodeRef, conversionService.getRequired(property));
-			if (value != null) {
-				node.getProperties().put(property, conversionService.getForApplication(value));
+		if (! scope.getProperties().isEmpty()) {
+			// On récupére toutes les propriétés d'un coup pour éviter d'avoir à faire trop d'appels qui évaluent les transactions, ACL, etc.
+			Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+			for (NameReference property : scope.getProperties()) {
+				Serializable value = properties.get(conversionService.getRequired(property));
+				if (value != null) {
+					node.getProperties().put(property, conversionService.getForApplication(value));
+				}
 			}
 		}
 		for (Entry<NameReference, NodeContentDeserializer<?>> entry : scope.getContentDeserializers().entrySet()) {
@@ -187,29 +193,23 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 						Object value = deserializer.deserialize(node, contentProperty, inputStream);
 						node.getContents().put(contentProperty, value);
 					} catch (IOException e) {
-						throw new IllegalStateException(e);
+						throw new IllegalStateRemoteException(e);
 					}
 				}
 			}
 		}
-		for (NameReference aspect : scope.getAspects()) {
-			if (nodeService.hasAspect(nodeRef, conversionService.getRequired(aspect))) {
-				node.getAspects().add(aspect);
+		if (! scope.getAspects().isEmpty()) {
+			Set<QName> aspects = nodeService.getAspects(nodeRef);
+			for (NameReference aspect : scope.getAspects()) {
+				if (aspects.contains(conversionService.getRequired(aspect))) {
+					node.getAspects().add(aspect);
+				}
 			}
 		}
 		
 		// get associations
 		for (final Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
-			ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, conversionService.getRequired(entry.getKey()));
-			if (renditionRef == null) {
-				// On est dans un read-only. On a donc besoin d'une inner transaction pour générer la rendition
-				renditionRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<ChildAssociationRef>() {
-					@Override
-					public ChildAssociationRef execute() throws Throwable {
-						return renditionService.render(nodeRef, conversionService.getRequired(entry.getKey()));
-					}
-				}, false, true);
-			}
+			ChildAssociationRef renditionRef = getRendition(nodeRef, conversionService.getRequired(entry.getKey()));
 			node.getRenditions().put(
 					entry.getKey(), 
 					getRepositoryNode(renditionRef.getChildRef(), entry.getValue()));
@@ -265,6 +265,48 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		return node;
 	}
 
+	private ChildAssociationRef getRendition(final NodeRef nodeRef, final QName renditionName) {
+		ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, renditionName);
+		if (renditionRef == null) {
+			// Si la rendition n'est pas encore calculée, on la calcule.
+			// On est dans un read-only. On a donc besoin d'une inner transaction pour générer la rendition
+			renditionRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<ChildAssociationRef>() {
+				@Override
+				public ChildAssociationRef execute() throws Throwable {
+					return renditionService.render(nodeRef, renditionName);
+				}
+			}, false, true);
+			
+//			// On vérouille sur un nodeRef donné pour éviter de risquer la même rendition dans plusieurs threads.
+//			NodeRef lock = renditionLocks.putIfAbsent(nodeRef, nodeRef);
+//			try {
+//				synchronized ((lock != null) ? lock : nodeRef) {
+//					// On est dans un read-only. On a donc besoin d'une inner transaction pour générer la rendition
+//					renditionRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<ChildAssociationRef>() {
+//						@Override
+//						public ChildAssociationRef execute() throws Throwable {
+//							ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, renditionName);
+//							if (renditionRef == null) {
+//								// On fait en system pour que même un utilisateur avec juste les droits de lecture seule puisse demander une rendition
+//								renditionRef = AuthenticationUtil.runAs(
+//									new AuthenticationUtil.RunAsWork<ChildAssociationRef>() {
+//										@Override
+//										public ChildAssociationRef doWork() throws Exception {
+//											return renditionService.render(nodeRef, renditionName);
+//										}
+//									}, AuthenticationUtil.getSystemUserName());
+//							}
+//							return renditionRef;
+//						}
+//					}, false, true);
+//				}
+//			} finally {
+//				renditionLocks.remove(nodeRef);
+//			}
+		}
+		return renditionRef;
+	}
+	
 	protected void validateCreate(RepositoryNode node) {
 		if (node.getNodeReference() != null) {
 			throw new InvalidPayloadException("Node already has a reference");
@@ -451,7 +493,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				setPermissions(nodeRef, node);
 			}
 			if (! nodeScope.getUserPermissions().isEmpty()) {
-				throw new IllegalStateException("You can't update the permissions of the current user on the node (userPermissions). To modify the node permissions for everyone, use accessPermissions");
+				throw new IllegalStateRemoteException("You can't update the permissions of the current user on the node (userPermissions). To modify the node permissions for everyone, use accessPermissions");
 			}
 		} catch (DuplicateChildNodeNameException e) {
 			throw new DuplicateChildNodeNameRemoteException(cmName, e);
@@ -545,7 +587,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				try (OutputStream outputStream = writer.getContentOutputStream()) {
 					serializer.serialize(node, contentProperty, contentValue, outputStream);
 				} catch (IOException e) {
-					throw new IllegalStateException(e);
+					throw new IllegalStateRemoteException(e);
 				}
 				setContentData(nodeRef, contentProperty, contentData, writer);
 			} else {
