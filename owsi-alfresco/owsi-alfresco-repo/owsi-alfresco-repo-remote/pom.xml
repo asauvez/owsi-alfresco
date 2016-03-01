@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-repo</artifactId>
-		<version>0.2.7</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-repo-remote</artifactId>
 
