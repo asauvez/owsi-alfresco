@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NamespaceReference implements Serializable {
 
 	private static Map<String, String> uriByPrefix = new ConcurrentHashMap<>(); 
+	private static Map<String, String> prefixByUri = new ConcurrentHashMap<>();
 	
 	private final String prefix;
 	private final String uri;
@@ -19,6 +20,7 @@ public class NamespaceReference implements Serializable {
 	public static NamespaceReference create(String prefix, String uri) {
 		NamespaceReference namespaceReference = new NamespaceReference(prefix, uri);
 		uriByPrefix.put(prefix, uri);
+		prefixByUri.put(uri, prefix);
 		return namespaceReference;
 	}
 
@@ -35,6 +37,13 @@ public class NamespaceReference implements Serializable {
 			throw new IllegalArgumentException("Unknown prefix " + prefix);
 		}
 		return uri;
+	}
+	public static String getPrefixByUri(String uri) {
+		String prefix = prefixByUri.get(uri);
+		if (prefix == null) {
+			throw new IllegalArgumentException("Unknown uri " + uri);
+		}
+		return prefix;
 	}
 
 	@Override
