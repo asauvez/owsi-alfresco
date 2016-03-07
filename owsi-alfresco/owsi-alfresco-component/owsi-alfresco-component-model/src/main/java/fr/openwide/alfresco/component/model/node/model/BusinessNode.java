@@ -6,12 +6,14 @@ import fr.openwide.alfresco.component.model.node.model.embed.AssociationsNode;
 import fr.openwide.alfresco.component.model.node.model.embed.ContentsNode;
 import fr.openwide.alfresco.component.model.node.model.embed.PermissionsNode;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.embed.RenditionsNode;
 
 public class BusinessNode {
 
 	private RepositoryNode node;
 	private PropertiesNode propertiesNode;
 	private AssociationsNode associationsNode;
+	private RenditionsNode renditionsNode;
 	private PermissionsNode permissionsNode;
 	private ContentsNode contentsNode;
 	
@@ -19,6 +21,7 @@ public class BusinessNode {
 		this.node = node;
 		propertiesNode = new PropertiesNode(this);
 		associationsNode = new AssociationsNode(this);
+		renditionsNode = new RenditionsNode(this);
 		permissionsNode = new PermissionsNode(this);
 		contentsNode = new ContentsNode(this);
 	}
@@ -79,6 +82,10 @@ public class BusinessNode {
 	
 	public AssociationsNode assocs() {
 		return associationsNode;
+	}
+	
+	public RenditionsNode renditions() {
+		return renditionsNode;
 	}
 
 	public ContentsNode contents() {
