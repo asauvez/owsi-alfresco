@@ -211,7 +211,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		}
 		
 		// get associations
-		for (final Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
+		for (Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
 			ChildAssociationRef renditionRef = getRendition(nodeRef, conversionService.getRequired(entry.getKey()));
 			node.getRenditions().put(
 					entry.getKey(), 
@@ -373,7 +373,9 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
 			}
 			setContents(nodeRef, node, node.getContents().keySet());
-			setPermissions(nodeRef, node);
+			if (node.getInheritParentPermissions() != null || ! node.getAccessControlList().isEmpty()) {
+				setPermissions(nodeRef, node);
+			}
 			
 			for (Entry<NameReference, List<RepositoryNode>> entry : node.getChildAssociations().entrySet()) {
 				for (RepositoryNode childNode : entry.getValue()) {
