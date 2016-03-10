@@ -25,7 +25,8 @@ public class ValidationResponse {
 	private AlertContainer alertContainer = new AlertContainer();
 	private MessageSource messageSource;
 
-	private String viewName;
+	private String viewName;	// Page à renvoyer comme si on renvoyé un ModelAndView
+	private String redirect;	// URL où $.formBindAjaxPost() va rediriger le navigateur. 
 
 	public void addGlobalAlerts(BindingResult bindingResult) {
 		addErrors(bindingResult, false);
@@ -176,4 +177,10 @@ public class ValidationResponse {
 		this.viewName = viewName;
 	}
 
+	public String getRedirect() {
+		return redirect;
+	}
+	public void setRedirect(String redirect) {
+		this.redirect = redirect;
+	}
 }
