@@ -15,7 +15,7 @@
 	<properties>
 		<owsi-alfresco.spring-security.version>4.0.1.RELEASE</owsi-alfresco.spring-security.version>
 		
-		<owsi-alfresco.owsi-core.version>0.9.8</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.owsi-core.version>0.11.1</owsi-alfresco.owsi-core.version>
 		<owsi-alfresco.app.hibernate-jpamodelgen.version>4.3.7.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
 		<owsi-alfresco.app.querydsl.version>3.4.3</owsi-alfresco.app.querydsl.version>
 		
@@ -104,6 +104,12 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
 				<version>${owsi-alfresco.hibernate-validator.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.fasterxml</groupId>
+						<artifactId>classmate</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			
 			<dependency>
