@@ -10,6 +10,10 @@
 
 	<name>OWSI Alfresco - Application - Core</name>
 
+	<properties>
+		<owsi-core.hibernate-search.version>5.5.2.Final</owsi-core.hibernate-search.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
@@ -20,6 +24,45 @@
 			<groupId>fr.openwide.core.packages</groupId>
 			<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
 			<type>pom</type>
+		</dependency>
+		
+		<!-- Uniquement parce que owsi-core GenericEntity a besoin de @Field
+			 https://github.com/openwide-java/owsi-core-parent/issues/31
+		 -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-search-engine</artifactId>
+			<version>${owsi-core.hibernate-search.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hibernate.common</groupId>
+					<artifactId>hibernate-commons-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-backward-codecs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-misc</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-analyzers-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.lucene</groupId>
+					<artifactId>lucene-facet</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.logging</groupId>
+					<artifactId>jboss-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>

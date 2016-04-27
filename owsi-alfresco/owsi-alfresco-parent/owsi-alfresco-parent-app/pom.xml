@@ -16,8 +16,8 @@
 		<owsi-alfresco.spring-security.version>4.0.1.RELEASE</owsi-alfresco.spring-security.version>
 		
 		<owsi-alfresco.owsi-core.version>0.11.1</owsi-alfresco.owsi-core.version>
-		<owsi-alfresco.app.hibernate-jpamodelgen.version>4.3.7.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
-		<owsi-alfresco.app.querydsl.version>3.4.3</owsi-alfresco.app.querydsl.version>
+		<owsi-alfresco.app.hibernate-jpamodelgen.version>5.1.0.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
+		<owsi-alfresco.app.querydsl.version>4.0.9</owsi-alfresco.app.querydsl.version>
 		
 		<owsi-alfresco.spring-security-kerberos.version>1.0.0.RELEASE</owsi-alfresco.spring-security-kerberos.version>
 		<owsi-alfresco.hibernate-validator.version>5.1.3.Final</owsi-alfresco.hibernate-validator.version>
@@ -215,7 +215,7 @@
 							<version>${owsi-alfresco.app.hibernate-jpamodelgen.version}</version>
 						</dependency>
 						<dependency>
-							<groupId>com.mysema.querydsl</groupId>
+							<groupId>com.querydsl</groupId>
 							<artifactId>querydsl-apt</artifactId>
 							<version>${owsi-alfresco.app.querydsl.version}</version>
 						</dependency>
@@ -228,7 +228,7 @@
 						</options>
 						<processors>
 							<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-							<processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
+							<processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
 						</processors>
 					</configuration>
 					<executions>

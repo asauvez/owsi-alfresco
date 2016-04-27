@@ -19,6 +19,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Tiré par owsi-alfresco-app-core, mais comme ce dernier est exclu coté API, on est obligé de le mettre directement -->
 		<dependency>
