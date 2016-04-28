@@ -14,6 +14,7 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.apache.commons.io.IOUtils;
+import org.springframework.extensions.surf.util.Content;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
@@ -38,7 +39,7 @@ import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteExcept
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
-public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<RemoteCallPayload<R>, InputStream> {
+public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<RemoteCallPayload<R>, Content> {
 
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
@@ -65,12 +66,12 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	protected abstract JavaType getParameterType();
 
 	@Override
-	protected InputStream extractPayload(WebScriptRequest req) {
-		return req.getContent().getInputStream();
+	protected Content extractPayload(WebScriptRequest req) {
+		return req.getContent();
 	}
 	
 	@Override
-	protected RemoteCallPayload<R> executeImpl(InputStream payload) {
+	protected RemoteCallPayload<R> executeImpl(Content payload) {
 		final AtomicReference<R> resultRef = new AtomicReference<>();
 		NodePayloadCallback<P> payloadCallback = new NodePayloadCallback<P>() {
 			@Override
@@ -107,7 +108,7 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			// L'appel du service se fait dans le callback
 			RemoteCallPayload<P> requestPayload = serializationComponent.deserialize(
 					getParameterType(), payloadCallback, defaultDeserializationParameters,
-					payload);
+					payload.getInputStream());
 			return new RemoteCallPayload<R>(resultRef.get(), requestPayload.getRemoteCallParameters());
 		} catch (IOException e) {
 			throw new InvalidMessageRemoteException(e);

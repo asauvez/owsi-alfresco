@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repository.remote.framework.web.script;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,6 +15,8 @@ import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.TempFileProvider;
+import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.extensions.webscripts.AbstractWebScript;
@@ -66,6 +69,14 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	protected TransactionService transactionService;
 	protected ObjectMapper objectMapper;
+	private int maxRetries = 0;
+
+	// @see RepositoryContainer
+	private boolean encryptTempFiles = false;
+	private String tempDirectoryName = null;
+	private int memoryThreshold = 4 * 1024 * 1024; // 4mb
+	private long maxContentSize = (long) 4 * 1024 * 1024 * 1024; // 4gb
+	private ThresholdOutputStreamFactory streamFactory = null;
 
 	@Override
 	public void init(Container container, Description description) {
@@ -86,12 +97,23 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		} else {
 			throw new IllegalStateRemoteException("Could not alter webscript description: " + description.getClass());
 		}
+		
+		File tempDirectory = TempFileProvider.getTempDir(tempDirectoryName);
+		this.streamFactory = ThresholdOutputStreamFactory.newInstance(tempDirectory, memoryThreshold, maxContentSize, encryptTempFiles);
 	}
 
 	@Override
 	public final void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Executing {} method with uri: {}", getDescription().getMethod(), req.getPathInfo());
+		}
+		
+		BufferedRequest bufferedRequest = null;
+		if (maxRetries > 0) {
+			// En cas de problème de concurrence, on veut rejouer la requête. On ne peut rejouer la requête que si
+			// on a bufferiser son contenu. C'est un mécanisme équivalent à ce que l'on trouve dans @see RepositoryContainer.
+			bufferedRequest = new BufferedRequest(req, streamFactory);
+			req = bufferedRequest;
 		}
 		
 		P payload = extractPayload(req);
@@ -101,7 +123,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		Exception resException = null;
 		int statusCode;
 		try {
-			resValue = transactionedExecute(payload);
+			resValue = transactionedExecute(payload, bufferedRequest);
 			statusCode = (resValue != null) ? Status.STATUS_OK : Status.STATUS_NO_CONTENT;
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
 			LOGGER.warn("Could not get access", e);
@@ -135,6 +157,10 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 			LOGGER.error(message, e);
 			resException = new IllegalStateRemoteException(message, e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
+		} finally {
+			if (bufferedRequest != null) {
+				bufferedRequest.close();
+			}
 		}
 		// apply status code
 		res.setStatus(statusCode);
@@ -149,7 +175,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		}
 	}
 
-	protected R transactionedExecute(final P parameter) throws Exception {
+	protected R transactionedExecute(final P parameter, final BufferedRequest bufferedRequest) throws Exception {
 		RequiredTransactionParameters transaction = 
 				(RequiredTransactionParameters) getDescription().getExtensions().get(KEY_INNER_TRANSACTION);
 		if (RequiredTransaction.none.equals(transaction.getRequired())) {
@@ -161,6 +187,10 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 				@Override
 				public R execute() throws Exception {
 					try {
+						if (bufferedRequest != null) {
+							bufferedRequest.rewind();
+						}
+						
 						return executeImpl(parameter);
 					} catch (Exception e) {
 						UserTransaction txn = RetryingTransactionHelper.getActiveUserTransaction();
@@ -180,8 +210,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 			boolean requiresNew = RequiredTransaction.requiresnew.equals(transaction.getRequired());
 			
 			RetryingTransactionHelper retryingTransactionHelper = transactionService.getRetryingTransactionHelper();
-			// On ne peut pas rejouer le script car on consomme le flux de la requête.
-			retryingTransactionHelper.setMaxRetries(0);
+			retryingTransactionHelper.setMaxRetries(maxRetries);
 			return retryingTransactionHelper.doInTransaction(work, readonly, requiresNew);
 		}
 	}
@@ -228,5 +257,22 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
+	public void setMaxRetries(int maxRetries) {
+		this.maxRetries = maxRetries;
+	}
+	public void setEncryptTempFiles(Boolean encryptTempFiles) {
+		this.encryptTempFiles = encryptTempFiles.booleanValue();
+	}
 
+	public void setTempDirectoryName(String tempDirectoryName) {
+		this.tempDirectoryName = tempDirectoryName;
+	}
+
+	public void setMemoryThreshold(Integer memoryThreshold) {
+		this.memoryThreshold = memoryThreshold.intValue();
+	}
+
+	public void setMaxContentSize(Long maxContentSize) {
+		this.maxContentSize = maxContentSize.longValue();
+	}
 }
