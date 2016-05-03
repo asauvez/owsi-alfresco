@@ -150,6 +150,14 @@ public class ClassificationBuilder {
 		return subFolder(new SubFolderBuilder(CmModel.auditable.created)
 			.formatDay());
 	}
+	public ClassificationBuilder subFolderHour() {
+		return subFolder(new SubFolderBuilder(CmModel.auditable.created)
+			.formatHour());
+	}
+	public ClassificationBuilder subFolderMinute() {
+		return subFolder(new SubFolderBuilder(CmModel.auditable.created)
+			.formatMinute());
+	}
 	
 	public NodeReference getDestinationFolder() {
 		return destinationFolder;
