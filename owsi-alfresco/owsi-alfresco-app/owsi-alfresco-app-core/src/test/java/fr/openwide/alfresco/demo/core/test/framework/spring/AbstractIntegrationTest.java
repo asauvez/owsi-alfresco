@@ -20,7 +20,7 @@ import fr.openwide.alfresco.demo.core.test.framework.spring.config.IntegrationTe
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=IntegrationTestConfig.class)
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
 
 	@Autowired
 	private RepositoryAuthenticationUserDetailsService userDetailsService;
