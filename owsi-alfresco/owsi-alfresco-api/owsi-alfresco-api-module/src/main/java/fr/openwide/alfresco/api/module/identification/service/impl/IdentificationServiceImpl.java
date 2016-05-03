@@ -29,6 +29,13 @@ public class IdentificationServiceImpl implements IdentificationService {
 	}
 
 	@Override
+	public Optional<BusinessNode> getByIdentifier(NameReference identifier, NodeScopeBuilder nodeScopeBuilder) {
+		return nodeSearchModelService.searchUnique(new RestrictionBuilder()
+				.eq(OwsiModel.identifiable.identifier, identifier).of(),
+				nodeScopeBuilder);
+	}
+
+	@Override
 	public void setIdentifier(NodeReference nodeReference, NameReference identifier) {
 		nodeModelService.update(new BusinessNode(nodeReference)
 				.properties().set(OwsiModel.identifiable.identifier, identifier),
