@@ -51,5 +51,28 @@ public class ClassificationTest extends AbstractDemoTest {
 		Assert.assertEquals("classification", parent.properties().getName());
 		parent = parent.assocs().primaryParent();
 		Assert.assertEquals("Demo", parent.properties().getName());
+		
+		nodeModelService.delete(demoFile);
+		Assert.assertEquals(0, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
+	}
+	
+	@Test
+	public void testDeleteIfEmpty() {
+		NodeReference rootFolder = getRootFolder();
+		
+		NodeReference folder = nodeModelService.createFolder(rootFolder, "folder");
+		nodeModelService.update(
+				new BusinessNode(folder).aspect(OwsiModel.deleteIfEmpty),
+				new NodeScopeBuilder().aspect(OwsiModel.deleteIfEmpty));
+
+		NodeReference file1 = nodeModelService.createContent(folder, "demo1.txt", "text/plain", "UTF-8", "hello world");
+		NodeReference file2 = nodeModelService.createContent(folder, "demo2.txt", "text/plain", "UTF-8", "hello world");
+		Assert.assertEquals(1, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
+
+		nodeModelService.delete(file1);
+		Assert.assertEquals(1, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
+		
+		nodeModelService.delete(file2);
+		Assert.assertEquals(0, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
 	}
 }

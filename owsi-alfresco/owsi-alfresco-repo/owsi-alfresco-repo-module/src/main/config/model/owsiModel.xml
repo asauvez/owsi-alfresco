@@ -18,7 +18,11 @@
 	<aspects>
 		<aspect name="owsi:classifiable">
 			<title>OWSI Classifiable</title>
-			<description>Ajouter à un noeud ou déclarer en mandatory-aspect, indique qu'il faut classer le document</description>
+			<description>Add to a node or declare it as mandatory-aspect in order to indicate trigger the classification of the node</description>
+		</aspect>
+		<aspect name="owsi:deleteIfEmpty">
+			<title>OWSI Delete if empty</title>
+			<description>A folder with the aspect will be deleted if their is no more child node.</description>
 		</aspect>
 
 		<aspect name="owsi:identifiable">

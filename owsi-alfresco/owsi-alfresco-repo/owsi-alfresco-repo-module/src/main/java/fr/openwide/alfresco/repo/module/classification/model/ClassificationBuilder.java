@@ -115,6 +115,7 @@ public class ClassificationBuilder {
 	 * du noeud fourni.
 	 */
 	public ClassificationBuilder subFolder(BusinessNode folderNode) {
+		folderNode.aspect(OwsiModel.deleteIfEmpty);
 		destinationFolder = service.subFolder(folderNode, destinationFolder);
 		return this;
 	}

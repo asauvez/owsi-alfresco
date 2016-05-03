@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -16,6 +19,7 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -55,7 +59,8 @@ import fr.openwide.alfresco.repository.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
-		OnAddAspectPolicy, OnUpdatePropertiesPolicy, PreNodeCreationCallback {
+		OnAddAspectPolicy, OnUpdatePropertiesPolicy, OnDeleteChildAssociationPolicy, OnMoveNodePolicy, OnDeleteNodePolicy, 
+		PreNodeCreationCallback {
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
@@ -134,6 +139,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
+		policyRepositoryService.onDeleteNodePolicy(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onMoveNodePolicy(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onDeleteChildAssociationPolicy(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
+		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
 
@@ -146,6 +155,30 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
 			classify(nodeRef, ClassificationMode.UPDATE);
+		}
+	}
+	
+	
+	@Override
+	public void onDeleteNode(ChildAssociationRef childAssocRef, boolean isNodeArchived) {
+		try {
+			if (nodeModelService.get(conversionService.get(childAssocRef.getParentRef()), new NodeScopeBuilder().aspect(OwsiModel.deleteIfEmpty)).hasAspect(OwsiModel.deleteIfEmpty)) {
+				onDeleteChildAssociation(childAssocRef);
+			}
+		} catch (NoSuchNodeRemoteException ex) {
+			// ignore
+		}
+	}
+	@Override
+	public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
+		onDeleteNode(oldChildAssocRef, true);
+	}
+	@Override
+	public void onDeleteChildAssociation(ChildAssociationRef childAssocRef) {
+		NodeReference folderRef = conversionService.get(childAssocRef.getParentRef());
+		List<BusinessNode> children = nodeModelService.getChildren(folderRef, CmModel.folder.contains, new NodeScopeBuilder());
+		if (children.isEmpty()) {
+			nodeModelService.delete(folderRef);
 		}
 	}
 	
