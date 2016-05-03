@@ -193,7 +193,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		NameReference type = getPolicy(nodeReference);
 		if (type == null) {
-			throw new IllegalStateException("Can't find a policy to classify " + type);
+			throw new IllegalStateException("Can't find a policy to classify " + nodeRef);
 		}
 
 		@SuppressWarnings("unchecked")
