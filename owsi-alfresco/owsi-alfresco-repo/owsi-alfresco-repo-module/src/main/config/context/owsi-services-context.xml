@@ -19,7 +19,7 @@
 		<constructor-arg ref="owsi.service.nodeModelService"/>
 	</bean>
 
-	<bean id="owsi.service.boostrapService" class="fr.openwide.alfresco.repo.module.bootstrap.service.impl.BootstrapServiceImpl"
+	<bean id="owsi.service.bootstrapService" class="fr.openwide.alfresco.repo.module.bootstrap.service.impl.BootstrapServiceImpl"
 			depends-on="owsi.dictionaryBootstrap">
 		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
@@ -31,7 +31,7 @@
 	</bean>
 
 	<bean id="owsi.patch.parent" abstract="true" parent="module.baseComponent">
-		<property name="boostrapService" ref="owsi.service.boostrapService" />
+		<property name="bootstrapService" ref="owsi.service.bootstrapService" />
 		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
 		<property name="identificationService" ref="owsi.service.identificationService"/>
 	</bean>
