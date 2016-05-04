@@ -20,6 +20,7 @@
 		<module>owsi-alfresco-demo-webapp</module>
 		<module>owsi-alfresco-demo-alfresco-component</module>
 		<module>owsi-alfresco-demo-alfresco</module>
+		<module>owsi-alfresco-demo-share</module>
 	</modules>
 
 	<dependencyManagement>

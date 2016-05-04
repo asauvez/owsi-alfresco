@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-parent-repo</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+		<relativePath />
+	</parent>
+	<artifactId>owsi-alfresco-demo-share</artifactId>
+	<packaging>war</packaging>
+
+	<name>OWSI Alfresco - Demo share</name>
+	<description>Serveur Share de démonstration et de test</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>share</artifactId>
+			<type>war</type>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${share.webapp.name}</finalName>
+	</build>
+
+</project>
