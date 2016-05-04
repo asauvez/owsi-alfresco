@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.demo.core.test.framework.spring;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.annotation.IfProfileValue;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,6 +20,7 @@ import fr.openwide.alfresco.demo.core.test.framework.spring.config.IntegrationTe
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=IntegrationTestConfig.class)
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
+@IfProfileValue(name="integration-test", value="true")
 public abstract class AbstractIntegrationTest {
 
 	@Autowired
@@ -29,12 +30,6 @@ public abstract class AbstractIntegrationTest {
 	
 	public String getTestUsername() {
 		return "admin";
-	}
-	
-	@Before
-	public void checkIntegrationTest() {
-		Assume.assumeTrue("Ajouter -Dintegration-test=true pour exécuter les tests d'intégration.", 
-				Boolean.parseBoolean(System.getProperty("integration-test", "false")));
 	}
 	
 	@Before
