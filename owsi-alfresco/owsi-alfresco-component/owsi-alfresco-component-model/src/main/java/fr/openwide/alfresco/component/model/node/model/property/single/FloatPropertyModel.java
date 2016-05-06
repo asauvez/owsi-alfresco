@@ -14,4 +14,8 @@ public class FloatPropertyModel extends AbstractNumberPropertyModel<Float> {
 		return Float.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:float";
+	}
 }

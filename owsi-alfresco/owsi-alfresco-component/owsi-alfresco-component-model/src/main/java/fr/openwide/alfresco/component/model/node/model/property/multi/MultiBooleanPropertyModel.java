@@ -13,5 +13,9 @@ public class MultiBooleanPropertyModel extends MultiPropertyModel<Boolean> {
 	public Class<Boolean> getValueClass() {
 		return Boolean.class;
 	}
-
+	
+	@Override
+	public String getDataType() {
+		return "d:boolean";
+	}
 }

@@ -15,4 +15,8 @@ public class ContentPropertyModel extends SinglePropertyModel<RepositoryContentD
 		return RepositoryContentData.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:content";
+	}
 }

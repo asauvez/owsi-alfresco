@@ -16,4 +16,8 @@ public class LocalePropertyModel extends SinglePropertyModel<Locale> {
 		return Locale.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:category";
+	}
 }

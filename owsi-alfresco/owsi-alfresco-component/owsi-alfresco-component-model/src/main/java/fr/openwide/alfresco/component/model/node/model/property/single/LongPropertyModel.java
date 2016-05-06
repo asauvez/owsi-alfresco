@@ -14,4 +14,8 @@ public class LongPropertyModel extends AbstractNumberPropertyModel<Long> {
 		return Long.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:long";
+	}
 }

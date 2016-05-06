@@ -14,4 +14,8 @@ public class IntegerPropertyModel extends AbstractNumberPropertyModel<Integer> {
 		return Integer.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:int";
+	}
 }

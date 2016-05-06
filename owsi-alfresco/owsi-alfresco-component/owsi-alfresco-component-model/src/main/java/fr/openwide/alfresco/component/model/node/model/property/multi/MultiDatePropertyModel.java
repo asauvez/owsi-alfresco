@@ -8,5 +8,10 @@ public class MultiDatePropertyModel extends AbstractMultiDatePropertyModel {
 	public MultiDatePropertyModel(ContainerModel type, NameReference nameReference) {
 		super(type, nameReference);
 	}
+	
+	@Override
+	public String getDataType() {
+		return "d:date";
+	}
 
 }

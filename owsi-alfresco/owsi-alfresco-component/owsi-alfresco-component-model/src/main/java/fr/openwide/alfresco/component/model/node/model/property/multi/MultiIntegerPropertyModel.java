@@ -13,5 +13,10 @@ public class MultiIntegerPropertyModel extends AbstractMultiNumberPropertyModel<
 	public Class<Integer> getValueClass() {
 		return Integer.class;
 	}
+	
+	@Override
+	public String getDataType() {
+		return "d:int";
+	}
 
 }
