@@ -18,7 +18,8 @@ public class ClassificationTest extends AbstractDemoTest {
 		NodeReference rootFolder = getRootFolder();
 		
 		// Create
-		NodeReference demoFile = nodeModelService.create(new BusinessNode(rootFolder, CmModel.content, "demo.txt")
+		// On n'a pas besoin de passer de parent.
+		NodeReference demoFile = nodeModelService.create(new BusinessNode(null, CmModel.content, "demo.txt")
 			.properties().set(CmModel.content.content, new RepositoryContentData("text/plain", "UTF-8"))
 			.properties().set(DemoModel.demoAspect.demoProperty, "category1")
 			.aspect(OwsiModel.classifiable)

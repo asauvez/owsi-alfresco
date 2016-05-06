@@ -309,7 +309,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			throw new InvalidPayloadException("Node already has a reference");
 		}
 		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
-		if (primaryParent == null || primaryParent.getParentNode() == null) {
+		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
 			throw new InvalidPayloadException("A primary parent association is required.");
 		}
 		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
