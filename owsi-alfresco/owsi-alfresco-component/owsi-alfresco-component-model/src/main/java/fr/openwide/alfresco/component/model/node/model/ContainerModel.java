@@ -14,8 +14,6 @@ public abstract class ContainerModel extends Model {
 
 	private Map<NameReference, AspectModel> mandatoryAspects = new HashMap<>();
 	
-	private XmlModelGenerator xmlModelGenerator;
-
 	public ContainerModel(NameReference nameReference) {
 		super(nameReference);
 	}
@@ -53,7 +51,6 @@ public abstract class ContainerModel extends Model {
 		}
 	}
 	
-	
 	public String getXmlModel(String containerType) throws Exception {
 		return getXmlModel(containerType,0);
 	}
@@ -81,7 +78,6 @@ public abstract class ContainerModel extends Model {
 	public void getXmlProperties(StringBuilder xml, ContainerModel container, int profondeur) throws Exception {
 		StringBuilder properties = new StringBuilder();
 		StringBuilder associations = new StringBuilder();
-		
 		StringBuilder tabulation = new StringBuilder();
 		
 		for (int i = 0; i < profondeur; i++){

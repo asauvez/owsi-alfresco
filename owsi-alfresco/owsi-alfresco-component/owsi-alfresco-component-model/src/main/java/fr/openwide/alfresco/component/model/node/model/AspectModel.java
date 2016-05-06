@@ -3,8 +3,6 @@ package fr.openwide.alfresco.component.model.node.model;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class AspectModel extends ContainerModel {
-	
-	
 
 	public AspectModel(NameReference nameReference) {
 		super(nameReference);
