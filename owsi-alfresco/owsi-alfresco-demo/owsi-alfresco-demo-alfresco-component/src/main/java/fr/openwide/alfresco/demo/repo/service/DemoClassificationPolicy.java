@@ -23,6 +23,18 @@ public class DemoClassificationPolicy implements ClassificationPolicy<DemoAspect
 			.subFolderYear()
 			.subFolderMonth()
 			.moveNode();
+		
+//		builder
+//			.unlinkSecondaryParents()
+//			.rootFolderIdentifier(DemoModel.DEMO_ROOT_FOLDER)
+//			.subFolder("classification2")
+//			.createLink();
+		
+		builder
+			.rootFolderIdentifier(DemoModel.DEMO_ROOT_FOLDER)
+			.subFolder("classification3")
+			.deletePrevious()
+			.copyNode();
 	}
 
 }

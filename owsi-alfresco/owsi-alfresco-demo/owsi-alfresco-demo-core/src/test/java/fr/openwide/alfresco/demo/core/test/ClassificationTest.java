@@ -32,6 +32,8 @@ public class ClassificationTest extends AbstractDemoTest {
 			.properties().name();
 		BusinessNode demoNode = nodeModelService.get(demoFile, nodeScopeBuilder);
 		
+		Assert.assertEquals(2, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
+		
 		String path = demoNode.getPath();
 		Assert.assertTrue(path.startsWith("/{http://www.alfresco.org/model/application/1.0}company_home"
 				+ "/{http://www.alfresco.org/model/content/1.0}Demo"
@@ -53,8 +55,13 @@ public class ClassificationTest extends AbstractDemoTest {
 		parent = parent.assocs().primaryParent();
 		Assert.assertEquals("Demo", parent.properties().getName());
 		
+		nodeModelService.update(new BusinessNode(demoFile)
+				.properties().set(DemoModel.demoAspect.demoProperty, "category1_2"),
+			new NodeScopeBuilder()
+				.properties().set(DemoModel.demoAspect.demoProperty));
+		
 		nodeModelService.delete(demoFile);
-		Assert.assertEquals(0, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
+		Assert.assertEquals(1, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
 	}
 	
 	@Test
