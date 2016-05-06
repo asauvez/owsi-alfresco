@@ -60,19 +60,27 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 		return null;
 	}
 	
-	public String getXmlProperties() {
+	public String getXmlModel() {
+		return getXmlModel(0);
+	}
+
+	public String getXmlModel(int profondeur) {
 		StringBuilder xml = new StringBuilder();
+		StringBuilder tabulation = new StringBuilder();
 		
-		xml.append("<property name=\"") .append(this.getNameReference().getFullName()).append("\">\n")
-			.append("	<type>").append(this.getDataType()).append("</type>\n");
-		
-		if (this instanceof MultiPropertyModel) {
-			xml.append("	<multiplate>true</multiple>\n");
+		for (int i = 0; i < profondeur; i++){
+			tabulation.append("	");
 		}
 		
-		xml.append("</property>\n");
+		xml.append(tabulation.toString()).append("<property name=\"") .append(this.getNameReference().getFullName()).append("\">\n")
+			.append(tabulation.toString()).append("	<type>").append(this.getDataType()).append("</type>\n");
+		
+		if (this instanceof MultiPropertyModel) {
+			xml.append(tabulation.toString()).append("	<multiple>true</multiple>\n");
+		}
+		
+		xml.append(tabulation.toString()).append("</property>\n");
 		
 		return xml.toString();
 	}
-
 }

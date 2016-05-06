@@ -12,8 +12,8 @@ public class ModelCheckerTest {
 	
 	@Test
 	public void testModel() throws Exception {
-		System.out.println(new XmlModelGenerator().generateModel(DemoModel.class));
-		System.out.println(new XmlModelGenerator().generateModel(CmModel.class));
+		System.out.println(new XmlModelGenerator().getXmlModel(DemoModel.class));
+		System.out.println(new XmlModelGenerator().getXmlModel(CmModel.class));
 		
 		ModelChecker checker = new ModelChecker();
 		checker.checkModel(DemoModel.class);

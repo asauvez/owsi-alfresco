@@ -13,4 +13,7 @@ public class TypeModel extends ContainerModel {
 		copy(typeModel, this);
 	}
 	
+	public String getXmlModel() throws Exception {
+		return getXmlModel("type");
+	}
 }
