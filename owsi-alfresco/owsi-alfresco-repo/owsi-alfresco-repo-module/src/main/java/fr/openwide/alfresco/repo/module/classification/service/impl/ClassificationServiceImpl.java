@@ -188,19 +188,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	 */
 	@Override
 	public void onPreNodeCreationCallback(RepositoryNode node) {
-		if (node.getPrimaryParentAssociation() == null) {
-			TypeDefinition type = dictionaryService.getType(conversionService.getRequired(node.getType()));
-			boolean isclassifiable = node.getAspects().contains(OwsiModel.classifiable);
-			QName classifiable = conversionService.getRequired(OwsiModel.classifiable.getNameReference());
-			if (! isclassifiable) {
-				for (AspectDefinition aspect : type.getDefaultAspects(true)) {
-					if (classifiable.equals(aspect.getName())) {
-						isclassifiable = true;
-						break;
-					}
-				}
-			}
-			if (isclassifiable) {
+		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
+		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
+			if (isClassifiable(node)) {
 				Optional<NodeReference> homeFolder = getHomeFolder();
 				if (homeFolder.isPresent()) {
 					if (logger.isDebugEnabled()) {
@@ -216,6 +206,29 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				}
 			}
 		}
+	}
+	
+	private boolean isClassifiable(RepositoryNode node) {
+		TypeDefinition type = dictionaryService.getType(conversionService.getRequired(node.getType()));
+		QName classifiable = conversionService.getRequired(OwsiModel.classifiable.getNameReference());
+
+		for (AspectDefinition defaultAspect : type.getDefaultAspects(true)) {
+			if (classifiable.equals(defaultAspect.getName())) {
+				return true;
+			}
+		}
+		for (NameReference aspectName : node.getAspects()) {
+			if (OwsiModel.classifiable.getNameReference().equals(aspectName)) {
+				return true;
+			}
+			AspectDefinition aspect = dictionaryService.getAspect(conversionService.getRequired(aspectName));
+			for (AspectDefinition defaultAspect : aspect.getDefaultAspects(true)) {
+				if (classifiable.equals(defaultAspect.getName())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public Optional<NodeReference> getHomeFolder() {
