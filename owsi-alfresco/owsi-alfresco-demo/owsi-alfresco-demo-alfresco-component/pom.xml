@@ -13,7 +13,7 @@
 	<description>Composant Alfresco de démonstration et de test</description>
 
 	<properties>
-		<alfresco.module.name>owsi-alfresco-demo-component</alfresco.module.name>
+		<alfresco.module.name>owsi-alfresco-demo-alfresco-component</alfresco.module.name>
 	</properties>
 
 	<dependencies>
