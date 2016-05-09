@@ -13,7 +13,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
-public class AuthorityTest extends AbstractDemoTest {
+public class AuthorityIT extends AbstractDemoIT {
 
 	@Autowired
 	private AuthorityModelService authorityModelService;

@@ -15,12 +15,12 @@
 
 	<modules>
 		<module>owsi-alfresco-demo-api</module>
-		<module>owsi-alfresco-demo-application</module>
-		<module>owsi-alfresco-demo-core</module>
-		<module>owsi-alfresco-demo-webapp</module>
 		<module>owsi-alfresco-demo-alfresco-component</module>
 		<module>owsi-alfresco-demo-alfresco</module>
 		<module>owsi-alfresco-demo-share</module>
+		<module>owsi-alfresco-demo-application</module>
+		<module>owsi-alfresco-demo-core</module>
+		<module>owsi-alfresco-demo-webapp</module>
 	</modules>
 
 	<dependencyManagement>

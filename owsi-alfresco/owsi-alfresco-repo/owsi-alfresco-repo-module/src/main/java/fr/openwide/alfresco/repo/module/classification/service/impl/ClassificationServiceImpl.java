@@ -330,15 +330,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
-		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder();
-		nodeScopeBuilder.assocs().parent(childAssociationModel).nodeReference();
-		nodeScopeBuilder.assocs().primaryParent().nodeReference();
-		BusinessNode node = nodeModelService.get(nodeReference, nodeScopeBuilder);
-		for (BusinessNode parent : node.assocs().getParentAssociation(childAssociationModel)) {
-			if (! parent.getNodeReference().equals(node.assocs().primaryParent().getNodeReference())) {
-				nodeModelService.removeChild(parent.getNodeReference(), nodeReference, childAssociationModel);
-			}
-		}
+		nodeModelService.unlinkSecondaryParents(nodeReference, childAssociationModel);
 	}
 	
 	private NameReference getPolicy(NodeReference nodeReference) {

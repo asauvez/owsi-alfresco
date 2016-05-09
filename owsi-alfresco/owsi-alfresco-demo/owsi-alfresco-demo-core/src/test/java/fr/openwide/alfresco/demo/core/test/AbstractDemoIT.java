@@ -14,10 +14,10 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
-import fr.openwide.alfresco.demo.core.test.framework.spring.AbstractIntegrationTest;
+import fr.openwide.alfresco.demo.core.test.framework.spring.AbstractAlfrescoIT;
 
 @ContextConfiguration(classes=AppModuleServiceConfig.class)
-public abstract class AbstractDemoTest extends AbstractIntegrationTest {
+public abstract class AbstractDemoIT extends AbstractAlfrescoIT {
 	
 	@Autowired
 	protected NodeModelService nodeModelService;

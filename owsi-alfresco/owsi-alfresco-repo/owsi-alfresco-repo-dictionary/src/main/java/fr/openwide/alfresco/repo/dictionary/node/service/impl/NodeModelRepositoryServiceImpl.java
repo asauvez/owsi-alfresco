@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 import com.google.common.base.Optional;
 
@@ -248,11 +249,23 @@ public class NodeModelRepositoryServiceImpl
 		NodeRef child = conversionService.getRequired(childRef);
 		for (ChildAssociationRef assoc : assocs) {
 			if (assoc.getChildRef().equals(child)) {
-				nodeService.removeSecondaryChildAssociation(assoc);
+				nodeService.removeChildAssociation(assoc);
 				return;
 			}
 		}
 		throw new IllegalStateRemoteException("Can't find secondary child association " + parentRef + "/" + childRef);
+	}
+	@Override
+	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
+		List<ChildAssociationRef> parentAssocs = nodeService.getParentAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(childAssociationModel.getNameReference()), 
+				RegexQNamePattern.MATCH_ALL);
+		for (ChildAssociationRef assoc : parentAssocs) {
+			if (! assoc.isPrimary()) {
+				nodeService.removeChildAssociation(assoc);
+			}
+		}
 	}
 	
 	@Override
