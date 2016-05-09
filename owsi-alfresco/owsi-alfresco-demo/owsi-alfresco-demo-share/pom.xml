@@ -15,6 +15,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-demo-share-component</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	
+		<dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>share</artifactId>
 			<type>war</type>
@@ -25,5 +31,39 @@
 	<build>
 		<finalName>${share.webapp.name}</finalName>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<webResources>
+								<resource>
+									<directory>src/main/dev-webapp</directory>
+								</resource>
+							</webResources>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>livraison</id>
+			<activation>
+				<property>
+					<name>livraison</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<!-- Nothing to do -->
+		</profile>
+	</profiles>
 
 </project>

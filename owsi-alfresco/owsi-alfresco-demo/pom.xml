@@ -15,12 +15,13 @@
 
 	<modules>
 		<module>owsi-alfresco-demo-api</module>
+		<module>owsi-alfresco-demo-alfresco-component</module>
+		<module>owsi-alfresco-demo-alfresco</module>
+		<module>owsi-alfresco-demo-share-component</module>
+		<module>owsi-alfresco-demo-share</module>
 		<module>owsi-alfresco-demo-application</module>
 		<module>owsi-alfresco-demo-core</module>
 		<module>owsi-alfresco-demo-webapp</module>
-		<module>owsi-alfresco-demo-alfresco-component</module>
-		<module>owsi-alfresco-demo-alfresco</module>
-		<module>owsi-alfresco-demo-share</module>
 	</modules>
 
 	<dependencyManagement>
@@ -28,6 +29,26 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-demo-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-demo-alfresco</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-demo-share-component</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-demo-share</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -45,16 +66,6 @@
 				<artifactId>owsi-alfresco-demo-webapp</artifactId>
 				<version>${project.version}</version>
 				<type>war</type>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-demo-alfresco</artifactId>
-				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

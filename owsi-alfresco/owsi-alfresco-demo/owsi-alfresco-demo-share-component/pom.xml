@@ -7,10 +7,10 @@
 		<version>0.3.0-SNAPSHOT</version>
 		<relativePath />
 	</parent>
-	<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
+	<artifactId>owsi-alfresco-demo-share-component</artifactId>
 
 	<name>OWSI Alfresco - Demo component</name>
-	<description>Composant Alfresco de démonstration et de test</description>
+	<description>Composant Share de démonstration et de test</description>
 
 	<properties>
 		<alfresco.module.name>owsi-alfresco-demo-share-component</alfresco.module.name>
