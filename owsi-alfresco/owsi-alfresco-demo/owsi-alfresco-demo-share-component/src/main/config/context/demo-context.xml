@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="owsi-alfresco.demo-service" class="fr.openwide.alfresco.demo.repo.service.DemoClassificationServiceImpl" depends-on="demo.dictionaryBootstrap" >
+		<property name="classificationService" ref="owsi.service.classificationService"/>
+		<property name="policy">
+			<bean class="fr.openwide.alfresco.demo.repo.service.DemoClassificationPolicy"/>
+		</property>
+	</bean>
+	
+</beans>

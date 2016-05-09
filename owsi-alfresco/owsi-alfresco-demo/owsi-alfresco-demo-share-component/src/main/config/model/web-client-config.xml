@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alfresco-config>
+	<config evaluator="aspect-name" condition="demo:demoAspect">
+		<property-sheet>
+			<show-property name="demo:demoProperty" />
+		</property-sheet>
+	</config>
+	<config evaluator="string-compare" condition="Action Wizards">
+		<aspects>
+			<aspect name="demo:demoAspect" />
+		</aspects>
+	</config>
+</alfresco-config>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="demo:demoModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+	<imports>
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+	</imports>
+
+	<namespaces>
+		<namespace uri="http://openwide.fr/modele/demo" prefix="demo" />
+	</namespaces>
+
+	<aspects>
+		<aspect name="demo:demoAspect">
+			<properties>
+				<property name="demo:demoProperty">
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+	</aspects>
+
+</model>
