@@ -2,9 +2,11 @@ package fr.openwide.alfresco.repo.module.classification.service.impl;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
@@ -14,6 +16,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -61,6 +64,8 @@ import fr.openwide.alfresco.repository.remote.conversion.service.ConversionServi
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
 		OnAddAspectPolicy, OnUpdatePropertiesPolicy, OnDeleteChildAssociationPolicy, OnMoveNodePolicy, OnDeleteNodePolicy, 
 		PreNodeCreationCallback {
+	
+	private static final String CLASSIFIED_NODE_TRANSACTION_KEY = ClassificationServiceImpl.class +  ".classifiedNodes";
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
@@ -237,6 +242,15 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
+		
+		Set<NodeReference> classifiedNodes = getClassifiedNodes();
+		if (! classifiedNodes.add(nodeReference)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Node {} already classified.", nodeReference);
+			}
+			return;
+		}
+		
 		NameReference type = getPolicy(nodeReference);
 		if (type == null) {
 			throw new IllegalStateException("Can't find a policy to classify " + nodeRef);
@@ -281,6 +295,15 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 	}
 	
+	private Set<NodeReference> getClassifiedNodes() {
+		Set<NodeReference> nodes = AlfrescoTransactionSupport.getResource(CLASSIFIED_NODE_TRANSACTION_KEY);
+		if (nodes == null) {
+			nodes = new HashSet<>();
+			AlfrescoTransactionSupport.bindResource(CLASSIFIED_NODE_TRANSACTION_KEY, nodes);
+		}
+		return nodes;
+	}
+	
 	private String getPath(NodeReference nodeReference) {
 		return nodeModelService.get(nodeReference, new NodeScopeBuilder().path()).getPath();
 	}
@@ -291,19 +314,33 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 		nodeModelService.moveNode(node, destinationFolder);
 	}
-	public void copyNode(NodeReference node, NodeReference destinationFolder) {
+	public NodeReference copyNode(NodeReference node, NodeReference destinationFolder, Optional<String> newName) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Copy node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		nodeModelService.copy(node, destinationFolder);
+		NodeReference copyNodeReference = nodeModelService.copy(node, destinationFolder, newName);
+		getClassifiedNodes().add(copyNodeReference);
+		return copyNodeReference;
 	}
 	public void createLink(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Add link from node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		nodeModelService.addChild(node, destinationFolder);
+		nodeModelService.addChild(destinationFolder, node);
 	}
 
+	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
+		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder();
+		nodeScopeBuilder.assocs().parent(childAssociationModel).nodeReference();
+		nodeScopeBuilder.assocs().primaryParent().nodeReference();
+		BusinessNode node = nodeModelService.get(nodeReference, nodeScopeBuilder);
+		for (BusinessNode parent : node.assocs().getParentAssociation(childAssociationModel)) {
+			if (! parent.getNodeReference().equals(node.assocs().primaryParent().getNodeReference())) {
+				nodeModelService.removeChild(parent.getNodeReference(), nodeReference, childAssociationModel);
+			}
+		}
+	}
+	
 	private NameReference getPolicy(NodeReference nodeReference) {
 		NameReference result = null;
 
@@ -432,6 +469,16 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
 		this.policyRepositoryService = policyRepositoryService;
+	}
+
+	public void deletePrevious(NodeReference destinationFolder, String childName) {
+		Optional<NodeReference> child = nodeModelService.getChildByName(destinationFolder, childName);
+		if (child.isPresent()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Delete previous node {} in {}", childName, destinationFolder);
+			}
+			nodeModelService.delete(child.get());
+		}
 	}
 
 }

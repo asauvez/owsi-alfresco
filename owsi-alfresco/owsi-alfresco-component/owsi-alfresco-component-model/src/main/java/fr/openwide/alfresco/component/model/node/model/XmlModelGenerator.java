@@ -17,7 +17,7 @@ public class XmlModelGenerator {
 		String uri = namespaceReference.getUri();
 		
 		//profondeur 0
-		StringBuilder xml = new StringBuilder("<?xml version=_\"1.0\" encoding=\"UTF-8\"?>\n")
+		StringBuilder xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 			.append("<model name=\"").append(prefix).append(":").append(prefix).append("Model")
 			.append("\" xmlns=\"http://www.alfresco.org/model/dictionary/1.0\">\n\n");
 		
@@ -50,7 +50,6 @@ public class XmlModelGenerator {
 				//profondeur 2
 				ContainerModel container = (ContainerModel) value;
 				xml.append(container.getXmlModel("aspect", 2));
-				
 			}
 		}
 		xml.append("	</aspects>\n\n");

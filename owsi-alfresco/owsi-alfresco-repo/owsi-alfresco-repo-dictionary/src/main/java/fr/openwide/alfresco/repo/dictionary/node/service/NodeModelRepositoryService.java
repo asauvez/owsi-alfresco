@@ -20,11 +20,15 @@ public interface NodeModelRepositoryService extends NodeModelService {
 
 	boolean exists(NodeReference nodeReference);
 	void moveNode(NodeReference nodeReference, NodeReference newParentRef);
-	void copy(NodeReference nodeReference, NodeReference newParentRef);
+	NodeReference copy(NodeReference nodeReference, NodeReference newParentRef, Optional<String> newName);
 
 	void addChild(NodeReference parentRef, NodeReference childRef);
 	void addChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType);
 	void addChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
+
+	void removeChild(NodeReference parentRef, NodeReference childRef);
+	void removeChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType);
+	void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
 
 	NameReference getType(NodeReference nodeReference);
 	void setType(NodeReference nodeReference, NameReference type);

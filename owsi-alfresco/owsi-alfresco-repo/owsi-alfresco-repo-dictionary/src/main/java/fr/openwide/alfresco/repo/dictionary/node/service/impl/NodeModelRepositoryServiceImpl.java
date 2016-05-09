@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -18,6 +19,7 @@ import org.alfresco.service.namespace.QName;
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -66,9 +68,22 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
-	public void copy(NodeReference nodeReference, NodeReference newParentRef) {
-		copyService.copy(conversionService.getRequired(nodeReference), 
-				conversionService.getRequired(newParentRef));
+	public NodeReference copy(NodeReference nodeReference, NodeReference newParentRef, Optional<String> newName) {
+		NodeRef nodeRef = conversionService.getRequired(nodeReference);
+		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
+		QName name = newName.isPresent() 
+				? NodeRemoteServiceImpl.createAssociationName(newName.get())
+				: primaryParent.getQName();
+		NodeRef copy = copyService.copy(
+			nodeRef, 
+			conversionService.getRequired(newParentRef), 
+			primaryParent.getTypeQName(), 
+			name, 
+			true);
+		nodeService.setProperty(copy, ContentModel.PROP_NAME, newName.isPresent() 
+				? newName.get()
+				: nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+		return conversionService.get(copy);
 	}
 
 	@Override
@@ -213,6 +228,31 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(childRef), 
 				conversionService.getRequired(assocType), 
 				NodeRemoteServiceImpl.createAssociationName(childName));
+	}
+	
+	@Override
+	public void removeChild(NodeReference parentRef, NodeReference childRef) {
+		removeChild(parentRef, childRef, CmModel.folder.contains);
+	}
+	@Override
+	public void removeChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType) {
+		removeChild(parentRef, childRef, assocType.getNameReference());
+	}
+	@Override
+	public void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType) {
+		String childName = getProperty(childRef, CmModel.object.name);
+		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
+				conversionService.getRequired(parentRef), 
+				conversionService.getRequired(assocType), 
+				NodeRemoteServiceImpl.createAssociationName(childName));
+		NodeRef child = conversionService.getRequired(childRef);
+		for (ChildAssociationRef assoc : assocs) {
+			if (assoc.getChildRef().equals(child)) {
+				nodeService.removeSecondaryChildAssociation(assoc);
+				return;
+			}
+		}
+		throw new IllegalStateRemoteException("Can't find secondary child association " + parentRef + "/" + childRef);
 	}
 	
 	@Override
