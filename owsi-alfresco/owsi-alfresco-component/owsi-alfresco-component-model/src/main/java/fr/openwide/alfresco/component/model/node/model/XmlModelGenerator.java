@@ -11,7 +11,7 @@ import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
  */
 public class XmlModelGenerator {
 	
-	public String getXmlModel(Class<?> model) throws Exception {
+	public static String getXmlModel(Class<?> model) throws Exception {
 		NamespaceReference namespaceReference = (NamespaceReference) model.getField("NAMESPACE").get(null);
 		String prefix = namespaceReference.getPrefix();
 		String uri = namespaceReference.getUri();
