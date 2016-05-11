@@ -86,11 +86,6 @@
 						<goals>
 							<goal>integration-test</goal>
 						</goals>
-						<configuration>
-							<systemPropertyVariables>
-								<integration-test>true</integration-test>
-							</systemPropertyVariables>
-						</configuration>
 					</execution>
 					<execution>
 						<id>verify-integration-test</id>

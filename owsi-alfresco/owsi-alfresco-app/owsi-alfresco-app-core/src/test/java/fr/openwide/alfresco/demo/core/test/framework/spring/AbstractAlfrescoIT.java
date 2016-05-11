@@ -8,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.annotation.IfProfileValue;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -24,7 +23,6 @@ import fr.openwide.alfresco.demo.core.test.framework.spring.config.IntegrationTe
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=IntegrationTestConfig.class)
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
-@IfProfileValue(name="integration-test", value="true")
 public abstract class AbstractAlfrescoIT {
 
 	@Autowired
