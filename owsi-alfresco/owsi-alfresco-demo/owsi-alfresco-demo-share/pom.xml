@@ -24,6 +24,38 @@
 
 	<build>
 		<finalName>${share.webapp.name}</finalName>
+		<!-- http://docs.alfresco.com/5.1/tasks/install-share-troubleshooting.html -->
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeTypes>war</includeTypes>
+							<includeGroupIds>org.alfresco</includeGroupIds>
+							<includeArtifactIds>share</includeArtifactIds>
+							<includes>META-INF/MANIFEST.MF</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifestFile>${project.build.directory}/dependency/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+					<webResources>
+					</webResources>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>

@@ -8,15 +8,13 @@ import java.util.HashMap;
 
 import javax.transaction.UserTransaction;
 
-import net.sf.acegisecurity.AccessDeniedException;
-
 import org.alfresco.repo.domain.node.NodeExistsException;
 import org.alfresco.repo.node.integrity.IntegrityException;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.TempFileProvider;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.extensions.webscripts.AbstractWebScript;
@@ -43,6 +41,8 @@ import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteExcept
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
 import fr.openwide.alfresco.repository.remote.framework.model.InnerTransactionParameters;
+import fr.openwide.alfresco.repository.remote.framework.web.util.BufferedRequest;
+import fr.openwide.alfresco.repository.remote.framework.web.util.ThresholdOutputStreamFactory;
 
 /**
  * Base class which handle web-service returning one object of type R.

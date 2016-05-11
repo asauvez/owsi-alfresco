@@ -6,9 +6,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
@@ -66,6 +69,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		PreNodeCreationCallback {
 	
 	private static final String CLASSIFIED_NODE_TRANSACTION_KEY = ClassificationServiceImpl.class +  ".classifiedNodes";
+	private static final Set<QName> IGNORED_PROPERTIES = new HashSet<>(Arrays.asList(
+			ContentModel.PROP_CONTENT,
+			ContentModel.PROP_CASCADE_CRC,
+			ContentModel.PROP_CASCADE_TX
+		));
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
@@ -159,7 +167,31 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
-			classify(nodeRef, ClassificationMode.UPDATE);
+			Set<QName> newFields = new TreeSet<>(after.keySet());
+			Set<QName> removedFields = new TreeSet<>();
+			Set<QName> changedFields = new TreeSet<>();
+			
+			for (Entry<QName, Serializable> entry : before.entrySet()) {
+				QName property = entry.getKey();
+				Serializable oldValue = entry.getValue();
+				Serializable newValue = after.get(property);
+				
+				newFields.remove(property);
+				if ((oldValue != null || newValue != null) && !oldValue.equals(newValue)) {
+					if (! IGNORED_PROPERTIES.contains(property)) {
+						changedFields.add(property);
+					}
+				} else if (oldValue != null && newValue == null) {
+					removedFields.add(property);
+				}
+			}
+			
+			if (! newFields.isEmpty() || ! removedFields.isEmpty() || ! changedFields.isEmpty()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Reclassify node on new {}, removed {}, changed {}", newFields, removedFields, changedFields);
+				}
+				classify(nodeRef, ClassificationMode.UPDATE);
+			}
 		}
 	}
 	

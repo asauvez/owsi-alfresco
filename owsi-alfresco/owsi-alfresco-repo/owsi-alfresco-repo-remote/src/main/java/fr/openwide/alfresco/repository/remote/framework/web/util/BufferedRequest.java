@@ -1,13 +1,10 @@
-package fr.openwide.alfresco.repository.remote.framework.web.script;
+package fr.openwide.alfresco.repository.remote.framework.web.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStream;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStream.ThresholdInputStream;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
 import org.springframework.extensions.surf.util.Content;
 import org.springframework.extensions.webscripts.Description.FormatStyle;
 import org.springframework.extensions.webscripts.Match;
@@ -16,8 +13,10 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WrappingWebScriptRequest;
 import org.springframework.util.FileCopyUtils;
 
+import fr.openwide.alfresco.repository.remote.framework.web.util.ThresholdOutputStream.ThresholdInputStream;
+
 /**
- * Correction de {@link org.alfresco.repo.web.scripts.BufferedRequest}.
+ * Correction de {@link fr.openwide.alfresco.repository.remote.framework.web.util.web.scripts.BufferedRequest}.
  * 
  * @author asauvez
  */
