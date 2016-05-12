@@ -8,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.annotation.IfProfileValue;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,11 +16,14 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.demo.core.test.framework.spring.config.IntegrationTestConfig;
 
+/**
+ * Pour executer les tests d'intégration, il est nécessaire de lancer les tests avec :
+ * -Dintegration-test=true
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=IntegrationTestConfig.class)
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
-@IfProfileValue(name="integration-test", value="true")
-public abstract class AbstractIntegrationTest {
+public abstract class AbstractAlfrescoIT {
 
 	@Autowired
 	private RepositoryAuthenticationUserDetailsService userDetailsService;

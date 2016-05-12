@@ -29,6 +29,7 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	void removeChild(NodeReference parentRef, NodeReference childRef);
 	void removeChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType);
 	void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
+	void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel);
 
 	NameReference getType(NodeReference nodeReference);
 	void setType(NodeReference nodeReference, NameReference type);

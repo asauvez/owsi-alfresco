@@ -16,7 +16,7 @@ import fr.openwide.alfresco.component.model.search.model.restriction.Restriction
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
 
-public class CrudTest extends AbstractDemoTest {
+public class CrudIT extends AbstractDemoIT {
 
 	@Autowired
 	private NodeSearchModelService nodeSearchModelService;

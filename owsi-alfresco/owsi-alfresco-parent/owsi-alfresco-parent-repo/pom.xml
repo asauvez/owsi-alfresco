@@ -16,8 +16,7 @@
 	<properties>
 		<alfresco.webapp.name>alfresco</alfresco.webapp.name>
 		<share.webapp.name>share</share.webapp.name>
-		
-		<owsi-alfresco.repo.alfresco.version>4.2.5.1</owsi-alfresco.repo.alfresco.version>
+		<owsi-alfresco.repo.alfresco.version>5.1.0.1</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		
@@ -85,81 +84,157 @@
 			
 			<dependency>
 				<groupId>org.alfresco</groupId>
-				<artifactId>alfresco-web-client</artifactId>
+				<artifactId>alfresco-data-model</artifactId>
 				<version>${owsi-alfresco.repo.alfresco.version}</version>
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
-						<groupId>org.alfresco</groupId>
-						<artifactId>alfresco-web-framework-commons</artifactId>
+						<groupId>commons-codec</groupId>
+						<artifactId>commons-codec</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>com.sun</groupId>
-						<artifactId>tools</artifactId>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>xml-apis</groupId>
-						<artifactId>xml-apis</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>rhino</groupId>
-						<artifactId>js</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>cglib</groupId>
-						<artifactId>cglib</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j12</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
+						<groupId>commons-httpclient</groupId>
+						<artifactId>commons-httpclient</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>commons-logging</groupId>
 						<artifactId>commons-logging</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>commons-dbcp</groupId>
-						<artifactId>commons-dbcp</artifactId>
+						<groupId>commons-io</groupId>
+						<artifactId>commons-io</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>jdom</groupId>
-						<artifactId>jdom</artifactId>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-math3</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>xalan</groupId>
-						<artifactId>xalan</artifactId>
+						<groupId>org.hibernate</groupId>
+						<artifactId>hibernate</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.codehaus.woodstox</groupId>
-						<artifactId>wstx-asl</artifactId>
+						<groupId>org.safehaus.jug</groupId>
+						<artifactId>jug</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.springframework.security</groupId>
-						<artifactId>spring-security-crypto</artifactId>
+						<groupId>org.mybatis</groupId>
+						<artifactId>mybatis</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.apache.myfaces.core</groupId>
-						<artifactId>myfaces-api</artifactId>
+						<groupId>org.mybatis</groupId>
+						<artifactId>mybatis-spring</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.apache.myfaces.core</groupId>
-						<artifactId>myfaces-impl</artifactId>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>org.json</groupId>
 						<artifactId>json</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.codehaus.jackson</groupId>
-						<artifactId>jackson-mapper-asl</artifactId>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-orm</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.quartz-scheduler</groupId>
+						<artifactId>quartz</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.xml.bind</groupId>
+						<artifactId>jaxb-xjc</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.xml.bind</groupId>
+						<artifactId>jaxb-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.guessencoding</groupId>
+						<artifactId>guessencoding</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>joda-time</groupId>
+						<artifactId>joda-time</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.httpcomponents</groupId>
+						<artifactId>httpclient</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>jaxen</groupId>
+						<artifactId>jaxen</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jibx</groupId>
+						<artifactId>jibx-run</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.antlr</groupId>
+						<artifactId>antlr</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.chemistry.opencmis</groupId>
+						<artifactId>chemistry-opencmis-client-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.chemistry.opencmis</groupId>
+						<artifactId>chemistry-opencmis-commons-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jvnet.staxex</groupId>
+						<artifactId>stax-ex</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.chemistry.opencmis</groupId>
+						<artifactId>chemistry-opencmis-server-bindings</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.woodstox</groupId>
+						<artifactId>woodstox-core-asl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.acegisecurity</groupId>
+						<artifactId>acegi-security</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-xmlfactory</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xpp3</groupId>
+						<artifactId>xpp3</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.tika</groupId>
+						<artifactId>tika-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.tika</groupId>
+						<artifactId>tika-parsers</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.gagravarr</groupId>
+						<artifactId>vorbis-java-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.gagravarr</groupId>
+						<artifactId>vorbis-java-tika</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.googlecode.juniversalchardet</groupId>
+						<artifactId>juniversalchardet</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -171,20 +246,220 @@
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
-						<groupId>org.springframework.social</groupId>
-						<artifactId>spring-social-twitter</artifactId>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.springframework.social</groupId>
-						<artifactId>spring-social-facebook</artifactId>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.activiti</groupId>
-						<artifactId>activiti-spring</artifactId>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-legacy-lucene</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.springframework.extensions.surf</groupId>
-						<artifactId>spring-webscripts</artifactId>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-jlan-embed</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-mbeans</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-text-gen</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.alfresco.services</groupId>
+						<artifactId>alfresco-events</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.mail</groupId>
+						<artifactId>javax.mail</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.alfresco</groupId>
+						<artifactId>alfresco-greenmail</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-dbcp</groupId>
+						<artifactId>commons-dbcp</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-digester</groupId>
+						<artifactId>commons-digester</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-discovery</groupId>
+						<artifactId>commons-discovery</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-fileupload</groupId>
+						<artifactId>commons-fileupload</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-compress</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-codec</groupId>
+						<artifactId>commons-codec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-beanutils</groupId>
+						<artifactId>commons-beanutils</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-io</groupId>
+						<artifactId>commons-io</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-net</groupId>
+						<artifactId>commons-net</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-lang</groupId>
+						<artifactId>commons-lang</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-pool</groupId>
+						<artifactId>commons-pool</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-validator</groupId>
+						<artifactId>commons-validator</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.httpcomponents</groupId>
+						<artifactId>httpclient-cache</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.json</groupId>
+						<artifactId>json</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jbpm</groupId>
+						<artifactId>jbpm-jpdl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.ibm.icu</groupId>
+						<artifactId>icu4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>oro</groupId>
+						<artifactId>oro</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.googlecode.json-simple</groupId>
+						<artifactId>json-simple</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.mozilla</groupId>
+						<artifactId>rhino</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-web</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springmodules</groupId>
+						<artifactId>spring-modules-jbpm31</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.subethamail</groupId>
+						<artifactId>subethasmtp</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.maven</groupId>
+						<artifactId>maven-artifact</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>de.schlichtherle.truezip</groupId>
+						<artifactId>truezip-driver-zip</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>de.schlichtherle.truezip</groupId>
+						<artifactId>truezip-file</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.thoughtworks.xstream</groupId>
+						<artifactId>xstream</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.pdfview</groupId>
+						<artifactId>pdfrenderer</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.xmlrpc</groupId>
+						<artifactId>xmlrpc-client</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.benfante</groupId>
+						<artifactId>JSlideShare</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>bsf</groupId>
+						<artifactId>bsf</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.beetstra.jutf7</groupId>
+						<artifactId>jutf7</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>cglib</groupId>
+						<artifactId>cglib</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.beanshell</groupId>
+						<artifactId>bsh</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xalan</groupId>
+						<artifactId>xalan</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.geronimo.specs</groupId>
+						<artifactId>geronimo-annotation_1.0_spec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.geronimo.specs</groupId>
+						<artifactId>geronimo-jaxws_2.1_spec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.geronimo.specs</groupId>
+						<artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jbpm</groupId>
+						<artifactId>jbpm-identity</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>net.java.dev.stax-utils</groupId>
+						<artifactId>stax-utils</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.freemarker</groupId>
+						<artifactId>freemarker</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.jackson</groupId>
+						<artifactId>jackson-mapper-asl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>jstl</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>org.apache.myfaces.core</groupId>
@@ -195,28 +470,224 @@
 						<artifactId>myfaces-impl</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>commons-collections</groupId>
-						<artifactId>commons-collections</artifactId>
+						<groupId>org.apache.xmlbeans</groupId>
+						<artifactId>xmlbeans</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
+						<groupId>org.apache.pdfbox</groupId>
+						<artifactId>pdfbox</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>xml-apis</groupId>
-						<artifactId>xml-apis</artifactId>
+						<groupId>org.apache.pdfbox</groupId>
+						<artifactId>fontbox</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
+						<groupId>org.apache.pdfbox</groupId>
+						<artifactId>jempbox</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>rhino</groupId>
-						<artifactId>js</artifactId>
+						<groupId>org.bouncycastle</groupId>
+						<artifactId>bcprov-jdk15</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>cglib</groupId>
-						<artifactId>cglib</artifactId>
+						<groupId>com.googlecode.mp4parser</groupId>
+						<artifactId>isoparser</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.drewnoakes</groupId>
+						<artifactId>metadata-extractor</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.ccil.cowan.tagsoup</groupId>
+						<artifactId>tagsoup</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.solr</groupId>
+						<artifactId>solr-solrj</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>net.sf</groupId>
+						<artifactId>bliki</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>net.sf.jsr107cache</groupId>
+						<artifactId>jsr107cache</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.jws</groupId>
+						<artifactId>jsr181-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.annotation</groupId>
+						<artifactId>jsr250-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.ws.commons.schema</groupId>
+						<artifactId>XmlSchema</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.googlecode.concurrentlinkedhashmap</groupId>
+						<artifactId>concurrentlinkedhashmap-lru</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.xml.fastinfoset</groupId>
+						<artifactId>FastInfoset</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.codehaus.groovy</groupId>
+						<artifactId>groovy-all</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.artofsolving</groupId>
+						<artifactId>jodconverter</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.openoffice</groupId>
+						<artifactId>unoil</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.openoffice</groupId>
+						<artifactId>juh</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>net.sf.javamusictag</groupId>
+						<artifactId>jid3lib</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>jmagick</groupId>
+						<artifactId>jmagick</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.openoffice</groupId>
+						<artifactId>jut</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.htmlparser</groupId>
+						<artifactId>htmlparser</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>antlr</groupId>
+						<artifactId>antlr</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.poi</groupId>
+						<artifactId>poi</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.poi</groupId>
+						<artifactId>poi-ooxml</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.poi</groupId>
+						<artifactId>poi-scratchpad</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.poi</groupId>
+						<artifactId>ooxml-schemas</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.livetribe</groupId>
+						<artifactId>livetribe-jsr223</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>edu.ucar</groupId>
+						<artifactId>netcdf</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.alfresco.surf</groupId>
+						<artifactId>spring-surf-core-configservice</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-linkedin</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-facebook</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-twitter</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.chemistry.opencmis</groupId>
+						<artifactId>chemistry-opencmis-commons-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.chemistry.opencmis</groupId>
+						<artifactId>chemistry-opencmis-server-support</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-core-1.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-media-1.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-client-1.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-client-meta-1.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-docs-3.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-docs-meta-3.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.gdata</groupId>
+						<artifactId>gdata-youtube-2.0</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.guava</groupId>
+						<artifactId>guava</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.security</groupId>
+						<artifactId>spring-security-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-facebook-web</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.social</groupId>
+						<artifactId>spring-social-web</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-databind</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-annotations</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.activiti</groupId>
+						<artifactId>activiti-engine</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.activiti</groupId>
+						<artifactId>activiti-spring</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjrt</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>

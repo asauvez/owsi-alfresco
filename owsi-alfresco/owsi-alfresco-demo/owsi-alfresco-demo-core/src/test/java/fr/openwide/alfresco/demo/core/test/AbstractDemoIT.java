@@ -2,7 +2,6 @@ package fr.openwide.alfresco.demo.core.test;
 
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,10 +13,10 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
-import fr.openwide.alfresco.demo.core.test.framework.spring.AbstractIntegrationTest;
+import fr.openwide.alfresco.demo.core.test.framework.spring.AbstractAlfrescoIT;
 
 @ContextConfiguration(classes=AppModuleServiceConfig.class)
-public abstract class AbstractDemoTest extends AbstractIntegrationTest {
+public abstract class AbstractDemoIT extends AbstractAlfrescoIT {
 	
 	@Autowired
 	protected NodeModelService nodeModelService;
@@ -28,7 +27,7 @@ public abstract class AbstractDemoTest extends AbstractIntegrationTest {
 		return identificationService.getByIdentifier(DemoModel.DEMO_ROOT_FOLDER).get();
 	}
 
-	@Before @After
+	@Before
 	public void cleanRootFolder() {
 		List<BusinessNode> children = nodeModelService.getChildren(getRootFolder(), new NodeScopeBuilder().nodeReference());
 		for (BusinessNode child : children) {

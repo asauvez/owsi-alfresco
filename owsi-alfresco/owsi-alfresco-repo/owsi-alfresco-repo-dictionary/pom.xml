@@ -21,7 +21,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-web-client</artifactId>
+			<artifactId>alfresco-data-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-repository</artifactId>
 		</dependency>
 	</dependencies>
 	

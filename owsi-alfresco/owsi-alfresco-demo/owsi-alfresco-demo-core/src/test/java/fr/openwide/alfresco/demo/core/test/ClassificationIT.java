@@ -11,7 +11,7 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
 
-public class ClassificationTest extends AbstractDemoTest {
+public class ClassificationIT extends AbstractDemoIT {
 
 	@Test
 	public void testClassification() {
@@ -32,7 +32,7 @@ public class ClassificationTest extends AbstractDemoTest {
 			.properties().name();
 		BusinessNode demoNode = nodeModelService.get(demoFile, nodeScopeBuilder);
 		
-		Assert.assertEquals(2, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
+		Assert.assertEquals(3, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
 		
 		String path = demoNode.getPath();
 		Assert.assertTrue(path.startsWith("/{http://www.alfresco.org/model/application/1.0}company_home"
