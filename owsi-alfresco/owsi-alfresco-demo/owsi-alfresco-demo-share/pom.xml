@@ -53,6 +53,7 @@
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifestFile>${project.build.directory}/dependency/META-INF/MANIFEST.MF</manifestFile>
