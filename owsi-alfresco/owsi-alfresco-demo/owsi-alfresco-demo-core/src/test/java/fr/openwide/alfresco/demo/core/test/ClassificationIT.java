@@ -83,4 +83,48 @@ public class ClassificationIT extends AbstractDemoIT {
 		nodeModelService.delete(file2);
 		Assert.assertEquals(0, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
 	}
+	
+	@Test
+	public void testUniqueName() {
+		testUniqueName("");
+	}		
+	@Test
+	public void testUniqueNameWithExtension() {
+		testUniqueName(".txt");
+	}
+	
+	private void testUniqueName(String extension) {
+		// Create 0
+		NodeReference demoFile0 = nodeModelService.create(new BusinessNode(null, CmModel.content, "demoFile" + extension)
+			.properties().set(CmModel.content.content, new RepositoryContentData("text/plain", "UTF-8"))
+			.properties().set(DemoModel.demoAspect.demoProperty, "unique")
+			.aspect(OwsiModel.classifiable)
+			.contents().set("hello world 0"));
+		
+		Assert.assertEquals("demoFile" + extension, nodeModelService.get(demoFile0, 
+				new NodeScopeBuilder().properties().name())
+				.properties().getName());
+
+		// Create 2
+		NodeReference demoFile1 = nodeModelService.create(new BusinessNode(null, CmModel.content, "demoFile" + extension)
+			.properties().set(CmModel.content.content, new RepositoryContentData("text/plain", "UTF-8"))
+			.properties().set(DemoModel.demoAspect.demoProperty, "unique")
+			.aspect(OwsiModel.classifiable)
+			.contents().set("hello world 1"));
+		Assert.assertEquals("demoFile-1" + extension, nodeModelService.get(demoFile1, 
+				new NodeScopeBuilder().properties().name())
+				.properties().getName());
+		
+		// Create 3
+		NodeReference demoFile2 = nodeModelService.create(new BusinessNode(null, CmModel.content, "demoFile" + extension)
+			.properties().set(CmModel.content.content, new RepositoryContentData("text/plain", "UTF-8"))
+			.properties().set(DemoModel.demoAspect.demoProperty, "unique")
+			.aspect(OwsiModel.classifiable)
+			.contents().set("hello world 2"));
+		Assert.assertEquals("demoFile-2" + extension, nodeModelService.get(demoFile2, 
+				new NodeScopeBuilder().properties().name())
+				.properties().getName());
+	}
+	
+
 }

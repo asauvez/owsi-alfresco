@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -340,6 +341,23 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return nodeModelService.get(nodeReference, new NodeScopeBuilder().path()).getPath();
 	}
 
+	public String getUniqueName(NodeReference folder, String originalName) {
+		String extension = FilenameUtils.getExtension(originalName);
+		if (! extension.isEmpty()) {
+			extension = "." + extension;
+		}
+		String baseName = FilenameUtils.removeExtension(originalName);
+		String name = originalName;
+		int index = 1;
+		while (nodeModelService.getChildByName(folder, name).isPresent()) {
+			name = baseName + "-" + (index ++) + extension;
+		}
+		return name;
+	}
+	public void setNewName(NodeReference node, String newName) {
+		nodeModelService.setProperty(node, CmModel.object.name, newName);
+	}
+	
 	public void moveNode(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Move node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));

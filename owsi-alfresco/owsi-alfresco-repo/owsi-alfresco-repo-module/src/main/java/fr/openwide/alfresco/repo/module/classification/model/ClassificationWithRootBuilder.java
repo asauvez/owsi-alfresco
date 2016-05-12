@@ -88,6 +88,21 @@ public class ClassificationWithRootBuilder {
 		return destinationFolder;
 	}
 	
+	public ClassificationWithRootBuilder uniqueName() {
+		String currentName = node.properties().getName();
+		String newName = service.getUniqueName(destinationFolder, currentName);
+		return name(newName);
+	}
+	
+	public ClassificationWithRootBuilder name(String newName) {
+		String currentName = node.properties().getName();
+		if (! currentName.equals(newName)) {
+			service.setNewName(node.getNodeReference(), newName);
+			node.properties().name(newName);
+		}
+		return this;
+	}
+	
 	/**
 	 * Déplace le noeud dans le répertoire de destination. 
 	 */

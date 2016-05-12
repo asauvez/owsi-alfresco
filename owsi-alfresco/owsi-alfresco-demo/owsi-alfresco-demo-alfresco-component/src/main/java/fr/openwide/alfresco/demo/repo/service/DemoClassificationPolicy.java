@@ -15,6 +15,15 @@ public class DemoClassificationPolicy implements ClassificationPolicy<DemoAspect
 
 	@Override
 	public void classify(ClassificationBuilder builder, DemoAspect model, ClassificationEvent event) {
+		if ("unique".equals(event.getNode().properties().get(model.demoProperty))) {
+			builder
+				.rootFolderIdentifier(DemoModel.DEMO_ROOT_FOLDER)
+				.subFolder("classificationUnique")
+				.uniqueName()
+				.moveNode();
+			return;
+		}
+		
 		builder
 			.rootFolderIdentifier(DemoModel.DEMO_ROOT_FOLDER)
 			.subFolder("classification")
