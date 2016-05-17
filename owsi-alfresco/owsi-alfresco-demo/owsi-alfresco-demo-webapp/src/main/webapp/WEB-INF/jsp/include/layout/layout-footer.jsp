@@ -11,7 +11,8 @@
 				--%>
 				<ul class="nav nav-pills">
 					<li>
-						<a href="mailto:<mdphapp:contactMailto />">
+						<spring:message code="contact.mail" var="mailContact"/>
+						<a href="mailto: ${mailContact}">
 							<spring:message code="contact.label" var="contactLabel" />
 							<i class="glyphicon glyphicon-comment" title="${contactLabel}"></i>
 							${contactLabel}

@@ -1,16 +1,12 @@
 package fr.openwide.alfresco.demo.web.application.business;
 
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -70,7 +66,7 @@ public class AccueilController extends BusinessController {
 			}
 			session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
 		}
-		return "accueil";//Views.Security.login;
+		return "login";//Views.Security.login;
 	}
 
 	@RequestMapping(method=RequestMethod.GET, value=REFRESH_URL)

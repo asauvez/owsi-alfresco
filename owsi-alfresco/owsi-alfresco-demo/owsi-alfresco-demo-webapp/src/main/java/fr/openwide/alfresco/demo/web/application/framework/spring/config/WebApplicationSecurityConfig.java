@@ -45,7 +45,7 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 				.logoutSuccessUrl("/")
 				.and()
 			.authorizeRequests()
-				.antMatchers("/accueil").permitAll()
+//				.antMatchers("/accueil").permitAll()
 				.antMatchers(AccueilController.LOGIN_URL).permitAll()
 				.antMatchers(HttpMethod.GET, "/security/logout").permitAll()
 				.antMatchers("/static/**").permitAll()
