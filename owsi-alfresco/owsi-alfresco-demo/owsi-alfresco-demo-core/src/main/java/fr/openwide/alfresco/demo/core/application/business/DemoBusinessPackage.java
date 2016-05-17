@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.demo.core.common.business;
+package fr.openwide.alfresco.demo.core.application.business;
 
 public class DemoBusinessPackage {
 

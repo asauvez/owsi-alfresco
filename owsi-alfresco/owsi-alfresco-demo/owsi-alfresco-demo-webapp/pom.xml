@@ -29,6 +29,10 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<finalName>demo</finalName>
+	</build>
+
 	<profiles>
 		<profile>
 			<id>development</id>
@@ -44,6 +48,10 @@
 			</dependencies>
 			<build>
 				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
 					<resource>
 						<directory>src/main/dev-resources</directory>
 						<filtering>true</filtering>

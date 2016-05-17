@@ -1,0 +1,37 @@
+
+
+<alfresco-config>
+
+	<config evaluator="string-compare" condition="DocumentLibrary">
+		<aspects>
+			<!-- Aspects that a user can see -->
+			<visible>
+				<aspect name="demo:demoAspect" />
+			</visible>
+
+			<!-- Aspects that a user can add. Same as "visible" if left empty -->
+			<addable>
+			</addable>
+
+			<!-- Aspects that a user can remove. Same as "visible" if left empty -->
+			<removeable>
+			</removeable>
+		</aspects>
+	</config>
+	<config evaluator="string-compare" condition="Action Wizards">
+		<aspects>
+			<aspect name="demo:demoAspect" />
+		</aspects>
+	</config>
+
+	<config evaluator="aspect" condition="demo:demoAspect">
+		<forms>
+			<form>
+				<field-visibility>
+					<!-- fields from my example aspect -->
+					<show id="demo:demoProperty" />
+				</field-visibility>
+			</form>
+		</forms>
+	</config>
+</alfresco-config>
