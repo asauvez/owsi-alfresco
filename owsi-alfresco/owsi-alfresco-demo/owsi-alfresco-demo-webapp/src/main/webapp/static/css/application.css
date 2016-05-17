@@ -1,0 +1,182 @@
+#logo {
+	content: "Application";
+}
+
+body {
+	padding-bottom: 40px;
+	padding-top: 20px;
+}
+
+.navbar {
+	padding-left: 70px;
+	background-image: url(../img/logo-navbar.png);
+	background-repeat: no-repeat;
+	background-position: 20px center;
+}
+
+.pagination {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.tree-browser div.tree-toggle {
+	cursor: pointer;
+}
+
+.tree-browser div.tree-toggle label {
+	cursor: pointer;
+}
+
+.tree-browser li {
+	border: 1px solid #ddd;
+	border-width: 1px 0px 0px 0px;
+	padding: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.tree-browser li.first {
+	border-width: 0px 0px 0px 0px;
+}
+
+.tree-browser li div {
+	padding: 10px 15px;
+}
+
+.tree-browser ul {
+	padding: 0px;
+	margin: 0px;
+}
+
+ul.tree-browser {
+	padding-left: 0px;
+	margin: 0px;
+}
+
+.tree-browser li {
+	display : list-item;
+	list-style-type: none;
+}
+
+.tree-browser li .badge {
+	float: right;
+}
+
+.tree-browser li .tree-indent {
+	margin-left: 6px;
+	margin-right: 20px;
+	width: 26px;
+	border: dotted 1px #aaa;
+	border-width: 0px 1px 0px 0px;
+}
+
+.tree-browser a.selectedLink:link {
+	text-decoration: underline;
+}
+
+/*
+* Styles relatifs a la validation des formulaires
+*/
+
+.error-picto {
+	background-color: #b94a48;
+	color: white;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	display: inline-block;
+	vertical-align: middle;
+	width: 20px;
+	line-height: 22px;
+	float: left;
+	margin-right: 5px;
+}
+
+.warning-picto {
+	background-color: #c09853;
+	color: white;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	display: inline-block;
+	vertical-align: middle;
+	width: 20px;
+	line-height: 22px;
+	float: left;
+	margin-right: 5px;
+}
+
+.submitting {
+	padding-left: 30px;
+	background-image: url(../img/ajax-loader-white.gif);
+	background-repeat: no-repeat;
+	background-position: 7px 11px;
+}
+
+/*
+* Styles utilises pour le viewer PDF
+*/
+.panel-heading.second-heading {
+	background-color: #fcfcfc;
+}
+
+/*
+* Elargissement de la largeur du container bootstrap
+*/
+@media {
+	.container {
+		max-width: none;
+	}
+}
+
+/*
+* Eclaircissement du backdrop pour les fenêtres modales
+*/
+.modal-backdrop.in {
+	opacity: .1;
+	filter: alpha(opacity=10);
+}
+
+/*
+* Page de login
+*/
+body.login-body .container .layout-footer,
+.container .login-panel {
+	margin: 100px 0 100px 340px;
+	width: 700px;
+}
+
+.container .login-panel {
+	background-color: #006da3;
+	background-repeat: no-repeat;
+	background-position: 20px center;
+}
+
+.container .login-panel .panel-body {
+	margin-left: 205px;
+	background-color: #ffffff;
+}
+
+/*
+* Nom de l'utilisateur connecte dans la barre de navigation
+*/
+.navbar .input-group-addon, .input-group-btn{
+	width: auto;
+}
+
+/*
+* Pour l'impression des PDF
+*/
+body.pdf-printing #viewer {
+	display: none;
+}
+
+@media print {
+	body.pdf-printing > * {
+		display: none;
+	}
+	
+	body.pdf-printing #viewer {
+		display: block;
+	}
+}
