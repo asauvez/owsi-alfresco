@@ -1,10 +1,8 @@
 package fr.openwide.alfresco.demo.web.application.business;
 
-import java.text.MessageFormat;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +59,7 @@ public class AccueilController extends BusinessController {
 		NodeWrap folder = new NodeWrap(folderNode);
 		
 		model.addAttribute("folder", folder);
+		model.addAttribute("filAriane", getFilAriane(folderNode));
 		
 		return "demo";
 	}
@@ -93,5 +92,21 @@ public class AccueilController extends BusinessController {
 			NodeReferenceDownloadResponse response) {
 		response.nodeReference(fileRef);
 		return response;
+	}
+	
+	public static List<NodeWrap> getFilAriane(BusinessNode nodeReference){
+		List<NodeWrap> filAriane = new ArrayList<NodeWrap>();
+		
+		getFilAriane(nodeReference.assocs().getPrimaryParent(), filAriane);
+		
+		return filAriane;
+	}
+	
+	private static void getFilAriane(BusinessNode nodeReference, List<NodeWrap> filAriane){
+		NodeWrap wrap = new NodeWrap(nodeReference);
+		if (nodeReference.assocs().getPrimaryParent() != null){
+			getFilAriane(nodeReference.assocs().getPrimaryParent(), filAriane);
+			filAriane.add(wrap);
+		}
 	}
 }

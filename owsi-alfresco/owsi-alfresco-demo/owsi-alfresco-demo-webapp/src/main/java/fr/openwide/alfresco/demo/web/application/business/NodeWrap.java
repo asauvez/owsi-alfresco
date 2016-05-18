@@ -36,7 +36,7 @@ public class NodeWrap {
 	}
 	
 	public boolean isFolder() {
-		return node.isType(CmModel.folder);
+		return node.properties().get(CmModel.content.content) == null;
 	}
 	
 	public List<NodeWrap> getChildren(){
@@ -52,5 +52,9 @@ public class NodeWrap {
 	
 	public String getPath() {
 		return node.getPath();
+	}
+	
+	public NodeReference getParent(){
+		return node.assocs().getPrimaryParent().getNodeReference();
 	}
 }

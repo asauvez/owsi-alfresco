@@ -21,6 +21,16 @@
 						</h3>
 					</div>
 					<div class="panel-body">
+						<ol class="breadcrumb">
+							<c:forEach var="parent" items="${filAriane}">
+								<c:url value="/folder" var="url">
+									<c:param name="nodeRef" value="${parent.nodeRef}" />
+								</c:url>
+								
+								<li><a href="${url}"> ${parent.name} </a></li>
+							</c:forEach>
+							<li class ="active">${file.name}</li>
+						</ol>
 						<div class="panel panel-default">
 							<div class="panel-body">
 								<div class="row">

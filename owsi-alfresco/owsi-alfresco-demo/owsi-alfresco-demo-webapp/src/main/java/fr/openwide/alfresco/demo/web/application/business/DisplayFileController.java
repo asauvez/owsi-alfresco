@@ -30,12 +30,16 @@ public class DisplayFileController extends BusinessController{
 				.properties().description()
 				.properties().title()
 				.properties().set(CmModel.content.content);
+		nodeScopeBuilder.assocs().recursivePrimaryParent()
+			.properties().name();
 		
 
 		BusinessNode fileNode = nodeModelService.get(nodeRef, nodeScopeBuilder);
 		NodeWrap file = new NodeWrap(fileNode);
 		
 		model.addAttribute("file", file);
+		model.addAttribute("filAriane", AccueilController.getFilAriane(fileNode));
+		
 		
 		
 		return "displayFile";
