@@ -24,17 +24,21 @@
 						<div class="panel panel-default">
 							<div class="panel-body">
 								<div class="row">
-									<div class="col-md-9">
-									<p> Titre : ${file.title}</p>
-									<p> Description : ${file.description}</p>
-									<p> Size : ${file.fileSize}</p>
-									</div>
-									<div class="col-md-2">
+									<table class="table table-striped">
+										<tr>
+											<td>Titre :</td><td>${file.title}</td>
+										</tr>
+										<tr>
+											<td>Description :</td><td>${file.description}</td>
+										</tr>
+										<tr>
+											<td>Size :</td><td>${file.fileSize} Octets</td>
+										</tr>
+									</table>
 										<c:url value="/content/${file.name}" var="urlDownload">
 											<c:param name="nodeRef" value="${file.nodeRef}" />
 										</c:url>
 										<a class="btn btn-primary" href="${urlDownload}"><spring:message code="file.download"/></a>
-									</div>
 								</div>
 							</div>
 						</div>

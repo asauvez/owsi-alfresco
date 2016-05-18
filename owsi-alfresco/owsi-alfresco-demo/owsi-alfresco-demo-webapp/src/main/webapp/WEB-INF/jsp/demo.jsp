@@ -23,34 +23,33 @@
 					<div class="panel-body">
 						<div class="panel panel-default">
 							<div class="panel-body">
-								<div class="row">
-									<c:forEach var="child" items="${folder.children}">
-										<c:choose>
-											<c:when test="${child.folder}">
-												<div class="col-md-9">
-													<c:url value="/folder" var="url">
+									<table class="table table-striped">
+										<c:forEach var="child" items="${folder.children}">
+											<tr><c:choose>
+												<c:when test="${child.folder}">
+													<td>
+														<c:url value="/folder" var="url">
+															<c:param name="nodeRef" value="${child.nodeRef}" />
+														</c:url>
+														<a href="${url}"><h3> ${child.name} </h3></a>
+													</td>
+												</c:when>
+												<c:otherwise>
+													<c:url value="/content/${child.name}" var="urlDownload">
 														<c:param name="nodeRef" value="${child.nodeRef}" />
 													</c:url>
-													<a href="${url}"><h3> ${child.name} </h3></a>
-												</div>
-											</c:when>
-											<c:otherwise>
-												<c:url value="/content/${child.name}" var="urlDownload">
-													<c:param name="nodeRef" value="${child.nodeRef}" />
-												</c:url>
-												<c:url value="/file" var="urlFile">
-													<c:param name="nodeRef" value="${child.nodeRef}" />
-												</c:url>
-												<div class="col-md-9">
-													<a href="${urlFile}"><h3> ${child.name} </h3></a>
-												</div>
-												<div class="col-md-2">
-													<a class="btn btn-primary" href="${urlDownload}"><spring:message code="file.download"/></a>
-												</div>
-											</c:otherwise>
-										</c:choose>
-									</c:forEach>
-								</div>
+													<c:url value="/file" var="urlFile">
+														<c:param name="nodeRef" value="${child.nodeRef}" />
+													</c:url>
+													<td>
+														<a href="${urlFile}"><h3> ${child.name} </h3></a>
+													</td><td>
+														<a class="btn btn-primary" href="${urlDownload}"><spring:message code="file.download"/></a>
+													</td>
+												</c:otherwise>
+											</c:choose></tr>
+										</c:forEach>
+									</table>
 							</div>
 						</div>
 					</div>

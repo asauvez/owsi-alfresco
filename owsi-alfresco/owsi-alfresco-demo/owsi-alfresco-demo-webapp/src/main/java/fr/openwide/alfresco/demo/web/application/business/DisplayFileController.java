@@ -38,6 +38,6 @@ public class DisplayFileController extends BusinessController{
 		model.addAttribute("file", file);
 		
 		
-		return "afficheFile";
+		return "displayFile";
 	}
 }
