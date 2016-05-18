@@ -3,6 +3,7 @@ package fr.openwide.alfresco.demo.web.application.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
@@ -22,6 +23,22 @@ public class NodeWrap {
 		return node.properties().get(CmModel.content.content).getSize();
 	}
 	
+	public String getTitle() {
+		return node.properties().getTitle();
+	}
+	
+	public String getDescription() {
+		return node.properties().getDescription();
+	}
+	
+	public NodeReference getNodeRef() {
+		return node.getNodeReference();
+	}
+	
+	public boolean isFolder() {
+		return node.isType(CmModel.folder);
+	}
+	
 	public List<NodeWrap> getChildren(){
 		List<BusinessNode> temp = node.assocs().getChildAssociationContains();
 		List<NodeWrap> tmp = new ArrayList<NodeWrap>();
@@ -31,5 +48,9 @@ public class NodeWrap {
 		}
 		
 		return tmp;
+	}
+	
+	public String getPath() {
+		return node.getPath();
 	}
 }

@@ -17,22 +17,39 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">
 							<i class="glyphicon glyphicon-dashboard"></i>
-							<%-- <spring:message code="demo.fichiers" /> --%>
-							${folderName}
+							${folder.name}
 						</h3>
 					</div>
 					<div class="panel-body">
 						<div class="panel panel-default">
 							<div class="panel-body">
 								<div class="row">
-									<c:forEach var="folder" items="${childrenFolder}">
-										<h2> ${folder.name} </h2>
+									<c:forEach var="child" items="${folder.children}">
+										<c:choose>
+											<c:when test="${child.folder}">
+												<div class="col-md-9">
+													<c:url value="/folder" var="url">
+														<c:param name="nodeRef" value="${child.nodeRef}" />
+													</c:url>
+													<a href="${url}"><h3> ${child.name} </h3></a>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<c:url value="/content/${child.name}" var="urlDownload">
+													<c:param name="nodeRef" value="${child.nodeRef}" />
+												</c:url>
+												<c:url value="/file" var="urlFile">
+													<c:param name="nodeRef" value="${child.nodeRef}" />
+												</c:url>
+												<div class="col-md-9">
+													<a href="${urlFile}"><h3> ${child.name} </h3></a>
+												</div>
+												<div class="col-md-2">
+													<a class="btn btn-primary" href="${urlDownload}"><spring:message code="file.download"/></a>
+												</div>
+											</c:otherwise>
+										</c:choose>
 									</c:forEach>
-									<div class="col-md-2">
-										<div class="text-muted">
-										</div>
-									</div>
-									<div class="col-md-9"></div>
 								</div>
 							</div>
 						</div>

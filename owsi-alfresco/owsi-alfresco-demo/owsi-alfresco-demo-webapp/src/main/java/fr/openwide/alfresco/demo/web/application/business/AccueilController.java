@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
+import fr.openwide.alfresco.app.web.download.model.NodeReferenceDownloadResponse;
 import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
@@ -34,9 +35,6 @@ public class AccueilController extends BusinessController {
 	public static final String LOGIN_URL = "/security/login";
 	public static final String REFRESH_URL = "/security/refresh";
 
-	private static final String HEADER_REFRESH_NAME = "Refresh";
-	private static final String HEADER_REFRESH_VALUE_PATTERN = "{0,number,#};url={1}{2}";
-	
 	@Autowired
 	private NodeModelService nodeModelService;
 	@Autowired
@@ -57,18 +55,16 @@ public class AccueilController extends BusinessController {
 			.properties().name()
 			.type()
 			.properties().set(CmModel.content.content);
+		nodeScopeBuilder.assocs().recursivePrimaryParent()
+			.properties().name();
 		BusinessNode folderNode = nodeModelService.get(folderRef, nodeScopeBuilder);
+		NodeWrap folder = new NodeWrap(folderNode);
 		
-		model.addAttribute("folderRef", folderRef);
-		model.addAttribute("folderName", folderNode.properties().getName());
-		model.addAttribute("childrenNodes", folderNode.assocs().getChildAssociationContains());
-		
-		NodeWrap nw = new NodeWrap(folderNode);
-		
-		model.addAttribute("childrenFolder", nw.getChildren());
+		model.addAttribute("folder", folder);
 		
 		return "demo";
 	}
+	
 //	@PreAuthorize(BusinessPermissionConstants.ROLE_UTILISATEUR)
 	@RequestMapping(value = { "", "/" }, method = RequestMethod.GET)
 	public String root() {
@@ -91,10 +87,11 @@ public class AccueilController extends BusinessController {
 		return "login";//Views.Security.login;
 	}
 
-	@RequestMapping(method=RequestMethod.GET, value=REFRESH_URL)
-	public void refreshPage(HttpServletRequest request, HttpServletResponse response) {
-		response.setHeader(HEADER_REFRESH_NAME, MessageFormat.format(HEADER_REFRESH_VALUE_PATTERN, 
-				TimeUnit.SECONDS.toSeconds(1), request.getContextPath(), LOGIN_URL));
+	@RequestMapping(method=RequestMethod.GET, value="/content/*")
+	public NodeReferenceDownloadResponse downloadFile(
+			@RequestParam("nodeRef") NodeReference fileRef,
+			NodeReferenceDownloadResponse response) {
+		response.nodeReference(fileRef);
+		return response;
 	}
-
 }
