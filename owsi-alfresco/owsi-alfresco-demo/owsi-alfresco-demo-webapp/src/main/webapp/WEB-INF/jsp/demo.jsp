@@ -43,7 +43,7 @@
 													</c:url>
 													<a href="${url}"> ${child.name} </a>
 												</td>
-												<!-- Pour avoir un tableau de 2 colonnes même quand on a pas de de bouton "Download" -->
+												<!-- We use an "empty td" to have two columns when we don't have the  button "Download" -->
 												<td/>
 											</c:when>
 											<c:otherwise>

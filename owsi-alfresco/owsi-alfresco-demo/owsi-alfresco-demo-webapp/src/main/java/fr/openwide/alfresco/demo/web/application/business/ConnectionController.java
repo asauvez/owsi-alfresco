@@ -1,0 +1,39 @@
+package fr.openwide.alfresco.demo.web.application.business;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.WebAttributes;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
+import fr.openwide.alfresco.demo.web.application.framework.spring.controller.BusinessController;
+
+@Controller
+public class ConnectionController extends BusinessController {
+
+	public static final String LOGIN_URL = "/security/login";
+	public static final String REFRESH_URL = "/security/refresh";
+
+
+	@RequestMapping(method=RequestMethod.GET, value=LOGIN_URL)
+	public String getLoginPage(HttpSession session, AlertContainer alertContainer) {
+		AuthenticationException authenticationException = (AuthenticationException) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+		if (authenticationException != null) {
+			if (authenticationException instanceof AuthenticationServiceException) {
+				alertContainer.addError("login.repositoryNotFound");
+			} else if (authenticationException instanceof BadCredentialsException) {
+				alertContainer.addError("login.invalidPassword");
+			} else {
+				throw authenticationException;
+			}
+			session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+		}
+		return "login";//Views.Security.login;
+	}
+
+}

@@ -10,11 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationProvider;
 import fr.openwide.alfresco.app.web.security.authentication.RepositoryLogoutHandler;
-import fr.openwide.alfresco.demo.web.application.business.AccueilController;
+import fr.openwide.alfresco.demo.web.application.business.ConnectionController;
 
 @Configuration
 @EnableWebSecurity
@@ -32,12 +31,12 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 			.headers().disable()
 			.authenticationProvider(repositoryAuthenticationProvider)
 			.formLogin()
-				.loginPage(AccueilController.LOGIN_URL)
+				.loginPage(ConnectionController.LOGIN_URL)
 				.loginProcessingUrl("/j_spring_security_check")
 				.usernameParameter("j_username")
 				.passwordParameter("j_password")
 				.defaultSuccessUrl("/")
-				.failureUrl(AccueilController.LOGIN_URL)
+				.failureUrl(ConnectionController.LOGIN_URL)
 				.permitAll()
 				.and()
 			.logout()
@@ -46,7 +45,7 @@ public class WebApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 			.authorizeRequests()
 //				.antMatchers("/accueil").permitAll()
-				.antMatchers(AccueilController.LOGIN_URL).permitAll()
+				.antMatchers(ConnectionController.LOGIN_URL).permitAll()
 				.antMatchers(HttpMethod.GET, "/security/logout").permitAll()
 				.antMatchers("/static/**").permitAll()
 				.anyRequest().authenticated()
