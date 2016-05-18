@@ -57,4 +57,8 @@ public class NodeWrap {
 	public NodeReference getParent(){
 		return node.assocs().getPrimaryParent().getNodeReference();
 	}
+	
+	public String getMime() {
+		return node.properties().get(CmModel.content.content).getMimetype();
+	}
 }

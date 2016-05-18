@@ -44,6 +44,10 @@
 										<tr>
 											<td>Size :</td><td>${file.fileSize} Octets</td>
 										</tr>
+										<tr>
+											<td>Mime type :</td><td>${file.mime}</td>
+										</tr>
+										
 									</table>
 										<c:url value="/content/${file.name}" var="urlDownload">
 											<c:param name="nodeRef" value="${file.nodeRef}" />

@@ -20,6 +20,8 @@
 			<div class="global-alerts">
 				<%@ include file="/WEB-INF/jsp/include/alerts.jsp"%>
 			</div>
+			<c:url value="/security/logout" var="url"/>
+			<a class="btn btn-primary" style="float: right;" href="${url}"><spring:message code="logout.title"/></a>
 	
 			<div class="contenu">
 				<c:if test="${isUtilisateur}">
@@ -104,5 +106,6 @@
 		<script type="text/javascript" src="${staticUrl}/js/application.js"></script>
 		
 		<decorator:getProperty property="page.scripts"/>
+		
 	</body>
 </html>

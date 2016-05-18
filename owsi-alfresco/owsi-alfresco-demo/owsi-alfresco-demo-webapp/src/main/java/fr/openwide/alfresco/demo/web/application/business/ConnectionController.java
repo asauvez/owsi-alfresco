@@ -18,7 +18,7 @@ public class ConnectionController extends BusinessController {
 
 	public static final String LOGIN_URL = "/security/login";
 	public static final String REFRESH_URL = "/security/refresh";
-
+	
 
 	@RequestMapping(method=RequestMethod.GET, value=LOGIN_URL)
 	public String getLoginPage(HttpSession session, AlertContainer alertContainer) {
@@ -35,5 +35,5 @@ public class ConnectionController extends BusinessController {
 		}
 		return "login";//Views.Security.login;
 	}
-
+	
 }
