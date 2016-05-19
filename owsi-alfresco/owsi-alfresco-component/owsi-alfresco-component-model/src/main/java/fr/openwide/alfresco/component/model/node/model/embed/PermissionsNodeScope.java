@@ -13,12 +13,21 @@ public class PermissionsNodeScope {
 		this.builder = builder;
 		this.scope = builder.getScope();
 	}
-
 	
 	public NodeScopeBuilder userPermission(RepositoryPermission permission) {
 		scope.getUserPermissions().add(permission);
 		return builder;
 	}
+	public NodeScopeBuilder userPermissionAddChildren() {
+		return userPermission(RepositoryPermission.ADD_CHILDREN);
+	}
+	public NodeScopeBuilder userPermissionWrite() {
+		return userPermission(RepositoryPermission.WRITE);
+	}
+	public NodeScopeBuilder userPermissionDelete() {
+		return userPermission(RepositoryPermission.DELETE);
+	}
+	
 	public NodeScopeBuilder accessPermissions() {
 		scope.setAccessPermissions(true);
 		return builder;
