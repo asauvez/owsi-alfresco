@@ -1,24 +1,13 @@
-<div class="panel panel-default layout-footer">
+<div class="panel panel-default">
 	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<%-- Contact sous la forme d'un bouton, au cas où un changement de présentation est demandé
-				<button id="mdphMessage" type="button" class="btn btn-default" data-js-onclick="mailto:<mdphapp:contactMailto />;">
+				<spring:message code="contact.mail" var="mailContact"/>
+				<a href="mailto: ${mailContact}">
 					<spring:message code="contact.label" var="contactLabel" />
-					<span class="glyphicon glyphicon-envelope" title="${contactLabel}"></span>
+					<i class="glyphicon glyphicon-comment" title="${contactLabel}"></i>
 					${contactLabel}
-				</button>
-				--%>
-				<ul class="nav nav-pills">
-					<li>
-						<spring:message code="contact.mail" var="mailContact"/>
-						<a href="mailto: ${mailContact}">
-							<spring:message code="contact.label" var="contactLabel" />
-							<i class="glyphicon glyphicon-comment" title="${contactLabel}"></i>
-							${contactLabel}
-						</a>
-					</li>
-				</ul>
+				</a>
 			</div>
 			<div class="col-md-6 text-right text-muted">
 				<h6>

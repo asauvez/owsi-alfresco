@@ -7,5 +7,3 @@
 <%@ taglib prefix="spring"		uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="alfapp"		uri="http://app.alfresco.openwide.fr/tags/util" %>
 <%@ taglib prefix="owsi"		uri="http://app.alfresco.openwide.fr/tags/util" %>
-
-<!--<%@ taglib prefix="mdph"		tagdir="/WEB-INF/tags" %>-->

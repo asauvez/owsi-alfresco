@@ -41,7 +41,11 @@ public class NodeWrap {
 	}
 	
 	public boolean isMayDelete() {
-		return node.permissions().hasUserPermission(RepositoryPermission.DELETE);
+		return node.permissions().hasUserPermissionDelete();
+	}
+	
+	public boolean isMayAdd() {
+		return node.permissions().hasUserPermissionAddChildren();
 	}
 	
 	public List<NodeWrap> getChildren(){

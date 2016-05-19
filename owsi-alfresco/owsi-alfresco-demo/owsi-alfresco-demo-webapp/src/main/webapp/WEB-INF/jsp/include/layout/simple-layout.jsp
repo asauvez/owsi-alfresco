@@ -7,6 +7,8 @@
 	</head>
 	<body class="<decorator:getProperty property="page.bodyCssClass" />">
 		<div class="container">
+			<%@ include file="/WEB-INF/jsp/include/layout/layout-header.jsp"%>
+			
 			<decorator:body/>
 			
 			<%@ include file="/WEB-INF/jsp/include/layout/layout-footer.jsp"%>

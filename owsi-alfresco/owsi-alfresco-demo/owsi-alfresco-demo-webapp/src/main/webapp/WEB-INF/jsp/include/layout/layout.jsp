@@ -7,8 +7,9 @@
 	</head>
 	<body>
 		<div class="container">
-			<%@ include file="/WEB-INF/jsp/include/profile-vars.jsp"%>
-
+		
+			<%@ include file="/WEB-INF/jsp/include/layout/layout-header.jsp"%>
+			
 			<div id="navbar">
 				<decorator:getProperty property="page.navbar"/>
 			</div>
@@ -20,8 +21,7 @@
 			<div class="global-alerts">
 				<%@ include file="/WEB-INF/jsp/include/alerts.jsp"%>
 			</div>
-			<c:url value="/security/logout" var="url"/>
-			<a class="btn btn-primary" style="float: right;" href="${url}"><spring:message code="logout.title"/></a>
+			
 	
 			<div class="contenu">
 				<c:if test="${isUtilisateur}">
