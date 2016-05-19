@@ -16,7 +16,7 @@
 	<properties>
 		<alfresco.webapp.name>alfresco</alfresco.webapp.name>
 		<share.webapp.name>share</share.webapp.name>
-		<owsi-alfresco.repo.alfresco.version>5.1.0.1</owsi-alfresco.repo.alfresco.version>
+		<owsi-alfresco.repo.alfresco.version>5.1.0.3</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		
