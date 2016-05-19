@@ -68,6 +68,71 @@
 				</div>
 
 			</div>
+			<div class="col-md-2">
+			
+				<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalAddFolder">
+					<spring:message code="file.addFolder"/>
+				</button>
+				 <div class="modal fade" tabindex="-1" role="dialog" id="modalAddFolder">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title"><spring:message code="file.addFolder"/></h4>
+							</div>
+							<c:url value="/add-folder" var="urlAddFolder">
+								<c:param name="nodeRef" value="${folder.nodeRef}" />
+							</c:url>
+							<form method="post" action="${urlAddFolder}">
+								<div class="modal-body">
+									<div class="form-group">
+										<label class="control-label"><spring:message code="file.modal.folder.name"/></label>
+										<input type="text" class="form-control" name="folderName">
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="file.modal.close"/></button>
+									<spring:message var="label" code="file.addFolder"/>
+									<input type="submit" class="btn btn-primary" value="${label}">
+								</div>
+							</form>
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal-dialog -->
+				</div><!-- /.modal -->
+				<br/>
+				<br/>
+				
+				<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalAddFile" >
+					<spring:message code="file.addFile"/>
+				</button>
+				
+				<div class="modal fade" tabindex="-1" role="dialog" id="modalAddFile">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title"><spring:message code="file.addFile"/></h4>
+							</div>
+							<c:url value="/add-file" var="urlAddFile">
+								<c:param name="nodeRef" value="${folder.nodeRef}" />
+							</c:url>
+							<form method="post" action="${urlAddFile}" enctype="multipart/form-data">
+								<div class="modal-body">
+									<div class="form-group">
+										<label class="control-label"><spring:message code="file.modal.folder.name"/></label>
+										<input type="file" class="form-control" name="file">
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="file.modal.close"/></button>
+									<spring:message var="label" code="file.addFile"/>
+									<input type="submit" class="btn btn-primary" value="${label}">
+								</div>
+							</form>
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal-dialog -->
+				</div><!-- /.modal -->
+			</div>
 		</div>
 
 	</div>

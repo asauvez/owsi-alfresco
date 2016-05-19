@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
@@ -94,8 +95,36 @@ public class DisplayControler extends BusinessController {
 		
 		
 		
+		
 		return "displayFile";
 	}
+	
+	@RequestMapping(method=RequestMethod.POST, value="/add-folder")
+	public String addFolder(
+			@RequestParam("nodeRef") NodeReference folderRef,
+			@RequestParam("folderName") String folderName) {
+		
+		try {
+			nodeModelService.createFolder(folderRef, folderName);
+		} catch (Exception e) {
+//			throw e;
+		}
+		return getRedirect("folder?nodeRef=" + folderRef.getReference());
+	}
+	
+	
+	@RequestMapping(method=RequestMethod.POST, value="/add-file")
+	public String addFile(
+			@RequestParam("nodeRef") NodeReference folderRef,
+			@RequestParam("file") MultipartFile file) {
+		
+		try {
+			nodeModelService.createContent(folderRef, file);
+		} catch (Exception e) {
+//			throw e;
+		}
+		return getRedirect("folder?nodeRef=" + folderRef.getReference());
+	}	
 	
 	private List<NodeWrap> getFilAriane(BusinessNode nodeReference){
 		List<NodeWrap> filAriane = new ArrayList<NodeWrap>();

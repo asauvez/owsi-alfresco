@@ -3,6 +3,7 @@ package fr.openwide.alfresco.demo.web.application.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -37,6 +38,10 @@ public class NodeWrap {
 	
 	public boolean isFolder() {
 		return node.properties().get(CmModel.content.content) == null;
+	}
+	
+	public boolean isMayDelete() {
+		return node.permissions().hasUserPermission(RepositoryPermission.DELETE);
 	}
 	
 	public List<NodeWrap> getChildren(){
