@@ -24,7 +24,7 @@
 
 			<form method="post" action="${formURL}" class="form-horizontal">
 				<div class="content">
-					<h4><spring:message code="application.title" /></p></h4>
+					<h4><spring:message code="application.title" /></h4>
 					
 					<p class="text-muted"><spring:message code="application.welcome" /></p>
 					

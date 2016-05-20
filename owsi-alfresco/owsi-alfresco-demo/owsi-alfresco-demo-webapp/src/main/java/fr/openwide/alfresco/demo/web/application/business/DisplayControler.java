@@ -125,9 +125,12 @@ public class DisplayControler extends BusinessController {
 		try {
 			nodeModelService.createFolder(folderRef, folderName);
 		} catch (Exception e) {
-//			throw e;
+			alertContainer.addError("excepion.add.folder");
 		}
+		alertContainer.addSuccess("ok.add.folder");
+//		return "demo";
 		return getRedirect("folder?nodeRef=" + folderRef.getReference());
+//		return "folder?nodeRef=" + folderRef.getReference();
 	}
 	
 	

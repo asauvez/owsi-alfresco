@@ -61,8 +61,6 @@
 				"pagination.page.previous": "<spring:message code="pagination.page.previous" javaScriptEscape="true"/>",
 				"pagination.page.next": "<spring:message code="pagination.page.next" javaScriptEscape="true"/>",
 				"typeahead.noItem": "<spring:message code="typeahead.noItem" javaScriptEscape="true"/>",
-				"sort.order.asc": "<spring:message code="sort.order.asc" javaScriptEscape="true"/>",
-				"sort.order.desc": "<spring:message code="sort.order.desc" javaScriptEscape="true"/>",
 				"exception.generic.message": "<spring:message code="exception.generic.message" javaScriptEscape="true"/>",
 				"exception.javascript.message": "<spring:message code="exception.javascript.message" javaScriptEscape="true"/>",
 				"exception.jsp.message": "<spring:message code="exception.jsp.message" javaScriptEscape="true"/>"

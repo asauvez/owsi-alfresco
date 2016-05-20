@@ -59,13 +59,18 @@
 						
 						<div class="panel panel-default">
 							<table class="table table-striped">
+								<c:if test="${empty folder.children}">
+									<tr><td>(<spring:message code="empty" />)</td></tr>
+								</c:if>
 								<c:forEach var="child" items="${folder.children}">
 									<tr>
 										<c:choose>
 											<c:when test="${child.folder}">
 												<td><c:url value="/folder" var="url">
 														<c:param name="nodeRef" value="${child.nodeRef}" />
-													</c:url> <a href="${url}"> ${child.name} </a>
+													</c:url>
+													<i class="glyphicon glyphicon-folder-open"></i>
+													<a href="${url}">  ${child.name} </a>
 												</td>
 													
 												<td><c:if test="${child.mayDelete}">
@@ -87,7 +92,10 @@
 												<c:url value="/file" var="urlFile">
 													<c:param name="nodeRef" value="${child.nodeRef}" />
 												</c:url>
-												<td><a href="${urlFile}"> ${child.name} </a></td>
+												<td>
+													<i class="glyphicon glyphicon-file"></i>
+													<a href="${urlFile}"> ${child.name} </a>
+												</td>
 												<td>
 													<div class="pull-right">
 														<c:url value="/content/${child.name}" var="urlShow">

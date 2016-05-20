@@ -7,7 +7,11 @@
 	</head>
 	<body class="<decorator:getProperty property="page.bodyCssClass" />">
 		<div class="container">
-			<%@ include file="/WEB-INF/jsp/include/layout/layout-header.jsp"%>
+		
+			<nav class="navbar navbar-default">
+				<div class="container-fluid">
+				</div>
+			</nav>
 			
 			<decorator:body/>
 			
