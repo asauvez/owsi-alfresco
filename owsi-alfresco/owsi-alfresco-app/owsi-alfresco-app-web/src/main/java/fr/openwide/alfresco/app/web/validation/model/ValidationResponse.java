@@ -3,6 +3,8 @@ package fr.openwide.alfresco.app.web.validation.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.context.MessageSource;
@@ -10,6 +12,7 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,6 +27,7 @@ public class ValidationResponse {
 
 	private AlertContainer alertContainer = new AlertContainer();
 	private MessageSource messageSource;
+	private NativeWebRequest webRequest;
 
 	private String viewName;	// Page à renvoyer comme si on renvoyé un ModelAndView
 	private String redirect;	// URL où $.formBindAjaxPost() va rediriger le navigateur. 
@@ -169,6 +173,9 @@ public class ValidationResponse {
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
+	public void setWebRequest(NativeWebRequest webRequest) {
+		this.webRequest = webRequest;
+	}
 
 	public String getViewName() {
 		return viewName;
@@ -182,5 +189,10 @@ public class ValidationResponse {
 	}
 	public void setRedirect(String redirect) {
 		this.redirect = redirect;
+	}
+	public void setRedirectWithinContextPath(String redirect) {
+		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		String contextPath = request.getContextPath();
+		setRedirect(contextPath + redirect);
 	}
 }

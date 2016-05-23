@@ -59,6 +59,7 @@ public class ValidationResponseMethodProcessor extends AbstractMessageConverterM
 		// build validationResponse
 		ValidationResponse validationResponse = new ValidationResponse();
 		validationResponse.setMessageSource(messageSource);
+		validationResponse.setNativeWebRequest(webRequest);
 		return validationResponse;
 	}
 
