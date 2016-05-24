@@ -125,42 +125,34 @@
 		},
 		
 		linkBindAjaxPost: function(options) {
-			$(this).linkTreatment(options);
-		},
-		
-		linkTreatment: function(options){
+			
 			this.each(function() {
 				
-				if(this.tagName != 'FORM'){
-					var link = $(this);
-					var localOptions = $.extend({
-						confirmationMsg : link.attr('data-confirmation-msg'),
-						type: 'POST'
-					}, options);
-					link.click(function() {
-						if (localOptions.confirmationMsg != null) {
-							if (! confirm(localOptions.confirmationMsg)) {
-								return false;
-							}
+				var link = $(this);
+				var localOptions = $.extend({
+					confirmationMsg : link.data('confirmation-msg'),
+					type: 'POST'
+				}, options);
+				link.click(function() {
+					if (localOptions.confirmationMsg != null) {
+						if (! confirm(localOptions.confirmationMsg)) {
+							return false;
 						}
+					}
+					
+					var url = link.attr('href');
+					$.ajax(url, {
+						success: function(data) {
+							if (data.redirection != null) {
+								document.location = data.redirection;
+							}
+						},
 						
-						var url = link.attr('href');
-						$.ajax(url, {
-							success: function(data) {
-								if (data.redirection != null) {
-									document.location = data.redirection;
-								}
-								if (options.confirmationMsg) {
-									options.onSucces(data);
-								}
-							},
-							
-							dataType: "json",
-							type: localOptions.type
-						});
-						return false;
+						dataType: "json",
+						type: localOptions.type
 					});
-				};
+					return false;
+				});
 			});
 		},
 		
@@ -209,29 +201,27 @@
 			}, options);
 			
 			this.each(function() {
-				if(this.tagName == 'FORM'){
-					var form = $(this);
-					
-					form.submitOnce(options.submitOnceOptions);
-					
-					form.on("aftersubmit.formBindAjaxPost", function() {
-						form.formBindClearErrors();
-					});
-					form.ajaxForm({
-						beforeSend: function (request) {
-							options.beforeSend(form, request);
-						},
-						beforeSubmit: function(data) {
-							options.beforeSubmit(form, data);
-						},
-						success: function(data) {
-							options.onSuccess(form, data);
-						},
-						error: function(xhr) {
-							form.formBindManageJsonErrors(xhr);
-						}
-					});
-				};
+				var form = $(this);
+				
+				form.submitOnce(options.submitOnceOptions);
+				
+				form.on("aftersubmit.formBindAjaxPost", function() {
+					form.formBindClearErrors();
+				});
+				form.ajaxForm({
+					beforeSend: function (request) {
+						options.beforeSend(form, request);
+					},
+					beforeSubmit: function(data) {
+						options.beforeSubmit(form, data);
+					},
+					success: function(data) {
+						options.onSuccess(form, data);
+					},
+					error: function(xhr) {
+						form.formBindManageJsonErrors(xhr);
+					}
+				});
 				
 			});
 			
