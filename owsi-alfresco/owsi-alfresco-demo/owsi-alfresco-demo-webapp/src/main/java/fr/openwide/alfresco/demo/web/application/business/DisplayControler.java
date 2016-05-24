@@ -16,7 +16,6 @@ import fr.openwide.alfresco.api.core.remote.exception.IntegrityRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
 import fr.openwide.alfresco.app.web.download.model.NodeReferenceDownloadResponse;
-import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
 import fr.openwide.alfresco.app.web.validation.model.ValidationResponse;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
@@ -71,7 +70,7 @@ public class DisplayControler extends BusinessController {
 	
 	@RequestMapping(value = { "", "/" }, method = RequestMethod.GET)
 	public String root() {
-		return getRedirect("folder");
+		return "redirect:/folder";
 	}
 
 	@RequestMapping(value="/file", method=RequestMethod.GET)
@@ -138,7 +137,6 @@ public class DisplayControler extends BusinessController {
 	public ValidationResponse addFile(
 			@RequestParam("nodeRef") NodeReference folderRef,
 			@RequestParam("file") MultipartFile file,
-			AlertContainer alertContainer,
 			ValidationResponse response) {
 		
 		try {

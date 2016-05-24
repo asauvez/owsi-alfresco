@@ -1,15 +1,9 @@
 package fr.openwide.alfresco.demo.core.framework.spring.config;
 
-import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.access.intercept.RunAsImplAuthenticationProvider;
 import org.springframework.security.acls.domain.PermissionFactory;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.framework.spring.config.AppCorePermissionConfigurerAdapter;

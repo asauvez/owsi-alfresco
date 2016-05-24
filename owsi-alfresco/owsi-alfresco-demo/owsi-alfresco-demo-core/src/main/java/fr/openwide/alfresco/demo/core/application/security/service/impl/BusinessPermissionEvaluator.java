@@ -6,12 +6,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import fr.openwide.alfresco.app.core.security.service.impl.UserAwarePermissionEvaluator;
-import fr.openwide.alfresco.demo.core.application.security.model.BusinessPermission;
 
-/**
- * @author Alexandre FIEVEE
- *
- */
 public class BusinessPermissionEvaluator extends UserAwarePermissionEvaluator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BusinessPermissionEvaluator.class);

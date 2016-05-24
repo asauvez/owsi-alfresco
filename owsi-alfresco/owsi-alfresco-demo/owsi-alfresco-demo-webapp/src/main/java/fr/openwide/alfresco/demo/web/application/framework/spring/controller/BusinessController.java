@@ -18,7 +18,7 @@ import fr.openwide.core.jpa.exception.SecurityServiceException;
  * @author Alexandre FIEVEE
  *
  */
-public abstract class BusinessController extends CommonController {
+public abstract class BusinessController {
 
 	@Autowired
 	protected ResourceBundleMessageSource messageSource;
