@@ -30,7 +30,7 @@ public class ValidationResponse {
 	private NativeWebRequest webRequest;
 
 	private String viewName;	// Page à renvoyer comme si on renvoyé un ModelAndView
-	private String redirect;	// URL où $.formBindAjaxPost() va rediriger le navigateur. 
+	private String redirection;	// URL où $.formBindAjaxPost() va rediriger le navigateur. 
 
 	public void addGlobalAlerts(BindingResult bindingResult) {
 		addErrors(bindingResult, false);
@@ -184,15 +184,20 @@ public class ValidationResponse {
 		this.viewName = viewName;
 	}
 
-	public String getRedirect() {
-		return redirect;
+	public String getRedirection() {
+		return redirection;
 	}
-	public void setRedirect(String redirect) {
-		this.redirect = redirect;
-	}
-	public void setRedirectWithinContextPath(String redirect) {
-		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-		String contextPath = request.getContextPath();
-		setRedirect(contextPath + redirect);
+	
+	/**
+	 * @param redirection Si on ne passe pas une URL absolu, prefixe l'URL fournie par le context path.
+	 */
+	public void setRedirection(String redirection) {
+		if (! redirection.startsWith("http")) {
+			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+			String contextPath = request.getContextPath();
+			redirection = contextPath + redirection;
+		}
+		setRedirection(redirection);
 	}
 }
+
