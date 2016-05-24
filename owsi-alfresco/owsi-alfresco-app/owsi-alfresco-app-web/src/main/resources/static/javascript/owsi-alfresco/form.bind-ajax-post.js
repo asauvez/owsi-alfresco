@@ -125,21 +125,21 @@
 		},
 		
 		linkBindAjaxPost: function(options) {
-			$(this).linkTraitment(options);
+			$(this).linkTreatment(options);
 		},
 		
-		linkTraitment: function(options){
+		linkTreatment: function(options){
 			this.each(function() {
 				
 				if(this.tagName != 'FORM'){
 					var link = $(this);
-					options = $.extend({
+					var localOptions = $.extend({
 						confirmationMsg : link.attr('data-confirmation-msg'),
+						type: 'POST'
 					}, options);
-					link.click(function() { 
-						if (options.confirmationMsg != null) {
-							options.confirmationMsg = confirm(options.confirmationMsg);
-							if (! options.confirmationMsg) {
+					link.click(function() {
+						if (localOptions.confirmationMsg != null) {
+							if (! confirm(localOptions.confirmationMsg)) {
 								return false;
 							}
 						}
@@ -155,7 +155,8 @@
 								}
 							},
 							
-							dataType: "json"
+							dataType: "json",
+							type: localOptions.type
 						});
 						return false;
 					});

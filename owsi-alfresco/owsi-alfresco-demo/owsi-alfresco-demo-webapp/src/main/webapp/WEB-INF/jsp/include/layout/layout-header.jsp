@@ -8,11 +8,14 @@
 
 		<ul class="nav navbar-nav navbar-right">
 			<li>
-				<form class="navbar-form navbar-left" role="search">
+				<c:url value="/search" var="urlSearch"/>
+				<form class="navbar-form navbar-left" method="get" action="${urlSearch}">
 					<div class="form-group">
-						<input type="text" class="form-control" placeholder="Search">
+						<input name="q" type="text" class="form-control"
+							required="required" placeholder="Search" autofocus>
 					</div>
-					<button type="submit" class="btn btn-default">Submit</button>
+					<spring:message var="label" code="search" />
+					<input type="submit" class="btn btn-default" value="${label}">
 				</form>
 			<li>
 			<li>

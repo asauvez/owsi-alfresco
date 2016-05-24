@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
+import fr.openwide.alfresco.api.core.remote.exception.IntegrityRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
 import fr.openwide.alfresco.app.web.download.model.NodeReferenceDownloadResponse;
@@ -84,7 +86,7 @@ public class DisplayControler extends BusinessController {
 				.properties().set(CmModel.content.content)
 				.permissions().userPermissionDelete();
 		nodeScopeBuilder.assocs().recursivePrimaryParent()
-		.properties().name();
+			.properties().name();
 		
 		
 		BusinessNode fileNode = nodeModelService.get(nodeRef, nodeScopeBuilder);
@@ -110,8 +112,6 @@ public class DisplayControler extends BusinessController {
 		return response;
 	}
 	
-	
-	
 	/*
 	 * Add content
 	 */
@@ -124,8 +124,10 @@ public class DisplayControler extends BusinessController {
 		try {
 			nodeModelService.createFolder(folderRef, folderName);
 			response.getAlertContainer().addSuccess("ok.add.folder");
-		} catch (Exception e) {
-			response.getAlertContainer().addError("exception.add.folder");
+		} catch (DuplicateChildNodeNameRemoteException e){
+			response.getAlertContainer().addError("exception.add.same.folder");
+		} catch (IntegrityRemoteException i) {
+			response.getAlertContainer().addError("exception.add.wrong.name.folder");
 		}
 
 		return response;
@@ -142,7 +144,7 @@ public class DisplayControler extends BusinessController {
 		try {
 			nodeModelService.createContent(folderRef, file);
 			response.getAlertContainer().addSuccess("ok.add.file");
-		} catch (Exception e) {
+		} catch (DuplicateChildNodeNameRemoteException e) {
 			response.getAlertContainer().addError("exception.add.file");
 		}
 		
@@ -154,28 +156,37 @@ public class DisplayControler extends BusinessController {
 	/*
 	 * Delete content
 	 */
-	@RequestMapping(method=RequestMethod.GET, value="/ajax/delete")
+	@RequestMapping(method=RequestMethod.POST, value="/ajax/delete")
 	public ValidationResponse delete(
 			@RequestParam("nodeRef") NodeReference folderRef,
 			ValidationResponse response) {
 		
-		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
-				.assocs().recursivePrimaryParent()
-				.properties().name();
+		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder();
+		nodeScopeBuilder.assocs().primaryParent().nodeReference();
 		
-		String parentAdresse = nodeModelService.get(folderRef, nodeScopeBuilder).assocs().primaryParent().getNodeReference().getReference();
-		try {
-			nodeModelService.delete(folderRef);
-		} catch (Exception e) {
-			response.getAlertContainer().addError("exception.delete");
-//			throw e;
-		}
-		response.setRedirect("/demo/folder?nodeRef=" + parentAdresse);
+		NodeReference parentAdresse = nodeModelService.get(folderRef, nodeScopeBuilder).assocs().primaryParent().getNodeReference();
+		nodeModelService.delete(folderRef);
+		response.setRedirectWithinContextPath("/folder?nodeRef=" + parentAdresse);
 		response.getAlertContainer().addSuccess("ok.delete");
 		
 		return response;
 	}
 	
+	
+//	public void search(@RequestParam("q") String query) {
+//		NodeSearchModelService nodeSearchModelService = null;
+//		List<BusinessNode> list = nodeSearchModelService.search(new SearchQueryBuilder()
+//				.restriction(new RestrictionBuilder()
+//					.or()
+//						.match(CmModel.object.name, query).of()
+//						.match(CmModel.titled.title, query).of()
+//						.match(CmModel.titled.description, query).of()
+//						.match(CmModel.content.content, query).of()
+//						.of())
+//				.nodeScopeBuilder(new NodeScopeBuilder()
+//						.properties().name())
+//				.sort().sortByName());
+//	}
 	
 	/*
 	 * Functions

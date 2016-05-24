@@ -32,7 +32,7 @@
 									<c:param name="nodeRef" value="${folder.nodeRef}" />
 								</c:url>
 								<a class="btn btn-danger ajax-link" href="${urlDelete}" 
-									data-confirmation-msg="Do you realy want to delete ${folder.name}?'">
+									data-confirmation-msg="Do you realy want to delete ${folder.name}?">
 									<span class="glyphicon glyphicon-trash"></span>
 								</a>
 							</c:if>
@@ -78,7 +78,7 @@
 															<c:param name="nodeRef" value="${child.nodeRef}" />
 														</c:url>
 														<a class="btn btn-danger pull-right ajax-link" href="${urlDelete}"
-															onclick="return(confirm('Do you realy want to delete ${child.name}?'));">
+															data-confirmation-msg="Do you realy want to delete ${child.name}?">
 															<span class="glyphicon glyphicon-trash"></span>
 														</a>
 													</c:if>
@@ -104,7 +104,7 @@
 															</c:url>
 															
 															<a class="btn btn-danger ajax-link" href="${urlDelete}"
-																onclick="return(confirm('Do you realy want to delete ${child.name}?'));">
+																data-confirmation-msg="Do you realy want to delete ${child.name}?">
 																<span class="glyphicon glyphicon-trash"></span>
 															</a>
 														</c:if>
@@ -151,8 +151,10 @@
 						<form class="ajax-form" method="post" action="${urlAddFolder}">
 							<div class="modal-body">
 								<div class="form-group">
-									<label class="control-label"><spring:message
-											code="file.modal.folder.name" /></label> <input type="text"
+									<label class="control-label">
+										<spring:message code="file.modal.folder.name" />
+									</label> 
+									<input type="text" required="required"
 										class="form-control" name="folderName" autofocus>
 								</div>
 							</div>
@@ -193,8 +195,10 @@
 							enctype="multipart/form-data">
 							<div class="modal-body">
 								<div class="form-group">
-									<label class="control-label"><spring:message
-											code="file.modal.folder.name" /></label> <input type="file"
+									<label class="control-label">
+										<spring:message code="file.modal.folder.name" />
+									</label>
+									<input type="file" required="required"
 										class="form-control" name="file">
 								</div>
 							</div>
