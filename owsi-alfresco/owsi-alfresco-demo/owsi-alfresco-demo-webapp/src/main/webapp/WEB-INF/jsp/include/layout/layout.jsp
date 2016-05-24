@@ -81,17 +81,6 @@
 		<%-- Calendrier bootstrap --%>
 		<script type="text/javascript" src="${staticUrl}/${bootstrapDatepickerPath}/js/bootstrap-datepicker.js"></script>
 	
-		<%-- Viewer PDF.js (0.8.1334 cf. H23610) --%>
-		<script type="text/javascript" src="${staticUrl}/javascript/pdf-viewer/compatibility.js"></script>
-		<script type="text/javascript" src="${staticUrl}/javascript/pdf-viewer/pdf.js"></script>
-		<script type="text/javascript">
-			PDFJS.imageResourcesPath = './images/';
-			PDFJS.workerSrc = '${staticUrl}/javascript/pdf-viewer/pdf.worker.js';
-			PDFJS.cMapUrl = '${staticUrl}/javascript/pdf-viewer/cmaps/';
-			PDFJS.cMapPacked = true;
-		</script>
-		<script type="text/javascript" src="${staticUrl}/javascript/pdf-viewer/pdf.viewer.js"></script>
-		
 		<%-- OWSI --%>
 		<script type="text/javascript" src="${staticUrl}/javascript/owsi-alfresco/form.submit-once.js"></script>
 		<script type="text/javascript" src="${staticUrl}/javascript/owsi-alfresco/form.bind-ajax-post.js"></script>

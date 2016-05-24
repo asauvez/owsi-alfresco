@@ -11,7 +11,7 @@
 		<div class="row">
 
 			<div class="col-md-12">
-
+				<!-- Head of the pannel -->
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="pull-right">
@@ -28,11 +28,11 @@
 							</c:if>
 							
 							<c:if test="${folder.mayDelete}">
-								<c:url value="/delete" var="urlDelete">
+								<c:url value="/ajax/delete" var="urlDelete">
 									<c:param name="nodeRef" value="${folder.nodeRef}" />
 								</c:url>
-								<a class="btn btn-danger " href="${urlDelete}"
-									onclick="return(confirm('Do you realy want to delete ${folder.name}?'));">
+								<a class="btn btn-danger ajax-link" href="${urlDelete}" 
+									data-confirmation-msg="Do you realy want to delete ${folder.name}?'">
 									<span class="glyphicon glyphicon-trash"></span>
 								</a>
 							</c:if>
@@ -74,10 +74,10 @@
 												</td>
 													
 												<td><c:if test="${child.mayDelete}">
-														<c:url value="/delete" var="urlDelete">
+														<c:url value="/ajax/delete" var="urlDelete">
 															<c:param name="nodeRef" value="${child.nodeRef}" />
 														</c:url>
-														<a class="btn btn-danger pull-right" href="${urlDelete}"
+														<a class="btn btn-danger pull-right ajax-link" href="${urlDelete}"
 															onclick="return(confirm('Do you realy want to delete ${child.name}?'));">
 															<span class="glyphicon glyphicon-trash"></span>
 														</a>
@@ -98,21 +98,25 @@
 												</td>
 												<td>
 													<div class="pull-right">
-														<c:url value="/content/${child.name}" var="urlShow">
-															<c:param name="nodeRef" value="${child.nodeRef}" />
-														</c:url> <a class="btn btn-info" href="${urlShow}" target="blank_"><span
-															class="glyphicon glyphicon-eye-open"></span></a> <a
-														class="btn btn-info " href="${urlDownload}"><span
-															class="glyphicon glyphicon-download-alt"></span></a> <c:if
-															test="${child.mayDelete}">
-															<c:url value="/delete" var="urlDelete">
+														<c:if test="${child.mayDelete}">
+															<c:url value="/ajax/delete" var="urlDelete">
 																<c:param name="nodeRef" value="${child.nodeRef}" />
 															</c:url>
-															<a class="btn btn-danger " href="${urlDelete}"
+															
+															<a class="btn btn-danger ajax-link" href="${urlDelete}"
 																onclick="return(confirm('Do you realy want to delete ${child.name}?'));">
 																<span class="glyphicon glyphicon-trash"></span>
 															</a>
 														</c:if>
+														<c:url value="/content/${child.name}" var="urlShow">
+															<c:param name="nodeRef" value="${child.nodeRef}" />
+														</c:url>
+														<a class="btn btn-info" href="${urlShow}" target="blank_">
+															<span class="glyphicon glyphicon-eye-open"></span>
+														</a>
+														<a class="btn btn-info " href="${urlDownload}">
+															<span class="glyphicon glyphicon-download-alt"></span>
+														</a> 
 													</div>
 												</td>
 											</c:otherwise>
@@ -125,11 +129,6 @@
 				</div>
 
 			</div>
-
-
-
-				
-
 
 
 			<!-- Modal windows -->
@@ -146,10 +145,10 @@
 								<spring:message code="file.addFolder" />
 							</h4>
 						</div>
-						<c:url value="/add-folder" var="urlAddFolder">
+						<c:url value="/ajax/add-folder" var="urlAddFolder">
 							<c:param name="nodeRef" value="${folder.nodeRef}" />
 						</c:url>
-						<form method="post" action="${urlAddFolder}">
+						<form class="ajax-form" method="post" action="${urlAddFolder}">
 							<div class="modal-body">
 								<div class="form-group">
 									<label class="control-label"><spring:message
@@ -158,8 +157,7 @@
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-default"
-									data-dismiss="modal">
+								<button type="button" class="btn btn-default" data-dismiss="modal">
 									<spring:message code="file.modal.close" />
 								</button>
 								<spring:message var="label" code="file.addFolder" />
@@ -188,10 +186,10 @@
 								<spring:message code="file.addFile" />
 							</h4>
 						</div>
-						<c:url value="/add-file" var="urlAddFile">
+						<c:url value="/ajax/add-file" var="urlAddFile">
 							<c:param name="nodeRef" value="${folder.nodeRef}" />
 						</c:url>
-						<form method="post" action="${urlAddFile}"
+						<form class="ajax-form" method="post" action="${urlAddFile}"
 							enctype="multipart/form-data">
 							<div class="modal-body">
 								<div class="form-group">

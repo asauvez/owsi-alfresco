@@ -27,9 +27,17 @@
 								class="btn btn-info" href="${urlDownload}"><span
 								class="glyphicon glyphicon-download-alt"></span></a>
 							<c:if test="${file.mayDelete}">
-								<c:url value="/delete" var="urlDelete">
+								<c:url value="/ajax/delete" var="urlDelete">
 									<c:param name="nodeRef" value="${file.nodeRef}" />
 								</c:url>
+								
+								<form class="ajax-form" method="get" action="${urlDelete}">
+									<div class="form-group has-feedback has-feedback">
+										<input type="submit" class="btn btn-danger form-control" value="">
+										<i class="glyphicon glyphicon-trash form-control-feedback"></i>
+									</div>
+								</form>
+								
 								<a class="btn btn-danger " href="${urlDelete}"
 									onclick="return(confirm('Do you realy want to delete ${child.name}?'));">
 									<span class="glyphicon glyphicon-trash"></span>

@@ -3,8 +3,6 @@ package fr.openwide.alfresco.demo.web.application.business;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +15,7 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
 import fr.openwide.alfresco.app.web.download.model.NodeReferenceDownloadResponse;
 import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
+import fr.openwide.alfresco.app.web.validation.model.ValidationResponse;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
@@ -116,35 +115,38 @@ public class DisplayControler extends BusinessController {
 	/*
 	 * Add content
 	 */
-	@RequestMapping(method=RequestMethod.POST, value="/add-folder")
-	public String addFolder(
+	@RequestMapping(method=RequestMethod.POST, value="/ajax/add-folder")
+	public ValidationResponse addFolder(
 			@RequestParam("nodeRef") NodeReference folderRef,
 			@RequestParam("folderName") String folderName,
-			HttpSession session, AlertContainer alertContainer) {
+			ValidationResponse response) {
 		
 		try {
 			nodeModelService.createFolder(folderRef, folderName);
+			response.getAlertContainer().addSuccess("ok.add.folder");
 		} catch (Exception e) {
-			alertContainer.addError("excepion.add.folder");
+			response.getAlertContainer().addError("exception.add.folder");
 		}
-		alertContainer.addSuccess("ok.add.folder");
-//		return "demo";
-		return getRedirect("folder?nodeRef=" + folderRef.getReference());
-//		return "folder?nodeRef=" + folderRef.getReference();
+
+		return response;
 	}
 	
 	
-	@RequestMapping(method=RequestMethod.POST, value="/add-file")
-	public String addFile(
+	@RequestMapping(method=RequestMethod.POST, value="/ajax/add-file")
+	public ValidationResponse addFile(
 			@RequestParam("nodeRef") NodeReference folderRef,
-			@RequestParam("file") MultipartFile file) {
+			@RequestParam("file") MultipartFile file,
+			AlertContainer alertContainer,
+			ValidationResponse response) {
 		
 		try {
 			nodeModelService.createContent(folderRef, file);
+			response.getAlertContainer().addSuccess("ok.add.file");
 		} catch (Exception e) {
-//			throw e;
+			response.getAlertContainer().addError("exception.add.file");
 		}
-		return getRedirect("folder?nodeRef=" + folderRef.getReference());
+		
+		return response;
 	}
 	
 	
@@ -152,9 +154,10 @@ public class DisplayControler extends BusinessController {
 	/*
 	 * Delete content
 	 */
-	@RequestMapping(method=RequestMethod.GET, value="/delete")
-	public String delete(
-			@RequestParam("nodeRef") NodeReference folderRef) {
+	@RequestMapping(method=RequestMethod.GET, value="/ajax/delete")
+	public ValidationResponse delete(
+			@RequestParam("nodeRef") NodeReference folderRef,
+			ValidationResponse response) {
 		
 		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
 				.assocs().recursivePrimaryParent()
@@ -164,10 +167,13 @@ public class DisplayControler extends BusinessController {
 		try {
 			nodeModelService.delete(folderRef);
 		} catch (Exception e) {
+			response.getAlertContainer().addError("exception.delete");
 //			throw e;
 		}
+		response.setRedirect("/demo/folder?nodeRef=" + parentAdresse);
+		response.getAlertContainer().addSuccess("ok.delete");
 		
-		return getRedirect("folder?nodeRef=" + parentAdresse);
+		return response;
 	}
 	
 	

@@ -124,11 +124,52 @@
 			});
 		},
 		
+		linkBindAjaxPost: function(options) {
+			$(this).linkTraitment(options);
+		},
+		
+		linkTraitment: function(options){
+			this.each(function() {
+				
+				if(this.tagName != 'FORM'){
+					var link = $(this);
+					options = $.extend({
+						confirmationMsg : link.attr('data-confirmation-msg'),
+					}, options);
+					link.click(function() { 
+						if (options.confirmationMsg != null) {
+							options.confirmationMsg = confirm(options.confirmationMsg);
+							if (! options.confirmationMsg) {
+								return false;
+							}
+						}
+						
+						var url = link.attr('href');
+						$.ajax(url, {
+							success: function(data) {
+								if (data.redirect != null) {
+									document.location = data.redirect;
+								}
+								if (options.confirmationMsg) {
+									options.onSucces(data);
+								}
+							},
+							
+							dataType: "json"
+						});
+						return false;
+					});
+				};
+			});
+		},
+		
+		
 		formBindAjaxPost: function(options) {
 			var defaultTargetRequestPath = function() {
 				return location.pathname + location.search + location.hash;
 			};
 			options = $.extend({
+<<<<<<< refs/remotes/origin/ft-demo
 					onSuccess : function(form, data) {
 						if (data.redirection != null) {
 							location.href = data.redirection;
@@ -138,49 +179,64 @@
 							location.reload();
 						};
 					},
-					
-					targetRequestPath : defaultTargetRequestPath,
-					
-					beforeSend: function(form, request) {
-						// le set du header est fait ici car sa valeur peut dependre de valeurs modifiees dans le formulaire
-						targetRequestPath = options.targetRequestPath;
-						if (typeof targetRequestPath == "function") {
-							targetRequestPath = options.targetRequestPath(defaultTargetRequestPath());
-						}
-						request.setRequestHeader("targetRequestPath", targetRequestPath);
-					},
-					
-					beforeSubmit: function(form, data) {
-						// On ne fait rien par défaut
-					},
-					
-					submitOnceOptions: {}
-					
-				}, options);
+=======
+				onSuccess : function(form, data) {
+					if (data.redirect != null) {
+						location.href = data.redirect;
+					} else {
+						// Par defaut, on recharge la page en cas de succes
+						// Pas de form.trigger("aftersubmit"); car on recharge la page
+						location.reload();
+					};
+				},
+				
+				targetRequestPath : defaultTargetRequestPath,
+				
+				beforeSend: function(form, request) {
+					// le set du header est fait ici car sa valeur peut dependre de valeurs modifiees dans le formulaire
+					targetRequestPath = options.targetRequestPath;
+					if (typeof targetRequestPath == "function") {
+						targetRequestPath = options.targetRequestPath(defaultTargetRequestPath());
+					}
+					request.setRequestHeader("targetRequestPath", targetRequestPath);
+				},
+				
+				beforeSubmit: function(form, data) {
+					// On ne fait rien par défaut
+				},
+				
+				submitOnceOptions: {}
+				
+			}, options);
 			
 			this.each(function() {
-				var form = $(this);
-				form.submitOnce(options.submitOnceOptions);
+				if(this.tagName == 'FORM'){
+					var form = $(this);
+>>>>>>> ajout de l'ajax dans la gestion des messages d'information
+					
+					form.submitOnce(options.submitOnceOptions);
+					
+					form.on("aftersubmit.formBindAjaxPost", function() {
+						form.formBindClearErrors();
+					});
+					form.ajaxForm({
+						beforeSend: function (request) {
+							options.beforeSend(form, request);
+						},
+						beforeSubmit: function(data) {
+							options.beforeSubmit(form, data);
+						},
+						success: function(data) {
+							options.onSuccess(form, data);
+						},
+						error: function(xhr) {
+							form.formBindManageJsonErrors(xhr);
+						}
+					});
+				};
 				
-				form.on("aftersubmit.formBindAjaxPost", function() {
-					form.formBindClearErrors();
-				});
-				
-				form.ajaxForm({
-					beforeSend: function (request) {
-						options.beforeSend(form, request);
-					},
-					beforeSubmit: function(data) {
-						options.beforeSubmit(form, data);
-					},
-					success: function(data) {
-						options.onSuccess(form, data);
-					},
-					error: function(xhr) {
-						form.formBindManageJsonErrors(xhr);
-					}
-				});
 			});
+			
 			// pour chainage jquery
 			return this;
 		}

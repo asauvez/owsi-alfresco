@@ -14,5 +14,4 @@
 		<!--[if IE]>
 			<link type="text/css" rel="stylesheet" href="${staticUrl}/css/application-ie8.css">
 		<![endif]-->
-		<link rel="Shortcut icon" href="${staticUrl}/img/cg71-favicon.ico" type="image/x-icon" />
 		<decorator:head/>

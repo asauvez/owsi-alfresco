@@ -1,9 +1,5 @@
 package fr.openwide.alfresco.demo.web.application.framework.spring.controller;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,21 +28,21 @@ public abstract class BusinessController extends CommonController {
 	/**
 	 * La méthode a été reprise du projet AMF COLLEGE.
 	 */
-	@ExceptionHandler(Exception.class)
-	protected String handleException(Exception e, Model model, AlertContainer alertContainer, HttpServletResponse response) {
-		// log exception as error
-		logger.error(e.getMessage(), e);
-		// return user friendly output
-		model.addAttribute("title", "exception.generic.title");
-		model.addAttribute("type", e.getClass().getCanonicalName());
-		model.addAttribute("message", e.getMessage());
-		Writer stacktrace = new StringWriter();
-		e.printStackTrace(new PrintWriter(stacktrace));
-		model.addAttribute("stacktrace", stacktrace.toString());
-		alertContainer.addError("exception.generic.message");
-		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		return null;//Views.exception;
-	}
+//	@ExceptionHandler(Exception.class)
+//	protected String handleException(Exception e, Model model, AlertContainer alertContainer, HttpServletResponse response) {
+//		// log exception as error
+//		logger.error(e.getMessage(), e);
+//		// return user friendly output
+//		model.addAttribute("title", "exception.generic.title");
+//		model.addAttribute("type", e.getClass().getCanonicalName());
+//		model.addAttribute("message", e.getMessage());
+//		Writer stacktrace = new StringWriter();
+//		e.printStackTrace(new PrintWriter(stacktrace));
+//		model.addAttribute("stacktrace", stacktrace.toString());
+//		alertContainer.addError("exception.generic.message");
+//		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//		return null;//Views.exception;
+//	}
 
 	/**
 	 * La méthode a été reprise du projet AMF COLLEGE.
