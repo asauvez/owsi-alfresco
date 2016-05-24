@@ -147,8 +147,8 @@
 						var url = link.attr('href');
 						$.ajax(url, {
 							success: function(data) {
-								if (data.redirect != null) {
-									document.location = data.redirect;
+								if (data.redirection != null) {
+									document.location = data.redirection;
 								}
 								if (options.confirmationMsg) {
 									options.onSucces(data);
@@ -170,7 +170,6 @@
 				return location.pathname + location.search + location.hash;
 			};
 			options = $.extend({
-<<<<<<< refs/remotes/origin/ft-demo
 					onSuccess : function(form, data) {
 						if (data.redirection != null) {
 							location.href = data.redirection;
@@ -180,7 +179,6 @@
 							location.reload();
 						};
 					},
-=======
 				onSuccess : function(form, data) {
 					if (data.redirect != null) {
 						location.href = data.redirect;
@@ -213,7 +211,6 @@
 			this.each(function() {
 				if(this.tagName == 'FORM'){
 					var form = $(this);
->>>>>>> ajout de l'ajax dans la gestion des messages d'information
 					
 					form.submitOnce(options.submitOnceOptions);
 					

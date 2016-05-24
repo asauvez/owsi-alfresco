@@ -197,7 +197,7 @@ public class ValidationResponse {
 			String contextPath = request.getContextPath();
 			redirection = contextPath + redirection;
 		}
-		setRedirection(redirection);
+		this.redirection = redirection;
 	}
 }
 

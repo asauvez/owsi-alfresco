@@ -166,27 +166,11 @@ public class DisplayControler extends BusinessController {
 		
 		NodeReference parentAdresse = nodeModelService.get(folderRef, nodeScopeBuilder).assocs().primaryParent().getNodeReference();
 		nodeModelService.delete(folderRef);
-		response.setRedirectWithinContextPath("/folder?nodeRef=" + parentAdresse);
+		response.setRedirection("/folder?nodeRef=" + parentAdresse);
 		response.getAlertContainer().addSuccess("ok.delete");
 		
 		return response;
 	}
-	
-	
-//	public void search(@RequestParam("q") String query) {
-//		NodeSearchModelService nodeSearchModelService = null;
-//		List<BusinessNode> list = nodeSearchModelService.search(new SearchQueryBuilder()
-//				.restriction(new RestrictionBuilder()
-//					.or()
-//						.match(CmModel.object.name, query).of()
-//						.match(CmModel.titled.title, query).of()
-//						.match(CmModel.titled.description, query).of()
-//						.match(CmModel.content.content, query).of()
-//						.of())
-//				.nodeScopeBuilder(new NodeScopeBuilder()
-//						.properties().name())
-//				.sort().sortByName());
-//	}
 	
 	/*
 	 * Functions
