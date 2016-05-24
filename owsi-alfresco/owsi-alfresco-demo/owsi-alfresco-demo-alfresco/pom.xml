@@ -58,11 +58,6 @@
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
 							<failOnMissingWebXml>false</failOnMissingWebXml>
-							<webResources>
-								<resource>
-									<directory>src/main/dev-webapp</directory>
-								</resource>
-							</webResources>
 						</configuration>
 					</plugin>
 				</plugins>

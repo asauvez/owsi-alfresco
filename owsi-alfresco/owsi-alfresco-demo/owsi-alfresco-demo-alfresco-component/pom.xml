@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
 
-	<name>OWSI Alfresco - Demo component</name>
+	<name>OWSI Alfresco - Demo repo component</name>
 	<description>Composant Alfresco de démonstration et de test</description>
 
 	<properties>
