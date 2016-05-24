@@ -130,8 +130,8 @@
 			};
 			options = $.extend({
 					onSuccess : function(form, data) {
-						if (data.redirect != null) {
-							location.href = data.redirect;
+						if (data.redirection != null) {
+							location.href = data.redirection;
 						} else {
 							// Par defaut, on recharge la page en cas de succes
 							// Pas de form.trigger("aftersubmit"); car on recharge la page
