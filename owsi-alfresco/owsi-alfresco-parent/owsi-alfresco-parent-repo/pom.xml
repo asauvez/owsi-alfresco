@@ -894,6 +894,10 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<!--
+						Ce plugin n'est plus nécessaire. On peut maintenant (Alfresco 5) mettre directement 
+						module.version=${project.version} 
+					-->
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>${owsi-alfresco.build-helper-maven-plugin.version}</version>
