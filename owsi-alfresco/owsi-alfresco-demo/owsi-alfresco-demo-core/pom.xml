@@ -57,57 +57,28 @@
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
 			</plugin>
-		<!-- 
+			
+			<!-- Integration test -->
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
 				<configuration>
-					<fork>true</fork>
-					<port>8080</port>
-					<ignorePackaging>true</ignorePackaging>
-					<path>/alfresco</path>
-					<warDirectory>${project.basedir}/../owsi-alfresco-demo-alfresco/target/alfresco</warDirectory>
+					<webapps>
+						<webapp>
+							<contextPath>/alfresco</contextPath>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-demo-alfresco</artifactId>
+							<version>${project.version}</version>
+							<type>war</type>
+							<asWebapp>true</asWebapp>
+						</webapp>
+					</webapps>
 				</configuration>
-				<executions>
-					<execution>
-						<id>launch-tomcat</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>run-war</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>stop-tomcat</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>shutdown</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.19.1</version>
-				<executions>
-					<execution>
-						<id>integration-test</id>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>integration-test</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>verify-integration-test</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
-			 -->
 		</plugins>
 	</build>
 	

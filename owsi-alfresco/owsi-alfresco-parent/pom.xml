@@ -18,6 +18,7 @@
 
 	<properties>
 		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
+		<owsi-alfresco.maven-failsafe-plugin.version>2.19.1</owsi-alfresco.maven-failsafe-plugin.version>
 	</properties>
 
 	<modules>
@@ -25,6 +26,7 @@
 		<module>owsi-alfresco-parent-api</module>
 		<module>owsi-alfresco-parent-app</module>
 		<module>owsi-alfresco-parent-repo</module>
+		<module>owsi-alfresco-parent-alfresco</module>
 	</modules>
 
 	<profiles>
@@ -53,6 +55,55 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<!-- Integration test -->
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+					<configuration>
+						<fork>true</fork>
+						<port>8080</port>
+						<ignorePackaging>true</ignorePackaging>
+					</configuration>
+					<executions>
+						<execution>
+							<id>launch-tomcat</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>stop-tomcat</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>shutdown</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.19.1</version>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>integration-test</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>verify-integration-test</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
 					<artifactId>jgitflow-maven-plugin</artifactId>
@@ -75,6 +126,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
 
 	<repositories>
 		<repository>

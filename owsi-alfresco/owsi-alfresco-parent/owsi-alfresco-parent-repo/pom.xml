@@ -20,6 +20,7 @@
 		<owsi-alfresco.repo.alfresco.version>5.1.0.3</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
+		<owsi-alfresco.repo.h2.version>1.4.190</owsi-alfresco.repo.h2.version>
 		
 		<owsi-alfresco.repo.quartz.version>1.8.3-alfresco-patched</owsi-alfresco.repo.quartz.version>
 		<owsi-alfresco.repo.freemarker.version>2.3.18-alfresco-patched-2</owsi-alfresco.repo.freemarker.version>
@@ -47,7 +48,7 @@
 		<owsi-alfresco.repo.stax-api.version>1.0-2</owsi-alfresco.repo.stax-api.version>
 		<owsi-alfresco.repo.spring-social.version>1.0.3.RELEASE</owsi-alfresco.repo.spring-social.version>
 		
-		<owsi-alfresco.build-helper-maven-plugin.version>1.9.1</owsi-alfresco.build-helper-maven-plugin.version>
+		<owsi-alfresco.build-helper-maven-plugin.version>1.10</owsi-alfresco.build-helper-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
