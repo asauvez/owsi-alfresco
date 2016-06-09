@@ -444,20 +444,20 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				nodeService.moveNode(nodeRef, parentRef, assocType, assocName);
 			}
 			
-			Map<QName,Serializable> properties = new HashMap<QName,Serializable>();
-					
-			for (NameReference propertyName : nodeScope.getProperties()) {
-				Serializable value = node.getProperty(propertyName);
-				if (value != null) {
-					if (! (value instanceof RepositoryContentData)) {
-						properties.put(conversionService.getRequired(propertyName), conversionService.getForRepository(value));
+			if (! nodeScope.getProperties().isEmpty()) {
+				Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+				for (NameReference propertyName : nodeScope.getProperties()) {
+					Serializable value = node.getProperty(propertyName);
+					if (value != null) {
+						if (! (value instanceof RepositoryContentData)) {
+							properties.put(conversionService.getRequired(propertyName), conversionService.getForRepository(value));
+						}
+					} else {
+						properties.remove(conversionService.getRequired(propertyName)); 
 					}
-				} else {
-					nodeService.removeProperty(nodeRef, 
-						conversionService.getRequired(propertyName)); 
 				}
+				nodeService.setProperties(nodeRef, properties);
 			}
-			nodeService.setProperties(nodeRef, properties);
 			
 			for (NameReference aspectName : nodeScope.getAspects()) {
 				if (node.getAspects().contains(aspectName)) {

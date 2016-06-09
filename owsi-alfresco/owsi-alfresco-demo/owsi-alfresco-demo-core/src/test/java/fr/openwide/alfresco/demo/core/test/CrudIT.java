@@ -95,7 +95,8 @@ public class CrudIT extends AbstractDemoIT {
 	public void testNodePropertie(){
 		NodeReference rootFolder = getRootFolder();
 		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
-			.properties().set(CmModel.titled.description);
+			.properties().set(CmModel.titled.description)
+			.properties().set(CmModel.titled.title);
 		
 		// Create
 		NodeReference demoFile = nodeModelService.createContent(rootFolder, "demo.txt", "text/plain", "UTF-8", "hello world");
@@ -111,10 +112,13 @@ public class CrudIT extends AbstractDemoIT {
 
 		nodeModelService.update(
 			new BusinessNode(demoFile)
-				.properties().set(CmModel.titled.description, ""),
+				.properties().set(CmModel.titled.description, "")
+				.properties().set(CmModel.titled.title, "demo"),
 			new NodeScopeBuilder()
-				.properties().set(CmModel.titled.description));
+				.properties().set(CmModel.titled.description)
+				.properties().set(CmModel.titled.title));
 		buisNodeTest = nodeModelService.get(demoFile, nodeScopeBuilder);
+		Assert.assertEquals("demo", buisNodeTest.properties().get(CmModel.titled.title));
 		Assert.assertEquals("", buisNodeTest.properties().get(CmModel.titled.description));
 
 		nodeModelService.update(
@@ -123,6 +127,16 @@ public class CrudIT extends AbstractDemoIT {
 			new NodeScopeBuilder()
 				.properties().set(CmModel.titled.description));
 		buisNodeTest = nodeModelService.get(demoFile, nodeScopeBuilder);
+		Assert.assertEquals("demo", buisNodeTest.properties().get(CmModel.titled.title));
 		Assert.assertEquals(null, buisNodeTest.properties().get(CmModel.titled.description));
+		
+		nodeModelService.update(
+				new BusinessNode(demoFile)
+				.properties().set(CmModel.titled.title, "demo test"),
+				new NodeScopeBuilder()
+				.properties().set(CmModel.titled.title));
+		buisNodeTest = nodeModelService.get(demoFile, nodeScopeBuilder);
+		Assert.assertEquals("demo test", buisNodeTest.properties().get(CmModel.titled.title));
+		
 	}
 }
