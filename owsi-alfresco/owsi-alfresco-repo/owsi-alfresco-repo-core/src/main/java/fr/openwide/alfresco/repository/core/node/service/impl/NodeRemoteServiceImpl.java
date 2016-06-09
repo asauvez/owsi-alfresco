@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -442,19 +443,22 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				}
 				nodeService.moveNode(nodeRef, parentRef, assocType, assocName);
 			}
+			
+			Map<QName,Serializable> properties = new HashMap<QName,Serializable>();
+					
 			for (NameReference propertyName : nodeScope.getProperties()) {
 				Serializable value = node.getProperty(propertyName);
 				if (value != null) {
 					if (! (value instanceof RepositoryContentData)) {
-						nodeService.setProperty(nodeRef, 
-							conversionService.getRequired(propertyName), 
-							conversionService.getForRepository(value));
+						properties.put(conversionService.getRequired(propertyName), conversionService.getForRepository(value));
 					}
 				} else {
 					nodeService.removeProperty(nodeRef, 
 						conversionService.getRequired(propertyName)); 
 				}
 			}
+			nodeService.setProperties(nodeRef, properties);
+			
 			for (NameReference aspectName : nodeScope.getAspects()) {
 				if (node.getAspects().contains(aspectName)) {
 					nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
