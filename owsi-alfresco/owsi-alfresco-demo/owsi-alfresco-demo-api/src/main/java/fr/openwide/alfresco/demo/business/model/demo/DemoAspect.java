@@ -19,6 +19,4 @@ public class DemoAspect extends AspectModel {
 	
 	public final TextPropertyModel demoProperty = PropertyModels.newText(this, DemoModel.NAMESPACE, "demoProperty");
 	
-	public final DatePropertyModel demoDate = PropertyModels.newDate(this, DemoModel.NAMESPACE, "demoDateProperty");
-	
 }
