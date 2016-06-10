@@ -51,7 +51,7 @@ public class ClassificationBuilder {
 				? service.searchUniqueReferenceCached(restrictionBuilder) 
 				: service.searchUniqueReference(restrictionBuilder);
 		if (! optional.isPresent()) {
-			throw new NoSuchNodeRemoteException(restrictionBuilder.toQuery());
+			throw new NoSuchNodeRemoteException(restrictionBuilder.toFtsQuery());
 		}
 		return rootFolder(optional.get());
 	}

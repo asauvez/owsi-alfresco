@@ -10,8 +10,8 @@ public class MatchAllRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
-		return (value != null) ? "ALL:" + toLuceneValue(value) : "";
+	protected String toFtsQueryInternal() {
+		return (value != null) ? "ALL:" + toFtsLuceneValue(value) : "";
 	}
 
 }

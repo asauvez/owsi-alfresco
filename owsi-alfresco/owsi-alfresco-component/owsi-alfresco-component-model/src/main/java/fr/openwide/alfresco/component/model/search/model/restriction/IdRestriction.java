@@ -12,8 +12,13 @@ public class IdRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
-		return "ID" + nodeRef.getReference().replace(":", "\\:");
+	protected String toFtsQueryInternal() {
+		return "ID:" + nodeRef.getReference().replace(":", "\\:");
+	}
+	
+	@Override
+	protected String toCmisQueryWhereInternal() {
+		return (nodeRef.getReference() != null) ? "o.cmis:objectId =" + toCmisLuceneValue(nodeRef.getReference()) : "";
 	}
 
 }

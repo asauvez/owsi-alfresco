@@ -10,7 +10,7 @@ public class CustomRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
+	protected String toFtsQueryInternal() {
 		return customQuery;
 	}
 

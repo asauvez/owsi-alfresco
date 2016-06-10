@@ -18,7 +18,7 @@ public class ParentRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
+	protected String toFtsQueryInternal() {
 		return ((primary) ? "PRIMARYPARENT:" : "PARENT:") + parentRef.getReference().replace(":", "\\:");
 	}
 

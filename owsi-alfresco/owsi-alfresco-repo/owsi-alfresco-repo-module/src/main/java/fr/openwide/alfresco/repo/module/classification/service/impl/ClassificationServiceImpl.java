@@ -451,7 +451,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public Optional<NodeReference> searchUniqueReferenceCached(RestrictionBuilder restrictionBuilder) {
-		String query = restrictionBuilder.toQuery();
+		String query = restrictionBuilder.toFtsQuery();
 		NodeReference nodeReference = queryCache.get(query);
 		if (nodeReference == null) {
 			Optional<NodeReference> optional = searchUniqueReference(restrictionBuilder);

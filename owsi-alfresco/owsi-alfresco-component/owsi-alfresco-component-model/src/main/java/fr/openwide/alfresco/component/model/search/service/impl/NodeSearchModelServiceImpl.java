@@ -39,7 +39,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	public Optional<BusinessNode> searchUnique(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		List<BusinessNode> list = search(restrictionBuilder, nodeScopeBuilder);
 		if (list.size() > 1) {
-			throw new IllegalStateException("More than one result for " + restrictionBuilder.toQuery());
+			throw new IllegalStateException("More than one result for " + restrictionBuilder.toFtsQuery());
 		} else if (list.isEmpty()) {
 			return Optional.absent();
 		}

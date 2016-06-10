@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
+import java.util.Set;
 
+import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 public class BetweenRestriction<C extends Serializable> extends Restriction {
@@ -31,7 +33,7 @@ public class BetweenRestriction<C extends Serializable> extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
+	protected String toFtsQueryInternal() {
 		if (min == null && max == null) {
 			return "";
 		}
@@ -39,12 +41,43 @@ public class BetweenRestriction<C extends Serializable> extends Restriction {
 			+ (minInclusive ? "[" : "<")
 			+ ((min == null)
 					? ((max instanceof String) ? "\\\\u0000" : "MIN")
-					: toLuceneValue(property, min))
+					: toFtsLuceneValue(property, min))
 			+ " TO "
 			+ ((max == null)
 					? ((min instanceof String) ? "\\\\uFFFF" : "MAX")
-					: toLuceneValue(property, max))
+					: toFtsLuceneValue(property, max))
 			+ (maxInclusive ? "]" : ">");
+	}
+	
+	@Override
+	protected void addCmisQueryJoin(Set<ContainerModel> containersToJoin) {
+		containersToJoin.add(property.getType());
+	}
+	
+	@Override
+	protected String toCmisQueryWhereInternal() {
+		if (min == null && max == null) {
+			return "";
+		}
+		
+		StringBuilder result = new StringBuilder(toCmisProperty(property));
+		
+		if (min != null){
+			result .append(" >")
+				.append((minInclusive) ? "= " : " ")
+				.append(toCmisLuceneValue(property, min));
+			if (max !=null){
+				result.append("\nAND ")
+					.append(toCmisProperty(property));
+			}
+		}
+		if (max != null){
+			result .append(" <")
+				.append((maxInclusive) ? "= " : " ")
+				.append(toCmisLuceneValue(property, max));
+		}
+		
+		return result.toString();
 	}
 
 }
