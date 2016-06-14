@@ -5,6 +5,14 @@
 
 	<!-- Node service -->
 	
+	<bean id="owsi.service.nodeResetService" class="fr.openwide.alfresco.repository.core.resetModuleVersion.service.impl.ResetModuleVersionServiceImpl">
+		<property name="modules" value="${owsi.reset-module-version.modules}" />
+		<property name="globalProperties" ref="global-properties"/>
+		<property name="registryService" ref="RegistryService" />
+	</bean>
+
+	<!-- Node service -->
+	
 	<bean id="owsi.service.nodeService" class="fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl">
 		<property name="nodeService" ref="NodeService" />
 		<property name="contentService" ref="ContentService" />
