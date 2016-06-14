@@ -14,6 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
+/**
+ * 
+ * Class who "downgrade" a module version in the base. For example if you have your module version in 0.3.0 and now 
+ * the current version number is 0.3.0-SNAPSHOT, you can use it to downgrading your version number. 
+ * 
+ * For downgrading modules write in alfresco-global.properties :
+ * owsi.reset-module-version.modules=<moduleName1>, <moduleName2> 
+ * owsi.reset-module-version.<moduleName1>=<version1>
+ * owsi.reset-module-version.<moduleName2>=<version2>
+ * 
+ * @author recol
+ *
+ */
 public class ResetModuleVersionServiceImpl implements InitializingBean {
 
 	private String modules = "";
@@ -34,7 +47,7 @@ public class ResetModuleVersionServiceImpl implements InitializingBean {
 						new AuthenticationUtil.RunAsWork<Void>() {
 							@Override
 							public Void doWork() throws Exception {
-								resetModuleVersion(moduleId);
+								resetModuleVersion(moduleId.trim());
 								return null;
 							}
 						}, AuthenticationUtil.getSystemUserName());
