@@ -15,7 +15,7 @@
 	<properties>
 		<owsi-alfresco.spring-security.version>4.0.1.RELEASE</owsi-alfresco.spring-security.version>
 		
-		<owsi-alfresco.owsi-core.version>0.11.1</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.owsi-core.version>0.11.2</owsi-alfresco.owsi-core.version>
 		<owsi-alfresco.app.hibernate-jpamodelgen.version>5.1.0.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
 		<owsi-alfresco.app.querydsl.version>4.0.9</owsi-alfresco.app.querydsl.version>
 		
