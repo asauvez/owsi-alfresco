@@ -19,6 +19,19 @@
 			<artifactId>owsi-alfresco-demo-share-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.extensions.surf</groupId>
+			<artifactId>spring-webscripts</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco.surf</groupId>
+			<artifactId>spring-surf</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>
