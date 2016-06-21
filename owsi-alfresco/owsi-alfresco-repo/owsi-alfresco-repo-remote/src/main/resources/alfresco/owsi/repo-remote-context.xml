@@ -50,5 +50,7 @@
 
 	<bean id="webscript.owsi.remote.authentication.user.post" parent="webscript.owsi.remote.authentication"
 			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UserWebScript" />
+	<bean id="webscript.owsi.remote.authentication.username.get" parent="webscript.owsi.remote.authentication"
+			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UsernameWebScript" />
 
 </beans>

@@ -7,6 +7,7 @@ import org.junit.Test;
 import fr.openwide.alfresco.component.model.node.model.ModelChecker;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.RnModel;
+import fr.openwide.alfresco.component.model.repository.model.StModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 
 public class ModelCheckerTest {
@@ -16,6 +17,7 @@ public class ModelCheckerTest {
 		ModelChecker checker = new ModelChecker();
 		checker.checkModel(SysModel.class);
 		checker.checkModel(CmModel.class);
+		checker.checkModel(StModel.class);
 		checker.checkModel(RnModel.class);
 				
 		assertEquals(
@@ -28,6 +30,8 @@ public class ModelCheckerTest {
 				+ "CmModel : Field name generalClassifiable is not the same as the container name generalclassifiable\n"
 				+ "CmModel : Field name object is not the same as the container name cmobject\n"
 				+ "CmModel : Field name categoryRoot is not the same as the container name category_root\n"
+				+ "StModel : Field name siteContainer is not the same as the container name sitecontainer\n"
+				+ "StModel : Field name customSiteProperties is not the same as the container name customsiteproperties\n"
 				+ "RnModel : Field NAMESPACE rn is not the same as the container namespace cm:thumbnail\n"
 				+ "CmThumbnail : Field NAMESPACE rn is not the same as the property namespace cm:thumbnailName\n"
 				+ "CmThumbnail : Field NAMESPACE rn is not the same as the property namespace cm:contentPropertyName", 

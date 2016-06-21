@@ -62,6 +62,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 			// do not go any further if users are different
 			throw new AccessDeniedRemoteException();
 		}
+		
 		// get person
 		NodeRef userNodeRef;
 		try {
@@ -97,6 +98,19 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 		return user;
 	}
 
+	@Override
+	public String getAuthenticatedUsername() {
+		// build ticket
+		RepositoryTicket ticket = new RepositoryTicket(authenticationService.getCurrentTicket());
+		String userTicket = ticketComponent.getAuthorityForTicket(ticket.getTicket());
+		UserReference userReference = new UserReference(userTicket);
+		if (! AuthenticationUtil.getFullyAuthenticatedUser().equals(userTicket)) {
+			// do not go any further if users are different
+			throw new AccessDeniedRemoteException();
+		}
+		return userReference.getUsername();
+	}
+	
 	/**
 	 * {@see org.alfresco.repo.web.scripts.bean.LoginTicketDelete}
 	 */

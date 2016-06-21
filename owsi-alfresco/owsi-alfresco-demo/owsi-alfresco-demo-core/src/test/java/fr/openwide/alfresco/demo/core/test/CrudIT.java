@@ -24,6 +24,7 @@ public class CrudIT extends AbstractDemoIT {
 	
 	@Test
 	public void testCRUD() {
+		
 		NodeReference rootFolder = getRootFolder();
 		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
 			.properties().set(CmModel.object.name)

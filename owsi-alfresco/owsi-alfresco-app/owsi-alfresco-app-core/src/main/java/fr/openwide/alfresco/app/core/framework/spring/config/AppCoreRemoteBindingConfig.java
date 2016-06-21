@@ -55,6 +55,13 @@ public class AppCoreRemoteBindingConfig {
 	}
 
 	@Bean
+	public RepositoryRemoteBinding shareRemoteBinding(RepositoryTicketProvider ticketProvider) {
+		String repositoryUri = environment.getRequiredProperty("application.share.root.uri");
+		String ticketName = environment.getRequiredProperty("application.share.ticket.name");
+		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, null, ticketName, ticketProvider);
+	}
+
+	@Bean
 	public RestTemplate remoteRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new RepositoryRemoteExceptionHandler());
