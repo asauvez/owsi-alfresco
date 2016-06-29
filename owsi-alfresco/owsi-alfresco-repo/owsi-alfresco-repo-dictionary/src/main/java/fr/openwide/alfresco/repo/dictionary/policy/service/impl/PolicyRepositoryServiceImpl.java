@@ -4,6 +4,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -52,6 +53,10 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	@Override
 	public void onAddAspect(ContainerModel type, NotificationFrequency frequency, OnAddAspectPolicy policy) {
 		bindClassBehaviour(type, frequency, OnAddAspectPolicy.class, policy);
+	}
+	@Override
+	public void onRemoveAspect(ContainerModel type, NotificationFrequency frequency, OnRemoveAspectPolicy policy) {
+		bindClassBehaviour(type, frequency, OnRemoveAspectPolicy.class, policy);
 	}
 
 	@Override

@@ -72,6 +72,14 @@
 							<type>war</type>
 							<asWebapp>true</asWebapp>
 						</webapp>
+						<webapp>
+							<contextPath>/share</contextPath>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-demo-share</artifactId>
+							<version>${project.version}</version>
+							<type>war</type>
+							<asWebapp>true</asWebapp>
+						</webapp>
 					</webapps>
 				</configuration>
 			</plugin>

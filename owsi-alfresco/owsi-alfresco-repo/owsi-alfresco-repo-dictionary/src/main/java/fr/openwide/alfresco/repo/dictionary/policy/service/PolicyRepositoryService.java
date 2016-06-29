@@ -4,6 +4,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -19,6 +20,7 @@ public interface PolicyRepositoryService {
 
 	void onUpdateProperties(ContainerModel type, NotificationFrequency frequency, OnUpdatePropertiesPolicy policy);
 	void onAddAspect(ContainerModel type, NotificationFrequency frequency, OnAddAspectPolicy policy);
+	void onRemoveAspect(ContainerModel type, NotificationFrequency frequency, OnRemoveAspectPolicy policy);
 	
 	void onMoveNodePolicy(ContainerModel type, NotificationFrequency frequency, OnMoveNodePolicy policy);
 	void onDeleteNodePolicy(ContainerModel type, NotificationFrequency frequency, OnDeleteNodePolicy policy);

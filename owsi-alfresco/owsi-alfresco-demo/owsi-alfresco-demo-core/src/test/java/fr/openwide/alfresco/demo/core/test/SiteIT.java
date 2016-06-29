@@ -13,7 +13,6 @@ import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.app.core.site.model.RepositorySite;
 import fr.openwide.alfresco.app.core.site.model.SiteReference;
-import fr.openwide.alfresco.app.core.site.model.SiteVisibility;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
