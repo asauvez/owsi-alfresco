@@ -20,6 +20,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmLockable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmPreferences;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmSummarizable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTitled;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
@@ -61,6 +62,8 @@ public interface CmModel {
 	CmGeographic geographic = new CmGeographic();
 	
 	CmIndexControl indexControl = new CmIndexControl();
+	
+	CmPreferences preferences = new CmPreferences();
 	
 	// ---- Types
 

@@ -219,7 +219,7 @@ public class NodeContentSerializationComponent {
 	}
 	
 	public static Map<Class<?>, NodeContentSerializer<?>> getDefaultSerializersByClass() {
-		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new HashMap<>();
+		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new LinkedHashMap<>();
 		serializersByClass.put(String.class, StringRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(byte[].class, ByteArrayRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(File.class, TempFileRepositoryContentSerializer.INSTANCE);
