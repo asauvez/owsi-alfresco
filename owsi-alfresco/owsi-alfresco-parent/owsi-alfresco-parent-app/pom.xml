@@ -180,7 +180,7 @@
 										<exclude>org.springframework:spring</exclude> <!-- Use spring-context ou spring-web -->
 										<exclude>org.springframework:spring-ldap</exclude> <!-- Replace by org.springframework.ldap:spring-ldap-core -->
 										<exclude>commons-logging:commons-logging</exclude> <!-- Replace by org.slf4j:jcl-over-slf4j -->
-										<exclude>cglib:cglib</exclude>
+										<exclude>cglib:cglib</exclude> <!-- Replace by cglib:cglib-nodep -->
 										<exclude>rhino:rhino</exclude> <!-- Now included in Java -->
 										<exclude>rhino:js</exclude> <!-- Now included in Java -->
 										<exclude>javassist:javassist</exclude> <!-- Replace by org.javassist:javassist -->
