@@ -53,8 +53,7 @@ public class PropertiesNode {
 		return node;
 	}
 
-	public <E extends Enum<E>> E get(EnumTextPropertyModel<E> propertyModel) {
-		String code = (String) repoNode.getProperty(propertyModel.getNameReference());
+	public static <E extends Enum<E>> E textToEnum(EnumTextPropertyModel<E> propertyModel, String code) {
 		if (code == null) {
 			return null;
 		}
@@ -82,14 +81,23 @@ public class PropertiesNode {
 			}
 		}
 		throw new IllegalStateException("Can't find value for '" + code + "' in enum " + enumClass.getName());
+	} 
+	public <E extends Enum<E>> E get(EnumTextPropertyModel<E> propertyModel) {
+		String code = (String) repoNode.getProperty(propertyModel.getNameReference());
+		return textToEnum(propertyModel, code);
 	}
-	public <E extends Enum<E>> BusinessNode set(EnumTextPropertyModel<E> propertyModel, E e) {
+	
+	public static <E extends Enum<E>> String enumToText(E e) {
 		String code = (e instanceof PropertyEnumeration) 
 				? ((PropertyEnumeration) e).getCode() 
 				: e.name();
 		if (PropertyEnumeration.OTHER_VALUES.equals(code)) {
 			throw new IllegalStateException("You can't set back the OTHER_VALUES.");
 		}
+		return code;
+	}
+	public <E extends Enum<E>> BusinessNode set(EnumTextPropertyModel<E> propertyModel, E e) {
+		String code = enumToText(e);
 		return set(propertyModel, code);
 	}
 

@@ -28,7 +28,9 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -163,6 +165,10 @@ public class NodeModelRepositoryServiceImpl
 		return (C) getProperty(nodeReference, property.getNameReference());
 	}
 	@Override
+	public <E extends Enum<E>> E getProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property) {
+		return PropertiesNode.textToEnum(property, (String) getProperty(nodeReference, property.getNameReference()));
+	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public <C extends Serializable> List<C> getProperty(NodeReference nodeReference, MultiPropertyModel<C> property) {
 		return (List<C>) getProperty(nodeReference, property.getNameReference());
@@ -171,6 +177,11 @@ public class NodeModelRepositoryServiceImpl
 	@Override
 	public <C extends Serializable> void setProperty(NodeReference nodeReference, SinglePropertyModel<C> property, C value) {
 		setProperty(nodeReference, property.getNameReference(), value);
+	}
+	@Override
+	public <E extends Enum<E>> void setProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property, E value) {
+		String code = PropertiesNode.enumToText(value);
+		setProperty(nodeReference, property.getNameReference(), code);
 	}
 	@Override
 	public <C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value) {
