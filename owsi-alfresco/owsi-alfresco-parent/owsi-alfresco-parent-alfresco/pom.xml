@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco</artifactId>
+			<artifactId>alfresco-enterprise</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
