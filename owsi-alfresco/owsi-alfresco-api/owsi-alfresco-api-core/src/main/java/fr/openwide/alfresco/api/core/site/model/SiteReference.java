@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.site.model;
+package fr.openwide.alfresco.api.core.site.model;
 
 import java.util.Objects;
 
@@ -8,11 +8,16 @@ import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 
 public class SiteReference {
 	
-
+	public static final String DOCUMENTLIBRARY = "cm:documentlibrary";
+	public static final String WIKI = "cm:wiki";
+	
 	private String name;
 
-	public SiteReference(String name) {
+	private SiteReference(String name) {
 		this.name = name;
+	}
+	public static SiteReference create(String name) {
+		return new SiteReference(name);
 	}
 
 	@JsonValue
@@ -37,10 +42,10 @@ public class SiteReference {
 		return "/app:company_home/st:sites/cm:" + getName();
 	}
 	public String getPathDocumentLibrary() {
-		return getPath() + "/cm:documentlibrary";
+		return getPath() + "/" + DOCUMENTLIBRARY;
 	}
 	public String getPathWiki() {
-		return getPath() + "/cm:wiki";
+		return getPath() + "/" + WIKI;
 	}
 	
 	@Override

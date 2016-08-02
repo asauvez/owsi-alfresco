@@ -4,8 +4,8 @@ import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.site.model.RepositorySite;
-import fr.openwide.alfresco.app.core.site.model.SiteReference;
 
 public interface SiteService {
 

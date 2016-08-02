@@ -12,6 +12,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCopiedFrom;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCountable;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmEmailed;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeographic;
@@ -64,6 +65,8 @@ public interface CmModel {
 	CmIndexControl indexControl = new CmIndexControl();
 	
 	CmPreferences preferences = new CmPreferences();
+	
+	CmEmailed emailed = new CmEmailed();
 	
 	// ---- Types
 

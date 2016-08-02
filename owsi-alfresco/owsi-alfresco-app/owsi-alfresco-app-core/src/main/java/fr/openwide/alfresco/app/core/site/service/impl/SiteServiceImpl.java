@@ -13,11 +13,11 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
+import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.app.core.site.model.RepositorySite;
-import fr.openwide.alfresco.app.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 
 public class SiteServiceImpl implements SiteService {
@@ -44,7 +44,7 @@ public class SiteServiceImpl implements SiteService {
 	@Override
 	public SiteReference createSite(RepositorySite site) {
 		shareBinding.builder(CREATE_SITE_ENDPOINT, site).call();
-		return new SiteReference(site.getShortName());
+		return SiteReference.create(site.getShortName());
 	}
 	
 	@Override

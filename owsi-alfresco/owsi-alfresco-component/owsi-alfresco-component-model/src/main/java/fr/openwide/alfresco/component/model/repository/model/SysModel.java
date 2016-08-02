@@ -8,6 +8,8 @@ import fr.openwide.alfresco.component.model.repository.model.sys.SysContainer;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysLocalized;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysReferenceable;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysTemporary;
+import fr.openwide.alfresco.component.model.repository.model.sys.SysUndeletable;
+import fr.openwide.alfresco.component.model.repository.model.sys.SysUnmovable;
 
 public interface SysModel {
 
@@ -25,6 +27,9 @@ public interface SysModel {
 	SysArchived archived = new SysArchived();
 	
 	SysCascadeUpdate cascadeUpdate = new SysCascadeUpdate();
+	
+	SysUndeletable undeletable = new SysUndeletable();
+	SysUnmovable unmovable = new SysUnmovable();
 	
 	// ---- Types
 

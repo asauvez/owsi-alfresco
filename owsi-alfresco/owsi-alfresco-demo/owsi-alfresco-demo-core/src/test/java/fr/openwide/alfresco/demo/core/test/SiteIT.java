@@ -11,8 +11,8 @@ import com.google.common.base.Optional;
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.site.model.RepositorySite;
-import fr.openwide.alfresco.app.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -107,7 +107,7 @@ public class SiteIT extends AbstractDemoIT {
 		}
 		
 		// Delete
-		siteService.deleteSite(new SiteReference(site.getShortName()));
+		siteService.deleteSite(SiteReference.create(site.getShortName()));
 		
 		list = nodeSearchModelService.search(new RestrictionBuilder()
 				.eq(CmModel.object.name, siteName).of()

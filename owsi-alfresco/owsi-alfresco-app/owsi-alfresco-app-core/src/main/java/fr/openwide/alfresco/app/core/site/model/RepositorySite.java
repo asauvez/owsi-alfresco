@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.app.core.site.model;
 
+import fr.openwide.alfresco.api.core.site.model.SiteVisibility;
+
 public class RepositorySite {
 
 	private String shortName;

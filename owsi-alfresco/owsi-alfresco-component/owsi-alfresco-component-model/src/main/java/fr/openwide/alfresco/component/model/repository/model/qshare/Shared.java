@@ -8,15 +8,14 @@ import fr.openwide.alfresco.component.model.repository.model.QShareModel;
 
 public class Shared extends AspectModel {
 
-		public Shared() {
-			super(NameReference.create(QShareModel.NAMESPACE, "shared"));
-		}
+	public Shared() {
+		super(NameReference.create(QShareModel.NAMESPACE, "shared"));
+	}
 
-		protected Shared(NameReference nameReference) {
-			super(nameReference);
-		}
+	protected Shared(NameReference nameReference) {
+		super(nameReference);
+	}
 
-		public final TextPropertyModel sharedId = PropertyModels.newText(this, QShareModel.NAMESPACE, "sharedId");
-		
-		public final TextPropertyModel sharedBy = PropertyModels.newText(this, QShareModel.NAMESPACE, "sharedBy");
+	public final TextPropertyModel sharedId = PropertyModels.newText(this, QShareModel.NAMESPACE, "sharedId");
+	public final TextPropertyModel sharedBy = PropertyModels.newText(this, QShareModel.NAMESPACE, "sharedBy");
 }

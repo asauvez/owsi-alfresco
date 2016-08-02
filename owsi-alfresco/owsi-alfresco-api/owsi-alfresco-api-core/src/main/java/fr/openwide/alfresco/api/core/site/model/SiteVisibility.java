@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.app.core.site.model;
+package fr.openwide.alfresco.api.core.site.model;
 
 public enum SiteVisibility {
 	PUBLIC("PUBLIC"),
