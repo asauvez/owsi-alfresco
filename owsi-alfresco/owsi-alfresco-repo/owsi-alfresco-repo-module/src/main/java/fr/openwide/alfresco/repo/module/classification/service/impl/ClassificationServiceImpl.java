@@ -218,9 +218,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Override
 	public void onDeleteChildAssociation(ChildAssociationRef childAssocRef) {
 		NodeReference folderRef = conversionService.get(childAssocRef.getParentRef());
-		List<BusinessNode> children = nodeModelService.getChildren(folderRef, CmModel.folder.contains, new NodeScopeBuilder());
-		if (children.isEmpty()) {
-			nodeModelService.delete(folderRef);
+		if (nodeModelService.exists(folderRef)) {
+			List<BusinessNode> children = nodeModelService.getChildren(folderRef, CmModel.folder.contains, new NodeScopeBuilder());
+			if (children.isEmpty()) {
+				nodeModelService.delete(folderRef);
+			}
 		}
 	}
 	
