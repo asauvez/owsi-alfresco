@@ -75,6 +75,7 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	Optional<NodeReference> getByNamedPath(String ... names);
 	String getPath(NodeReference nodeReference);
 	
+	void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions);
 	public void setPermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission);
 	void deletePermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission);
 }

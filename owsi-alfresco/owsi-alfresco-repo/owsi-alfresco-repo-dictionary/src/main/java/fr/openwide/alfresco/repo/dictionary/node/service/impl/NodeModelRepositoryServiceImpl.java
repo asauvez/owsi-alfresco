@@ -348,6 +348,10 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
+	public void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions) {
+		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);
+	}
+	@Override
 	public void setPermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission) {
 		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), true);
 	}
