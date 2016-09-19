@@ -2,21 +2,18 @@ package fr.openwide.alfresco.app.core.site.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
+import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.api.core.site.model.SiteReference;
-import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.app.core.site.model.RepositorySite;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 
@@ -30,16 +27,16 @@ public class SiteServiceImpl implements SiteService {
 		public String shortName;
 	}
 	
-	@Autowired
-	private AuthorityService authorityService;
-	
-	@Autowired
-	private NodeSearchService nodeSearchService;
-	
-	
-	@Autowired
-	@Qualifier("shareRemoteBinding")
+	private AuthorityRemoteService authorityService;
+	private NodeSearchRemoteService nodeSearchService;
 	private RepositoryRemoteBinding shareBinding;
+	
+	public SiteServiceImpl(AuthorityRemoteService authorityService, NodeSearchRemoteService nodeSearchService,
+			RepositoryRemoteBinding shareBinding) {
+		this.authorityService = authorityService;
+		this.nodeSearchService = nodeSearchService;
+		this.shareBinding = shareBinding;
+	}
 	
 	@Override
 	public SiteReference createSite(RepositorySite site) {

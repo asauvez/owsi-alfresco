@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -24,6 +25,13 @@ public class AppCoreServiceConfig {
 
 	@Autowired
 	private AppCoreRemoteBindingConfig appCoreRemoteBindingConfig;
+
+	@Autowired
+	private RepositoryRemoteBinding repositoryRemoteBinding;
+
+	@Autowired
+	@Qualifier("shareRemoteBinding")
+	private RepositoryRemoteBinding shareBinding;
 	
 	@Autowired
 	private Environment environment;
@@ -39,23 +47,23 @@ public class AppCoreServiceConfig {
 	}
 
 	@Bean
-	public NodeService nodeService(RepositoryRemoteBinding repositoryRemoteBinding) {
+	public NodeService nodeService() {
 		return new NodeServiceImpl(repositoryRemoteBinding);
 	}
 
 	@Bean
-	public AuthorityService authorityService(NodeService nodeService) {
-		return new AuthorityServiceImpl(nodeService);
+	public AuthorityService authorityService() {
+		return new AuthorityServiceImpl(nodeService());
 	}
 
 	@Bean
-	public NodeSearchService nodeSearchService(NodeService nodeService) {
-		return new NodeSearchServiceImpl(nodeService);
+	public NodeSearchService nodeSearchService() {
+		return new NodeSearchServiceImpl(nodeService());
 	}
 
 	@Bean
 	public SiteService siteService() {
-		return new SiteServiceImpl();
+		return new SiteServiceImpl(authorityService(), nodeSearchService(), shareBinding);
 	}
 
 }

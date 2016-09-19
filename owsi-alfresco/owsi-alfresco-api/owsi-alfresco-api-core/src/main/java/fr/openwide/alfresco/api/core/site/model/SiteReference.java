@@ -8,7 +8,7 @@ import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 
 public class SiteReference {
 	
-	public static final String DOCUMENTLIBRARY = "cm:documentlibrary";
+	public static final String PATH_DOCUMENTLIBRARY = "cm:documentlibrary";
 	public static final String WIKI = "cm:wiki";
 	
 	private String name;
@@ -42,7 +42,7 @@ public class SiteReference {
 		return "/app:company_home/st:sites/cm:" + getName();
 	}
 	public String getPathDocumentLibrary() {
-		return getPath() + "/" + DOCUMENTLIBRARY;
+		return getPath() + "/" + PATH_DOCUMENTLIBRARY;
 	}
 	public String getPathWiki() {
 		return getPath() + "/" + WIKI;

@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.repo.dictionary.policy.service.impl;
 
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
@@ -65,12 +67,20 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	}
 	
 	@Override
+	public void onCreateNodePolicy(ContainerModel type, NotificationFrequency frequency, OnCreateNodePolicy policy) {
+		bindClassBehaviour(type, frequency, OnCreateNodePolicy.class, policy);
+	}
+	@Override
 	public void onMoveNodePolicy(ContainerModel type, NotificationFrequency frequency, OnMoveNodePolicy policy) {
 		bindClassBehaviour(type, frequency, OnMoveNodePolicy.class, policy);
 	}
 	@Override
 	public void onDeleteNodePolicy(ContainerModel type, NotificationFrequency frequency, OnDeleteNodePolicy policy) {
 		bindClassBehaviour(type, frequency, OnDeleteNodePolicy.class, policy);
+	}
+	@Override
+	public void onCreateChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnCreateChildAssociationPolicy policy) {
+		bindAssociationBehaviour(type, association, frequency, OnCreateChildAssociationPolicy.class, policy);
 	}
 	@Override
 	public void onDeleteChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy) {

@@ -572,9 +572,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 							ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
 							writer.putContent(inputStream);
 	
-							setContentData(nodeRef, contentProperty, 
-									(contentData != null) ? contentData : new RepositoryContentData(), 
-									writer);
+							setContentData(nodeRef, contentProperty, contentData, writer);
 						}
 					}
 				});
@@ -600,26 +598,28 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	}
 
 	private void setContentData(NodeRef nodeRef, NameReference contentProperty, RepositoryContentData contentData, ContentWriter writer) {
-		if (contentData.getMimetype() != null) {
-			writer.setMimetype(contentData.getMimetype());
-		}
-		if (contentData.getEncoding() != null) {
-			writer.setEncoding(contentData.getEncoding());
-		}
-		if (contentData.getLocale() != null) {
-			writer.setLocale(contentData.getLocale());
-		}
-
-		if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
-			if (contentData.getMimetype() == null) {
-				String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-				writer.guessMimetype(cmName);
+		if (contentData != null) {
+			if (contentData.getMimetype() != null) {
+				writer.setMimetype(contentData.getMimetype());
 			}
-			if (contentData.getEncoding() == null) {
-				writer.guessEncoding();
+			if (contentData.getEncoding() != null) {
+				writer.setEncoding(contentData.getEncoding());
 			}
-			// Nécessaire, car non mis à jour après putContent
-			nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
+			if (contentData.getLocale() != null) {
+				writer.setLocale(contentData.getLocale());
+			}
+	
+			if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
+				if (contentData.getMimetype() == null) {
+					String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+					writer.guessMimetype(cmName);
+				}
+				if (contentData.getEncoding() == null) {
+					writer.guessEncoding();
+				}
+				// Nécessaire, car non mis à jour après putContent
+				nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
+			}
 		}
 	}
 	

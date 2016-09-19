@@ -13,7 +13,14 @@ public class RepositoryAuthority implements Serializable {
 	
 	public static final RepositoryAuthority USER_SYSTEM = RepositoryAuthority.authority("System");
 	public static final RepositoryAuthority GROUP_EVERYONE = RepositoryAuthority.group("EVERYONE");
-	public static final RepositoryAuthority GROUP_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_ADMINISTRATORS");
+	
+	public static final RepositoryAuthority GROUP_ALFRESCO_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_ADMINISTRATORS");
+	public static final RepositoryAuthority GROUP_ALFRESCO_MODEL_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_MODEL_ADMINISTRATORS");
+	public static final RepositoryAuthority GROUP_ALFRESCO_SEARCH_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_SEARCH_ADMINISTRATORS");
+	public static final RepositoryAuthority GROUP_EMAIL_CONTRIBUTORS = RepositoryAuthority.group("EMAIL_CONTRIBUTORS");
+	public static final RepositoryAuthority GROUP_SITE_ADMINISTRATORS = RepositoryAuthority.group("SITE_ADMINISTRATORS");
+	
+	public static final RepositoryAuthority ROLE_ADMINISTRATOR = RepositoryAuthority.authority("ROLE_ADMINISTRATOR");
 
 	private String name;
 

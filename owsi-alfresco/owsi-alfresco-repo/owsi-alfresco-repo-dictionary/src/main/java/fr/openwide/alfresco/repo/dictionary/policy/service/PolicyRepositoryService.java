@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.repo.dictionary.policy.service;
 
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
@@ -22,9 +24,27 @@ public interface PolicyRepositoryService {
 	void onAddAspect(ContainerModel type, NotificationFrequency frequency, OnAddAspectPolicy policy);
 	void onRemoveAspect(ContainerModel type, NotificationFrequency frequency, OnRemoveAspectPolicy policy);
 	
+	void onCreateNodePolicy(ContainerModel type, NotificationFrequency frequency, OnCreateNodePolicy policy);
 	void onMoveNodePolicy(ContainerModel type, NotificationFrequency frequency, OnMoveNodePolicy policy);
 	void onDeleteNodePolicy(ContainerModel type, NotificationFrequency frequency, OnDeleteNodePolicy policy);
+	
+	void onCreateChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnCreateChildAssociationPolicy policy);
 	void onDeleteChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy);
 
+//    public interface BeforeCreateNodePolicy extends ClassPolicy
+//    public interface BeforeMoveNodePolicy extends ClassPolicy
+//    public interface BeforeUpdateNodePolicy extends ClassPolicy
+//    public interface OnUpdateNodePolicy extends ClassPolicy
+//    public interface BeforeDeleteNodePolicy extends ClassPolicy
+//    public interface BeforeArchiveNodePolicy extends ClassPolicy
+//    public interface BeforeAddAspectPolicy extends ClassPolicy
+//    public interface BeforeRemoveAspectPolicy extends ClassPolicy
+//    public interface OnRestoreNodePolicy extends ClassPolicy
+//    public interface BeforeSetNodeTypePolicy extends ClassPolicy
+//    public interface OnSetNodeTypePolicy extends ClassPolicy
 
+//  public interface BeforeDeleteChildAssociationPolicy extends AssociationPolicy
+//  public interface OnCreateAssociationPolicy extends AssociationPolicy
+//  public interface BeforeDeleteAssociationPolicy extends AssociationPolicy
+//  public interface OnDeleteAssociationPolicy extends AssociationPolicy
 }

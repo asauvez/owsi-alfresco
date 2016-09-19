@@ -61,7 +61,7 @@ public class AuthorityIT extends AbstractDemoIT {
 	@Test
 	public void testGetContainedUsers() {
 		List<BusinessNode> users = authorityModelService.getContainedUsers(new AuthorityQueryBuilder()
-				.parentAuthority(RepositoryAuthority.GROUP_ADMINISTRATORS)
+				.parentAuthority(RepositoryAuthority.GROUP_ALFRESCO_ADMINISTRATORS)
 				.nodeScopeBuilder(new NodeScopeBuilder()
 					.properties().set(CmModel.person.userName)));
 		boolean foundAdmin = false;

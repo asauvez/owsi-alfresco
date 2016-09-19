@@ -199,6 +199,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	@Override
 	public void onDeleteNode(ChildAssociationRef childAssocRef, boolean isNodeArchived) {
+		if (policies.isEmpty()) return;
+		
 		try {
 			if (nodeModelService.get(conversionService.get(childAssocRef.getParentRef()), new NodeScopeBuilder().aspect(OwsiModel.deleteIfEmpty)).hasAspect(OwsiModel.deleteIfEmpty)) {
 				onDeleteChildAssociation(childAssocRef);
@@ -209,6 +211,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	@Override
 	public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
+		if (policies.isEmpty()) return;
+		
 		onDeleteNode(oldChildAssocRef, true);
 	}
 	@Override
