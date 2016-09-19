@@ -6,6 +6,8 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -58,6 +60,8 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	<C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value);
 	<C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value);
 
+	Optional<NodeReference> getPrimaryParent(NodeReference nodeReference);
+	
 	Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName);
 
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName);
@@ -71,4 +75,6 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	Optional<NodeReference> getByNamedPath(String ... names);
 	String getPath(NodeReference nodeReference);
 	
+	public void setPermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission);
+	void deletePermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission);
 }
