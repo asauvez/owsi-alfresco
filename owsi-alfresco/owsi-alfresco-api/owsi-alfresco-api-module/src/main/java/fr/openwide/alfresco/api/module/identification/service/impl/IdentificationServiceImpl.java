@@ -1,5 +1,8 @@
 package fr.openwide.alfresco.api.module.identification.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -31,6 +34,23 @@ public class IdentificationServiceImpl implements IdentificationService {
 	@Override
 	public Optional<BusinessNode> getByIdentifier(NameReference identifier, NodeScopeBuilder nodeScopeBuilder) {
 		return nodeSearchModelService.searchUnique(new RestrictionBuilder()
+				.eq(OwsiModel.identifiable.identifier, identifier).of(),
+				nodeScopeBuilder);
+	}
+
+	@Override
+	public List<NodeReference> listByIdentifier(NameReference identifier) {
+		List<BusinessNode> nodes = listByIdentifier(identifier, new NodeScopeBuilder().nodeReference());
+		List<NodeReference> refs = new ArrayList<>(nodes.size());
+		for (BusinessNode node : nodes) {
+			refs.add(node.getNodeReference());
+		}
+		return refs;
+	}
+
+	@Override
+	public List<BusinessNode> listByIdentifier(NameReference identifier, NodeScopeBuilder nodeScopeBuilder) {
+		return nodeSearchModelService.search(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of(),
 				nodeScopeBuilder);
 	}
