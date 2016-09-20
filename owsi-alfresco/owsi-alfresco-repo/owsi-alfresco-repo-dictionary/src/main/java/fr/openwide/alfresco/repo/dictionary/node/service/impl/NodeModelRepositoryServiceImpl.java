@@ -203,7 +203,7 @@ public class NodeModelRepositoryServiceImpl
 	@Override
 	public Optional<NodeReference> getPrimaryParent(NodeReference nodeReference) {
 		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(conversionService.getRequired(nodeReference));
-		return (primaryParent != null) 
+		return (primaryParent != null && primaryParent.getParentRef() != null) 
 				? Optional.of(conversionService.get(primaryParent.getParentRef()))
 				: Optional.<NodeReference>absent();
 	}
