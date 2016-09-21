@@ -18,7 +18,14 @@ public class StSiteContainer extends AspectModel {
 	}
 
 	public enum SiteContainerType implements PropertyEnumeration {
-		DOCUMENT_LIBRARY("documentLibrary");
+		DOCUMENT_LIBRARY("documentLibrary"),
+		WIKI("wiki"),
+		LINKS("links"),
+		DISCUSSIONS("discussions"),
+		DATALISTS("dataLists"),
+		BLOG("blog"),
+		CALENDAR("calendar"),
+		OTHER(PropertyEnumeration.OTHER_VALUES);
 		
 		private final String code;
 		private SiteContainerType(String code) {
