@@ -617,9 +617,9 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				if (contentData.getEncoding() == null) {
 					writer.guessEncoding();
 				}
-				// Nécessaire, car non mis à jour après putContent
-				nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
 			}
+			// Nécessaire, car non mis à jour après putContent
+			nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
 		}
 	}
 	
