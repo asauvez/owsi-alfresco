@@ -40,18 +40,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/config</directory>
-				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
-	
 </project>
