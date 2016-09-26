@@ -357,8 +357,12 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		try {
 			NodeRef parentRef = conversionService.getRequired(primaryParent.getParentNode().getNodeReference());
 			QName assocType = conversionService.getRequired(primaryParent.getType());
-			QName assocName = createAssociationName(cmName);
+			NameReference parentAssociationNameHint = (NameReference) node.getExtensions().remove(PARENT_ASSOCIATION_NAME_HINT);
+			QName assocName = (parentAssociationNameHint != null) 
+					? conversionService.getRequired(parentAssociationNameHint) 
+					: createAssociationName(cmName);
 			QName type = conversionService.getRequired(node.getType());
+			
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Creating node type {} in {}/{}/{}", type, parentRef, assocType, assocName);
 			}
