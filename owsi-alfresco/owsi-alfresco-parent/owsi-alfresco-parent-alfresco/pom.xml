@@ -42,6 +42,10 @@
 			<build>
 				<resources>
 					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+					<resource>
 						<directory>src/main/dev-resources</directory>
 						<filtering>true</filtering>
 					</resource>
