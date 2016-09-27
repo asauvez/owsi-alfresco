@@ -61,6 +61,7 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	<C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value);
 
 	Optional<NodeReference> getPrimaryParent(NodeReference nodeReference);
+	List<NodeReference> getParentAssocs(NodeReference nodeReference);
 	
 	Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName);
 

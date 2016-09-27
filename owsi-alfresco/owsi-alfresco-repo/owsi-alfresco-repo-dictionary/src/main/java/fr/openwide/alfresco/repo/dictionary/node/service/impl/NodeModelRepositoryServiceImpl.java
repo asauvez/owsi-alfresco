@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -207,7 +208,17 @@ public class NodeModelRepositoryServiceImpl
 				? Optional.of(conversionService.get(primaryParent.getParentRef()))
 				: Optional.<NodeReference>absent();
 	}
-	
+
+	@Override
+	public List<NodeReference> getParentAssocs(NodeReference nodeReference) {
+		List<ChildAssociationRef> children = nodeService.getParentAssocs(conversionService.getRequired(nodeReference));
+		List<NodeReference> list = new ArrayList<>();
+		for (ChildAssociationRef child : children) {
+			list.add(conversionService.get(child.getParentRef()));
+		}
+		return list;
+	}
+
 	@Override
 	public Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName) {
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(
