@@ -1,6 +1,8 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
+import fr.openwide.alfresco.component.model.repository.model.app.AppFileLink;
+import fr.openwide.alfresco.component.model.repository.model.app.AppFolderLink;
 import fr.openwide.alfresco.component.model.repository.model.app.AppInlineEditable;
 
 public interface AppModel {
@@ -14,4 +16,6 @@ public interface AppModel {
 	
 	// ---- Types
 
-	}
+	AppFileLink fileLink = new AppFileLink();
+	AppFolderLink folderLink = new AppFolderLink();
+}

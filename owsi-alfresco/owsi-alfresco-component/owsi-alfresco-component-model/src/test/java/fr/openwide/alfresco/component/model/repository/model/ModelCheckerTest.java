@@ -30,6 +30,8 @@ public class ModelCheckerTest {
 				+ "CmEmailed : Field name sentDate is not the same as the property name sentdate\n"
 				+ "CmModel : Field name object is not the same as the container name cmobject\n"
 				+ "CmModel : Field name categoryRoot is not the same as the container name category_root\n"
+				+ "AppModel : Field name fileLink is not the same as the container name filelink\n"
+				+ "AppModel : Field name folderLink is not the same as the container name folderlink\n"
 				+ "StModel : Field name customSiteProperties is not the same as the container name customsiteproperties\n"
 				+ "StCustomSiteProperties : Field NAMESPACE st is not the same as the property namespace stcp:additionalInformation\n"
 				+ "RnModel : Field NAMESPACE rn is not the same as the container namespace cm:thumbnail\n"

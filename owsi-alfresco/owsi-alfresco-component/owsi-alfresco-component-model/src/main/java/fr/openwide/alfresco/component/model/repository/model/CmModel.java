@@ -17,6 +17,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeographic;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmIndexControl;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmLink;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmLockable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
@@ -84,4 +85,6 @@ public interface CmModel {
 
 	CmCategoryRoot categoryRoot = new CmCategoryRoot();
 	CmCategory category = new CmCategory();
+	
+	CmLink link = new CmLink();
 }
