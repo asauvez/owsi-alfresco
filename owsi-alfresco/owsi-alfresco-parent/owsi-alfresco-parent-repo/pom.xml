@@ -26,7 +26,7 @@
 		<owsi-alfresco.repo.freemarker.version>2.3.18-alfresco-patched-2</owsi-alfresco.repo.freemarker.version>
 		<owsi-alfresco.repo.poi.version>3.10.1</owsi-alfresco.repo.poi.version>
 		<owsi-alfresco.repo.tika.version>1.6-20140428-alfresco-patched</owsi-alfresco.repo.tika.version>
-		<owsi-alfresco.repo.pdfbox.version>1.8.4-alfresco-patched</owsi-alfresco.repo.pdfbox.version>
+		<owsi-alfresco.repo.pdfbox.version>1.8.10-alfresco-patched</owsi-alfresco.repo.pdfbox.version>
 		<owsi-alfresco.repo.xerces.version>2.10.0-alfresco-patched</owsi-alfresco.repo.xerces.version>
 		<owsi-alfresco.repo.commons-lang.version>2.6</owsi-alfresco.repo.commons-lang.version>
 		<owsi-alfresco.repo.commons-io.version>2.4</owsi-alfresco.repo.commons-io.version>
@@ -36,7 +36,7 @@
 		<owsi-alfresco.repo.commons-beanutils.version>1.7.0</owsi-alfresco.repo.commons-beanutils.version>
 		<owsi-alfresco.repo.commons-httpclient.version>3.1-HTTPCLIENT-1265</owsi-alfresco.repo.commons-httpclient.version>
 		<owsi-alfresco.repo.jaxen.version>1.1.4</owsi-alfresco.repo.jaxen.version>
-		<owsi-alfresco.repo.joda-time.version>2.3</owsi-alfresco.repo.joda-time.version>
+		<owsi-alfresco.repo.joda-time.version>2.8.1</owsi-alfresco.repo.joda-time.version>
 		<owsi-alfresco.repo.axiom.version>1.2.5</owsi-alfresco.repo.axiom.version>
 		<owsi-alfresco.repo.xmlbeans.version>2.6.0</owsi-alfresco.repo.xmlbeans.version>
 		<owsi-alfresco.repo.javax-mail.version>1.4.4</owsi-alfresco.repo.javax-mail.version>
@@ -699,6 +699,12 @@
 						<artifactId>aspectjrt</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<scope>provided</scope>
 			</dependency>
 			
 			<dependency>
