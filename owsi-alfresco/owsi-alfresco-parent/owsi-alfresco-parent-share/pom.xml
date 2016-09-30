@@ -73,23 +73,63 @@
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				<!-- 
-					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifestFile>${project.build.directory}/dependency/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-					 -->
 					<overlays>
 						<overlay>
 							<groupId>org.alfresco</groupId>
 							<artifactId>share</artifactId>
-							<excludes></excludes>
+							<excludes>
+								<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
+							</excludes>
 						</overlay>
 					</overlays>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
+
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+					<resource>
+						<directory>src/main/dev-resources</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-war-plugin</artifactId>
+							<configuration>
+								<failOnMissingWebXml>false</failOnMissingWebXml>
+								<archive>
+									<manifestFile>${project.build.directory}/m2e-wtp/overlays/share-${owsi-alfresco.share.alfresco.version}.war/META-INF/MANIFEST.MF</manifestFile>
+								</archive>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>livraison</id>
+			<activation>
+				<property>
+					<name>livraison</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<!-- Nothing to do -->
+		</profile>
+	</profiles>
+		
 </project>
