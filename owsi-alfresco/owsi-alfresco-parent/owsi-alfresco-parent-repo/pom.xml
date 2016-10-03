@@ -47,6 +47,7 @@
 		<owsi-alfresco.repo.stax-ex.version>1.2</owsi-alfresco.repo.stax-ex.version>
 		<owsi-alfresco.repo.stax-api.version>1.0-2</owsi-alfresco.repo.stax-api.version>
 		<owsi-alfresco.repo.spring-social.version>1.0.3.RELEASE</owsi-alfresco.repo.spring-social.version>
+		<owsi-alfresco.repo.jcl-over-slf4j.version>1.7.2</owsi-alfresco.repo.jcl-over-slf4j.version>
 		
 		<owsi-alfresco.build-helper-maven-plugin.version>1.10</owsi-alfresco.build-helper-maven-plugin.version>
 	</properties>
@@ -892,6 +893,12 @@
 				<groupId>org.springframework.social</groupId>
 				<artifactId>spring-social-core</artifactId>
 				<version>${owsi-alfresco.repo.spring-social.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${owsi-alfresco.repo.jcl-over-slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>
 		</dependencies>
