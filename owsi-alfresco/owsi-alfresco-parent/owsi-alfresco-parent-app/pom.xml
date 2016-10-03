@@ -210,11 +210,6 @@
 					<artifactId>maven-processor-plugin</artifactId>
 					<dependencies>
 						<dependency>
-							<groupId>org.hibernate</groupId>
-							<artifactId>hibernate-jpamodelgen</artifactId>
-							<version>${owsi-alfresco.app.hibernate-jpamodelgen.version}</version>
-						</dependency>
-						<dependency>
 							<groupId>com.querydsl</groupId>
 							<artifactId>querydsl-apt</artifactId>
 							<version>${owsi-alfresco.app.querydsl.version}</version>
@@ -227,7 +222,6 @@
 							<addSuppressWarningsAnnotation>true</addSuppressWarningsAnnotation>
 						</options>
 						<processors>
-							<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
 							<processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
 						</processors>
 					</configuration>
