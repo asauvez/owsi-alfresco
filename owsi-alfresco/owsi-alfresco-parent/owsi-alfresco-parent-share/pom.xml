@@ -82,6 +82,9 @@
 							</excludes>
 						</overlay>
 					</overlays>
+					<archive>
+						<manifestFile>${project.build.directory}/share/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
