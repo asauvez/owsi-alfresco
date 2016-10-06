@@ -41,7 +41,7 @@ public class RepositoryPermission implements Serializable {
 	public static final RepositoryPermission EDITOR = new RepositoryPermission("Editor");
 	public static final RepositoryPermission CONSUMER = new RepositoryPermission("Consumer");
 
-	public static final RepositoryPermission SITE_MANAGER = new RepositoryPermission("Manager");
+	public static final RepositoryPermission SITE_MANAGER = new RepositoryPermission("SiteManager");
 	public static final RepositoryPermission SITE_COLLABORATOR = new RepositoryPermission("SiteCollaborator");
 	public static final RepositoryPermission SITE_CONTRIBUTOR = new RepositoryPermission("SiteContributor");
 	public static final RepositoryPermission SITE_CONSUMER = new RepositoryPermission("SiteConsumer");
