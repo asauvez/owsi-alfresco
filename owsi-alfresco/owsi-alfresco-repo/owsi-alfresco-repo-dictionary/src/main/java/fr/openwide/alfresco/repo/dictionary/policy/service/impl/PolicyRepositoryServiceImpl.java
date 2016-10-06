@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.policy.service.impl;
 
+import java.util.concurrent.Callable;
+
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -10,6 +12,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -23,6 +26,7 @@ import fr.openwide.alfresco.repository.remote.conversion.service.ConversionServi
 public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 
 	private PolicyComponent policyComponent;
+	private BehaviourFilter policyFilter;
 
 	private ConversionService conversionService;
 	
@@ -86,9 +90,25 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	public void onDeleteChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy) {
 		bindAssociationBehaviour(type, association, frequency, OnDeleteChildAssociationPolicy.class, policy);
 	}
+	
+	@Override
+	public <T> T disableBehaviour(ContainerModel type, Callable<T> callable) {
+		QName typeQName = conversionService.getRequired(type.getNameReference());
+		policyFilter.disableBehaviour(typeQName);
+		try {
+			return callable.call();
+		} catch (Exception e) {
+			throw (e instanceof RuntimeException) ? (RuntimeException) e : new IllegalStateException(e);
+		} finally {
+			policyFilter.enableBehaviour(typeQName);
+		}
+	}
 
 	public void setPolicyComponent(PolicyComponent policyComponent) {
 		this.policyComponent = policyComponent;
+	}
+	public void setPolicyFilter(BehaviourFilter policyFilter) {
+		this.policyFilter = policyFilter;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

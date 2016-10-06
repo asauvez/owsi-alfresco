@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.policy.service;
 
+import java.util.concurrent.Callable;
+
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -31,6 +33,8 @@ public interface PolicyRepositoryService {
 	void onCreateChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnCreateChildAssociationPolicy policy);
 	void onDeleteChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy);
 
+	<T> T disableBehaviour(ContainerModel type, Callable<T> callable);
+	
 //    public interface BeforeCreateNodePolicy extends ClassPolicy
 //    public interface BeforeMoveNodePolicy extends ClassPolicy
 //    public interface BeforeUpdateNodePolicy extends ClassPolicy
