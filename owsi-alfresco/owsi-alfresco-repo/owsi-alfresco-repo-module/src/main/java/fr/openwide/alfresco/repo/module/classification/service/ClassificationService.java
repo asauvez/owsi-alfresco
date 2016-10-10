@@ -12,4 +12,6 @@ public interface ClassificationService {
 
 	<T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy);
 
+	void reclassify(ContainerModel model);
+	void reclassify(ContainerModel model, int batchSize);
 }

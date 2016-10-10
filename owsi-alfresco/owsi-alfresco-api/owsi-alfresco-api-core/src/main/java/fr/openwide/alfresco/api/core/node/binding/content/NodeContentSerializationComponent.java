@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,9 +93,7 @@ public class NodeContentSerializationComponent {
 		zos.setLevel(remoteCallParameters.getCompressionLevel());
 		
 		// Ecrit le JSon
-		RemoteCallPayload<Object> remoteCallPayload = new RemoteCallPayload<>();
-		remoteCallPayload.setPayload(payload);
-		remoteCallPayload.setRemoteCallParameters(remoteCallParameters);
+		RemoteCallPayload<Object> remoteCallPayload = new RemoteCallPayload<>(payload, remoteCallParameters);
 		
 		zos.putNextEntry(new ZipEntry(JSON_ZIP_ENTRY_NAME));
 		if (LOGGER.isDebugEnabled()) {
@@ -221,7 +218,7 @@ public class NodeContentSerializationComponent {
 	}
 	
 	public static Map<Class<?>, NodeContentSerializer<?>> getDefaultSerializersByClass() {
-		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new HashMap<>();
+		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new LinkedHashMap<>();
 		serializersByClass.put(String.class, StringRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(byte[].class, ByteArrayRepositoryContentSerializer.INSTANCE);
 		serializersByClass.put(File.class, TempFileRepositoryContentSerializer.INSTANCE);

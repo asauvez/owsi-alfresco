@@ -10,8 +10,11 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.apache.commons.io.IOUtils;
+import org.springframework.extensions.surf.util.Content;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
@@ -20,6 +23,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
@@ -35,10 +39,12 @@ import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteExcept
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
 
-public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<RemoteCallPayload<R>, InputStream> {
+public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<RemoteCallPayload<R>, Content> {
 
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
+
+	private boolean runAsEnabled;
 
 	private NodeContentSerializationParameters defaultSerializationParameters = new NodeContentSerializationParameters();
 	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
@@ -60,12 +66,12 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	protected abstract JavaType getParameterType();
 
 	@Override
-	protected InputStream extractPayload(WebScriptRequest req) {
-		return req.getContent().getInputStream();
+	protected Content extractPayload(WebScriptRequest req) {
+		return req.getContent();
 	}
 	
 	@Override
-	protected RemoteCallPayload<R> executeImpl(InputStream payload) {
+	protected RemoteCallPayload<R> executeImpl(Content payload) {
 		final AtomicReference<R> resultRef = new AtomicReference<>();
 		NodePayloadCallback<P> payloadCallback = new NodePayloadCallback<P>() {
 			@Override
@@ -73,13 +79,27 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 				return getInputNodes(payload);
 			}
 			@Override
-			public void doWithPayload(RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers) {
+			public void doWithPayload(final RemoteCallPayload<P> remoteCallPayload, Collection<ContentPropertyWrapper> wrappers) {
 				for (ContentPropertyWrapper wrapper : wrappers) {
 					// va être renseigné par le service
 					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentHolder(wrapper));
 				}
 				// Vrai appel du Service
-				R result = execute(remoteCallPayload.getPayload());
+				UserReference runAs = remoteCallPayload.getRemoteCallParameters().getRunAs();
+				R result;
+				if (runAs == null) {
+					result = execute(remoteCallPayload.getPayload());
+				} else {
+					if (! runAsEnabled) {
+						throw new IllegalStateException("Can't specify a runAs userName because 'owsi-alfresco.run-as.enabled' is set to false.");
+					}
+					result = AuthenticationUtil.runAs(new RunAsWork<R>() {
+						@Override
+						public R doWork() throws Exception {
+							return execute(remoteCallPayload.getPayload());
+						}
+					}, runAs.getUsername());
+				}
 				resultRef.set(result);
 			}
 		};
@@ -88,11 +108,8 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			// L'appel du service se fait dans le callback
 			RemoteCallPayload<P> requestPayload = serializationComponent.deserialize(
 					getParameterType(), payloadCallback, defaultDeserializationParameters,
-					payload);
-			RemoteCallPayload<R> responsePayload = new RemoteCallPayload<R>();
-			responsePayload.setPayload(resultRef.get());
-			responsePayload.setRemoteCallParameters(requestPayload.getRemoteCallParameters());
-			return responsePayload;
+					payload.getInputStream());
+			return new RemoteCallPayload<R>(resultRef.get(), requestPayload.getRemoteCallParameters());
 		} catch (IOException e) {
 			throw new InvalidMessageRemoteException(e);
 		}
@@ -145,6 +162,9 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 	
 	public void setNodeService(NodeRemoteService nodeService) {
 		this.nodeService = nodeService;
+	}
+	public void setRunAsEnabled(boolean runAsEnabled) {
+		this.runAsEnabled = runAsEnabled;
 	}
 
 }

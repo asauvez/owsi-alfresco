@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
+import java.util.Set;
 
+import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 public class MatchRestriction<C extends Serializable> extends Restriction {
@@ -17,12 +19,22 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
+	protected String toFtsQueryInternal() {
 		if (value instanceof String && ((String) value).isEmpty()) {
 			value = null;
 		}
 		String prefix = exact ? "=" : "@";
-		return (value != null) ? prefix + property.toLucene() + ":" + toLuceneValue(property, value) : "";
+		return (value != null) ? prefix + property.toLucene() + ":" + toFtsLuceneValue(property, value) : "";
+	}
+	
+	@Override
+	protected void addCmisQueryJoin(Set<ContainerModel> containersToJoin) {
+		containersToJoin.add(property.getType());
+	}
+	
+	@Override
+	protected String toCmisQueryWhereInternal() {
+		return (value != null) ? toCmisProperty(property) + "=" + toCmisLuceneValue(property, value) : "";
 	}
 	
 	/**

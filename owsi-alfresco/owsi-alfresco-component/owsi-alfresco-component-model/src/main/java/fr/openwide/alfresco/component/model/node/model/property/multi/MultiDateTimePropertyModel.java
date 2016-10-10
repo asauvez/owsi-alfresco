@@ -9,4 +9,8 @@ public class MultiDateTimePropertyModel extends AbstractMultiDatePropertyModel {
 		super(type, nameReference);
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:datetime";
+	}
 }

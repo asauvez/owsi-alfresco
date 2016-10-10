@@ -1,0 +1,8 @@
+<webscript>
+	<shortname>/owsi/admin/setModuleCurrentVersion.get</shortname>
+	<description>Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.</description>
+	<url>/owsi/admin/setModuleCurrentVersion?module={moduleId}&amp;version={version}</url>
+	<authentication>user</authentication>
+	<format default="html">argument</format>
+	<family>OWSI</family>
+</webscript>

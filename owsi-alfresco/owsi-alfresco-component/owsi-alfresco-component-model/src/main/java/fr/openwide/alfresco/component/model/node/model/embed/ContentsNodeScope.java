@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.FolderRepositoryContentSerializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.JacksonRepositoryContentSerializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.OutputStreamRepositoryContentDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.SingleFileRepositoryContentSerializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.StringRepositoryContentSerializer;
@@ -45,6 +46,11 @@ public class ContentsNodeScope {
 	public NodeScopeBuilder asOutputStream(OutputStream outputStream) {
 		return withDeserializer(new OutputStreamRepositoryContentDeserializer(outputStream));
 	}
+	public <T> NodeScopeBuilder asJackson(Class<T> clazz) {
+		return withDeserializer(new JacksonRepositoryContentSerializer<T>(clazz));
+	}
+
+	
 	/** Indique que l'on souhaite uploader un fichier. Le format sera pris en fonction du type d'objet. */
 	public NodeScopeBuilder forUpload() {
 		return asTempFile();

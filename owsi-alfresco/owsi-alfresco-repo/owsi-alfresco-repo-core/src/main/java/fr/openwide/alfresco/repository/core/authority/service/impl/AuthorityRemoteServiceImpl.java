@@ -8,19 +8,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.PropertyMap;
 
+import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
@@ -31,6 +36,7 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 
 	private PersonService personService;
 	private AuthorityService authorityService;
+	private MutableAuthenticationService authenticationService;
 	private NodeService nodeService;
 
 	@Override
@@ -41,21 +47,62 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 		}
 		return nodeRemoteService.get(conversionService.get(nodeRef), nodeScope);
 	}
-	
+
 	@Override
-	public List<RepositoryNode> getContainedUsers(RepositoryAuthorityQueryParameters searchParameters) {
-		return getContained(AuthorityType.USER, searchParameters);
+	public RepositoryNode createUser(String userName, String firstName, String lastName, String email, String password,
+			NodeScope nodeScope) throws AuthorityExistsRemoteException {
+		if (personService.personExists(userName)) {
+			throw new AuthorityExistsRemoteException();
+		}
+		PropertyMap properties = new PropertyMap();
+		properties.put(ContentModel.PROP_USERNAME, userName);
+		properties.put(ContentModel.PROP_FIRSTNAME, firstName);
+		properties.put(ContentModel.PROP_LASTNAME, lastName);
+		properties.put(ContentModel.PROP_EMAIL, email);
+		try {
+			NodeRef personRef = personService.createPerson(properties);
+			authenticationService.createAuthentication(userName, password.toCharArray());
+			authenticationService.setAuthenticationEnabled(userName, true);
+			return nodeRemoteService.get(conversionService.get(personRef), nodeScope);
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedGroups(RepositoryAuthorityQueryParameters searchParameters) {
-		return getContained(AuthorityType.GROUP, searchParameters);
+	public void deleteUser(String userName) throws NoSuchNodeRemoteException {
+		if ( !personService.personExists(userName)) {
+			throw new NoSuchNodeRemoteException(userName);
+		}
+		try {
+			personService.deletePerson(userName);
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
 	}
 
-	private List<RepositoryNode> getContained(AuthorityType type, RepositoryAuthorityQueryParameters searchParameters) {
-		Set<String> authorities = authorityService.getContainedAuthorities(type, 
+	@Override
+	public void updateUserPassword(String userName, String newPassword) throws NoSuchNodeRemoteException {
+		if ( !personService.personExists(userName)) {
+			throw new NoSuchNodeRemoteException(userName);
+		}
+		try {
+			authenticationService.setAuthentication(userName, newPassword.toCharArray());
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
+	}
+
+	@Override
+	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
+		AuthorityType authorityType = (searchParameters.getAuthorityType() != null) ? AuthorityType.valueOf(searchParameters.getAuthorityType().name()) : null;
+		Set<String> authorities = authorityService.getContainedAuthorities(authorityType, 
 				searchParameters.getParentAuthority().getName(), 
 				searchParameters.isImmediate());
+		
+		if (searchParameters.isIncludingParent()) {
+			authorities.add(searchParameters.getParentAuthority().getName());
+		}
 		
 		Pattern pattern = (searchParameters.getFilterValue() != null) 
 				? Pattern.compile(".*\\b" + searchParameters.getFilterValue().toLowerCase() + ".*") : null;
@@ -113,7 +160,77 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 			});
 		}
 	}
-	
+
+	@Override
+	public RepositoryNode getGroup(String groupShortName, NodeScope nodeScope) throws NoSuchNodeRemoteException {
+		NodeRef groupNodeRef = authorityService.getAuthorityNodeRef(authorityService.getName(AuthorityType.GROUP, groupShortName));
+		if (groupNodeRef != null) {
+			return nodeRemoteService.get(conversionService.get(groupNodeRef), nodeScope);
+		} else {
+			throw new NoSuchNodeRemoteException(groupShortName);
+		}
+	}
+
+	@Override
+	public RepositoryNode createRootGroup(String groupShortName, String groupDisplayName, NodeScope nodeScope)
+			throws AuthorityExistsRemoteException {
+		String groupFullName = authorityService.getName(AuthorityType.GROUP, groupShortName);
+		if (authorityService.authorityExists(groupFullName)) {
+			throw new AuthorityExistsRemoteException();
+		}
+		try {
+			authorityService.createAuthority(AuthorityType.GROUP, groupShortName, groupDisplayName, authorityService.getDefaultZones());
+			return getGroup(groupShortName, nodeScope);
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
+	}
+
+	@Override
+	public void deleteGroup(String groupShortName) throws NoSuchNodeRemoteException {
+		String groupFullName = authorityService.getName(AuthorityType.GROUP, groupShortName);
+		if (! authorityService.authorityExists(groupFullName)) {
+			throw new NoSuchNodeRemoteException(groupFullName);
+		}
+		try {
+			authorityService.deleteAuthority(groupFullName);
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
+	}
+
+	@Override
+	public void addToGroup(String subAuthorityFullName, String parentGroupShortName) throws NoSuchNodeRemoteException {
+		String parentGroupFullName = authorityService.getName(AuthorityType.GROUP, parentGroupShortName);
+		if (! authorityService.authorityExists(parentGroupFullName)) {
+			throw new NoSuchNodeRemoteException(parentGroupFullName);
+		}
+		if (! authorityService.authorityExists(subAuthorityFullName)) {
+			throw new NoSuchNodeRemoteException(subAuthorityFullName);
+		}
+		try {
+			authorityService.addAuthority(parentGroupFullName, subAuthorityFullName);
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
+	}
+
+	@Override
+	public void removeFromGroup(String subAuthorityFullName, String parentGroupShortName) throws NoSuchNodeRemoteException {
+		String parentGroupFullName = authorityService.getName(AuthorityType.GROUP, parentGroupShortName);
+		if (! authorityService.authorityExists(parentGroupFullName)) {
+			throw new NoSuchNodeRemoteException(parentGroupFullName);
+		}
+		if (! authorityService.authorityExists(subAuthorityFullName)) {
+			throw new NoSuchNodeRemoteException(subAuthorityFullName);
+		}
+		try {
+			authorityService.removeAuthority(parentGroupFullName, subAuthorityFullName);
+		} catch (Exception e) {
+			throw new RepositoryRemoteException(e);
+		}
+	}
+
 	public void setNodeRemoteService(NodeRemoteService nodeRemoteService) {
 		this.nodeRemoteService = nodeRemoteService;
 	}
@@ -123,6 +240,9 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 
 	public void setAuthorityService(AuthorityService authorityService) {
 		this.authorityService = authorityService;
+	}
+	public void setAuthenticationService(MutableAuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
 	}
 	public void setPersonService(PersonService personService) {
 		this.personService = personService;

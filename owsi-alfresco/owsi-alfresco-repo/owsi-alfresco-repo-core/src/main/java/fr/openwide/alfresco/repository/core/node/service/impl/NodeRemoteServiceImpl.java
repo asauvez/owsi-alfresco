@@ -211,7 +211,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		}
 		
 		// get associations
-		for (final Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
+		for (Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
 			ChildAssociationRef renditionRef = getRendition(nodeRef, conversionService.getRequired(entry.getKey()));
 			node.getRenditions().put(
 					entry.getKey(), 
@@ -260,7 +260,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			node.setInheritParentPermissions(permissionService.getInheritParentPermissions(nodeRef));
 			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
 				node.getAccessControlList().add(new RepositoryAccessControl(
-						new RepositoryAuthority(accessPermission.getAuthority()),
+						RepositoryAuthority.authority(accessPermission.getAuthority()),
 						new RepositoryPermission(accessPermission.getPermission()),
 						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
@@ -309,7 +309,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			throw new InvalidPayloadException("Node already has a reference");
 		}
 		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
-		if (primaryParent == null || primaryParent.getParentNode() == null) {
+		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
 			throw new InvalidPayloadException("A primary parent association is required.");
 		}
 		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
@@ -357,8 +357,12 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		try {
 			NodeRef parentRef = conversionService.getRequired(primaryParent.getParentNode().getNodeReference());
 			QName assocType = conversionService.getRequired(primaryParent.getType());
-			QName assocName = createAssociationName(cmName);
+			NameReference parentAssociationNameHint = (NameReference) node.getExtensions().remove(PARENT_ASSOCIATION_NAME_HINT);
+			QName assocName = (parentAssociationNameHint != null) 
+					? conversionService.getRequired(parentAssociationNameHint) 
+					: createAssociationName(cmName);
 			QName type = conversionService.getRequired(node.getType());
+			
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Creating node type {} in {}/{}/{}", type, parentRef, assocType, assocName);
 			}
@@ -373,7 +377,9 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
 			}
 			setContents(nodeRef, node, node.getContents().keySet());
-			setPermissions(nodeRef, node);
+			if (node.getInheritParentPermissions() != null || ! node.getAccessControlList().isEmpty()) {
+				setPermissions(nodeRef, node);
+			}
 			
 			for (Entry<NameReference, List<RepositoryNode>> entry : node.getChildAssociations().entrySet()) {
 				for (RepositoryNode childNode : entry.getValue()) {
@@ -440,19 +446,22 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				}
 				nodeService.moveNode(nodeRef, parentRef, assocType, assocName);
 			}
-			for (NameReference propertyName : nodeScope.getProperties()) {
-				Serializable value = node.getProperty(propertyName);
-				if (value != null) {
-					if (! (value instanceof RepositoryContentData)) {
-						nodeService.setProperty(nodeRef, 
-							conversionService.getRequired(propertyName), 
-							conversionService.getForRepository(value));
+			
+			if (! nodeScope.getProperties().isEmpty()) {
+				Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+				for (NameReference propertyName : nodeScope.getProperties()) {
+					Serializable value = node.getProperty(propertyName);
+					if (value != null) {
+						if (! (value instanceof RepositoryContentData)) {
+							properties.put(conversionService.getRequired(propertyName), conversionService.getForRepository(value));
+						}
+					} else {
+						properties.remove(conversionService.getRequired(propertyName)); 
 					}
-				} else {
-					nodeService.removeProperty(nodeRef, 
-						conversionService.getRequired(propertyName)); 
 				}
+				nodeService.setProperties(nodeRef, properties);
 			}
+			
 			for (NameReference aspectName : nodeScope.getAspects()) {
 				if (node.getAspects().contains(aspectName)) {
 					nodeService.addAspect(nodeRef, conversionService.getRequired(aspectName), null);
@@ -531,7 +540,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		for (AccessPermission oldPermission : permissionService.getAllSetPermissions(nodeRef)) {
 			if (oldPermission.isSetDirectly()) {
 				oldPermissions.add(new RepositoryAccessControl(
-					new RepositoryAuthority(oldPermission.getAuthority()),
+					RepositoryAuthority.authority(oldPermission.getAuthority()),
 					new RepositoryPermission(oldPermission.getPermission()),
 					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
@@ -567,9 +576,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 							ContentWriter writer = contentService.getWriter(nodeRef, conversionService.getRequired(contentProperty), true);
 							writer.putContent(inputStream);
 	
-							setContentData(nodeRef, contentProperty, 
-									(contentData != null) ? contentData : new RepositoryContentData(), 
-									writer);
+							setContentData(nodeRef, contentProperty, contentData, writer);
 						}
 					}
 				});
@@ -595,23 +602,25 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	}
 
 	private void setContentData(NodeRef nodeRef, NameReference contentProperty, RepositoryContentData contentData, ContentWriter writer) {
-		if (contentData.getMimetype() != null) {
-			writer.setMimetype(contentData.getMimetype());
-		}
-		if (contentData.getEncoding() != null) {
-			writer.setEncoding(contentData.getEncoding());
-		}
-		if (contentData.getLocale() != null) {
-			writer.setLocale(contentData.getLocale());
-		}
-
-		if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
-			if (contentData.getMimetype() == null) {
-				String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-				writer.guessMimetype(cmName);
+		if (contentData != null) {
+			if (contentData.getMimetype() != null) {
+				writer.setMimetype(contentData.getMimetype());
 			}
-			if (contentData.getEncoding() == null) {
-				writer.guessEncoding();
+			if (contentData.getEncoding() != null) {
+				writer.setEncoding(contentData.getEncoding());
+			}
+			if (contentData.getLocale() != null) {
+				writer.setLocale(contentData.getLocale());
+			}
+	
+			if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
+				if (contentData.getMimetype() == null) {
+					String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+					writer.guessMimetype(cmName);
+				}
+				if (contentData.getEncoding() == null) {
+					writer.guessEncoding();
+				}
 			}
 			// Nécessaire, car non mis à jour après putContent
 			nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());

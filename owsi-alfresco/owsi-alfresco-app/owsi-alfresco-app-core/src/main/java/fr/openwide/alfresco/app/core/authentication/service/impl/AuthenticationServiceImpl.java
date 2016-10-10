@@ -82,6 +82,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public RepositoryUser getAuthenticatedUser(NodeScope nodeScope) {
 		throw new UnsupportedOperationException("Use authenticate methods");
 	}
+	@Override
+	public String getAuthenticatedUsername() {
+		throw new UnsupportedOperationException("Use authenticate methods");
+	}
 
 	@Override
 	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {

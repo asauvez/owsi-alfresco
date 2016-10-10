@@ -14,4 +14,8 @@ public class MultiFloatPropertyModel extends AbstractMultiNumberPropertyModel<Fl
 		return Float.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:float";
+	}
 }

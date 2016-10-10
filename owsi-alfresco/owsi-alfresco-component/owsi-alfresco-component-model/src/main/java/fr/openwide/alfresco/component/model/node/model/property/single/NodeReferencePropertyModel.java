@@ -15,4 +15,8 @@ public class NodeReferencePropertyModel extends SinglePropertyModel<NodeReferenc
 		return NodeReference.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:noderef";
+	}
 }

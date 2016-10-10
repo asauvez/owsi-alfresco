@@ -8,6 +8,7 @@ import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.Model;
 import fr.openwide.alfresco.component.model.node.model.constraint.ConstraintException;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class PropertyModel<C extends Serializable> extends Model {
@@ -27,6 +28,8 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 		return type;
 	}
 
+	public abstract String getDataType();
+	
 	public PropertyModel<C> add(PropertyConstraint constraint) {
 		constraints.add(constraint);
 		return this;
@@ -56,5 +59,28 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 		}
 		return null;
 	}
+	
+	public String getXmlModel() {
+		return getXmlModel(0);
+	}
 
+	public String getXmlModel(int profondeur) {
+		StringBuilder xml = new StringBuilder();
+		StringBuilder tabulation = new StringBuilder();
+		
+		for (int i = 0; i < profondeur; i++){
+			tabulation.append("	");
+		}
+		
+		xml.append(tabulation.toString()).append("<property name=\"") .append(this.getNameReference().getFullName()).append("\">\n")
+			.append(tabulation.toString()).append("	<type>").append(this.getDataType()).append("</type>\n");
+		
+		if (this instanceof MultiPropertyModel) {
+			xml.append(tabulation.toString()).append("	<multiple>true</multiple>\n");
+		}
+		
+		xml.append(tabulation.toString()).append("</property>\n");
+		
+		return xml.toString();
+	}
 }

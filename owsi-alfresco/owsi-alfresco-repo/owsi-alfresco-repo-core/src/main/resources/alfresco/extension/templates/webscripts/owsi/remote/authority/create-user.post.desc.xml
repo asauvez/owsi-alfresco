@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>create-user</shortname>
+	<description>Create a new user</description>
+	<url>/owsi/authority/create-user</url>
+	<format default="json" />
+	<authentication>admin</authentication>
+	<transaction>required</transaction>
+	<family>OWSI</family>
+</webscript>

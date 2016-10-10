@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-repo</artifactId>
-		<version>0.2.8</version>
+		<version>0.3.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-repo-module</artifactId>
 
@@ -25,7 +25,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-web-client</artifactId>
+			<artifactId>alfresco-data-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-repository</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -41,13 +49,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<plugins>
-			<!-- Pour définir alfresco.module.version -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
 	</build>
 	
 </project>

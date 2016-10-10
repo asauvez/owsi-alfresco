@@ -14,4 +14,8 @@ public class DoublePropertyModel extends AbstractNumberPropertyModel<Double> {
 		return Double.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:double";
+	}
 }

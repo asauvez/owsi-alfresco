@@ -5,6 +5,14 @@
 
 	<!-- Node service -->
 	
+	<bean id="owsi.service.nodeResetService" class="fr.openwide.alfresco.repository.core.resetModuleVersion.service.impl.ResetModuleVersionServiceImpl">
+		<property name="modules" value="${owsi.reset-module-version.modules}" />
+		<property name="globalProperties" ref="global-properties"/>
+		<property name="registryService" ref="RegistryService" />
+	</bean>
+
+	<!-- Node service -->
+	
 	<bean id="owsi.service.nodeService" class="fr.openwide.alfresco.repository.core.node.service.impl.NodeRemoteServiceImpl">
 		<property name="nodeService" ref="NodeService" />
 		<property name="contentService" ref="ContentService" />
@@ -18,6 +26,7 @@
 
 	<bean id="webscript.owsi.node" parent="webscript.owsi.remote" abstract="true">
 		<property name="nodeService" ref="owsi.service.nodeService" />
+		<property name="runAsEnabled" value="${owsi-alfresco.run-as.enabled}" />
 	</bean>
 
 	<bean id="webscript.owsi.remote.node.node-get.post" parent="webscript.owsi.node"
@@ -57,6 +66,7 @@
 		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="authorityService" ref="AuthorityService" />
+		<property name="authenticationService" ref="AuthenticationService" />
 		<property name="personService" ref="PersonService" />
 		<property name="nodeService" ref="NodeService" />
 	</bean>
@@ -69,9 +79,31 @@
 
 	<bean id="webscript.owsi.remote.authority.get-user.post" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.GetUserWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-contained-users.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedUsersWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-contained-groups.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedGroupsWebScript" />
+	<bean id="webscript.owsi.remote.authority.get-contained-authorities.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetContainedAuthoritiesWebScript" />
+	<bean id="webscript.owsi.remote.authority.create-user.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.CreateUserWebScript" />
+	<bean id="webscript.owsi.remote.authority.delete-user.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.DeleteUserWebScript" />
+	<bean id="webscript.owsi.remote.authority.update-user-password.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.UpdateUserPasswordWebScript" />
+	<bean id="webscript.owsi.remote.authority.get-group.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.GetGroupWebScript" />
+	<bean id="webscript.owsi.remote.authority.create-root-group.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.CreateRootGroupWebScript" />
+	<bean id="webscript.owsi.remote.authority.add-to-group.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.AddToGroupWebScript" />
+	<bean id="webscript.owsi.remote.authority.remove-from-group.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.RemoveFromGroupWebScript" />
+	<bean id="webscript.owsi.remote.authority.delete-group.post" parent="webscript.owsi.authority"
+			class="fr.openwide.alfresco.repository.core.authority.web.script.DeleteGroupWebScript" />
+
+	<!-- Admin webscripts -->
+
+	<bean id="webscript.owsi.remote.admin.setModuleCurrentVersion.get" 
+			class="fr.openwide.alfresco.repository.core.admin.web.script.SetModuleCurrentVersionWebScript" 
+			parent="webscript">
+		<property name="nodeService" ref="NodeService" />
+	</bean>
 
 </beans>

@@ -14,4 +14,8 @@ public class NameReferencePropertyModel extends SinglePropertyModel<NameReferenc
 		return NameReference.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:text";
+	}
 }

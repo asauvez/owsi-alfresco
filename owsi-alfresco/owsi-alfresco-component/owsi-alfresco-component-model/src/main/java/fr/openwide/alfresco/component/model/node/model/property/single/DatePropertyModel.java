@@ -9,4 +9,8 @@ public class DatePropertyModel extends AbstractDatePropertyModel {
 		super(type, nameReference);
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:date";
+	}
 }

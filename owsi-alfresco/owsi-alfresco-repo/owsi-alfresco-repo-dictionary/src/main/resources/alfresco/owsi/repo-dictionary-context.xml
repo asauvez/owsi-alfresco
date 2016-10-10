@@ -6,9 +6,12 @@
 	<bean id="owsi.service.nodeModelService" class="fr.openwide.alfresco.repo.dictionary.node.service.impl.NodeModelRepositoryServiceImpl">
 		<constructor-arg ref="owsi.service.nodeService"/>
 		<property name="nodeService" ref="NodeService"/>
+		<property name="permissionService" ref="PermissionService"/>
 		<property name="copyService" ref="CopyService"/>
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="repositoryHelper" ref="repositoryHelper" />
+		<property name="singletonCache" ref="immutableSingletonCache" />
+		<property name="dataDictionaryChildName"><value>${spaces.dictionary.childname}</value></property>
 	</bean>
 
 	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl">
@@ -21,6 +24,7 @@
 
 	<bean id="owsi.service.policyService" class="fr.openwide.alfresco.repo.dictionary.policy.service.impl.PolicyRepositoryServiceImpl">
 		<property name="policyComponent" ref="policyComponent" />
+		<property name="policyFilter" ref="policyBehaviourFilter" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 

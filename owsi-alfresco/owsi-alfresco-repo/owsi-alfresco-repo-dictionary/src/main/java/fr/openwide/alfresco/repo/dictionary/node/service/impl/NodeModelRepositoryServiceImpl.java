@@ -1,26 +1,40 @@
 package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -33,10 +47,15 @@ public class NodeModelRepositoryServiceImpl
 	implements NodeModelRepositoryService {
 
 	private NodeService nodeService;
+	private PermissionService permissionService;
 	private CopyService copyService;
 	private Repository repositoryHelper;
 
 	private ConversionService conversionService;
+	
+	private String dataDictionaryChildName;
+	private SimpleCache<String, NodeReference> singletonCache; // eg. for dataDictionaryNodeRef
+	private final String KEY_DATADICTIONARY_NODEREF = "owsi.key.datadictionary.noderef";
 	
 	public NodeModelRepositoryServiceImpl(NodeRemoteService nodeService) {
 		super(nodeService);
@@ -57,9 +76,22 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
-	public void copy(NodeReference nodeReference, NodeReference newParentRef) {
-		copyService.copy(conversionService.getRequired(nodeReference), 
-				conversionService.getRequired(newParentRef));
+	public NodeReference copy(NodeReference nodeReference, NodeReference newParentRef, Optional<String> newName) {
+		NodeRef nodeRef = conversionService.getRequired(nodeReference);
+		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
+		QName name = newName.isPresent() 
+				? NodeRemoteServiceImpl.createAssociationName(newName.get())
+				: primaryParent.getQName();
+		NodeRef copy = copyService.copy(
+			nodeRef, 
+			conversionService.getRequired(newParentRef), 
+			primaryParent.getTypeQName(), 
+			name, 
+			true);
+		nodeService.setProperty(copy, ContentModel.PROP_NAME, newName.isPresent() 
+				? newName.get()
+				: nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+		return conversionService.get(copy);
 	}
 
 	@Override
@@ -138,6 +170,10 @@ public class NodeModelRepositoryServiceImpl
 		return (C) getProperty(nodeReference, property.getNameReference());
 	}
 	@Override
+	public <E extends Enum<E>> E getProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property) {
+		return PropertiesNode.textToEnum(property, (String) getProperty(nodeReference, property.getNameReference()));
+	}
+	@Override
 	@SuppressWarnings("unchecked")
 	public <C extends Serializable> List<C> getProperty(NodeReference nodeReference, MultiPropertyModel<C> property) {
 		return (List<C>) getProperty(nodeReference, property.getNameReference());
@@ -146,6 +182,11 @@ public class NodeModelRepositoryServiceImpl
 	@Override
 	public <C extends Serializable> void setProperty(NodeReference nodeReference, SinglePropertyModel<C> property, C value) {
 		setProperty(nodeReference, property.getNameReference(), value);
+	}
+	@Override
+	public <E extends Enum<E>> void setProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property, E value) {
+		String code = PropertiesNode.enumToText(value);
+		setProperty(nodeReference, property.getNameReference(), code);
 	}
 	@Override
 	public <C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value) {
@@ -160,6 +201,34 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getForRepository(value));
 	}
 
+	@Override
+	public Optional<NodeReference> getPrimaryParent(NodeReference nodeReference) {
+		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(conversionService.getRequired(nodeReference));
+		return (primaryParent != null && primaryParent.getParentRef() != null) 
+				? Optional.of(conversionService.get(primaryParent.getParentRef()))
+				: Optional.<NodeReference>absent();
+	}
+
+	@Override
+	public List<NodeReference> getParentAssocs(NodeReference nodeReference) {
+		List<ChildAssociationRef> children = nodeService.getParentAssocs(conversionService.getRequired(nodeReference));
+		List<NodeReference> list = new ArrayList<>();
+		for (ChildAssociationRef child : children) {
+			list.add(conversionService.get(child.getParentRef()));
+		}
+		return list;
+	}
+
+	@Override
+	public Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName) {
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(associationType.getNameReference()), 
+				conversionService.getRequired(assocName));
+		return Optional.fromNullable((children.isEmpty()) 
+				? null
+				: conversionService.get(children.get(0).getChildRef()));
+	}
 	@Override
 	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName) {
 		return getChildByName(nodeReference, childName, CmModel.folder.contains);
@@ -197,10 +266,67 @@ public class NodeModelRepositoryServiceImpl
 	}
 	
 	@Override
+	public void removeChild(NodeReference parentRef, NodeReference childRef) {
+		removeChild(parentRef, childRef, CmModel.folder.contains);
+	}
+	@Override
+	public void removeChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType) {
+		removeChild(parentRef, childRef, assocType.getNameReference());
+	}
+	@Override
+	public void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType) {
+		String childName = getProperty(childRef, CmModel.object.name);
+		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
+				conversionService.getRequired(parentRef), 
+				conversionService.getRequired(assocType), 
+				NodeRemoteServiceImpl.createAssociationName(childName));
+		NodeRef child = conversionService.getRequired(childRef);
+		for (ChildAssociationRef assoc : assocs) {
+			if (assoc.getChildRef().equals(child)) {
+				nodeService.removeChildAssociation(assoc);
+				return;
+			}
+		}
+		throw new IllegalStateRemoteException("Can't find secondary child association " + parentRef + "/" + childRef);
+	}
+	@Override
+	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
+		List<ChildAssociationRef> parentAssocs = nodeService.getParentAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(childAssociationModel.getNameReference()), 
+				RegexQNamePattern.MATCH_ALL);
+		for (ChildAssociationRef assoc : parentAssocs) {
+			if (! assoc.isPrimary()) {
+				nodeService.removeChildAssociation(assoc);
+			}
+		}
+	}
+	
+	@Override
 	public NodeReference getCompanyHome() {
 		return conversionService.get(repositoryHelper.getCompanyHome());
 	}
+	@Override
+	public NodeReference getDataDictionary() {
+		NodeReference dataDictionaryRef = singletonCache.get(KEY_DATADICTIONARY_NODEREF);
+		if (dataDictionaryRef == null) {
+			dataDictionaryRef = AuthenticationUtil.runAs(new RunAsWork<NodeReference>() {
+				@Override
+				public NodeReference doWork() throws Exception {
+					NodeReference parent = getCompanyHome();
+					return getChildAssocs(parent, CmModel.folder.contains, NameReference.create(dataDictionaryChildName)).get();
+				}
+			}, AuthenticationUtil.getSystemUserName());
+
+			singletonCache.put(KEY_DATADICTIONARY_NODEREF, dataDictionaryRef);
+		}
+		return dataDictionaryRef;
+	}
 	
+	/**
+	 * Retourne le home folder de l'utilisateur en cours. 
+	 * Cela ne tient pas compte de possible runAs.
+	 */
 	@Override
 	public Optional<NodeReference> getUserHome() {
 		NodeRef person = repositoryHelper.getFullyAuthenticatedPerson();
@@ -212,6 +338,11 @@ public class NodeModelRepositoryServiceImpl
 		}
 	}
 
+	/**
+	 * Recherche un noeud à partir d'un chemin. Le chemin est défini en dessous de "Company Home",
+	 * avec une liste de cm:name. 
+	 * Cette méthode n'utilise pas de recherche Lucene.
+	 */
 	@Override
 	public Optional<NodeReference> getByNamedPath(String ... names) {
 		NodeReference nodeReference = conversionService.get(repositoryHelper.getCompanyHome());
@@ -227,8 +358,29 @@ public class NodeModelRepositoryServiceImpl
 		return Optional.of(nodeReference);
 	}
 
+	@Override
+	public void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions) {
+		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);
+	}
+	@Override
+	public void setPermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission) {
+		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), true);
+	}
+	@Override
+	public void deletePermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission) {
+		permissionService.deletePermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName());
+	}
+
+	@Override
+	public String getPath(NodeReference nodeReference) {
+		return get(nodeReference, new NodeScopeBuilder().path()).getPath();
+	}
+
 	public void setNodeService(NodeService nodeService) {
 		this.nodeService = nodeService;
+	}
+	public void setPermissionService(PermissionService permissionService) {
+		this.permissionService = permissionService;
 	}
 	public void setCopyService(CopyService copyService) {
 		this.copyService = copyService;
@@ -236,8 +388,14 @@ public class NodeModelRepositoryServiceImpl
 	public void setRepositoryHelper(Repository repositoryHelper) {
 		this.repositoryHelper = repositoryHelper;
 	}
+	public void setDataDictionaryChildName(String dataDictionaryChildName) {
+		this.dataDictionaryChildName = dataDictionaryChildName;
+	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
+	}
+	public void setSingletonCache(SimpleCache<String, NodeReference> singletonCache) {
+		this.singletonCache = singletonCache;
 	}
 
 }

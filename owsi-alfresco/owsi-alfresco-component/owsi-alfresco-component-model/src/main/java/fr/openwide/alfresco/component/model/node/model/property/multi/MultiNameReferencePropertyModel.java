@@ -14,4 +14,8 @@ public class MultiNameReferencePropertyModel extends MultiPropertyModel<NameRefe
 		return NameReference.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:text";
+	}
 }

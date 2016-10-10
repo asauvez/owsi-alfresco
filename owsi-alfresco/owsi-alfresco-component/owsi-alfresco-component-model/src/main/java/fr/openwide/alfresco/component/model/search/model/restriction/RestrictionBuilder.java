@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
+import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
@@ -147,20 +149,41 @@ public class RestrictionBuilder extends Restriction {
 		return restriction;
 	}
 
-	public boolean isEmpty() {
-		return restrictions.isEmpty();
-	}
-	
 	@Override
 	protected boolean isNeedingParenthesis() {
 		return true;
 	}
 	
 	@Override
-	protected String toQueryInternal() {
+	protected String toFtsQueryInternal() {
 		StringBuilder buf = new StringBuilder();
 		for (Restriction restriction : restrictions) {
-			String query = restriction.toQuery();
+			String query = restriction.toFtsQuery();
+			if (query.length() > 0) {
+				if (buf.length() > 0) {
+					buf.append("\n").append(operator.name()).append(" ");
+				}
+				boolean needingParenthesis = restriction.isNeedingParenthesis() && ! query.startsWith("NOT ");
+				if (needingParenthesis) buf.append("(");
+				buf.append(query.replace("\n", "\n\t"));
+				if (needingParenthesis) buf.append(")");
+			}
+		}
+		return buf.toString();
+	}
+	
+	@Override
+	protected void addCmisQueryJoin(Set<ContainerModel> containersToJoin) {
+		for (Restriction restriction : restrictions) {
+			restriction.addCmisQueryJoin(containersToJoin);
+		}
+	}
+	
+	@Override
+	protected String toCmisQueryWhereInternal() {
+		StringBuilder buf = new StringBuilder();
+		for (Restriction restriction : restrictions) {
+			String query = restriction.toCmisWhereQuery();
 			if (query.length() > 0) {
 				if (buf.length() > 0) {
 					buf.append("\n").append(operator.name()).append(" ");

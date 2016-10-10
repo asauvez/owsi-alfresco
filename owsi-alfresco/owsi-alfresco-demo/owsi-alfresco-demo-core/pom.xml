@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-demo-application</artifactId>
+		<version>0.3.0</version>
+		<relativePath>../owsi-alfresco-demo-application/pom.xml</relativePath>
+	</parent>
+	<artifactId>owsi-alfresco-demo-core</artifactId>
+
+	<name>OWSI Alfresco - Demo application - Core</name>
+	<description>Application de démonstration et de test</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-app-dictionary</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-app-module</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-demo-api</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-app-core</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+			</plugin>
+			
+			<!-- Integration test 
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<configuration>
+					<webapps>
+						<webapp>
+							<contextPath>/alfresco</contextPath>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-demo-alfresco</artifactId>
+							<version>${project.version}</version>
+							<type>war</type>
+							<asWebapp>true</asWebapp>
+						</webapp>
+						<webapp>
+							<contextPath>/share</contextPath>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-demo-share</artifactId>
+							<version>${project.version}</version>
+							<type>war</type>
+							<asWebapp>true</asWebapp>
+						</webapp>
+					</webapps>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			-->
+		</plugins>
+	</build>
+	
+</project>

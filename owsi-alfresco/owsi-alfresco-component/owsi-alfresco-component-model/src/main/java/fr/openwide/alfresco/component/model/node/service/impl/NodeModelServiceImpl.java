@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
@@ -68,7 +67,9 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public NodeReference createContent(NodeReference parentRef, final MultipartFile file) throws DuplicateChildNodeNameRemoteException {
-		String fileName = FilenameUtils.getName(file.getOriginalFilename());
+		int index = file.getOriginalFilename().replace('\\',  '/').lastIndexOf('/');
+		String fileName = (index != -1) ? file.getOriginalFilename().substring(index + 1) : file.getOriginalFilename();
+		
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 				.properties().set(CmModel.content.content, new RepositoryContentData(file.getContentType(), null))
 				.contents().set(file));

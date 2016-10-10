@@ -12,6 +12,8 @@ import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 
 public interface NodeRemoteService {
 
+	public static final NameReference PARENT_ASSOCIATION_NAME_HINT = NameReference.create("http://www.openwide.fr/owsi-alfresco", "parentAssociationNameHint"); 
+	
 	class GET_NODE_SERVICE {
 		public static final PostMethodEndpoint<RepositoryNode> ENDPOINT = new PostMethodEndpoint<RepositoryNode>("/owsi/node/get") {};
 		public NodeReference nodeReference;

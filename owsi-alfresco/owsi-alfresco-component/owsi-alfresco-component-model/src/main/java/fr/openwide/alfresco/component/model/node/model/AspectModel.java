@@ -13,4 +13,9 @@ public class AspectModel extends ContainerModel {
 		copy(aspectModel, this);
 	}
 	
+	public String getXmlModel() throws Exception {
+		return getXmlModel("aspect");
+	}
+	
+	
 }

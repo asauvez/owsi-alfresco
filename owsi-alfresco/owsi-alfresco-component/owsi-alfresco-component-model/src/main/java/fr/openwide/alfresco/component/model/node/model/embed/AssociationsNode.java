@@ -5,7 +5,6 @@ import java.util.List;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -48,11 +47,14 @@ public class AssociationsNode {
 		return childAssociationModel.getNameReference().equals(repoNode.getPrimaryParentAssociation().getType());
 	}
 
-	public BusinessNode getRendition(NameReference renditionName) {
-		RepositoryNode renditionNode = repoNode.getRenditions().get(renditionName);
-		return (renditionNode != null) ? new BusinessNode(renditionNode) : null;
+	public BusinessNode addChild(BusinessNode node) {
+		return addChild(CmModel.folder.contains, node);
 	}
-	
+	public BusinessNode addChild(ChildAssociationModel childAssociation, BusinessNode node) {
+		getChildAssociation(childAssociation).add(node);
+		return node;
+	}
+
 	public List<BusinessNode> getChildAssociationContains() {
 		return getChildAssociation(CmModel.folder.contains);
 	}

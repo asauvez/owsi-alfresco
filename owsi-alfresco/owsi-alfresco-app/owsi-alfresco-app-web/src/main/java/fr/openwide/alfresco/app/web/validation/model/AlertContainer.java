@@ -3,6 +3,9 @@ package fr.openwide.alfresco.app.web.validation.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 public class AlertContainer {
 
 	public static final String ALERTS_FIELD_NAME = "alerts";
@@ -35,6 +38,13 @@ public class AlertContainer {
 	public AlertContainer addInfo(String message, Object ... args) {
 		items.add(Alert.newInfo(message, null, args));
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+				.append("items", items)
+				.toString();
 	}
 
 }

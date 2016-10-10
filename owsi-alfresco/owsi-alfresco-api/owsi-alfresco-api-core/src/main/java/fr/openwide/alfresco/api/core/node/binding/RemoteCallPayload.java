@@ -10,6 +10,13 @@ public class RemoteCallPayload<P> {
 	private P payload;
 	private RemoteCallParameters remoteCallParameters;
 	
+	protected RemoteCallPayload() {}
+	
+	public RemoteCallPayload(P payload, RemoteCallParameters remoteCallParameters) {
+		this.payload = payload;
+		this.remoteCallParameters = remoteCallParameters;
+	}
+	
 	public P getPayload() {
 		return payload;
 	}

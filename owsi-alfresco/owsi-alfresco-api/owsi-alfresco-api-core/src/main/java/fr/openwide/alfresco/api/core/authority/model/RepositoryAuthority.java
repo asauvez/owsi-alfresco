@@ -11,18 +11,28 @@ public class RepositoryAuthority implements Serializable {
 
 	public static final String GROUP_PREFIX = "GROUP_"; 
 	
-	public static final RepositoryAuthority USER_SYSTEM = new RepositoryAuthority("System");
-	public static final RepositoryAuthority GROUP_EVERYONE = new RepositoryAuthority(GROUP_PREFIX + "EVERYONE");
-	public static final RepositoryAuthority GROUP_ADMINISTRATORS = new RepositoryAuthority(GROUP_PREFIX + "ALFRESCO_ADMINISTRATORS");
+	public static final RepositoryAuthority USER_SYSTEM = RepositoryAuthority.authority("System");
+	public static final RepositoryAuthority GROUP_EVERYONE = RepositoryAuthority.group("EVERYONE");
+	
+	public static final RepositoryAuthority GROUP_ALFRESCO_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_ADMINISTRATORS");
+	public static final RepositoryAuthority GROUP_ALFRESCO_MODEL_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_MODEL_ADMINISTRATORS");
+	public static final RepositoryAuthority GROUP_ALFRESCO_SEARCH_ADMINISTRATORS = RepositoryAuthority.group("ALFRESCO_SEARCH_ADMINISTRATORS");
+	public static final RepositoryAuthority GROUP_EMAIL_CONTRIBUTORS = RepositoryAuthority.group("EMAIL_CONTRIBUTORS");
+	public static final RepositoryAuthority GROUP_SITE_ADMINISTRATORS = RepositoryAuthority.group("SITE_ADMINISTRATORS");
+	
+	public static final RepositoryAuthority ROLE_ADMINISTRATOR = RepositoryAuthority.authority("ROLE_ADMINISTRATOR");
 
 	private String name;
 
-	public RepositoryAuthority(String name) {
+	private RepositoryAuthority(String name) {
 		this.name = name;
 	}
 	
+	public static RepositoryAuthority user(String username) {
+		return authority(username);
+	}
 	public static RepositoryAuthority group(String shortName) {
-		return new RepositoryAuthority(GROUP_PREFIX + shortName);
+		return authority(GROUP_PREFIX + shortName);
 	}
 	public static RepositoryAuthority authority(String authorityName) {
 		return new RepositoryAuthority(authorityName);

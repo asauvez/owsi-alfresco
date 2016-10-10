@@ -10,8 +10,8 @@ public class MatchTextRestriction extends Restriction {
 	}
 
 	@Override
-	protected String toQueryInternal() {
-		return (value != null) ? "TEXT:" + toLuceneValue(value) : "";
+	protected String toFtsQueryInternal() {
+		return (value != null) ? "TEXT:" + toFtsLuceneValue(value) : "";
 	}
 
 }

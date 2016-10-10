@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>fr.openwide.core.parents</groupId>
 		<artifactId>owsi-core-parent-maven-configuration-common</artifactId>
-		<version>0.9.8</version>
+		<version>0.12.0</version>
 		<relativePath />
 	</parent>
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.2.8</version>
+	<version>0.3.0</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
@@ -18,6 +18,7 @@
 
 	<properties>
 		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
+		<owsi-alfresco.maven-failsafe-plugin.version>2.19.1</owsi-alfresco.maven-failsafe-plugin.version>
 	</properties>
 
 	<modules>
@@ -25,6 +26,9 @@
 		<module>owsi-alfresco-parent-api</module>
 		<module>owsi-alfresco-parent-app</module>
 		<module>owsi-alfresco-parent-repo</module>
+		<module>owsi-alfresco-parent-alfresco</module>
+		<module>owsi-alfresco-parent-share-component</module>
+		<module>owsi-alfresco-parent-share</module>
 	</modules>
 
 	<profiles>
@@ -51,8 +55,63 @@
 	</profiles>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<pluginManagement>
 			<plugins>
+				<!-- Integration test -->
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+					<configuration>
+						<fork>true</fork>
+						<port>8080</port>
+						<ignorePackaging>true</ignorePackaging>
+					</configuration>
+					<executions>
+						<execution>
+							<id>launch-tomcat</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>stop-tomcat</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>shutdown</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.19.1</version>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>integration-test</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>verify-integration-test</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
 					<artifactId>jgitflow-maven-plugin</artifactId>
@@ -72,9 +131,24 @@
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
+
 
 	<repositories>
 		<repository>

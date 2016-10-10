@@ -20,11 +20,31 @@ public class RepositoryPermission implements Serializable {
 	public static final RepositoryPermission WRITE_PROPERTIES = new RepositoryPermission("WriteProperties");
 	public static final RepositoryPermission WRITE_CONTENT = new RepositoryPermission("WriteContent");
 
+	public static final RepositoryPermission READ_PERMISSIONS = new RepositoryPermission("ReadPermissions");
+	public static final RepositoryPermission CHANGE_PERMISSIONS = new RepositoryPermission("ChangePermissions");
+
+	public static final RepositoryPermission CREATE_ASSOCIATIONS = new RepositoryPermission("CreateAssociations");
+	public static final RepositoryPermission READ_ASSOCIATIONS = new RepositoryPermission("ReadAssociations");
+	public static final RepositoryPermission DELETE_ASSOCIATIONS = new RepositoryPermission("DeleteAssociations");
+
+	public static final RepositoryPermission TAKE_OWNERSHIP = new RepositoryPermission("TakeOwnership");
+	public static final RepositoryPermission SET_OWNER = new RepositoryPermission("SetOwner");
+	public static final RepositoryPermission LOCK = new RepositoryPermission("Lock");
+	public static final RepositoryPermission UNLOCK = new RepositoryPermission("Unlock");
+	public static final RepositoryPermission CHECK_OUT = new RepositoryPermission("CheckOut");
+	public static final RepositoryPermission CHECK_IN = new RepositoryPermission("CheckIn");
+	public static final RepositoryPermission CANCEL_CHECK_OUT = new RepositoryPermission("CancelCheckOut");
+
 	public static final RepositoryPermission COORDINATOR = new RepositoryPermission("Coordinator");
 	public static final RepositoryPermission COLLABORATOR = new RepositoryPermission("Collaborator");
 	public static final RepositoryPermission CONTRIBUTOR = new RepositoryPermission("Contributor");
 	public static final RepositoryPermission EDITOR = new RepositoryPermission("Editor");
 	public static final RepositoryPermission CONSUMER = new RepositoryPermission("Consumer");
+
+	public static final RepositoryPermission SITE_MANAGER = new RepositoryPermission("SiteManager");
+	public static final RepositoryPermission SITE_COLLABORATOR = new RepositoryPermission("SiteCollaborator");
+	public static final RepositoryPermission SITE_CONTRIBUTOR = new RepositoryPermission("SiteContributor");
+	public static final RepositoryPermission SITE_CONSUMER = new RepositoryPermission("SiteConsumer");
 
 	private String name;
 

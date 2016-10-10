@@ -14,4 +14,8 @@ public class MultiTextPropertyModel extends MultiPropertyModel<String> {
 		return String.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:text";
+	}
 }

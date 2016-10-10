@@ -12,6 +12,11 @@
 			class="fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript">
 		<property name="transactionService" ref="transactionService" />
 		<property name="objectMapper" ref="owsi.objectMapper" />
+		<property name="maxRetries" value="${server.transaction.max-retries}"/>
+		<property name="encryptTempFiles" value="${webscripts.encryptTempFiles}" />
+		<property name="tempDirectoryName" value="${webscripts.tempDirectoryName}" />
+		<property name="memoryThreshold" value="${webscripts.memoryThreshold}" />
+		<property name="maxContentSize" value="${webscripts.setMaxContentSize}" />
 	</bean>
 
 	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.repository.remote.conversion.service.impl.ConversionServiceImpl">
@@ -45,5 +50,7 @@
 
 	<bean id="webscript.owsi.remote.authentication.user.post" parent="webscript.owsi.remote.authentication"
 			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UserWebScript" />
+	<bean id="webscript.owsi.remote.authentication.username.get" parent="webscript.owsi.remote.authentication"
+			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UsernameWebScript" />
 
 </beans>

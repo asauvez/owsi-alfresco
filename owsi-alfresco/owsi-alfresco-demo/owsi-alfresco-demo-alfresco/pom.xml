@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-parent-alfresco</artifactId>
+		<version>0.3.0</version>
+		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-alfresco/pom.xml</relativePath>
+	</parent>
+	<artifactId>owsi-alfresco-demo-alfresco</artifactId>
+	<packaging>war</packaging>
+
+	<name>OWSI Alfresco - Demo repo</name>
+	<description>Serveur Alfresco de démonstration et de test</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>

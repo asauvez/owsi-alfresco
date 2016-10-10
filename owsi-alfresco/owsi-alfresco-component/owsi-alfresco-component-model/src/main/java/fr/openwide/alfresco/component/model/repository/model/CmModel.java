@@ -5,19 +5,24 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthorityContainer;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmCategory;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmCategoryRoot;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCheckedOut;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCopiedFrom;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCountable;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmEmailed;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeographic;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmIndexControl;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmLink;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmLockable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmPreferences;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmSummarizable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTitled;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
@@ -25,6 +30,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
 
 public interface CmModel {
 
+	// https://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/model/contentModel.xml
 	NamespaceReference NAMESPACE = NamespaceReference.create("cm", "http://www.alfresco.org/model/content/1.0");
 
 	// ---- Aspects
@@ -59,6 +65,10 @@ public interface CmModel {
 	
 	CmIndexControl indexControl = new CmIndexControl();
 	
+	CmPreferences preferences = new CmPreferences();
+	
+	CmEmailed emailed = new CmEmailed();
+	
 	// ---- Types
 
 	CmObject object = new CmObject();
@@ -73,4 +83,8 @@ public interface CmModel {
 	
 	CmPerson person = new CmPerson();
 
+	CmCategoryRoot categoryRoot = new CmCategoryRoot();
+	CmCategory category = new CmCategory();
+	
+	CmLink link = new CmLink();
 }

@@ -3,11 +3,16 @@ package fr.openwide.alfresco.app.web.validation.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,9 +27,10 @@ public class ValidationResponse {
 
 	private AlertContainer alertContainer = new AlertContainer();
 	private MessageSource messageSource;
+	private NativeWebRequest webRequest;
 
 	private String viewName;	// Page à renvoyer comme si on renvoyé un ModelAndView
-	private String redirect;	// URL où $.formBindAjaxPost() va rediriger le navigateur. 
+	private String redirection;	// URL où $.formBindAjaxPost() va rediriger le navigateur. 
 
 	public void addGlobalAlerts(BindingResult bindingResult) {
 		addErrors(bindingResult, false);
@@ -139,6 +145,15 @@ public class ValidationResponse {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+				.append("globalAlerts", globalAlerts)
+				.append("fieldErrors", fieldErrors)
+				.append("viewName", viewName)
+				.toString();
+	}
+
 	public List<FieldMessage> getFieldErrors() {
 		return fieldErrors;
 	}
@@ -158,6 +173,9 @@ public class ValidationResponse {
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
+	public void setWebRequest(NativeWebRequest webRequest) {
+		this.webRequest = webRequest;
+	}
 
 	public String getViewName() {
 		return viewName;
@@ -166,10 +184,20 @@ public class ValidationResponse {
 		this.viewName = viewName;
 	}
 
-	public String getRedirect() {
-		return redirect;
+	public String getRedirection() {
+		return redirection;
 	}
-	public void setRedirect(String redirect) {
-		this.redirect = redirect;
+	
+	/**
+	 * @param redirection Si on ne passe pas une URL absolu, prefixe l'URL fournie par le context path.
+	 */
+	public void setRedirection(String redirection) {
+		if (! redirection.startsWith("http")) {
+			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+			String contextPath = request.getContextPath();
+			redirection = contextPath + redirection;
+		}
+		this.redirection = redirection;
 	}
 }
+

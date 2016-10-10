@@ -13,5 +13,10 @@ public class MultiDoublePropertyModel extends AbstractMultiNumberPropertyModel<D
 	public Class<Double> getValueClass() {
 		return Double.class;
 	}
+	
+	@Override
+	public String getDataType() {
+		return "d:double";
+	}
 
 }

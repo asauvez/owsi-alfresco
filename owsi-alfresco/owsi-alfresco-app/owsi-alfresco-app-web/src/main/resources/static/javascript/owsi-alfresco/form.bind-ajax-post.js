@@ -124,48 +124,90 @@
 			});
 		},
 		
+		linkBindAjaxPost: function(options) {
+			
+			this.each(function() {
+				
+				var link = $(this);
+				var localOptions = $.extend({
+					confirmationMsg : link.data('confirmation-msg'),
+					type: 'POST'
+				}, options);
+				link.click(function() {
+					if (localOptions.confirmationMsg != null) {
+						if (! confirm(localOptions.confirmationMsg)) {
+							return false;
+						}
+					}
+					
+					var url = link.attr('href');
+					$.ajax(url, {
+						success: function(data) {
+							if (data.redirection != null) {
+								document.location = data.redirection;
+							}
+						},
+						
+						dataType: "json",
+						type: localOptions.type
+					});
+					return false;
+				});
+			});
+		},
+		
+		
 		formBindAjaxPost: function(options) {
 			var defaultTargetRequestPath = function() {
 				return location.pathname + location.search + location.hash;
 			};
 			options = $.extend({
 					onSuccess : function(form, data) {
-						if (data.redirect != null) {
-							location.href = data.redirect;
+						if (data.redirection != null) {
+							location.href = data.redirection;
 						} else {
 							// Par defaut, on recharge la page en cas de succes
 							// Pas de form.trigger("aftersubmit"); car on recharge la page
 							location.reload();
 						};
 					},
-					
-					targetRequestPath : defaultTargetRequestPath,
-					
-					beforeSend: function(form, request) {
-						// le set du header est fait ici car sa valeur peut dependre de valeurs modifiees dans le formulaire
-						targetRequestPath = options.targetRequestPath;
-						if (typeof targetRequestPath == "function") {
-							targetRequestPath = options.targetRequestPath(defaultTargetRequestPath());
-						}
-						request.setRequestHeader("targetRequestPath", targetRequestPath);
-					},
-					
-					beforeSubmit: function(form, data) {
-						// On ne fait rien par défaut
-					},
-					
-					submitOnceOptions: {}
-					
-				}, options);
+				onSuccess : function(form, data) {
+					if (data.redirect != null) {
+						location.href = data.redirect;
+					} else {
+						// Par defaut, on recharge la page en cas de succes
+						// Pas de form.trigger("aftersubmit"); car on recharge la page
+						location.reload();
+					};
+				},
+				
+				targetRequestPath : defaultTargetRequestPath,
+				
+				beforeSend: function(form, request) {
+					// le set du header est fait ici car sa valeur peut dependre de valeurs modifiees dans le formulaire
+					targetRequestPath = options.targetRequestPath;
+					if (typeof targetRequestPath == "function") {
+						targetRequestPath = options.targetRequestPath(defaultTargetRequestPath());
+					}
+					request.setRequestHeader("targetRequestPath", targetRequestPath);
+				},
+				
+				beforeSubmit: function(form, data) {
+					// On ne fait rien par défaut
+				},
+				
+				submitOnceOptions: {}
+				
+			}, options);
 			
 			this.each(function() {
 				var form = $(this);
+				
 				form.submitOnce(options.submitOnceOptions);
 				
 				form.on("aftersubmit.formBindAjaxPost", function() {
 					form.formBindClearErrors();
 				});
-				
 				form.ajaxForm({
 					beforeSend: function (request) {
 						options.beforeSend(form, request);
@@ -180,7 +222,9 @@
 						form.formBindManageJsonErrors(xhr);
 					}
 				});
+				
 			});
+			
 			// pour chainage jquery
 			return this;
 		}

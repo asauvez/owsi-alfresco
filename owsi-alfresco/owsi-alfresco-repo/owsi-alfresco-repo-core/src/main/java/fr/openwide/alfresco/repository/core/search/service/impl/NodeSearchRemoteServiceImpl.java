@@ -10,7 +10,6 @@ import org.alfresco.service.cmr.search.QueryConsistency;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +34,13 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
 	@Override
 	public List<RepositoryNode> search(RepositorySearchParameters rsp) {
-		if (StringUtils.isBlank(rsp.getQuery())) {
+		if (rsp.getQuery() == null || rsp.getQuery().isEmpty()) {
 			throw new InvalidPayloadException("The query should not be an empty string.");
 		}
 		try {
 			long before = System.currentTimeMillis();
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Searching for query : {}", rsp.getQuery());
+				LOGGER.debug("Searching for query : {}", rsp.getQuery().replace("\n", " "));
 			}
 
 			SearchParameters sp = new SearchParameters();

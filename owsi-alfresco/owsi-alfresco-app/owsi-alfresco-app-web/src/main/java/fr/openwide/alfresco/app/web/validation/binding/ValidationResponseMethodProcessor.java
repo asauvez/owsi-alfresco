@@ -59,6 +59,7 @@ public class ValidationResponseMethodProcessor extends AbstractMessageConverterM
 		// build validationResponse
 		ValidationResponse validationResponse = new ValidationResponse();
 		validationResponse.setMessageSource(messageSource);
+		validationResponse.setWebRequest(webRequest);
 		return validationResponse;
 	}
 
@@ -98,8 +99,8 @@ public class ValidationResponseMethodProcessor extends AbstractMessageConverterM
 					FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 					flashMap.put(AlertContainer.ALERTS_FIELD_NAME, alertContainer);
 					// get targetRequestPath: may be null if request is not standard ajax
-					String targetRequestPath = (validation.getRedirect() != null) 
-							? validation.getRedirect()
+					String targetRequestPath = (validation.getRedirection() != null) 
+							? validation.getRedirection()
 							: webRequest.getHeader(TARGET_REQUEST_PATH_HEADER_NAME);
 					if (targetRequestPath != null) {
 						UriComponents uriComponents = UriComponentsBuilder.fromUriString(targetRequestPath).build();

@@ -1,0 +1,52 @@
+#logo {
+	content: "Application";
+}
+
+body {
+	padding-bottom: 40px;
+	padding-top: 20px;
+}
+
+.navbar {
+	padding-left: 70px;
+	background-repeat: no-repeat;
+	background-position: 20px center;
+}
+
+/*
+* Elargissement de la largeur du container bootstrap
+*/
+@media {
+	.container {
+		max-width: none;
+	}
+}
+
+/*
+* Eclaircissement du backdrop pour les fenêtres modales
+*/
+.modal-backdrop.in {
+	opacity: .1;
+	filter: alpha(opacity=10);
+}
+
+/*
+* Page de login
+*/
+body.login-body .container .layout-footer,
+.container .login-panel {
+	margin: 100px 0 100px 340px;
+	width: 700px;
+}
+
+.container .login-panel {
+	background-color: #006da3;
+	background-repeat: no-repeat;
+	background-position: 20px center;
+}
+
+.container .login-panel .panel-body {
+	margin-left: 205px;
+	background-color: #ffffff;
+}
+

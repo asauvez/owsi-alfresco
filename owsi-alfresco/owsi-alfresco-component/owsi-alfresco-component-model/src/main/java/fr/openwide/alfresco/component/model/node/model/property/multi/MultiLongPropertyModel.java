@@ -14,4 +14,8 @@ public class MultiLongPropertyModel extends AbstractMultiNumberPropertyModel<Lon
 		return Long.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:long";
+	}
 }

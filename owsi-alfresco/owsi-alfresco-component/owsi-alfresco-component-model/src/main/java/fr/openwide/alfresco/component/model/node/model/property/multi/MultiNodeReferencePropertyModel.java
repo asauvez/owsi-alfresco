@@ -15,4 +15,9 @@ public class MultiNodeReferencePropertyModel extends MultiPropertyModel<NodeRefe
 		return NodeReference.class;
 	}
 
+	
+	@Override
+	public String getDataType() {
+		return "d:noderef";
+	}
 }

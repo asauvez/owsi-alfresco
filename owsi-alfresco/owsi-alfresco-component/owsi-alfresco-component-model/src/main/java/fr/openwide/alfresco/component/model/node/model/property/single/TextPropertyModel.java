@@ -15,4 +15,9 @@ public class TextPropertyModel extends SinglePropertyModel<String> {
 		return String.class;
 	}
 
+	@Override
+	public String getDataType() {
+		return "d:text";
+	}
+
 }

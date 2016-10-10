@@ -18,12 +18,20 @@ public class PermissionsNode {
 		this.repoNode = node.getRepositoryNode();
 	}
 	
+	/**
+	 * @return true if the current user has the given permission.
+	 */
 	public boolean hasUserPermission(RepositoryPermission permission) {
 		return repoNode.getUserPermissions().contains(permission);
 	}
-	public BusinessNode userPermission(RepositoryPermission permission) {
-		repoNode.getUserPermissions().add(permission);
-		return node;
+	public boolean hasUserPermissionAddChildren() {
+		return hasUserPermission(RepositoryPermission.ADD_CHILDREN);
+	}
+	public boolean hasUserPermissionWrite() {
+		return hasUserPermission(RepositoryPermission.WRITE);
+	}
+	public boolean hasUserPermissionDelete() {
+		return hasUserPermission(RepositoryPermission.DELETE);
 	}
 	
 	public Boolean getInheritParent() {
@@ -34,9 +42,28 @@ public class PermissionsNode {
 		return node;
 	}
 	
+	/**
+	 * @return All the permissions for all users.
+	 */
 	public Set<RepositoryAccessControl> getAccessControlList() {
 		return repoNode.getAccessControlList();
 	}
+	public BusinessNode addAccessControlCoordinator(RepositoryAuthority authority) {
+		return addAccessControl(authority, RepositoryPermission.COORDINATOR);
+	}
+	public BusinessNode addAccessControlCollaborator(RepositoryAuthority authority) {
+		return addAccessControl(authority, RepositoryPermission.COLLABORATOR);
+	}
+	public BusinessNode addAccessControlContributor(RepositoryAuthority authority) {
+		return addAccessControl(authority, RepositoryPermission.CONTRIBUTOR);
+	}
+	public BusinessNode addAccessControlEditor(RepositoryAuthority authority) {
+		return addAccessControl(authority, RepositoryPermission.EDITOR);
+	}
+	public BusinessNode addAccessControlConsumer(RepositoryAuthority authority) {
+		return addAccessControl(authority, RepositoryPermission.CONSUMER);
+	}
+	
 	public BusinessNode addAccessControl(RepositoryAuthority authority, RepositoryPermission permission) {
 		return addAccessControl(authority, permission, true);
 	}

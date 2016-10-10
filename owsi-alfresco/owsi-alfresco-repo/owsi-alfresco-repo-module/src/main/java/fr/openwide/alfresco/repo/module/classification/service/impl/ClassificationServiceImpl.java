@@ -2,23 +2,35 @@ package fr.openwide.alfresco.repo.module.classification.service.impl;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,11 +43,15 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.repository.model.SysModel;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
@@ -50,7 +66,15 @@ import fr.openwide.alfresco.repository.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
-		OnAddAspectPolicy, OnUpdatePropertiesPolicy, PreNodeCreationCallback {
+		OnAddAspectPolicy, OnUpdatePropertiesPolicy, OnDeleteChildAssociationPolicy, OnMoveNodePolicy, OnDeleteNodePolicy, 
+		PreNodeCreationCallback {
+	
+	private static final String CLASSIFIED_NODE_TRANSACTION_KEY = ClassificationServiceImpl.class +  ".classifiedNodes";
+	private static final Set<QName> IGNORED_PROPERTIES = new HashSet<>(Arrays.asList(
+			ContentModel.PROP_CONTENT,
+			ContentModel.PROP_CASCADE_CRC,
+			ContentModel.PROP_CASCADE_TX
+		));
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
@@ -82,9 +106,56 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	@Override
+	public void reclassify(ContainerModel model) {
+		reclassify(model, 100);
+	}
+	
+	@Override
+	public void reclassify(ContainerModel model, final int batchSize) {
+		final RestrictionBuilder restriction = new RestrictionBuilder();
+		if (model instanceof TypeModel) {
+			restriction.isType((TypeModel) model);
+		} else {
+			restriction.hasAspect((AspectModel) model);
+		}
+		
+		logger.info("Begin reclassify of " + model);
+		
+		for (int batchNumber = 0; ; batchNumber ++) {
+			logger.info("*** Reclassify batch " + batchNumber + " ***");
+			final int firstResult = batchNumber * batchSize;
+			int listSize = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Integer>() {
+				@Override
+				public Integer execute() {
+					List<BusinessNode> list = nodeSearchModelService.search(new SearchQueryBuilder()
+							.restriction(restriction)
+							.firstResult(firstResult)
+							.maxResults(batchSize)
+							.nodeScopeBuilder(new NodeScopeBuilder().nodeReference())
+							.sort().asc(SysModel.referenceable.nodeUuid));
+					int nodeNumber = 0;
+					for (BusinessNode node : list) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Reclassify node " + (nodeNumber ++) + " / " + list.size());
+						}
+						classify(conversionService.getRequired(node.getNodeReference()), ClassificationMode.RECLASSIFY);
+					}
+					return list.size();
+				}
+			}, false, true);
+			
+			if (listSize < batchSize) break;
+		}
+	}
+
+	@Override
 	public void afterPropertiesSet() throws Exception {
 		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
+		
+		policyRepositoryService.onDeleteNodePolicy(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onMoveNodePolicy(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onDeleteChildAssociationPolicy(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
@@ -97,24 +168,73 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
-			classify(nodeRef, ClassificationMode.UPDATE);
+			Set<QName> newFields = new TreeSet<>(after.keySet());
+			Set<QName> removedFields = new TreeSet<>();
+			Set<QName> changedFields = new TreeSet<>();
+			
+			for (Entry<QName, Serializable> entry : before.entrySet()) {
+				QName property = entry.getKey();
+				Serializable oldValue = entry.getValue();
+				Serializable newValue = after.get(property);
+				
+				newFields.remove(property);
+				if ((oldValue != null || newValue != null) && !oldValue.equals(newValue)) {
+					if (! IGNORED_PROPERTIES.contains(property)) {
+						changedFields.add(property);
+					}
+				} else if (oldValue != null && newValue == null) {
+					removedFields.add(property);
+				}
+			}
+			
+			if (! newFields.isEmpty() || ! removedFields.isEmpty() || ! changedFields.isEmpty()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Reclassify node on new {}, removed {}, changed {}", newFields, removedFields, changedFields);
+				}
+				classify(nodeRef, ClassificationMode.UPDATE);
+			}
+		}
+	}
+	
+	
+	@Override
+	public void onDeleteNode(ChildAssociationRef childAssocRef, boolean isNodeArchived) {
+		if (policies.isEmpty()) return;
+		
+		try {
+			if (nodeModelService.get(conversionService.get(childAssocRef.getParentRef()), new NodeScopeBuilder().aspect(OwsiModel.deleteIfEmpty)).hasAspect(OwsiModel.deleteIfEmpty)) {
+				onDeleteChildAssociation(childAssocRef);
+			}
+		} catch (NoSuchNodeRemoteException ex) {
+			// ignore
 		}
 	}
 	@Override
-	public void onPreNodeCreationCallback(RepositoryNode node) {
-		if (node.getPrimaryParentAssociation() == null) {
-			TypeDefinition type = dictionaryService.getType(conversionService.getRequired(node.getType()));
-			boolean isclassifiable = node.getAspects().contains(OwsiModel.classifiable);
-			QName classifiable = conversionService.getRequired(OwsiModel.classifiable.getNameReference());
-			if (! isclassifiable) {
-				for (AspectDefinition aspect : type.getDefaultAspects(true)) {
-					if (classifiable.equals(aspect.getName())) {
-						isclassifiable = true;
-						break;
-					}
-				}
+	public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
+		if (policies.isEmpty()) return;
+		
+		onDeleteNode(oldChildAssocRef, true);
+	}
+	@Override
+	public void onDeleteChildAssociation(ChildAssociationRef childAssocRef) {
+		NodeReference folderRef = conversionService.get(childAssocRef.getParentRef());
+		if (nodeModelService.exists(folderRef)) {
+			List<BusinessNode> children = nodeModelService.getChildren(folderRef, CmModel.folder.contains, new NodeScopeBuilder());
+			if (children.isEmpty()) {
+				nodeModelService.delete(folderRef);
 			}
-			if (isclassifiable) {
+		}
+	}
+	
+	/** 
+	 * Si un service demande à créer un noeud sans spécifier de parent et qu'une politique de classement est défini
+	 * pour son type, on le copie dans le home folder puis on le classe.
+	 */
+	@Override
+	public void onPreNodeCreationCallback(RepositoryNode node) {
+		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
+		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
+			if (isClassifiable(node)) {
 				Optional<NodeReference> homeFolder = getHomeFolder();
 				if (homeFolder.isPresent()) {
 					if (logger.isDebugEnabled()) {
@@ -131,6 +251,29 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			}
 		}
 	}
+	
+	private boolean isClassifiable(RepositoryNode node) {
+		TypeDefinition type = dictionaryService.getType(conversionService.getRequired(node.getType()));
+		QName classifiable = conversionService.getRequired(OwsiModel.classifiable.getNameReference());
+
+		for (AspectDefinition defaultAspect : type.getDefaultAspects(true)) {
+			if (classifiable.equals(defaultAspect.getName())) {
+				return true;
+			}
+		}
+		for (NameReference aspectName : node.getAspects()) {
+			if (OwsiModel.classifiable.getNameReference().equals(aspectName)) {
+				return true;
+			}
+			AspectDefinition aspect = dictionaryService.getAspect(conversionService.getRequired(aspectName));
+			for (AspectDefinition defaultAspect : aspect.getDefaultAspects(true)) {
+				if (classifiable.equals(defaultAspect.getName())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	public Optional<NodeReference> getHomeFolder() {
 		return nodeModelService.getUserHome();
@@ -138,9 +281,18 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
 		NodeReference nodeReference = conversionService.get(nodeRef);
+		
+		Set<NodeReference> classifiedNodes = getClassifiedNodes();
+		if (! classifiedNodes.add(nodeReference)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Node {} already classified.", nodeReference);
+			}
+			return;
+		}
+		
 		NameReference type = getPolicy(nodeReference);
 		if (type == null) {
-			throw new IllegalStateException("Can't find a policy to classify " + type);
+			throw new IllegalStateException("Can't find a policy to classify " + nodeRef);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -172,34 +324,71 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		try {
 			policy.classify(builder, model, event);
 		} catch (RuntimeException ex) {
-			logger.error("Error during classify of " + nodeReference + " of type " + type, ex);
-			throw ex;
+			// On log en debug uniquement, car cela peut être une erreur retryable, qui provoque en relance de la transaction.
+			// Dans ce cas, on ne veut pas avoir l'information en erreur, puisque l'appelant ne verra rien.
+			// C'est à l'appelant de tracer l'exception.
+			if (logger.isDebugEnabled()) {
+				logger.debug("Error during classify of " + nodeReference + " of type " + type, ex);
+			}
+			throw new IllegalStateException("Error during classify of " + nodeReference + " of type " + type, ex);
 		}
+	}
+	
+	private Set<NodeReference> getClassifiedNodes() {
+		Set<NodeReference> nodes = AlfrescoTransactionSupport.getResource(CLASSIFIED_NODE_TRANSACTION_KEY);
+		if (nodes == null) {
+			nodes = new HashSet<>();
+			AlfrescoTransactionSupport.bindResource(CLASSIFIED_NODE_TRANSACTION_KEY, nodes);
+		}
+		return nodes;
 	}
 	
 	private String getPath(NodeReference nodeReference) {
 		return nodeModelService.get(nodeReference, new NodeScopeBuilder().path()).getPath();
 	}
 
+	public String getUniqueName(NodeReference folder, String originalName) {
+		String extension = FilenameUtils.getExtension(originalName);
+		if (! extension.isEmpty()) {
+			extension = "." + extension;
+		}
+		String baseName = FilenameUtils.removeExtension(originalName);
+		String name = originalName;
+		int index = 1;
+		while (nodeModelService.getChildByName(folder, name).isPresent()) {
+			name = baseName + "-" + (index ++) + extension;
+		}
+		return name;
+	}
+	public void setNewName(NodeReference node, String newName) {
+		nodeModelService.setProperty(node, CmModel.object.name, newName);
+	}
+	
 	public void moveNode(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Move node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
 		nodeModelService.moveNode(node, destinationFolder);
 	}
-	public void copyNode(NodeReference node, NodeReference destinationFolder) {
+	public NodeReference copyNode(NodeReference node, NodeReference destinationFolder, Optional<String> newName) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Copy node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		nodeModelService.copy(node, destinationFolder);
+		NodeReference copyNodeReference = nodeModelService.copy(node, destinationFolder, newName);
+		getClassifiedNodes().add(copyNodeReference);
+		return copyNodeReference;
 	}
 	public void createLink(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Add link from node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		nodeModelService.addChild(node, destinationFolder);
+		nodeModelService.addChild(destinationFolder, node);
 	}
 
+	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
+		nodeModelService.unlinkSecondaryParents(nodeReference, childAssociationModel);
+	}
+	
 	private NameReference getPolicy(NodeReference nodeReference) {
 		NameReference result = null;
 
@@ -268,7 +457,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public Optional<NodeReference> searchUniqueReferenceCached(RestrictionBuilder restrictionBuilder) {
-		String query = restrictionBuilder.toQuery();
+		String query = restrictionBuilder.toFtsQuery();
 		NodeReference nodeReference = queryCache.get(query);
 		if (nodeReference == null) {
 			Optional<NodeReference> optional = searchUniqueReference(restrictionBuilder);
@@ -328,6 +517,16 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
 		this.policyRepositoryService = policyRepositoryService;
+	}
+
+	public void deletePrevious(NodeReference destinationFolder, String childName) {
+		Optional<NodeReference> child = nodeModelService.getChildByName(destinationFolder, childName);
+		if (child.isPresent()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Delete previous node {} in {}", childName, destinationFolder);
+			}
+			nodeModelService.delete(child.get());
+		}
 	}
 
 }
