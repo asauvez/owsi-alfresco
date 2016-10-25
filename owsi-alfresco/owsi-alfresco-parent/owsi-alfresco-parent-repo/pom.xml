@@ -48,6 +48,8 @@
 		<owsi-alfresco.repo.stax-api.version>1.0-2</owsi-alfresco.repo.stax-api.version>
 		<owsi-alfresco.repo.spring-social.version>1.0.3.RELEASE</owsi-alfresco.repo.spring-social.version>
 		<owsi-alfresco.repo.jcl-over-slf4j.version>1.7.2</owsi-alfresco.repo.jcl-over-slf4j.version>
+		<owsi-alfresco.repo.spring-surf.version>6.5</owsi-alfresco.repo.spring-surf.version>
+		<dependency.surf.version>${owsi-alfresco.repo.spring-surf.version}</dependency.surf.version>
 		
 		<owsi-alfresco.build-helper-maven-plugin.version>1.10</owsi-alfresco.build-helper-maven-plugin.version>
 	</properties>
@@ -901,6 +903,38 @@
 				<version>${owsi-alfresco.repo.jcl-over-slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-surf</artifactId>
+				<version>${owsi-alfresco.repo.spring-surf.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-surf-core</artifactId>
+				<version>${owsi-alfresco.repo.spring-surf.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax.servlet-api.version}</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -972,6 +1006,9 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+					</configuration>
 					<dependencies>
 						<dependency>
 							<!-- Pour utilisation https://artifacts.alfresco.com/nexus/content/repositories/alfresco-docs/alfresco-sdk-aggregator/latest/plugins/alfresco-maven-plugin/advanced-usage.html -->
