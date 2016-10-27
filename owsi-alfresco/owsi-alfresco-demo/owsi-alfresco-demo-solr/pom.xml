@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo</artifactId>
-		<version>0.3.0</version>
+		<version>0.3.1</version>
 		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-repo/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-demo-solr</artifactId>
