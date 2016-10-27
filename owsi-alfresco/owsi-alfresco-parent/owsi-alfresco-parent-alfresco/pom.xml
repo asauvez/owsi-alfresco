@@ -36,6 +36,22 @@
 		</dependency>
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.metaversant</groupId>
+				<artifactId>share-site-creators-repo</artifactId>
+				<version>0.0.5</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>com.softwareloop</groupId>
+				<artifactId>uploader-plus-repo</artifactId>
+				<version>1.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<build>
 		<finalName>${alfresco.webapp.name}</finalName>
 		<plugins>
@@ -91,7 +107,7 @@
 				</resources>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
+	 					<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
 							<failOnMissingWebXml>false</failOnMissingWebXml>

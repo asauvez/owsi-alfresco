@@ -64,6 +64,22 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.metaversant</groupId>
+				<artifactId>share-site-creators-share</artifactId>
+				<version>0.0.5</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>com.softwareloop</groupId>
+				<artifactId>uploader-plus-surf</artifactId>
+				<version>1.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	
 	<build>
 		<finalName>${share.webapp.name}</finalName>
