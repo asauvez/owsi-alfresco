@@ -14,12 +14,4 @@
 		</property>
 	</bean>
 
-	<!-- Messages -->
-	<bean id="demo.resourceBundle" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
-		<property name="resourceBundles">
-			<list>
-				<value>alfresco.module.${alfresco.module.name}.model.demoModel</value>
-			</list>
-		</property>
-	</bean>
 </beans>
