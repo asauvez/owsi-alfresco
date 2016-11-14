@@ -18,6 +18,8 @@
 		<module>owsi-alfresco-repo-core</module>
 		<module>owsi-alfresco-repo-dictionary</module>
 		<module>owsi-alfresco-repo-module</module>
+		<module>owsi-alfresco-repo-overlay</module>
+		<module>owsi-alfresco-share-overlay</module>
 	</modules>
 
 </project>

@@ -16,9 +16,8 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>share</artifactId>
-			<version>${owsi-alfresco.share.alfresco.version}</version>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-share-overlay</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -91,8 +90,8 @@
 				<configuration>
 					<overlays>
 						<overlay>
-							<groupId>org.alfresco</groupId>
-							<artifactId>share</artifactId>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-share-overlay</artifactId>
 							<excludes>
 								<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
 							</excludes>
