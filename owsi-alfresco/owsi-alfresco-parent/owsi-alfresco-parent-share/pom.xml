@@ -76,6 +76,13 @@
 				<groupId>com.softwareloop</groupId>
 				<artifactId>uploader-plus-surf</artifactId>
 				<version>1.2</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>com.alfdev.alfresco</groupId>
+				<artifactId>create-link-share</artifactId>
+				<version>1.0.0</version>
+				<type>amp</type>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
