@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -358,6 +359,11 @@ public class NodeModelRepositoryServiceImpl
 		return Optional.of(nodeReference);
 	}
 
+	@Override
+	public boolean hasPermission(NodeReference nodeReference, RepositoryPermission permission) {
+		return permissionService.hasPermission(conversionService.getRequired(nodeReference), permission.getName()) == AccessStatus.ALLOWED;
+	}
+	
 	@Override
 	public void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions) {
 		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);
