@@ -17,11 +17,13 @@
 		<alfresco.webapp.name>alfresco</alfresco.webapp.name>
 		<share.webapp.name>share</share.webapp.name>
 		<solr.webapp.name>solr</solr.webapp.name>
+		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
 		<owsi-alfresco.repo.alfresco.version>5.1.1</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.h2.version>1.4.190</owsi-alfresco.repo.h2.version>
 		
+		<!-- Quand on montera à Alfresco 5.2, mettre à jour : https://issues.alfresco.com/jira/browse/ACE-4055 -->
 		<owsi-alfresco.repo.quartz.version>1.8.3-alfresco-patched</owsi-alfresco.repo.quartz.version>
 		<owsi-alfresco.repo.freemarker.version>2.3.18-alfresco-patched-2</owsi-alfresco.repo.freemarker.version>
 		<owsi-alfresco.repo.poi.version>3.10.1</owsi-alfresco.repo.poi.version>
