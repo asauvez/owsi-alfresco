@@ -14,6 +14,7 @@ import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -34,6 +35,7 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
 	void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel);
 
+	boolean isType(NodeReference nodeReference, TypeModel typeModel);
 	NameReference getType(NodeReference nodeReference);
 	void setType(NodeReference nodeReference, NameReference type);
 	void setType(NodeReference nodeReference, TypeModel type);
@@ -69,6 +71,9 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
 
+	void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
+	void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
+	
 	NodeReference getCompanyHome();
 	NodeReference getDataDictionary();
 	Optional<NodeReference> getUserHome();

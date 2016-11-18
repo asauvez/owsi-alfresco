@@ -33,6 +33,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -95,6 +96,10 @@ public class NodeModelRepositoryServiceImpl
 		return conversionService.get(copy);
 	}
 
+	@Override
+	public boolean isType(NodeReference nodeReference, TypeModel typeModel) {
+		return typeModel.getNameReference().equals(getType(nodeReference));
+	}
 	@Override
 	public NameReference getType(NodeReference nodeReference) {
 		return conversionService.get(nodeService.getType(conversionService.getRequired(nodeReference)));
@@ -301,6 +306,18 @@ public class NodeModelRepositoryServiceImpl
 				nodeService.removeChildAssociation(assoc);
 			}
 		}
+	}
+	
+	@Override
+	public void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType) {
+		createAssociation(sourceRef, targetRef, assocType.getNameReference());
+	}
+	@Override
+	public void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType) {
+		nodeService.createAssociation(
+				conversionService.getRequired(sourceRef), 
+				conversionService.getRequired(targetRef), 
+				conversionService.getRequired(assocType));
 	}
 	
 	@Override
