@@ -3,13 +3,13 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-repo</artifactId>
+		<artifactId>owsi-alfresco-package</artifactId>
 		<version>0.3.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>owsi-alfresco-repo-overlay</artifactId>
+	<artifactId>owsi-alfresco-package-alfresco</artifactId>
 	<packaging>war</packaging>
 
-	<name>OWSI Alfresco - Repository - Overlay</name>
+	<name>OWSI Alfresco - Package - Alfresco</name>
 	<description>alfresco.war avec les overlays inclus</description>
 
 	<dependencies>

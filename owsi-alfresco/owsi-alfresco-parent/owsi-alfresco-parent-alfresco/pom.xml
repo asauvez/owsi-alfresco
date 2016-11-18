@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-overlay</artifactId>
+			<artifactId>owsi-alfresco-package-alfresco</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -60,7 +60,7 @@
 					<overlays>
 						<overlay>
 							<groupId>fr.openwide.alfresco</groupId>
-							<artifactId>owsi-alfresco-repo-overlay</artifactId>
+							<artifactId>owsi-alfresco-package-alfresco</artifactId>
 							<type>war</type>
 						</overlay>
 					</overlays>

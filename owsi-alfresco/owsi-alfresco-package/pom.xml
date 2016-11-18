@@ -7,17 +7,15 @@
 		<version>0.3.2-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo/pom.xml</relativePath>
 	</parent>
-	<artifactId>owsi-alfresco-repo</artifactId>
+	<artifactId>owsi-alfresco-package</artifactId>
 	<packaging>pom</packaging>
 
-	<name>OWSI Alfresco - Repository</name>
-	<description>Composants pour le développement d'extensions dans l'application Alfresco</description>
+	<name>OWSI Alfresco - Package</name>
+	<description>alfresco.war et share.war avec des AMP inclus</description>
 
 	<modules>
-		<module>owsi-alfresco-repo-remote</module>
-		<module>owsi-alfresco-repo-core</module>
-		<module>owsi-alfresco-repo-dictionary</module>
-		<module>owsi-alfresco-repo-module</module>
+		<module>owsi-alfresco-package-alfresco</module>
+		<module>owsi-alfresco-package-share</module>
 	</modules>
 
 </project>

@@ -92,13 +92,13 @@
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-repo-overlay</artifactId>
+				<artifactId>owsi-alfresco-package-alfresco</artifactId>
 				<version>0.3.2-SNAPSHOT</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-share-overlay</artifactId>
+				<artifactId>owsi-alfresco-package-share</artifactId>
 				<version>0.3.2-SNAPSHOT</version>
 				<type>war</type>
 			</dependency>
