@@ -81,6 +81,11 @@
 					<artifactId>postgresql</artifactId>
 					<scope>runtime</scope>
 				</dependency>
+				<dependency>
+					<groupId>de.fmaul</groupId>
+					<artifactId>javascript-console-repo</artifactId>
+					<type>amp</type>
+				</dependency>
 			</dependencies>
 			<build>
 				<resources>
@@ -99,6 +104,18 @@
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
 							<failOnMissingWebXml>false</failOnMissingWebXml>
+							<overlays>
+								<overlay>
+									<groupId>fr.openwide.alfresco</groupId>
+									<artifactId>owsi-alfresco-package-alfresco</artifactId>
+									<type>war</type>
+								</overlay>
+								<overlay>
+									<groupId>de.fmaul</groupId>
+									<artifactId>javascript-console-repo</artifactId>
+									<type>amp</type>
+								</overlay>
+							</overlays>
 						</configuration>
 					</plugin>
 				</plugins>

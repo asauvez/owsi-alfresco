@@ -124,6 +124,13 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>de.fmaul</groupId>
+					<artifactId>javascript-console-share</artifactId>
+					<type>amp</type>
+				</dependency>
+			</dependencies>
 			<build>
 				<resources>
 					<resource>
@@ -135,6 +142,27 @@
 						<filtering>true</filtering>
 					</resource>
 				</resources>
+				<plugins>
+					<plugin>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<overlays>
+								<overlay>
+									<groupId>fr.openwide.alfresco</groupId>
+									<artifactId>owsi-alfresco-package-share</artifactId>
+									<excludes>
+										<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
+									</excludes>
+								</overlay>
+								<overlay>
+									<groupId>de.fmaul</groupId>
+									<artifactId>javascript-console-share</artifactId>
+									<type>amp</type>
+								</overlay>
+							</overlays>
+						</configuration>
+					</plugin>
+				</plugins>
 				<pluginManagement>
 					<plugins>
 						<plugin>
