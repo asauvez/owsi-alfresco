@@ -2,6 +2,10 @@ package fr.openwide.alfresco.repo.dictionary.policy.service.impl;
 
 import java.util.concurrent.Callable;
 
+import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.BeforeMoveNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
@@ -9,6 +13,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -57,6 +62,10 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	}
 	
 	@Override
+	public void beforeAddAspect(ContainerModel type, NotificationFrequency frequency, BeforeAddAspectPolicy policy) {
+		bindClassBehaviour(type, frequency, BeforeAddAspectPolicy.class, policy);
+	}
+	@Override
 	public void onAddAspect(ContainerModel type, NotificationFrequency frequency, OnAddAspectPolicy policy) {
 		bindClassBehaviour(type, frequency, OnAddAspectPolicy.class, policy);
 	}
@@ -66,28 +75,44 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	}
 
 	@Override
+	public void onUpdateNode(ContainerModel type, NotificationFrequency frequency, OnUpdateNodePolicy policy) {
+		bindClassBehaviour(type, frequency, OnUpdateNodePolicy.class, policy);
+	}
+	@Override
 	public void onUpdateProperties(ContainerModel type, NotificationFrequency frequency, OnUpdatePropertiesPolicy policy) {
 		bindClassBehaviour(type, frequency, OnUpdatePropertiesPolicy.class, policy);
 	}
 	
 	@Override
-	public void onCreateNodePolicy(ContainerModel type, NotificationFrequency frequency, OnCreateNodePolicy policy) {
+	public void beforeCreateNode(ContainerModel type, NotificationFrequency frequency, BeforeCreateNodePolicy policy) {
+		bindClassBehaviour(type, frequency, BeforeCreateNodePolicy.class, policy);
+	}
+	@Override
+	public void onCreateNode(ContainerModel type, NotificationFrequency frequency, OnCreateNodePolicy policy) {
 		bindClassBehaviour(type, frequency, OnCreateNodePolicy.class, policy);
 	}
 	@Override
-	public void onMoveNodePolicy(ContainerModel type, NotificationFrequency frequency, OnMoveNodePolicy policy) {
+	public void beforeMoveNode(ContainerModel type, NotificationFrequency frequency, BeforeMoveNodePolicy policy) {
+		bindClassBehaviour(type, frequency, BeforeMoveNodePolicy.class, policy);
+	}
+	@Override
+	public void onMoveNode(ContainerModel type, NotificationFrequency frequency, OnMoveNodePolicy policy) {
 		bindClassBehaviour(type, frequency, OnMoveNodePolicy.class, policy);
 	}
 	@Override
-	public void onDeleteNodePolicy(ContainerModel type, NotificationFrequency frequency, OnDeleteNodePolicy policy) {
+	public void beforeDeleteNode(ContainerModel type, NotificationFrequency frequency, BeforeDeleteNodePolicy policy) {
+		bindClassBehaviour(type, frequency, BeforeDeleteNodePolicy.class, policy);
+	}
+	@Override
+	public void onDeleteNode(ContainerModel type, NotificationFrequency frequency, OnDeleteNodePolicy policy) {
 		bindClassBehaviour(type, frequency, OnDeleteNodePolicy.class, policy);
 	}
 	@Override
-	public void onCreateChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnCreateChildAssociationPolicy policy) {
+	public void onCreateChildAssociation(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnCreateChildAssociationPolicy policy) {
 		bindAssociationBehaviour(type, association, frequency, OnCreateChildAssociationPolicy.class, policy);
 	}
 	@Override
-	public void onDeleteChildAssociationPolicy(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy) {
+	public void onDeleteChildAssociation(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy) {
 		bindAssociationBehaviour(type, association, frequency, OnDeleteChildAssociationPolicy.class, policy);
 	}
 	
