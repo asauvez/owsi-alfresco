@@ -319,6 +319,17 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(targetRef), 
 				conversionService.getRequired(assocType));
 	}
+	@Override
+	public void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType) {
+		removeAssociation(sourceRef, targetRef, assocType.getNameReference());
+	}
+	@Override
+	public void removeAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType) {
+		nodeService.removeAssociation(
+				conversionService.getRequired(sourceRef), 
+				conversionService.getRequired(targetRef), 
+				conversionService.getRequired(assocType));
+	}
 	
 	@Override
 	public NodeReference getCompanyHome() {

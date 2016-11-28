@@ -73,6 +73,8 @@ public interface NodeModelRepositoryService extends NodeModelService {
 
 	void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
 	void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
+	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
+	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
 	
 	NodeReference getCompanyHome();
 	NodeReference getDataDictionary();
