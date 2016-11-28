@@ -2,8 +2,8 @@ package fr.openwide.alfresco.component.query.search.service;
 
 import java.util.List;
 
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.query.form.result.FormQueryResult;
 import fr.openwide.alfresco.component.query.search.model.NodeFormQuery;
 import fr.openwide.alfresco.component.query.search.model.SearchFormQuery;
