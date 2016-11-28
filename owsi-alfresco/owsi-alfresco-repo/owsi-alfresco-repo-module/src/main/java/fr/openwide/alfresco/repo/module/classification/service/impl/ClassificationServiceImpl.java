@@ -153,9 +153,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
-		policyRepositoryService.onDeleteNodePolicy(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
-		policyRepositoryService.onMoveNodePolicy(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
-		policyRepositoryService.onDeleteChildAssociationPolicy(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onDeleteNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onMoveNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onDeleteChildAssociation(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}

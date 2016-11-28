@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
@@ -11,7 +12,6 @@ import fr.openwide.alfresco.component.model.node.model.property.single.LongPrope
 import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmPerson extends CmAuthority {
 
@@ -63,5 +63,5 @@ public class CmPerson extends CmAuthority {
 	public final LongPropertyModel sizeQuota = PropertyModels.newLong(this, CmModel.NAMESPACE, "sizeQuota",
 			ProtectedPropertyConstraint.INSTANCE);
 
-	public final AssociationModel avatar = new AssociationModel(NameReference.create(CmModel.NAMESPACE, "avatar"));
+	public final OneToOneAssociationModel avatar = new OneToOneAssociationModel(NameReference.create(CmModel.NAMESPACE, "avatar"));
 }
