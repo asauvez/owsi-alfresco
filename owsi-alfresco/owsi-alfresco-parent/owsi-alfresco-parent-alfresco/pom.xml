@@ -47,6 +47,12 @@
 				<version>0.6</version>
 				<type>amp</type>
 			</dependency>
+			<dependency>
+				<groupId>external.module.alfresco-outlook</groupId>
+				<artifactId>alfresco-outlook-repository</artifactId>
+				<version>2.1.0</version>
+				<type>amp</type>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
