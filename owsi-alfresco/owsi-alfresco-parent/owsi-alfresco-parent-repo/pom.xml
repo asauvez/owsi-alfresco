@@ -18,7 +18,7 @@
 		<share.webapp.name>share</share.webapp.name>
 		<solr.webapp.name>solr</solr.webapp.name>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
-		<owsi-alfresco.repo.alfresco.version>5.1.1</owsi-alfresco.repo.alfresco.version>
+		<owsi-alfresco.repo.alfresco.version>5.1.2</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.h2.version>1.4.190</owsi-alfresco.repo.h2.version>
@@ -35,7 +35,7 @@
 		<owsi-alfresco.repo.commons-fileupload.version>1.3.1</owsi-alfresco.repo.commons-fileupload.version>
 		<owsi-alfresco.repo.commons-codec.version>1.5</owsi-alfresco.repo.commons-codec.version>
 		<owsi-alfresco.repo.commons-digester.version>1.6</owsi-alfresco.repo.commons-digester.version>
-		<owsi-alfresco.repo.commons-beanutils.version>1.7.0</owsi-alfresco.repo.commons-beanutils.version>
+		<owsi-alfresco.repo.commons-beanutils.version>1.9.3</owsi-alfresco.repo.commons-beanutils.version>
 		<owsi-alfresco.repo.commons-httpclient.version>3.1-HTTPCLIENT-1265</owsi-alfresco.repo.commons-httpclient.version>
 		<owsi-alfresco.repo.jaxen.version>1.1.4</owsi-alfresco.repo.jaxen.version>
 		<owsi-alfresco.repo.joda-time.version>2.8.1</owsi-alfresco.repo.joda-time.version>
