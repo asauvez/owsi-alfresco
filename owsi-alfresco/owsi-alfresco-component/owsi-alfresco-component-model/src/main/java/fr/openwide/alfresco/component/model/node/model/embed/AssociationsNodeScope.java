@@ -2,9 +2,9 @@ package fr.openwide.alfresco.component.model.node.model.embed;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class AssociationsNodeScope {

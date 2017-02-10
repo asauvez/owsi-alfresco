@@ -24,6 +24,7 @@
 
 	<bean id="owsi.service.policyService" class="fr.openwide.alfresco.repo.dictionary.policy.service.impl.PolicyRepositoryServiceImpl">
 		<property name="policyComponent" ref="policyComponent" />
+		<property name="policyFilter" ref="policyBehaviourFilter" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 

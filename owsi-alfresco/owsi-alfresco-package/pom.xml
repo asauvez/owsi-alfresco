@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-parent-repo</artifactId>
+		<version>0.4.0-SNAPSHOT</version>
+		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo/pom.xml</relativePath>
+	</parent>
+	<artifactId>owsi-alfresco-package</artifactId>
+	<packaging>pom</packaging>
+
+	<name>OWSI Alfresco - Package</name>
+	<description>alfresco.war et share.war avec des AMP inclus</description>
+
+	<modules>
+		<module>owsi-alfresco-package-alfresco</module>
+		<module>owsi-alfresco-package-share</module>
+	</modules>
+
+</project>

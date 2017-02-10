@@ -25,13 +25,6 @@ public class AppCoreServiceConfig {
 
 	@Autowired
 	private AppCoreRemoteBindingConfig appCoreRemoteBindingConfig;
-
-	@Autowired
-	private RepositoryRemoteBinding repositoryRemoteBinding;
-
-	@Autowired
-	@Qualifier("shareRemoteBinding")
-	private RepositoryRemoteBinding shareBinding;
 	
 	@Autowired
 	private Environment environment;
@@ -47,23 +40,24 @@ public class AppCoreServiceConfig {
 	}
 
 	@Bean
-	public NodeService nodeService() {
+	public NodeService nodeService(RepositoryRemoteBinding repositoryRemoteBinding) {
 		return new NodeServiceImpl(repositoryRemoteBinding);
 	}
 
 	@Bean
-	public AuthorityService authorityService() {
-		return new AuthorityServiceImpl(nodeService());
+	public AuthorityService authorityService(NodeService nodeService) {
+		return new AuthorityServiceImpl(nodeService);
 	}
 
 	@Bean
-	public NodeSearchService nodeSearchService() {
-		return new NodeSearchServiceImpl(nodeService());
+	public NodeSearchService nodeSearchService(NodeService nodeService) {
+		return new NodeSearchServiceImpl(nodeService);
 	}
 
 	@Bean
-	public SiteService siteService() {
-		return new SiteServiceImpl(authorityService(), nodeSearchService(), shareBinding);
+	public SiteService siteService(AuthorityService authorityService, NodeSearchService nodeSearchService, 
+			@Qualifier("shareRemoteBinding") RepositoryRemoteBinding shareBinding) {
+		return new SiteServiceImpl(authorityService, nodeSearchService, shareBinding);
 	}
 
 }

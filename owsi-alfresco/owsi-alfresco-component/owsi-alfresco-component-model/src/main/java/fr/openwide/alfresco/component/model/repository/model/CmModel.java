@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmAttachable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
@@ -17,6 +18,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeographic;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmIndexControl;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmLink;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmLockable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
@@ -66,6 +68,8 @@ public interface CmModel {
 	
 	CmPreferences preferences = new CmPreferences();
 	
+	CmAttachable attachable = new CmAttachable();
+	
 	CmEmailed emailed = new CmEmailed();
 	
 	// ---- Types
@@ -84,4 +88,6 @@ public interface CmModel {
 
 	CmCategoryRoot categoryRoot = new CmCategoryRoot();
 	CmCategory category = new CmCategory();
+	
+	CmLink link = new CmLink();
 }

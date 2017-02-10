@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent-repo/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-alfresco</artifactId>
@@ -15,17 +15,66 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-enterprise</artifactId>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-package-alfresco</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.metaversant</groupId>
+				<artifactId>share-site-creators-repo</artifactId>
+				<version>0.0.5</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>com.softwareloop</groupId>
+				<artifactId>uploader-plus-repo</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>com.alfdev.alfresco</groupId>
+				<artifactId>create-link-repo</artifactId>
+				<version>1.0.0</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>de.fmaul</groupId>
+				<artifactId>javascript-console-repo</artifactId>
+				<version>0.6</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>external.module.alfresco-outlook</groupId>
+				<artifactId>alfresco-outlook-repository</artifactId>
+				<version>2.1.0</version>
+				<type>amp</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<build>
 		<finalName>${alfresco.webapp.name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<overlays>
+						<overlay>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-package-alfresco</artifactId>
+							<type>war</type>
+						</overlay>
+					</overlays>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
-
+	
 	<profiles>
 		<profile>
 			<id>development</id>
@@ -38,9 +87,18 @@
 					<artifactId>postgresql</artifactId>
 					<scope>runtime</scope>
 				</dependency>
+				<dependency>
+					<groupId>de.fmaul</groupId>
+					<artifactId>javascript-console-repo</artifactId>
+					<type>amp</type>
+				</dependency>
 			</dependencies>
 			<build>
 				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
 					<resource>
 						<directory>src/main/dev-resources</directory>
 						<filtering>true</filtering>
@@ -48,10 +106,22 @@
 				</resources>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
+	 					<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
 						<configuration>
 							<failOnMissingWebXml>false</failOnMissingWebXml>
+							<overlays>
+								<overlay>
+									<groupId>fr.openwide.alfresco</groupId>
+									<artifactId>owsi-alfresco-package-alfresco</artifactId>
+									<type>war</type>
+								</overlay>
+								<overlay>
+									<groupId>de.fmaul</groupId>
+									<artifactId>javascript-console-repo</artifactId>
+									<type>amp</type>
+								</overlay>
+							</overlays>
 						</configuration>
 					</plugin>
 				</plugins>

@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -31,6 +33,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -93,6 +96,10 @@ public class NodeModelRepositoryServiceImpl
 		return conversionService.get(copy);
 	}
 
+	@Override
+	public boolean isType(NodeReference nodeReference, TypeModel typeModel) {
+		return typeModel.getNameReference().equals(getType(nodeReference));
+	}
 	@Override
 	public NameReference getType(NodeReference nodeReference) {
 		return conversionService.get(nodeService.getType(conversionService.getRequired(nodeReference)));
@@ -207,7 +214,17 @@ public class NodeModelRepositoryServiceImpl
 				? Optional.of(conversionService.get(primaryParent.getParentRef()))
 				: Optional.<NodeReference>absent();
 	}
-	
+
+	@Override
+	public List<NodeReference> getParentAssocs(NodeReference nodeReference) {
+		List<ChildAssociationRef> children = nodeService.getParentAssocs(conversionService.getRequired(nodeReference));
+		List<NodeReference> list = new ArrayList<>();
+		for (ChildAssociationRef child : children) {
+			list.add(conversionService.get(child.getParentRef()));
+		}
+		return list;
+	}
+
 	@Override
 	public Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName) {
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(
@@ -292,6 +309,29 @@ public class NodeModelRepositoryServiceImpl
 	}
 	
 	@Override
+	public void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType) {
+		createAssociation(sourceRef, targetRef, assocType.getNameReference());
+	}
+	@Override
+	public void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType) {
+		nodeService.createAssociation(
+				conversionService.getRequired(sourceRef), 
+				conversionService.getRequired(targetRef), 
+				conversionService.getRequired(assocType));
+	}
+	@Override
+	public void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType) {
+		removeAssociation(sourceRef, targetRef, assocType.getNameReference());
+	}
+	@Override
+	public void removeAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType) {
+		nodeService.removeAssociation(
+				conversionService.getRequired(sourceRef), 
+				conversionService.getRequired(targetRef), 
+				conversionService.getRequired(assocType));
+	}
+	
+	@Override
 	public NodeReference getCompanyHome() {
 		return conversionService.get(repositoryHelper.getCompanyHome());
 	}
@@ -347,6 +387,11 @@ public class NodeModelRepositoryServiceImpl
 		return Optional.of(nodeReference);
 	}
 
+	@Override
+	public boolean hasPermission(NodeReference nodeReference, RepositoryPermission permission) {
+		return permissionService.hasPermission(conversionService.getRequired(nodeReference), permission.getName()) == AccessStatus.ALLOWED;
+	}
+	
 	@Override
 	public void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions) {
 		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);

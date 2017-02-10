@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-share-component</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent-share-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share</artifactId>
@@ -16,9 +16,8 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>share</artifactId>
-			<version>${owsi-alfresco.share.alfresco.version}</version>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-package-share</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -64,6 +63,41 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.metaversant</groupId>
+				<artifactId>share-site-creators-share</artifactId>
+				<version>0.0.5</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>com.softwareloop</groupId>
+				<artifactId>uploader-plus-surf</artifactId>
+				<version>1.2</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>com.alfdev.alfresco</groupId>
+				<artifactId>create-link-share</artifactId>
+				<version>1.0.0</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>de.fmaul</groupId>
+				<artifactId>javascript-console-share</artifactId>
+				<version>0.6</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>external.module.alfresco-outlook</groupId>
+				<artifactId>alfresco-outlook-share</artifactId>
+				<version>2.1.0</version>
+				<type>amp</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	
 	<build>
 		<finalName>${share.webapp.name}</finalName>
@@ -71,36 +105,96 @@
 
 		<plugins>
 			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeTypes>war</includeTypes>
-							<includeGroupIds>org.alfresco</includeGroupIds>
-							<includeArtifactIds>share</includeArtifactIds>
-							<includes>META-INF/MANIFEST.MF</includes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<overlays>
+						<overlay>
+							<groupId>fr.openwide.alfresco</groupId>
+							<artifactId>owsi-alfresco-package-share</artifactId>
+							<excludes>
+								<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
+							</excludes>
+						</overlay>
+					</overlays>
 					<archive>
-						<addMavenDescriptor>false</addMavenDescriptor>
-						<manifestFile>${project.build.directory}/dependency/META-INF/MANIFEST.MF</manifestFile>
+						<manifestFile>${project.build.directory}/share/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
-					<webResources>
-					</webResources>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
+
+	<profiles>
+		<profile>
+			<id>development</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>de.fmaul</groupId>
+					<artifactId>javascript-console-share</artifactId>
+					<type>amp</type>
+				</dependency>
+			</dependencies>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+					<resource>
+						<directory>src/main/dev-resources</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<overlays>
+								<overlay>
+									<groupId>fr.openwide.alfresco</groupId>
+									<artifactId>owsi-alfresco-package-share</artifactId>
+									<excludes>
+										<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
+									</excludes>
+								</overlay>
+								<overlay>
+									<groupId>de.fmaul</groupId>
+									<artifactId>javascript-console-share</artifactId>
+									<type>amp</type>
+								</overlay>
+							</overlays>
+						</configuration>
+					</plugin>
+				</plugins>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-war-plugin</artifactId>
+							<configuration>
+								<failOnMissingWebXml>false</failOnMissingWebXml>
+								<archive>
+									<manifestFile>${project.build.directory}/m2e-wtp/overlays/share-${owsi-alfresco.share.alfresco.version}.war/META-INF/MANIFEST.MF</manifestFile>
+								</archive>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>livraison</id>
+			<activation>
+				<property>
+					<name>livraison</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<!-- Nothing to do -->
+		</profile>
+	</profiles>
+		
 </project>

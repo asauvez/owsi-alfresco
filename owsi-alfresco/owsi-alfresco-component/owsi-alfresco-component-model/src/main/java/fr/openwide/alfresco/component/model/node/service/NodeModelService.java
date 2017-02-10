@@ -4,13 +4,18 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.common.base.Optional;
+
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.component.model.node.model.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 
 public interface NodeModelService {
 
@@ -19,8 +24,17 @@ public interface NodeModelService {
 	List<BusinessNode> getChildren(NodeReference nodeReference, NodeScopeBuilder nodeScopeBuilder);
 	List<BusinessNode> getChildren(NodeReference nodeReference, ChildAssociationModel childAssoc, NodeScopeBuilder nodeScopeBuilder);
 
-	List<BusinessNode> getTargetAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
-	List<BusinessNode> getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+	List<BusinessNode> getTargetAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+	List<BusinessNode> getSourceAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+
+	Optional<BusinessNode> getTargetAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+	List<BusinessNode> getSourceAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+
+	List<BusinessNode> getTargetAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+	Optional<BusinessNode> getSourceAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+
+	Optional<BusinessNode> getTargetAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
+	Optional<BusinessNode> getSourceAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
 
 	NodeReference createFolder(NodeReference parent, String folderName) throws DuplicateChildNodeNameRemoteException;
 	NodeReference createContent(NodeReference parent, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNodeNameRemoteException;

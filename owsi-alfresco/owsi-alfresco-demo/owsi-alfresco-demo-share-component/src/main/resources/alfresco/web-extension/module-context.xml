@@ -3,6 +3,5 @@
 
 <beans>
 
-	<import resource="classpath:alfresco/module/${alfresco.module.name}/context/*-context.xml" />
 
 </beans>

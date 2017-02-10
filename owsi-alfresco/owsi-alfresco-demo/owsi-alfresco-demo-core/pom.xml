@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-demo-application</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-demo-application/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-demo-core</artifactId>
@@ -58,7 +58,7 @@
 				<artifactId>maven-processor-plugin</artifactId>
 			</plugin>
 			
-			<!-- Integration test -->
+			<!-- Integration test 
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -87,6 +87,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 	

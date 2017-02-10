@@ -4,15 +4,16 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-api</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent-api/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share-component</artifactId>
 	<packaging>pom</packaging>
 	
 	<properties>
-		<owsi-alfresco.share.alfresco.version>5.1.1</owsi-alfresco.share.alfresco.version>
+		<owsi-alfresco.share.alfresco.version>5.1.2</owsi-alfresco.share.alfresco.version>
 		<owsi-alfresco.share.alfresco-core.version>6.1</owsi-alfresco.share.alfresco-core.version>
+		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
 		<springframework-extensions-surf.version>1.2.0-M18</springframework-extensions-surf.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<jcl-over-slf4j.version>1.7.21</jcl-over-slf4j.version>
@@ -158,7 +159,29 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<configuration>
+						<failOnMissingWebXml>false</failOnMissingWebXml>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<!-- Pour utilisation https://artifacts.alfresco.com/nexus/content/repositories/alfresco-docs/alfresco-sdk-aggregator/latest/plugins/alfresco-maven-plugin/advanced-usage.html -->
+							<groupId>org.alfresco.maven.plugin</groupId>
+							<artifactId>alfresco-maven-plugin</artifactId>
+							<version>${owsi-alfresco.alfresco-maven-plugin.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
 	<repositories>
 		<repository>
 			<id>alfresco-enterprise</id>
