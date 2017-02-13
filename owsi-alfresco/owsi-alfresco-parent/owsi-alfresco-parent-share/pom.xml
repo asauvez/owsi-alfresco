@@ -79,12 +79,6 @@
 				<type>amp</type>
 			</dependency>
 			<dependency>
-				<groupId>com.alfdev.alfresco</groupId>
-				<artifactId>create-link-share</artifactId>
-				<version>1.0.0</version>
-				<type>amp</type>
-			</dependency>
-			<dependency>
 				<groupId>de.fmaul</groupId>
 				<artifactId>javascript-console-share</artifactId>
 				<version>0.6</version>

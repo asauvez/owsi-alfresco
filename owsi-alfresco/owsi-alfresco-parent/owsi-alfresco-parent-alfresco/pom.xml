@@ -36,12 +36,6 @@
 				<version>1.2</version>
 			</dependency>
 			<dependency>
-				<groupId>com.alfdev.alfresco</groupId>
-				<artifactId>create-link-repo</artifactId>
-				<version>1.0.0</version>
-				<type>amp</type>
-			</dependency>
-			<dependency>
 				<groupId>de.fmaul</groupId>
 				<artifactId>javascript-console-repo</artifactId>
 				<version>0.6</version>
