@@ -78,6 +78,7 @@
 						<pullDevelop>true</pullDevelop>
 						<pullMaster>true</pullMaster>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<allowSnapshots>true</allowSnapshots>
 					</configuration>
 				</plugin>
 			</plugins>
