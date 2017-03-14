@@ -24,7 +24,7 @@
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.h2.version>1.4.190</owsi-alfresco.repo.h2.version>
 		
-		<!-- Quand on montera à Alfresco 5.2, mettre à jour : https://issues.alfresco.com/jira/browse/ACE-4055 -->
+		<owsi-alfresco.repo.acegi-security.version>0.8.2_patched</owsi-alfresco.repo.acegi-security.version>
 		<owsi-alfresco.repo.commons-beanutils.version>1.9.3</owsi-alfresco.repo.commons-beanutils.version>
 		<owsi-alfresco.repo.commons-codec.version>1.10</owsi-alfresco.repo.commons-codec.version>
 		<owsi-alfresco.repo.commons-digester.version>2.1</owsi-alfresco.repo.commons-digester.version>
@@ -57,6 +57,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.acegisecurity</groupId>
+				<artifactId>acegi-security</artifactId>
+				<version>${owsi-alfresco.repo.acegi-security.version}</version>
+				<scope>provided</scope>
+			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
