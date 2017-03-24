@@ -129,6 +129,7 @@
 						<pullDevelop>true</pullDevelop>
 						<pullMaster>true</pullMaster>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<scmCommentPrefix>[release] </scmCommentPrefix>
 					</configuration>
 				</plugin>
 
