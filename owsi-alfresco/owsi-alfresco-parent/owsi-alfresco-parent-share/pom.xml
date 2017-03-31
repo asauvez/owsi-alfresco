@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-share-component</artifactId>
-		<version>0.3.3</version>
+		<version>0.4.0</version>
 		<relativePath>../owsi-alfresco-parent-share-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share</artifactId>
@@ -79,15 +79,15 @@
 				<type>amp</type>
 			</dependency>
 			<dependency>
-				<groupId>com.alfdev.alfresco</groupId>
-				<artifactId>create-link-share</artifactId>
-				<version>1.0.0</version>
-				<type>amp</type>
-			</dependency>
-			<dependency>
 				<groupId>de.fmaul</groupId>
 				<artifactId>javascript-console-share</artifactId>
 				<version>0.6</version>
+				<type>amp</type>
+			</dependency>
+			<dependency>
+				<groupId>external.module.alfresco-outlook</groupId>
+				<artifactId>alfresco-outlook-share</artifactId>
+				<version>2.1.0</version>
 				<type>amp</type>
 			</dependency>
 		</dependencies>

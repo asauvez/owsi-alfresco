@@ -10,7 +10,7 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.3.3</version>
+	<version>0.4.0</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
@@ -129,6 +129,7 @@
 						<pullDevelop>true</pullDevelop>
 						<pullMaster>true</pullMaster>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<scmCommentPrefix>[release] </scmCommentPrefix>
 					</configuration>
 				</plugin>
 

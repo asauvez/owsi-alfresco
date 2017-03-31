@@ -165,9 +165,9 @@ public class NodeModelRepositoryServiceImpl
 	@Override
 	@SuppressWarnings("unchecked")
 	public <C extends Serializable> C getProperty(NodeReference nodeReference, NameReference property) {
-		return (C) nodeService.getProperty(
+		return (C) conversionService.getForApplication(nodeService.getProperty(
 				conversionService.getRequired(nodeReference),
-				conversionService.getRequired(property));
+				conversionService.getRequired(property)));
 	}
 
 	@Override

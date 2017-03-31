@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmAttachable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuditable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthor;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmAuthority;
@@ -66,6 +67,8 @@ public interface CmModel {
 	CmIndexControl indexControl = new CmIndexControl();
 	
 	CmPreferences preferences = new CmPreferences();
+	
+	CmAttachable attachable = new CmAttachable();
 	
 	CmEmailed emailed = new CmEmailed();
 	

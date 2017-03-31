@@ -2,4 +2,10 @@ target/
 .settings/
 .project
 .classpath
+*.log.*
+.metadata
+.recommenders/
+*.idea
 *.log
+Servers/
+
