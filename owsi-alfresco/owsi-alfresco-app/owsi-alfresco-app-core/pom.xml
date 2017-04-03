@@ -18,12 +18,34 @@
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-api-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>jackson-databind</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
 			<groupId>fr.openwide.core.packages</groupId>
 			<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
 			<type>pom</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-beanutils</artifactId>
+					<groupId>commons-beanutils</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-collections</artifactId>
+					<groupId>commons-collections</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<!-- Uniquement parce que owsi-core GenericEntity a besoin de @Field
