@@ -11,7 +11,7 @@
 	<name>OWSI Alfresco - Application - Core</name>
 
 	<properties>
-		<owsi-core.hibernate-search.version>5.5.2.Final</owsi-core.hibernate-search.version>
+		<owsi-core.hibernate-search.version>5.5.3.Final</owsi-core.hibernate-search.version>
 	</properties>
 
 	<dependencies>
@@ -35,6 +35,21 @@
 					<artifactId>commons-beanutils</artifactId>
 					<groupId>commons-beanutils</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-search-orm</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-search-orm</artifactId>
+			<version>${owsi-core.hibernate-search.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-core</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -44,6 +59,10 @@
 				<exclusion>
 					<artifactId>commons-collections</artifactId>
 					<groupId>commons-collections</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
