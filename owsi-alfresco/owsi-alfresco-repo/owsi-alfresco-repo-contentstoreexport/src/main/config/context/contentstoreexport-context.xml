@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+			
+	<bean id="owsi.service.contentstoreexport" 
+		class="fr.openwide.alfresco.repository.contentstoreexport.service.impl.ContentStoreExportServiceImpl">
+		<property name="nodeService" ref="NodeService"/>
+		<property name="contentStoreFolder" value="${dir.contentstore}"/>
+		<property name="contentstoreexportPaths" value="${contentstoreexport.paths}"/>
+		<property name="contentstoreexportQueries" value="${contentstoreexport.queries}"/>
+		<property name="searchService" ref="SearchService"/>
+		<property name="contentService" ref="ContentService"/>
+	</bean>
+	
+	<bean id="webscript.owsi.contentstoreexport.export.get" 
+		class="fr.openwide.alfresco.repository.contentstoreexport.web.script.HelloWebScript"
+		parent="webscript">
+		<property name="contentStoreExportService" ref="owsi.service.contentstoreexport"/> 
+	</bean>
+</beans>

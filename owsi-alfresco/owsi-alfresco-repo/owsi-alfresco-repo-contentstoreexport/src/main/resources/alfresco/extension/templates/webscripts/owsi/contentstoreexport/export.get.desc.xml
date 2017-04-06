@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<webscript>
+	<shortname>Content store export</shortname>
+	<description>Export necessary files</description>
+	<url>/owsi/contentstoreexport</url>
+	<format default="html" />
+	<authentication>user</authentication>
+	<transaction allow="readonly">required</transaction>
+	<family>OWSI</family>
+</webscript>

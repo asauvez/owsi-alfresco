@@ -19,6 +19,10 @@
 			<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-contentstoreexport</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

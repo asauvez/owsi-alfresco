@@ -58,6 +58,11 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-contentstoreexport</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.acegisecurity</groupId>
 				<artifactId>acegi-security</artifactId>
 				<version>${owsi-alfresco.repo.acegi-security.version}</version>
