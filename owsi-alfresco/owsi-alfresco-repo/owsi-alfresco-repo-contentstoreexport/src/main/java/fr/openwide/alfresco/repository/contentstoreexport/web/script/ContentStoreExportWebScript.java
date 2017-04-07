@@ -8,7 +8,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.repository.contentstoreexport.service.ContentStoreExportService;
 
-public class HelloWebScript extends AbstractWebScript {
+public class ContentStoreExportWebScript extends AbstractWebScript {
 
 	private ContentStoreExportService contentStoreExportService;
 	

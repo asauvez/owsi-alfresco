@@ -37,6 +37,7 @@
 		<owsi-alfresco.repo.javax-mail.version>1.5.5</owsi-alfresco.repo.javax-mail.version>
 		<owsi-alfresco.repo.jaxb.version>2.1.11</owsi-alfresco.repo.jaxb.version>
 		<owsi-alfresco.repo.jaxen.version>1.1.6</owsi-alfresco.repo.jaxen.version>
+		<owsi-alfresco.repo.slf4j.version>1.7.12</owsi-alfresco.repo.slf4j.version>
 		<owsi-alfresco.repo.jcl-over-slf4j.version>1.7.2</owsi-alfresco.repo.jcl-over-slf4j.version>
 		<owsi-alfresco.repo.joda-time.version>2.9.4</owsi-alfresco.repo.joda-time.version>
 		<owsi-alfresco.repo.json-simple.version>1.1.1</owsi-alfresco.repo.json-simple.version>
@@ -911,6 +912,12 @@
 				<groupId>org.springframework.social</groupId>
 				<artifactId>spring-social-core</artifactId>
 				<version>${owsi-alfresco.repo.spring-social.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${owsi-alfresco.repo.slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>

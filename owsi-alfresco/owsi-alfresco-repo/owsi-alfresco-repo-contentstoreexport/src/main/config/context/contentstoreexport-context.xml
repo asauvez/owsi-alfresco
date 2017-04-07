@@ -6,15 +6,15 @@
 	<bean id="owsi.service.contentstoreexport" 
 		class="fr.openwide.alfresco.repository.contentstoreexport.service.impl.ContentStoreExportServiceImpl">
 		<property name="nodeService" ref="NodeService"/>
-		<property name="contentStoreFolder" value="${dir.contentstore}"/>
 		<property name="contentstoreexportPaths" value="${contentstoreexport.paths}"/>
 		<property name="contentstoreexportQueries" value="${contentstoreexport.queries}"/>
 		<property name="searchService" ref="SearchService"/>
 		<property name="contentService" ref="ContentService"/>
+		<property name="namespacePrefixResolver" ref="NamespaceService"/>
 	</bean>
 	
 	<bean id="webscript.owsi.contentstoreexport.export.get" 
-		class="fr.openwide.alfresco.repository.contentstoreexport.web.script.HelloWebScript"
+		class="fr.openwide.alfresco.repository.contentstoreexport.web.script.ContentStoreExportWebScript"
 		parent="webscript">
 		<property name="contentStoreExportService" ref="owsi.service.contentstoreexport"/> 
 	</bean>

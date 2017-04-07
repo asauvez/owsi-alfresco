@@ -2,7 +2,7 @@
 <webscript>
 	<shortname>Content store export</shortname>
 	<description>Export necessary files</description>
-	<url>/owsi/contentstoreexport</url>
+	<url>/owsi/contentstoreexport.zip</url>
 	<format default="html" />
 	<authentication>user</authentication>
 	<transaction allow="readonly">required</transaction>
