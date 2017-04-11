@@ -15,7 +15,10 @@ public class ContentStoreExportWebScript extends AbstractWebScript {
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse resp) throws IOException {
 		resp.setContentType("application/zip");
-		contentStoreExportService.export(resp.getOutputStream());
+		contentStoreExportService.export(resp.getOutputStream(), 
+				req.getParameter("paths"), 
+				req.getParameter("queries"), 
+				req.getParameter("nodeRefs"));
 	}
 	
 	public void setContentStoreExportService(ContentStoreExportService contentStoreExportService) {

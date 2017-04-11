@@ -4,5 +4,5 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public interface ContentStoreExportService {
-	void export(OutputStream outPutStream) throws IOException;
+	void export(OutputStream outPutStream, String paths, String queries, String nodeRefs) throws IOException;
 }
