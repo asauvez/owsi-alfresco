@@ -6,31 +6,21 @@ import java.util.Objects;
 import com.google.common.base.Joiner;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class RepositoryAccessControl implements Serializable {
 
 	private static final long serialVersionUID = 1391171626983929282L;
 
-	private NodeReference nodeReference;
 	private RepositoryAuthority authority;
 	private RepositoryPermission permission;
 	private boolean allowed;
 
 	public RepositoryAccessControl() {}
 
-	public RepositoryAccessControl(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
-		this.nodeReference = nodeReference;
+	public RepositoryAccessControl(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
 		this.authority = authority;
 		this.permission = permission;
 		this.allowed = allowed;
-	}
-
-	public NodeReference getNodeReference() {
-		return nodeReference;
-	}
-	public void setNodeReference(NodeReference nodeReference) {
-		this.nodeReference = nodeReference;
 	}
 
 	public RepositoryAuthority getAuthority() {
@@ -56,7 +46,7 @@ public class RepositoryAccessControl implements Serializable {
 
 	@Override
 	public String toString() {
-		return Joiner.on(":").join(nodeReference, authority, permission, allowed);
+		return Joiner.on(":").join(authority, permission, allowed);
 	}
 
 	@Override
@@ -69,8 +59,7 @@ public class RepositoryAccessControl implements Serializable {
 		}
 		if (object instanceof RepositoryAccessControl) {
 			RepositoryAccessControl other = (RepositoryAccessControl) object;
-			return Objects.equals(nodeReference, other.getNodeReference())
-				&& Objects.equals(authority, other.getAuthority())
+			return Objects.equals(authority, other.getAuthority())
 				&& Objects.equals(permission, other.getPermission())
 				&& Objects.equals(allowed, other.isAllowed());
 		}
@@ -79,7 +68,7 @@ public class RepositoryAccessControl implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(nodeReference, authority, permission, allowed);
+		return Objects.hash(authority, permission, allowed);
 	}
 
 }

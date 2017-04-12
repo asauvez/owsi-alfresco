@@ -260,7 +260,6 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			node.setInheritParentPermissions(permissionService.getInheritParentPermissions(nodeRef));
 			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
 				node.getAccessControlList().add(new RepositoryAccessControl(
-						nodeReference,
 						RepositoryAuthority.authority(accessPermission.getAuthority()),
 						new RepositoryPermission(accessPermission.getPermission()),
 						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
@@ -541,7 +540,6 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		for (AccessPermission oldPermission : permissionService.getAllSetPermissions(nodeRef)) {
 			if (oldPermission.isSetDirectly()) {
 				oldPermissions.add(new RepositoryAccessControl(
-					conversionService.get(nodeRef),
 					RepositoryAuthority.authority(oldPermission.getAuthority()),
 					new RepositoryPermission(oldPermission.getPermission()),
 					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
