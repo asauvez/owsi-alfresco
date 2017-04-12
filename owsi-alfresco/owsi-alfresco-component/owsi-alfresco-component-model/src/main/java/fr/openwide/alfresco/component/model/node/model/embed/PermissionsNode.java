@@ -68,7 +68,7 @@ public class PermissionsNode {
 		return addAccessControl(authority, permission, true);
 	}
 	public BusinessNode addAccessControl(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
-		repoNode.getAccessControlList().add(new RepositoryAccessControl(authority, permission, allowed));
+		repoNode.getAccessControlList().add(new RepositoryAccessControl(node.getNodeReference(), authority, permission, allowed));
 		return node;
 	}
 }
