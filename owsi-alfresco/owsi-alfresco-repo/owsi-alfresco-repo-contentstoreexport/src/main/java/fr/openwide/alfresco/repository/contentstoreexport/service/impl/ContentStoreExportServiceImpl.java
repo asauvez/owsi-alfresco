@@ -1,13 +1,11 @@
 package fr.openwide.alfresco.repository.contentstoreexport.service.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +15,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -26,6 +25,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -38,9 +38,12 @@ import fr.openwide.alfresco.repository.contentstoreexport.service.ContentStoreEx
 public class ContentStoreExportServiceImpl implements ContentStoreExportService {
 
 	private static final String STORE_PREFIX = "store:/";
+	private static final String SAMPLE_EXTENSION = ".sample";
+	private static final String TOMCAT_HOME = System.getProperty("catalina.base");
 
 	private final Logger LOGGER = LoggerFactory.getLogger(ContentStoreExportServiceImpl.class);
 
+	private DescriptorService descriptorService;
 	private NodeService nodeService;
 	private SearchService searchService;
 	private ContentService contentService;
@@ -48,34 +51,71 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 
 	private String contentstoreexportPaths;
 	private String contentstoreexportQueries;
+	private String contentstoreexportVersion;
 
 	@Override
 	public void export(OutputStream outPutStream, String paths, String queries, String noderefs) throws IOException {
 		long startTime = System.currentTimeMillis();
+		Set<String> processedNodes = new HashSet<String>();
+		int count = 0;
 		LOGGER.info("lancement de l'export.");
 		Properties properties = new Properties();
+		properties.setProperty("contentstoreexport.version", contentstoreexportVersion);
+		properties.setProperty("alfresco.version", descriptorService.getCurrentRepositoryDescriptor().getVersion());
 		Set<NodeRef> rootNodesToExport = getRootNodesToExport(paths, queries, noderefs, properties);
-		zipFiles(rootNodesToExport, outPutStream, new HashSet<String>(), properties);
-		LOGGER.info("Fin de l'export.");
-		long stopTime = System.currentTimeMillis();
-		String elapsedTime = secondToTimeConverter(stopTime - startTime);
-		properties.setProperty("tempsExecution", elapsedTime);
-		System.out.println(properties.toString());
+		try (ZipOutputStream zipOutPutStream = new ZipOutputStream(outPutStream)) {
+			for (NodeRef root : rootNodesToExport) {
+				count += recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes);
+			}
+			exportLocalFiles(zipOutPutStream, new File(TOMCAT_HOME + "/shared/classes"));
+			LOGGER.info("Nombre de fichiers exportés: " + count);
+			properties.setProperty("nbr.fichiers.exportes", "" + count);
+			LOGGER.info("Fin de l'export.");
+			//fin des traitements (aucun traitement supplémentaire ne doit etre fait au dela de ce point)
+			long stopTime = System.currentTimeMillis();
+			String elapsedTime = secondToTimeConverter(stopTime - startTime);
+			properties.setProperty("temps.execution", elapsedTime);
+			zipOutPutStream.putNextEntry(new ZipEntry("ContentStoreExport.properties"));
+			properties.store(zipOutPutStream, "Généré automatiquement par le service ContentStoreExport @SMILE");
+			zipOutPutStream.closeEntry();
+		}
 	}
 
+	private void exportLocalFiles(ZipOutputStream zipOutPutStream, File root) throws IOException {
+		if (root.isDirectory()) {
+			File[] files = root.listFiles();
+			if (files != null) {
+				for (File file:files) {
+					String path = file.getAbsolutePath();
+					if (path.startsWith(TOMCAT_HOME)) {
+						path = path.substring(TOMCAT_HOME.length()); 
+					}
+					
+					if (!file.isDirectory() && !path.endsWith(SAMPLE_EXTENSION)) {
+						zipOutPutStream.putNextEntry(new ZipEntry(path));
+						try (FileInputStream fileIn = new FileInputStream(file)) {
+							IOUtils.copy(fileIn, zipOutPutStream);
+							zipOutPutStream.closeEntry();
+						}
+					}
+					exportLocalFiles(zipOutPutStream, file);
+				}
+			}
+		}
+	}
+	
 	private Set<NodeRef> getRootNodesToExport(String paths, String queries, String nodeRefs, Properties properties) {
 		Set<NodeRef> rootNodesToExport = new HashSet<>();
-		properties.setProperty("date", new Timestamp(System.currentTimeMillis()).toString());
 		// Paths
 		if (paths != null) {
-			properties.setProperty("pathsParametresReq", paths);
+			properties.setProperty("paths.parametres.req", paths);
 			for (String path : paths.split(",")) {
 				if (!path.trim().isEmpty()) {
 					rootNodesToExport.add(getByPath(path));
 				}
 			}
 		}
-		properties.setProperty("pathsParametresConfig", contentstoreexportPaths);
+		properties.setProperty("paths.parametres.config", contentstoreexportPaths);
 		for (String path : contentstoreexportPaths.split(",")) {
 			if (!path.trim().isEmpty()) {
 				rootNodesToExport.add(getByPath(path));
@@ -83,7 +123,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		}
 		// Queries
 		if (queries != null) {
-			properties.setProperty("queriesParametresReq", queries);
+			properties.setProperty("queries.parametres.req", queries);
 			for (String query : queries.split(",")) {
 				if (!query.trim().isEmpty()) {
 					ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
@@ -93,7 +133,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				}
 			}
 		}
-		properties.setProperty("queriesParametresConfig", contentstoreexportQueries);
+		properties.setProperty("queries.parametres.config", contentstoreexportQueries);
 		for (String query : contentstoreexportQueries.split(",")) {
 			if (!query.trim().isEmpty()) {
 				ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
@@ -104,14 +144,13 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		}
 		// NodeRefs
 		if (nodeRefs != null) {
-			properties.setProperty("nodeRefsParametresReq", nodeRefs);
+			properties.setProperty("noderefs.parametres.req", nodeRefs);
 			for (String nodeRef : nodeRefs.split(",")) {
 				if (!nodeRef.trim().isEmpty()) {
 					rootNodesToExport.add(new NodeRef(nodeRef));
 				}
 			}
 		}
-
 		rootNodesToExport.add(nodeService.getRootNode(new StoreRef("system://system")));
 		LOGGER.info("Nombre de racines trouvées: " + rootNodesToExport.size());
 		return rootNodesToExport;
@@ -132,19 +171,6 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		return res;
 	}
 
-	private int zipFiles(Set<NodeRef> rootList, OutputStream outPutStream, Set<String> processedNodes, Properties properties)
-			throws IOException {
-		int count = 0;
-		try (ZipOutputStream zipOutPutStream = new ZipOutputStream(outPutStream)) {
-			for (NodeRef root : rootList) {
-				count += recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes);
-			}
-		}
-		LOGGER.info("Nombre de fichiers exportés: " + count);
-		properties.setProperty("nbrFichiersExportes", "" + count);
-		return count;
-	}
-
 	private int recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zip, Set<String> processedNodes)
 			throws IOException {
 		int count = 0;
@@ -156,9 +182,10 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				try (InputStream in = reader.getContentInputStream()) {
 					String contentUrl = contentData.getContentUrl();
 					if (processedNodes.add(contentUrl)) {
-						/*if (contentUrl.startsWith(STORE_PREFIX)) {
+						if (contentUrl.startsWith(STORE_PREFIX)) {
 							contentUrl = contentUrl.substring(STORE_PREFIX.length());
-						}*/
+							contentUrl = "/contentstore" + contentUrl;
+						}
 						zip.putNextEntry(new ZipEntry(contentUrl));
 						IOUtils.copy(in, zip);
 						count++;
@@ -178,33 +205,33 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	}
 
 	private String secondToTimeConverter (long seconds) {
-		long s = seconds %60;
+		seconds = seconds / 1000;
+		long s = seconds % 60;
 		long m = (seconds / 60) % 60;
 		long h = (seconds / (60 * 60)) % 24;
-		return String.format("%d:%02d:%02d", h,m,s);
+		return String.format("%dh %02dmn %02ds", h,m,s);
 	}
 	
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
+	public void setDescriptorService(DescriptorService descriptorService) {
+		this.descriptorService = descriptorService;
+	}
+	
+	public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+		this.nodeService = serviceRegistry.getNodeService();
+		this.searchService = serviceRegistry.getSearchService();
+		this.contentService = serviceRegistry.getContentService();
+		this.namespacePrefixResolver = serviceRegistry.getNamespaceService();
+	}
+	
+	public void setContentstoreexportVersion(String contentstoreexportVersion) {
+		this.contentstoreexportVersion = contentstoreexportVersion;
 	}
 
 	public void setContentstoreexportPaths(String contentstoreexportPaths) {
 		this.contentstoreexportPaths = contentstoreexportPaths;
 	}
 
-	public void setSearchService(SearchService searchService) {
-		this.searchService = searchService;
-	}
-
 	public void setContentstoreexportQueries(String contentstoreexportQueries) {
 		this.contentstoreexportQueries = contentstoreexportQueries;
-	}
-
-	public void setContentService(ContentService contentService) {
-		this.contentService = contentService;
-	}
-
-	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
-		this.namespacePrefixResolver = namespacePrefixResolver;
 	}
 }
