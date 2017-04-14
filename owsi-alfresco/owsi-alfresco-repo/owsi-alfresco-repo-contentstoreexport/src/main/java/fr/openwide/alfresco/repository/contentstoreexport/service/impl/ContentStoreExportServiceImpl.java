@@ -63,6 +63,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		properties.setProperty("contentstoreexport.version", contentstoreexportVersion);
 		properties.setProperty("alfresco.version", descriptorService.getCurrentRepositoryDescriptor().getVersion());
 		Set<NodeRef> rootNodesToExport = getRootNodesToExport(paths, queries, noderefs, properties);
+		// debut du stockage des fichiers dans le zip
 		try (ZipOutputStream zipOutPutStream = new ZipOutputStream(outPutStream)) {
 			for (NodeRef root : rootNodesToExport) {
 				count += recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes);
@@ -71,7 +72,9 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			LOGGER.info("Nombre de fichiers exportés: " + count);
 			properties.setProperty("nbr.fichiers.exportes", "" + count);
 			LOGGER.info("Fin de l'export.");
-			//fin des traitements (aucun traitement supplémentaire ne doit etre fait au dela de ce point)
+			// fin des traitements (aucun traitement supplémentaire ne doit etre fait au dela de ce point)
+			/* calcul du temps d'execution, intégration de la donnée dans le .properties et ajout du .properties
+			dans le zip */
 			long stopTime = System.currentTimeMillis();
 			String elapsedTime = secondToTimeConverter(stopTime - startTime);
 			properties.setProperty("temps.execution", elapsedTime);
@@ -81,16 +84,18 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		}
 	}
 
+	// parcours recursif du dossier shared/classes de Tomcat
 	private void exportLocalFiles(ZipOutputStream zipOutPutStream, File root) throws IOException {
 		if (root.isDirectory()) {
 			File[] files = root.listFiles();
 			if (files != null) {
 				for (File file:files) {
 					String path = file.getAbsolutePath();
+					// substring du path pour n'avoir que shared/classes dans le zip
 					if (path.startsWith(TOMCAT_HOME)) {
 						path = path.substring(TOMCAT_HOME.length()); 
 					}
-					
+					// on ignore les fichiers *.sample
 					if (!file.isDirectory() && !path.endsWith(SAMPLE_EXTENSION)) {
 						zipOutPutStream.putNextEntry(new ZipEntry(path));
 						try (FileInputStream fileIn = new FileInputStream(file)) {
@@ -151,6 +156,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				}
 			}
 		}
+		//la racine system://syteme est ajoutée en dur via un noderef
 		rootNodesToExport.add(nodeService.getRootNode(new StoreRef("system://system")));
 		LOGGER.info("Nombre de racines trouvées: " + rootNodesToExport.size());
 		return rootNodesToExport;
@@ -182,6 +188,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				try (InputStream in = reader.getContentInputStream()) {
 					String contentUrl = contentData.getContentUrl();
 					if (processedNodes.add(contentUrl)) {
+						//on remplace "/store://" par "/contentstore"
 						if (contentUrl.startsWith(STORE_PREFIX)) {
 							contentUrl = contentUrl.substring(STORE_PREFIX.length());
 							contentUrl = "/contentstore" + contentUrl;
@@ -194,18 +201,17 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				zip.closeEntry();
 			}
 		}
+		//recursion dans les fils
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
-		if (children.size() > 0) {
-			for (ChildAssociationRef childAssoc : children) {
-				NodeRef childNodeRef = childAssoc.getChildRef();
-				count += recurseThroughNodeRefChilds(childNodeRef, zip, processedNodes);
-			}
+		for (ChildAssociationRef childAssoc : children) {
+			NodeRef childNodeRef = childAssoc.getChildRef();
+			count += recurseThroughNodeRefChilds(childNodeRef, zip, processedNodes);
 		}
 		return count;
 	}
 
-	private String secondToTimeConverter (long seconds) {
-		seconds = seconds / 1000;
+	private String secondToTimeConverter (long milliseconds) {
+		long seconds = milliseconds / 1000;
 		long s = seconds % 60;
 		long m = (seconds / 60) % 60;
 		long h = (seconds / (60 * 60)) % 24;
