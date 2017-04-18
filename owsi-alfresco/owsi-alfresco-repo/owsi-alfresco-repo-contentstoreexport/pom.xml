@@ -12,6 +12,9 @@
 
 	<properties>
 		<alfresco.module.name>owsi-alfresco-contentstoreexport</alfresco.module.name>
+		
+		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.5 -->
+		<jdk.version>1.6</jdk.version>
 	</properties>
 	
 	<dependencies>
@@ -34,17 +37,13 @@
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/config</directory>
-				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
+		<plugins>
+			<!-- Pour définir alfresco.module.version -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
 	
 </project>
