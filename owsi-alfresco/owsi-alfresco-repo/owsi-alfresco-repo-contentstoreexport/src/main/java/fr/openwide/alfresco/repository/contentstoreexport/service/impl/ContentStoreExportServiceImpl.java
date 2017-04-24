@@ -83,22 +83,13 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			zipOutPutStream.putNextEntry(new ZipEntry("ContentStoreExport.properties"));
 			properties.store(zipOutPutStream, "Généré automatiquement par le service ContentStoreExport @SMILE");
 			zipOutPutStream.closeEntry();
-		} catch (IOException e) {
-			throw e;
 		} finally {
-			if(zipOutPutStream != null) {
-				try {
-					zipOutPutStream.close();
-				} catch (IOException e) {
-					throw e;
-				}
-			}
+			IOUtils.closeQuietly(zipOutPutStream);
 		}
 	}
 
 	// parcours recursif du dossier shared/classes de Tomcat
 	private void exportLocalFiles(ZipOutputStream zipOutPutStream, File root) throws IOException {
-		FileInputStream fileIn = null;
 		if (root.isDirectory()) {
 			File[] files = root.listFiles();
 			if (files != null) {
@@ -111,20 +102,12 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 					// on ignore les fichiers *.sample
 					if (!file.isDirectory() && !path.endsWith(SAMPLE_EXTENSION)) {
 						zipOutPutStream.putNextEntry(new ZipEntry(path));
+						FileInputStream fileIn = new FileInputStream(file);
 						try {
-							fileIn = new FileInputStream(file);
 							IOUtils.copy(fileIn, zipOutPutStream);
 							zipOutPutStream.closeEntry();
-						} catch (IOException e) {
-							throw e;
 						} finally {
-							if (fileIn != null) {
-								try {
-									fileIn.close();
-								} catch (IOException e) {
-									throw e;
-								}
-							}
+							IOUtils.closeQuietly(fileIn);
 						}
 					}
 					exportLocalFiles(zipOutPutStream, file);
@@ -203,7 +186,6 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 
 	private int recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes)
 			throws IOException {
-		InputStream inputStream = null;
 		int count = 0;
 		//recupération des properties du node courant
 		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
@@ -212,8 +194,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			if (property.getValue() instanceof ContentData) {
 				ContentData contentData = (ContentData) property.getValue();
 				ContentReader reader = contentService.getReader(nodeRef, property.getKey());
+				InputStream inputStream = reader.getContentInputStream();
 				try {
-					inputStream = reader.getContentInputStream();
 					String contentUrl = contentData.getContentUrl();
 					if (processedNodes.add(contentUrl)) {
 						//on remplace "/store://" par "/contentstore"
@@ -226,16 +208,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 						IOUtils.copy(inputStream, zipOutPutStream);
 						count++;
 					}
-				} catch (IOException e) {
-					throw e;
 				} finally {
-					if (inputStream != null) {
-						try {
-							inputStream.close();
-						} catch (IOException e) {
-							throw e;
-						}
-					}
+					IOUtils.closeQuietly(inputStream);
 				}
 				zipOutPutStream.closeEntry();
 			}
