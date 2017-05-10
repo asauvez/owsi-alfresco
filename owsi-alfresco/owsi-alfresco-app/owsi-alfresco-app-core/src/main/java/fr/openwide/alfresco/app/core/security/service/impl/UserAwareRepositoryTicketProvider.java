@@ -36,10 +36,10 @@ public class UserAwareRepositoryTicketProvider implements RepositoryTicketProvid
 	private RepositoryUserProvider getUserProvider(Optional<UserDetails> userDetails) {
 		if (! userDetails.isPresent()) {
 			throw new IllegalStateException("Currently not in an authenticated context");
-		} else if (userDetails.orNull() instanceof RepositoryUserProvider) {
-			return (RepositoryUserProvider) userDetails.orNull();
+		} else if (userDetails.get() instanceof RepositoryUserProvider) {
+			return (RepositoryUserProvider) userDetails.get();
 		} else {
-			throw new IllegalStateException("Currently held authentication is not a RepositoryUserProvider: " + userDetails.getClass());
+			throw new IllegalStateException("Currently held authentication is not a RepositoryUserProvider: " + userDetails.get().getClass());
 		}
 	}
 
