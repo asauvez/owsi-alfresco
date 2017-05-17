@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,9 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.management.MBeanServerConnection;
+
+import org.alfresco.repo.management.JmxDumpUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -48,6 +52,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private SearchService searchService;
 	private ContentService contentService;
 	private NamespacePrefixResolver namespacePrefixResolver;
+	private MBeanServerConnection mbeanServer;
 
 	private String contentstoreexportPaths;
 	private String contentstoreexportQueries;
@@ -74,6 +79,14 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			LOGGER.info("Nombre de fichiers exportés: " + count);
 			properties.setProperty("nbr.fichiers.exportes", "" + count);
 			LOGGER.info("Fin de l'export.");
+			
+			// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
+			zipOutPutStream.putNextEntry(new ZipEntry("jmxdump.txt"));
+			PrintWriter writer = new PrintWriter(zipOutPutStream);
+			JmxDumpUtil.dumpConnection(mbeanServer, writer);
+			writer.flush();
+			zipOutPutStream.closeEntry();
+
 			// fin des traitements (aucun traitement supplémentaire ne doit etre fait au dela de ce point)
 			/* calcul du temps d'execution, intégration de la donnée dans le .properties et ajout du .properties
 			dans le zip */
@@ -252,5 +265,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 
 	public void setContentstoreexportQueries(String contentstoreexportQueries) {
 		this.contentstoreexportQueries = contentstoreexportQueries;
+	}
+	public void setMBeanServer(MBeanServerConnection mbeanServer) {
+		this.mbeanServer = mbeanServer;
 	}
 }

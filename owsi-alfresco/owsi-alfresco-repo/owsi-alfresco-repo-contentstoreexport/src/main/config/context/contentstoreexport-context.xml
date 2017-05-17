@@ -10,6 +10,7 @@
 		<property name="contentstoreexportVersion" value="${contentstoreexport.version}"/>
 		<property name="serviceRegistry" ref="ServiceRegistry"/>
 		<property name="descriptorService" ref ="DescriptorService"/>
+		<property name="MBeanServer" ref="alfrescoMBeanServer" />
 	</bean>
 	
 	<bean id="webscript.owsi.contentstoreexport.export.get" 
