@@ -24,6 +24,7 @@ public class CoreCommonSecurityConfig extends AppCorePermissionConfigurerAdapter
 		return new RepositoryAuthenticationProvider();
 	}
 
+	// TODO : names still necessary ???
 	@Bean(name = {"repositoryAuthenticationUserDetailsService", "preAuthenticatedUserDetailsService"})
 	public RepositoryAuthenticationUserDetailsService userDetailsService(AuthenticationService authenticationService) {
 		return new RepositoryAuthenticationUserDetailsServiceImpl(authenticationService, loginTimeRoleHierarchy());

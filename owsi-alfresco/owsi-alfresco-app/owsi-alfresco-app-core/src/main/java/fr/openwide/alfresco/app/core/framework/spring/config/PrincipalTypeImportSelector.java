@@ -7,7 +7,9 @@ import org.springframework.util.Assert;
 
 import fr.openwide.alfresco.app.core.security.model.PrincipalType;
 
- /**
+/**
+ * Select the config to import depending the PrincipalType choosed.
+ * 
  * {@see org.springframework.context.annotation.AdviceModeImportSelector}
  * {@see org.springframework.context.annotation.AnnotationConfigUtils#attributesFor}
  */

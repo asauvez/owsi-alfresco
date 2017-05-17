@@ -11,21 +11,39 @@ import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.impl.NamedUserServiceImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryRunAsUserManagerImpl;
 
+/**
+ * Config for PrincipalType.NAMED_USER.
+ * 
+ * Alfresco is the main authentication mecanism.
+ */
 @Configuration
 public class NamedUserAppCoreSecurityConfig extends AbstractAppCoreSecurityConfig {
 
+	/**
+	 * Instantiated by application in xxx.CoreCommonSecurityConfig.
+	 * 
+	 * TODO: instantiate it here. Manage loginTimeRoleHierarchy.
+	 */
 	@Autowired
 	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
 
+	/**
+	 * Returns info about the current user.
+	 * The principal is always a NamedUser.
+	 */
 	@Bean
+	@Override
 	public NamedUserService userService() {
 		return new NamedUserServiceImpl(repositoryAuthenticationUserDetailsService);
 	}
 
 	@Bean
+	@Override
 	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
-		RepositoryRunAsUserManagerImpl manager = new RepositoryRunAsUserManagerImpl(authenticationManager, userService());
-		manager.setRepositoryAuthenticationUserDetailsService(repositoryAuthenticationUserDetailsService);
+		RepositoryRunAsUserManagerImpl manager = new RepositoryRunAsUserManagerImpl(
+				authenticationManager, 
+				repositoryAuthenticationUserDetailsService, 
+				userService());
 		manager.setKey(runAsSharedKey());
 		return manager;
 	}

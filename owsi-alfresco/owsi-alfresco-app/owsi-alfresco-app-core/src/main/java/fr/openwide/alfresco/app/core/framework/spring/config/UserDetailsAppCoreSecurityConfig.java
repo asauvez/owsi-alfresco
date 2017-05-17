@@ -14,14 +14,29 @@ import fr.openwide.alfresco.app.core.security.service.impl.RunAsUserManagerImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.UserAwareRepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 
+/**
+ * Config for PrincipalType.USER_DETAILS.
+ *  
+ * The main authentication mecanism is not Alfresco. It may be users in database or any other systems.
+ * 
+ * To call Alfresco, you have to be in a runAs bloc. When the runAs bloc is ended, the original authentication
+ * context is restored.
+ */
 @Configuration
 public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityConfig {
 
+	public static final String RUN_AS_USER_DETAILS_SERVICE = "runAsUserDetailsService";
+	
 	@Autowired
-	@Qualifier("runAsUserDetailsService")
+	@Qualifier(RUN_AS_USER_DETAILS_SERVICE)
 	private RepositoryAuthenticationUserDetailsService userDetailsService;
 
+	/**
+	 * Returns info about the current user.
+	 * The principal is a NamedUser when we are inside a runAs.
+	 */
 	@Bean
+	@Override
 	public UserService userService() {
 		return new UserServiceImpl();
 	}
@@ -32,9 +47,12 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 	}
 
 	@Bean
+	@Override
 	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
-		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(authenticationManager, userService());
-		manager.setUserDetailsService(userDetailsService);
+		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(
+				authenticationManager, 
+				userDetailsService, 
+				userService());
 		manager.setKey(runAsSharedKey());
 		return manager;
 	}

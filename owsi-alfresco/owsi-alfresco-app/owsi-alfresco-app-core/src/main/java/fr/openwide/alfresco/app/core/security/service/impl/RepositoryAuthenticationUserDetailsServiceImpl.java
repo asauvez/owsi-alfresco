@@ -21,7 +21,6 @@ import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
@@ -104,9 +103,9 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	@Override
 	public void logout(Authentication authentication) {
 		Object principal = authentication.getPrincipal();
-		if (principal instanceof RepositoryUserProvider) {
-			RepositoryUserProvider userProvider = (RepositoryUserProvider) principal;
-			authenticationService.logout(userProvider.getRepositoryUser().getTicket());
+		if (principal instanceof NamedUser) {
+			NamedUser user = (NamedUser) principal;
+			authenticationService.logout(user.getRepositoryUser().getTicket());
 		} else {
 			throw new IllegalStateException("Invalid authentication principal: " + principal);
 		}
