@@ -1,11 +1,9 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 
-import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
@@ -24,14 +22,6 @@ import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityConfig {
 
 	/**
-	 * Instantiated by application in xxx.CoreCommonSecurityConfig.
-	 * 
-	 * TODO: instantiate it here. Manage loginTimeRoleHierarchy.
-	 */
-	@Autowired
-	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
-
-	/**
 	 * Returns info about the current user.
 	 * The principal is a NamedUser when we are inside a runAs.
 	 */
@@ -44,7 +34,7 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 	@Bean
 	@Override
 	public RepositoryTicketProvider ticketProvider() {
-		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService);
+		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
 	}
 
 	@Bean
@@ -52,7 +42,7 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
 		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(
 				authenticationManager, 
-				repositoryAuthenticationUserDetailsService, 
+				repositoryAuthenticationUserDetailsService(), 
 				userService());
 		manager.setKey(runAsSharedKey());
 		return manager;

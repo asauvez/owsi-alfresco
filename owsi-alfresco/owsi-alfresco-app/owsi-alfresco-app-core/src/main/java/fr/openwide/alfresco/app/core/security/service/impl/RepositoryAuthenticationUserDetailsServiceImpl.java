@@ -35,12 +35,12 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	private RoleHierarchy loginTimeRoleHierarchy;
 
 	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService) {
-		this(authenticationService, new NullRoleHierarchy());
+		this(authenticationService, null);
 	}
 	
 	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService, RoleHierarchy loginTimeRoleHierarchy) {
 		this.authenticationService = authenticationService;
-		this.loginTimeRoleHierarchy = loginTimeRoleHierarchy;
+		this.loginTimeRoleHierarchy = (loginTimeRoleHierarchy != null) ? loginTimeRoleHierarchy : new NullRoleHierarchy();
 	}
 
 	@Override
