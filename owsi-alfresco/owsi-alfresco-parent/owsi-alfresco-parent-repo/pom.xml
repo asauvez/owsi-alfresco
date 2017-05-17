@@ -18,6 +18,7 @@
 		<share.webapp.name>share</share.webapp.name>
 		<solr.webapp.name>solr</solr.webapp.name>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
+		<jdk.version>1.8</jdk.version>
 		<owsi-alfresco.repo.alfresco.version>5.2.0</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-data-model.version>6.8</owsi-alfresco.alfresco-data-model.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
