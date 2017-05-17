@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 
 import fr.openwide.alfresco.app.core.security.service.NamedUserService;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
+import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.impl.NamedUserServiceImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryRunAsUserManagerImpl;
@@ -34,7 +35,13 @@ public class NamedUserAppCoreSecurityConfig extends AbstractAppCoreSecurityConfi
 	@Bean
 	@Override
 	public NamedUserService userService() {
-		return new NamedUserServiceImpl(repositoryAuthenticationUserDetailsService);
+		return new NamedUserServiceImpl();
+	}
+	
+	@Bean
+	@Override
+	public RepositoryTicketProvider ticketProvider() {
+		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService);
 	}
 
 	@Bean

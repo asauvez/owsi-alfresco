@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +10,6 @@ import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.core.security.service.impl.RunAsUserManagerImpl;
-import fr.openwide.alfresco.app.core.security.service.impl.UserAwareRepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 
 /**
@@ -25,11 +23,13 @@ import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 @Configuration
 public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityConfig {
 
-	public static final String RUN_AS_USER_DETAILS_SERVICE = "runAsUserDetailsService";
-	
+	/**
+	 * Instantiated by application in xxx.CoreCommonSecurityConfig.
+	 * 
+	 * TODO: instantiate it here. Manage loginTimeRoleHierarchy.
+	 */
 	@Autowired
-	@Qualifier(RUN_AS_USER_DETAILS_SERVICE)
-	private RepositoryAuthenticationUserDetailsService userDetailsService;
+	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
 
 	/**
 	 * Returns info about the current user.
@@ -42,8 +42,9 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 	}
 
 	@Bean
+	@Override
 	public RepositoryTicketProvider ticketProvider() {
-		return new UserAwareRepositoryTicketProvider(userService(), userDetailsService);
+		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService);
 	}
 
 	@Bean
@@ -51,7 +52,7 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
 		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(
 				authenticationManager, 
-				userDetailsService, 
+				repositoryAuthenticationUserDetailsService, 
 				userService());
 		manager.setKey(runAsSharedKey());
 		return manager;

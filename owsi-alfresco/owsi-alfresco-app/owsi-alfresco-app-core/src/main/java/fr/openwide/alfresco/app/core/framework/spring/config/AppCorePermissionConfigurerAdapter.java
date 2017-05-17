@@ -22,6 +22,8 @@ import fr.openwide.core.jpa.security.hierarchy.PermissionHierarchyImpl;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public abstract class AppCorePermissionConfigurerAdapter extends GlobalMethodSecurityConfiguration {
 
+	public static final String LOGIN_TIME_ROLE_HIERARCHY = "loginTimeRoleHierarchy";
+
 	@Bean
 	public abstract PermissionFactory applicationPermissionFactory();
 
@@ -50,7 +52,7 @@ public abstract class AppCorePermissionConfigurerAdapter extends GlobalMethodSec
 	
 	
 	@Bean
-	@Qualifier("loginTimeRoleHierarchy")
+	@Qualifier(LOGIN_TIME_ROLE_HIERARCHY)
 	public RoleHierarchy loginTimeRoleHierarchy() {
 		SecurityHierarchyBuilder builder = new SecurityHierarchyBuilder();
 		addRoleHierarchy(builder);

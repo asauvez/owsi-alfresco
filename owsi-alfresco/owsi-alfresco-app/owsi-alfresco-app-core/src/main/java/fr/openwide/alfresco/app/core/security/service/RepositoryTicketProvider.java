@@ -1,14 +1,44 @@
 package fr.openwide.alfresco.app.core.security.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.google.common.base.Optional;
+
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
 
-public interface RepositoryTicketProvider {
+public class RepositoryTicketProvider {
 
-	RepositoryTicket getTicket();
+	private UserService userService;
+	private RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService;
 
-	RepositoryUser getTicketOwner();
+	public RepositoryTicketProvider(UserService userService, RepositoryAuthenticationUserDetailsService repositoryAuthenticationUserDetailsService) {
+		this.userService = userService;
+		this.repositoryAuthenticationUserDetailsService = repositoryAuthenticationUserDetailsService;
+	}
 
-	void renewTicket();
+	public RepositoryTicket getTicket() {
+		NamedUser user = getNamedUser(userService.getCurrentUserDetails());
+		return user.getRepositoryUser().getTicket();
+	}
 
+	public RepositoryUser getTicketOwner() {
+		NamedUser user = getNamedUser(userService.getCurrentUserDetails());
+		return user.getRepositoryUser();
+	}
+
+	private NamedUser getNamedUser(Optional<UserDetails> userDetails) {
+		if (! userDetails.isPresent()) {
+			throw new IllegalStateException("Currently not in an authenticated context");
+		} else if (userDetails.get() instanceof NamedUser) {
+			return (NamedUser) userDetails.get();
+		} else {
+			throw new IllegalStateException("Currently held authentication is not a NamedUser: " + userDetails.get().getClass());
+		}
+	}
+
+	public void renewTicket() {
+		repositoryAuthenticationUserDetailsService.renewTicket(getTicketOwner());
+	}
 }
