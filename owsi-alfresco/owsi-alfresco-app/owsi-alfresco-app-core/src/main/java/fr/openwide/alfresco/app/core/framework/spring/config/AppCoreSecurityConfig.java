@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.intercept.RunAsImplAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +15,13 @@ import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUs
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
+import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationProvider;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationUserDetailsServiceImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.RunAsUserManagerImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 
-public abstract class AbstractAppCoreSecurityConfig {
+@Configuration
+public class AppCoreSecurityConfig {
 
 	private static final String RUN_AS_SHARED_KEY = UUID.randomUUID().toString();
 
@@ -50,6 +53,14 @@ public abstract class AbstractAppCoreSecurityConfig {
 		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
 	}
 
+	/**
+	 * Provider to allow Spring MVC to authenticate with Alfresco.
+	 */
+	@Bean
+	public RepositoryAuthenticationProvider repositoryAuthenticationProvider() {
+		return new RepositoryAuthenticationProvider();
+	}
+	
 	@Bean
 	public RunAsImplAuthenticationProvider runAsAuthenticationProvider() {
 		RunAsImplAuthenticationProvider provider = new RunAsImplAuthenticationProvider();
