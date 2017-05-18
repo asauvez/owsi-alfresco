@@ -2,12 +2,8 @@ package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 
-import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
-import fr.openwide.alfresco.app.core.security.service.impl.RunAsUserManagerImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 
 /**
@@ -23,7 +19,9 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 
 	/**
 	 * Returns info about the current user.
+	 * 
 	 * The principal is a NamedUser when we are inside a runAs.
+	 * Outside runAs, Principal is used to evaluate permission.
 	 */
 	@Bean
 	@Override
@@ -31,21 +29,8 @@ public class UserDetailsAppCoreSecurityConfig extends AbstractAppCoreSecurityCon
 		return new UserServiceImpl();
 	}
 
-	@Bean
 	@Override
-	public RepositoryTicketProvider ticketProvider() {
-		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
+	public boolean logoutAfterRunAs() {
+		return false;
 	}
-
-	@Bean
-	@Override
-	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
-		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(
-				authenticationManager, 
-				repositoryAuthenticationUserDetailsService(), 
-				userService());
-		manager.setKey(runAsSharedKey());
-		return manager;
-	}
-
 }

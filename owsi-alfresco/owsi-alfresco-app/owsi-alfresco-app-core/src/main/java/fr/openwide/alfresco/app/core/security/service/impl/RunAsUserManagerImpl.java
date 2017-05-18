@@ -10,24 +10,30 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.core.jpa.security.runas.CoreRunAsManagerImpl;
 
 public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserManager {
 
-	private UserService userService;
-	private UserDetailsService userDetailsService;
-	private AuthenticationManager authenticationManager;
+	private final UserService userService;
+	private final RepositoryAuthenticationUserDetailsService userDetailsService;
+	private final AuthenticationManager authenticationManager;
+	private final boolean logoutAfterRunAs;
 
-	public RunAsUserManagerImpl(AuthenticationManager authenticationManager, UserDetailsService userDetailsService, UserService userService) {
+	public RunAsUserManagerImpl(
+			AuthenticationManager authenticationManager, 
+			RepositoryAuthenticationUserDetailsService userDetailsService, 
+			UserService userService,
+			boolean logoutAfterRunAs) {
 		this.authenticationManager = authenticationManager;
 		this.userDetailsService = userDetailsService;
 		this.userService = userService;
+		this.logoutAfterRunAs = logoutAfterRunAs;
 	}
 
 	@Override
@@ -96,12 +102,10 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 		} finally {
 			// Crucial restore of SecurityContextHolder contents - do this before anything else.
 			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orNull());
-			afterRunAs(runAsAuthentication);
+			if (logoutAfterRunAs) {
+				userDetailsService.logout(runAsAuthentication);
+			}
 		}
-	}
-
-	protected void afterRunAs(@SuppressWarnings("unused") Authentication runAsAuthentication) {
-		// may be overriden
 	}
 
 }

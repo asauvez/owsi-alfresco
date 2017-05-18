@@ -2,14 +2,10 @@ package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 
 import fr.openwide.alfresco.app.core.security.service.NamedUserService;
-import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
-import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.impl.NamedUserServiceImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationProvider;
-import fr.openwide.alfresco.app.core.security.service.impl.RepositoryRunAsUserManagerImpl;
 
 /**
  * Config for PrincipalType.NAMED_USER.
@@ -21,6 +17,7 @@ public class NamedUserAppCoreSecurityConfig extends AbstractAppCoreSecurityConfi
 
 	/**
 	 * Returns info about the current user.
+	 * 
 	 * The principal is always a NamedUser.
 	 */
 	@Bean
@@ -28,24 +25,15 @@ public class NamedUserAppCoreSecurityConfig extends AbstractAppCoreSecurityConfi
 	public NamedUserService userService() {
 		return new NamedUserServiceImpl();
 	}
-	
-	@Bean
+
 	@Override
-	public RepositoryTicketProvider ticketProvider() {
-		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
+	public boolean logoutAfterRunAs() {
+		return true;
 	}
 
-	@Bean
-	@Override
-	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
-		RepositoryRunAsUserManagerImpl manager = new RepositoryRunAsUserManagerImpl(
-				authenticationManager, 
-				repositoryAuthenticationUserDetailsService(), 
-				userService());
-		manager.setKey(runAsSharedKey());
-		return manager;
-	}
-
+	/**
+	 * Provider to allow Spring MVC to authenticate with Alfresco.
+	 */
 	@Bean
 	public RepositoryAuthenticationProvider repositoryAuthenticationProvider() {
 		return new RepositoryAuthenticationProvider();

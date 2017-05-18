@@ -15,14 +15,14 @@ import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationUserDetailsServiceImpl;
+import fr.openwide.alfresco.app.core.security.service.impl.RunAsUserManagerImpl;
 
 public abstract class AbstractAppCoreSecurityConfig {
 
 	private static final String RUN_AS_SHARED_KEY = UUID.randomUUID().toString();
 
 	public abstract UserService userService();
-	public abstract RepositoryTicketProvider ticketProvider();
-	public abstract RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager);
+	public abstract boolean logoutAfterRunAs();
 	
 	@Autowired
 	private AuthenticationService authenticationService;
@@ -37,10 +37,26 @@ public abstract class AbstractAppCoreSecurityConfig {
 	}
 
 	@Bean
+	public RepositoryTicketProvider ticketProvider() {
+		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
+	}
+
+	@Bean
 	public RunAsImplAuthenticationProvider runAsAuthenticationProvider() {
 		RunAsImplAuthenticationProvider provider = new RunAsImplAuthenticationProvider();
 		provider.setKey(runAsSharedKey());
 		return provider;
+	}
+	
+	@Bean
+	public RunAsUserManager runAsUserManager(AuthenticationManager authenticationManager) {
+		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(
+				authenticationManager, 
+				repositoryAuthenticationUserDetailsService(), 
+				userService(),
+				logoutAfterRunAs());
+		manager.setKey(runAsSharedKey());
+		return manager;
 	}
 
 	protected String runAsSharedKey() {
