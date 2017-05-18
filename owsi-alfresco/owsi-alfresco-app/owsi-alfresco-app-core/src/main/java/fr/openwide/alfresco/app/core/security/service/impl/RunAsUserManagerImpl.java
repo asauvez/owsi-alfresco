@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
@@ -23,17 +24,14 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 	private final UserService userService;
 	private final RepositoryAuthenticationUserDetailsService userDetailsService;
 	private final AuthenticationManager authenticationManager;
-	private final boolean logoutAfterRunAs;
 
 	public RunAsUserManagerImpl(
 			AuthenticationManager authenticationManager, 
 			RepositoryAuthenticationUserDetailsService userDetailsService, 
-			UserService userService,
-			boolean logoutAfterRunAs) {
+			UserService userService) {
 		this.authenticationManager = authenticationManager;
 		this.userDetailsService = userDetailsService;
 		this.userService = userService;
-		this.logoutAfterRunAs = logoutAfterRunAs;
 	}
 
 	@Override
@@ -69,7 +67,7 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 		if (username == null) {
 			throw new IllegalStateException("Could not find a username attribute with prefix: " + CoreRunAsManagerImpl.RUN_AS_PREFIX);
 		}
-		UserDetails user = userDetailsService.loadUserByUsername(username);
+		NamedUser user = userDetailsService.loadUserByUsername(username);
 		return buildRunAs(user, originalAuthentication);
 	}
 
@@ -85,8 +83,12 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 			// No runAs if the current authenticated user is the target user
 			return work.call();
 		}
-		UserDetails user = userDetailsService.loadUserByUsername(username);
-		return runAsUser(user, work);
+		NamedUser user = userDetailsService.loadUserByUsername(username);
+		try {
+			return runAsUser(user, work);
+		} finally {
+			userDetailsService.logout(user);
+		}
 	}
 
 	@Override
@@ -102,9 +104,6 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 		} finally {
 			// Crucial restore of SecurityContextHolder contents - do this before anything else.
 			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orNull());
-			if (logoutAfterRunAs) {
-				userDetailsService.logout(runAsAuthentication);
-			}
 		}
 	}
 

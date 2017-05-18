@@ -16,14 +16,12 @@ import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationUserDetailsServiceImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.RunAsUserManagerImpl;
+import fr.openwide.alfresco.app.core.security.service.impl.UserServiceImpl;
 
 public abstract class AbstractAppCoreSecurityConfig {
 
 	private static final String RUN_AS_SHARED_KEY = UUID.randomUUID().toString();
 
-	public abstract UserService userService();
-	public abstract boolean logoutAfterRunAs();
-	
 	@Autowired
 	private AuthenticationService authenticationService;
 	
@@ -36,6 +34,17 @@ public abstract class AbstractAppCoreSecurityConfig {
 		return new RepositoryAuthenticationUserDetailsServiceImpl(authenticationService, loginTimeRoleHierarchy);
 	}
 
+	/**
+	 * Returns info about the current user.
+	 * 
+	 * The principal is a NamedUser when we are inside a runAs or when using PrincipalType.NAMED_USER.
+	 * Outside runAs, Principal is also used to evaluate permission.
+	 */
+	@Bean
+	public UserService userService() {
+		return new UserServiceImpl();
+	}
+	
 	@Bean
 	public RepositoryTicketProvider ticketProvider() {
 		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
@@ -53,8 +62,7 @@ public abstract class AbstractAppCoreSecurityConfig {
 		RunAsUserManagerImpl manager = new RunAsUserManagerImpl(
 				authenticationManager, 
 				repositoryAuthenticationUserDetailsService(), 
-				userService(),
-				logoutAfterRunAs());
+				userService());
 		manager.setKey(runAsSharedKey());
 		return manager;
 	}

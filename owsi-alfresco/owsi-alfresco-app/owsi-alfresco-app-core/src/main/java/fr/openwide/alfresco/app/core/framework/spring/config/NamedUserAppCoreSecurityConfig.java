@@ -3,8 +3,6 @@ package fr.openwide.alfresco.app.core.framework.spring.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import fr.openwide.alfresco.app.core.security.service.NamedUserService;
-import fr.openwide.alfresco.app.core.security.service.impl.NamedUserServiceImpl;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationProvider;
 
 /**
@@ -14,22 +12,6 @@ import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticat
  */
 @Configuration
 public class NamedUserAppCoreSecurityConfig extends AbstractAppCoreSecurityConfig {
-
-	/**
-	 * Returns info about the current user.
-	 * 
-	 * The principal is always a NamedUser.
-	 */
-	@Bean
-	@Override
-	public NamedUserService userService() {
-		return new NamedUserServiceImpl();
-	}
-
-	@Override
-	public boolean logoutAfterRunAs() {
-		return true;
-	}
 
 	/**
 	 * Provider to allow Spring MVC to authenticate with Alfresco.

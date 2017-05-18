@@ -30,15 +30,17 @@ public class RepositoryTicketProvider {
 
 	private NamedUser getNamedUser(Optional<UserDetails> userDetails) {
 		if (! userDetails.isPresent()) {
-			throw new IllegalStateException("Currently not in an authenticated context");
+			throw new IllegalStateException("Currently not in an authenticated context. You may want to call Alfresco inside a runAsUser().");
 		} else if (userDetails.get() instanceof NamedUser) {
 			return (NamedUser) userDetails.get();
 		} else {
-			throw new IllegalStateException("Currently held authentication is not a NamedUser: " + userDetails.get().getClass());
+			throw new IllegalStateException("Currently held authentication is not a NamedUser: " + userDetails.get().getClass() 
+					+ ". You may want to call Alfresco inside a runAsUser().");
 		}
 	}
 
 	public void renewTicket() {
-		repositoryAuthenticationUserDetailsService.renewTicket(getTicketOwner());
+		NamedUser user = getNamedUser(userService.getCurrentUserDetails());
+		repositoryAuthenticationUserDetailsService.renewTicket(user);
 	}
 }

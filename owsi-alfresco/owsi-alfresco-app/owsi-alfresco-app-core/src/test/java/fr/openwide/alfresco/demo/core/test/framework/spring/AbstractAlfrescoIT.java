@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.demo.core.test.framework.spring.config.IntegrationTestConfig;
 
@@ -28,7 +28,7 @@ public abstract class AbstractAlfrescoIT {
 	@Autowired
 	private RepositoryAuthenticationUserDetailsService userDetailsService;
 	
-	private Authentication testAuthentication = null;
+	private NamedUser testUser = null;
 	
 	public String getTestUsername() {
 		return "admin";
@@ -40,17 +40,17 @@ public abstract class AbstractAlfrescoIT {
 	}
 	public void loginUser(String username) {
 		logoutUser();
-		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-		testAuthentication = new UsernamePasswordAuthenticationToken(userDetails, null);
+		testUser = userDetailsService.loadUserByUsername(username);
+		Authentication testAuthentication = new UsernamePasswordAuthenticationToken(testUser, null);
 		SecurityContextHolder.getContext().setAuthentication(testAuthentication);
 	}
 	
 	@After
 	public void logoutUser() {
-		if (testAuthentication != null) {
+		if (testUser != null) {
 			SecurityContextHolder.clearContext();
-			userDetailsService.logout(testAuthentication);
-			testAuthentication = null;
+			userDetailsService.logout(testUser);
+			testUser = null;
 		}
 	}
 }

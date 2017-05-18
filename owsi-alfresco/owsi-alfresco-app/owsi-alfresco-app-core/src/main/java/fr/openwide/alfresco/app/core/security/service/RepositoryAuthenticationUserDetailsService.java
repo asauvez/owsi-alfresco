@@ -1,15 +1,18 @@
 package fr.openwide.alfresco.app.core.security.service;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
 
 public interface RepositoryAuthenticationUserDetailsService extends AuthenticationUserDetailsService<UsernamePasswordAuthenticationToken>, UserDetailsService {
 
-	void logout(Authentication authentication);
+	@Override
+	NamedUser loadUserByUsername(String username) throws UsernameNotFoundException;
 	
-	void renewTicket(RepositoryUser repositoryUser);
+	void logout(NamedUser user);
+	
+	void renewTicket(NamedUser user);
 }

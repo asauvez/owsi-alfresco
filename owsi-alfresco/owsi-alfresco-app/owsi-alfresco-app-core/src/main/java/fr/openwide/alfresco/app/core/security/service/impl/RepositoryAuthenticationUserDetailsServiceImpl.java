@@ -10,7 +10,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -101,19 +100,13 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	}
 
 	@Override
-	public void logout(Authentication authentication) {
-		Object principal = authentication.getPrincipal();
-		if (principal instanceof NamedUser) {
-			NamedUser user = (NamedUser) principal;
-			authenticationService.logout(user.getRepositoryUser().getTicket());
-		} else {
-			throw new IllegalStateException("Invalid authentication principal: " + principal);
-		}
+	public void logout(NamedUser user) {
+		authenticationService.logout(user.getRepositoryUser().getTicket());
 	}
-	
 
 	@Override
-	public void renewTicket(RepositoryUser repositoryUser) {
+	public void renewTicket(NamedUser user) {
+		RepositoryUser repositoryUser = user.getRepositoryUser();
 		try {
 			authenticationService.logout(repositoryUser.getTicket());
 		} catch (UnauthorizedRemoteException ex) {
