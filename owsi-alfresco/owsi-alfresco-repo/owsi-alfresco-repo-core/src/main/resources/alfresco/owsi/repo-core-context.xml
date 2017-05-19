@@ -98,12 +98,4 @@
 	<bean id="webscript.owsi.remote.authority.delete-group.post" parent="webscript.owsi.authority"
 			class="fr.openwide.alfresco.repository.core.authority.web.script.DeleteGroupWebScript" />
 
-	<!-- Admin webscripts -->
-
-	<bean id="webscript.owsi.remote.admin.setModuleCurrentVersion.get" 
-			class="fr.openwide.alfresco.repository.core.admin.web.script.SetModuleCurrentVersionWebScript" 
-			parent="webscript">
-		<property name="nodeService" ref="NodeService" />
-	</bean>
-
 </beans>

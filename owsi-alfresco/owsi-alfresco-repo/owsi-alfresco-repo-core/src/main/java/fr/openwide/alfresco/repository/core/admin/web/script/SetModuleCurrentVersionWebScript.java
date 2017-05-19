@@ -16,17 +16,31 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.VersionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
+
+/**
+ * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}
+ * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module=owsi-alfresco-repo-contentstoreexport&version=0.4.0
+ */
+@GenerateWebScript(
+		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
+		description="Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.",
+		formatDefault="html",
+		family="OWSI")
 public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 	
 	private static final String MODULE_PARAM = "module";
 	private static final String VERSION_PARAM = "version";
 	
 	private static final Logger logger = LoggerFactory.getLogger(SetModuleCurrentVersionWebScript.class);
+	
+	@Autowired
 	private NodeService nodeService;
 	
 	@Override
@@ -71,16 +85,11 @@ public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 		return (! childAssocs.isEmpty()) ? childAssocs.get(0).getChildRef() : null;
 	}
 
-	protected final void setStatusForBadRequest(Status status, int code,
-			String message, Throwable e) {
+	private void setStatusForBadRequest(Status status, int code, String message, Throwable e) {
 		status.setCode(code);
 		status.setMessage(message);
 		status.setException(e);
 		status.setRedirect(true);
-	}
-
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
 	}
 
 }

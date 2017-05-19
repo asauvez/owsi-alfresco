@@ -11,13 +11,17 @@
 	<name>OWSI Alfresco - Repository - Module</name>
 
 	<properties>
-		<alfresco.module.name>owsi-alfresco-contentstoreexport</alfresco.module.name>
+		<alfresco.module.name>owsi-alfresco-repo-contentstoreexport</alfresco.module.name>
 		
 		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.5 -->
 		<jdk.version>1.6</jdk.version>
 	</properties>
 	
 	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-data-model</artifactId>
