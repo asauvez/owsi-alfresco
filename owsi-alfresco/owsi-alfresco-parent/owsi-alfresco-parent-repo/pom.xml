@@ -1062,11 +1062,6 @@
 								<goal>process</goal>
 							</goals>
 							<configuration>
-								<outputDirectory>target/generated-resources/apt</outputDirectory>
-								<options>
-									<fullyAnnotationConfigured>true</fullyAnnotationConfigured>
-									<addSuppressWarningsAnnotation>true</addSuppressWarningsAnnotation>
-								</options>
 								<processors>
 									<processor>fr.openwide.alfresco.repository.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
 								</processors>

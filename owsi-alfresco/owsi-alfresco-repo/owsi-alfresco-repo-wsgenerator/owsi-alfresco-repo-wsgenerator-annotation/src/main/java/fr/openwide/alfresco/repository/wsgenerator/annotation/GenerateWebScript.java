@@ -11,17 +11,21 @@ import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.Remote
 @Retention(RetentionPolicy.SOURCE)
 public @interface GenerateWebScript {
 	
-	RemoteEndpointMethod method() default RemoteEndpointMethod.POST;
+	RemoteEndpointMethod method() default RemoteEndpointMethod.GET;
 	
 	String url();
 	
 	String shortName() default "";
 	String description() default "";
 	
+	String wsFolder() default "";
+	String wsName() default "";
+	
 	String family() default "";
 	
-	String format() default "";
-	String formatDefault() default "json";
+	enum GenerateWebScriptFormat { ARGUMENT, EXTENSION, ANY }
+	GenerateWebScriptFormat format() default GenerateWebScriptFormat.ANY;
+	String formatDefault() default "text";
 	
 	enum GenerateWebScriptAuthentication { NONE, GUEST, USER, ADMIN }
 	GenerateWebScriptAuthentication authentication() default GenerateWebScriptAuthentication.USER;

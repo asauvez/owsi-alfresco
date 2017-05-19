@@ -7,18 +7,16 @@ import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
 import fr.openwide.alfresco.repository.contentstoreexport.service.ContentStoreExportService;
 import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 @GenerateWebScript(
 		url="/owsi/contentstoreexport.zip",
-		method=RemoteEndpointMethod.GET,
 		shortName="Content store export",
 		description="Export necessary files",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
-		formatDefault="zip")
+		family="OWSI")
 public class ContentStoreExportWebScript extends AbstractWebScript {
 
 	@Autowired

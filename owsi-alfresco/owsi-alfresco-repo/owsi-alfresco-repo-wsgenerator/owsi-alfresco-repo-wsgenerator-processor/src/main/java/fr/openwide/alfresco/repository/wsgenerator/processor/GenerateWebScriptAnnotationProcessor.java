@@ -17,9 +17,9 @@ import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
 import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -32,33 +32,35 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		for (Element annotatedClassElement : annotatedClasses) {
 			GenerateWebScript classAnnotation = annotatedClassElement.getAnnotation(GenerateWebScript.class);
 			Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
-			
-			String url = classAnnotation.url();
-			String folderName = StringUtils.substringBeforeLast(url, "/");
-			String wsName = StringUtils.substringAfterLast(url, "/").replace(".", "-");
 
-			RemoteEndpointMethod method = classAnnotation.method();
-			
+			String url = classAnnotation.url();
+			String wsFolder = (! classAnnotation.wsFolder().isEmpty()) ? classAnnotation.wsFolder() : StringUtils.substringBeforeLast(url, "/");
+			String wsName = (! classAnnotation.wsName().isEmpty()) ? classAnnotation.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(url, "/"), "?").replace(".", "-");
+			String method = classAnnotation.method().name().toLowerCase();
+
+			String shortName = (! classAnnotation.shortName().isEmpty()) ? StringEscapeUtils.escapeXml11(classAnnotation.shortName()) : wsName;
+			CharSequence description = (! classAnnotation.description().isEmpty()) ? StringEscapeUtils.escapeXml11(classAnnotation.description()) : className;
+
 			String family = classAnnotation.family();
-			if (family.isEmpty() && url.split("/").length > 1) {
-				family = url.split("/")[1];
+			if (family.isEmpty()) {
+				family = (url.split("/").length > 1) ? url.split("/")[1] : "root";
 			}
 
 			Filer filer = processingEnv.getFiler();
 			try {
 				FileObject descXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
-						"alfresco.extension.templates.webscripts" + folderName.replace("/", "."), 
-						wsName + "." + method.name().toLowerCase() + ".desc.xml");
+						"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
+						wsName + "." + method + ".desc.xml");
 				try (PrintWriter out = new PrintWriter(descXml.openWriter())) {
 					out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
 					out.println("<webscript>");
-					out.println("	<shortname>" + ((classAnnotation.shortName() != null) ? classAnnotation.shortName() : wsName) + "</shortname>");
-					out.println("	<description>" + ((classAnnotation.description() != null) ? classAnnotation.description() : className) + "</description>");
-					out.println("	<url>" + url + "</url>");
-					out.println("	<format default=\"" + classAnnotation.formatDefault() + "\">" + classAnnotation.format() + "</format>");
+					out.println("	<shortname>" + shortName + "</shortname>");
+					out.println("	<description>" + description + "</description>");
+					out.println("	<url>" + StringEscapeUtils.escapeXml11(url) + "</url>");
+					out.println("	<format default=\"" + classAnnotation.formatDefault() + "\">" + classAnnotation.format().name().toLowerCase() + "</format>");
 					out.println("	<authentication>" + classAnnotation.authentication().name().toLowerCase() + "</authentication>");
 					out.println("	<transaction allow=\"" + classAnnotation.transactionAllow().name().toLowerCase()+ "\">" + classAnnotation.transaction().name().toLowerCase() + "</transaction>");
-					out.println("	<family>" + family + "</family>");
+					out.println("	<family>" + StringEscapeUtils.escapeXml11(family) + "</family>");
 					out.println("</webscript>");
 
 					out.flush();
@@ -66,13 +68,13 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + descXml.toUri() + " a été généré");
 
 				FileObject springContextXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
-						"alfresco.owsi", 
-						"wsgenerator" + folderName.replace("/", "-") + "-" + wsName + "-" + method.name().toLowerCase() + "-context.xml");
+						"alfresco.owsi",
+						"wsgenerator" + wsFolder.replace("/", "-") + "-" + wsName + "-" + method + "-context.xml");
 				try (PrintWriter out = new PrintWriter(springContextXml.openWriter())) {
 					out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
 					out.println("<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>");
 					out.println("<beans>");
-					out.println("	<bean id=\"webscript" + folderName.replace("/", ".") + "." + wsName + "." + method.name().toLowerCase() 
+					out.println("	<bean id=\"webscript" + wsFolder.replace("/", ".") + "." + wsName + "." + method 
 							+ "\" parent=\"" + classAnnotation.beanParent() + "\"");
 					out.println("		class=\"" + className + "\" />");
 					out.println("</beans>");
