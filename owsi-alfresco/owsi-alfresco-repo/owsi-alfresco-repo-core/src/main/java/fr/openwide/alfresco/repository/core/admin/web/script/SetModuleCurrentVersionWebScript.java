@@ -32,7 +32,8 @@ import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
 		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
 		description="Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.",
 		formatDefault="html",
-		family="OWSI")
+		family="OWSI",
+		useViewFile=true)
 public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 	
 	private static final String MODULE_PARAM = "module";

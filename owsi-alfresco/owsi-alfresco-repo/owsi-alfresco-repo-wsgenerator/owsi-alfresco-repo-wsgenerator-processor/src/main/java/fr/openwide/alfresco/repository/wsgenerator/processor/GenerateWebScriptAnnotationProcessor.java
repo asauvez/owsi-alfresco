@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repository.wsgenerator.processor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -68,6 +69,19 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 					out.flush();
 				}
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + descXml.toUri() + " a été généré");
+				
+				if (classAnnotation.useViewFile()) {
+					try {
+						FileObject viewFile = filer.getResource(StandardLocation.CLASS_PATH, 
+								"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
+								wsName + "." + method + "." + formatDefault + ".ftl");
+						processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + viewFile.toUri() + " existe bien");
+					} catch (FileNotFoundException ex) {
+						throw new IllegalStateException("If you declare useViewFile=true, you must create a file "
+								+ "src/main/resources/alfresco/extension/templates/webscripts" + wsFolder + "/" 
+								+ wsName + "." + method + "." + formatDefault + ".ftl");
+					}
+				}
 				
 				FileObject springContextXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
 						"alfresco.owsi",

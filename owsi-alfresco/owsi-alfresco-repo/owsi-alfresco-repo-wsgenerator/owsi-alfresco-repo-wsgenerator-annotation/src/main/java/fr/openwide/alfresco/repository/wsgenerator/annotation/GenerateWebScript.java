@@ -37,4 +37,6 @@ public @interface GenerateWebScript {
 	GenerateWebScriptTransactionAllow transactionAllow() default GenerateWebScriptTransactionAllow.READWRITE;
 	
 	String beanParent() default "webscript";
+	
+	boolean useViewFile() default false;
 }
