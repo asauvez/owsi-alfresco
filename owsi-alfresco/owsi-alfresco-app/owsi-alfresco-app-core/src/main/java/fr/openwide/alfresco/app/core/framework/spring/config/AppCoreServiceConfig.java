@@ -56,7 +56,7 @@ public class AppCoreServiceConfig {
 
 	@Bean
 	public SiteService siteService(AuthorityService authorityService, NodeSearchService nodeSearchService, 
-			@Qualifier("shareRemoteBinding") RepositoryRemoteBinding shareBinding) {
+			@Qualifier(AppCoreRemoteBindingConfig.SHARE_REMOTE_BINDING) RepositoryRemoteBinding shareBinding) {
 		return new SiteServiceImpl(authorityService, nodeSearchService, shareBinding);
 	}
 

@@ -6,9 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 
-public class NamedUser extends User implements RepositoryUserProvider {
+public class NamedUser extends User {
 
 	private static final long serialVersionUID = 336652943037329710L;
 
@@ -32,7 +31,6 @@ public class NamedUser extends User implements RepositoryUserProvider {
 		return repositoryUser.getEmail();
 	}
 
-	@Override
 	public RepositoryUser getRepositoryUser() {
 		return repositoryUser;
 	}

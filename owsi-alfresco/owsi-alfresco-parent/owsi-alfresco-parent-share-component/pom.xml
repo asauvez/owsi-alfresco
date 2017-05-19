@@ -11,6 +11,7 @@
 	<packaging>pom</packaging>
 	
 	<properties>
+		<jdk.version>1.8</jdk.version>
 		<owsi-alfresco.share.alfresco.version>5.1.2</owsi-alfresco.share.alfresco.version>
 		<owsi-alfresco.share.alfresco-core.version>6.1</owsi-alfresco.share.alfresco-core.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>

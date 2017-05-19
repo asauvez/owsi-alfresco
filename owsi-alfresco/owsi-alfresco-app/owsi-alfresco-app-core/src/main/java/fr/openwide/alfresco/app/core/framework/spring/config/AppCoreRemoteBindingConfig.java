@@ -24,6 +24,8 @@ import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
 @Configuration
 public class AppCoreRemoteBindingConfig {
 
+	public static final String SHARE_REMOTE_BINDING = "shareRemoteBinding";
+	
 	@Autowired
 	private Environment environment;
 
@@ -54,7 +56,7 @@ public class AppCoreRemoteBindingConfig {
 		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), authenticationUri);
 	}
 
-	@Bean
+	@Bean(name=SHARE_REMOTE_BINDING)
 	public RepositoryRemoteBinding shareRemoteBinding(RepositoryTicketProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.share.root.uri");
 		String ticketName = environment.getRequiredProperty("application.share.ticket.name");

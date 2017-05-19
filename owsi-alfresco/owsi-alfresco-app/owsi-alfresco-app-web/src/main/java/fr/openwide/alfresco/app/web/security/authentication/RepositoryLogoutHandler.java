@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.session.HttpSessionDestroyedEvent;
 
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 
 /**
@@ -32,10 +33,14 @@ public class RepositoryLogoutHandler implements ApplicationListener<HttpSessionD
 		for (SecurityContext context : event.getSecurityContexts()) {
 			Authentication authentication = context.getAuthentication();
 			if (authentication != null) {
-				try {
-					userDetailsService.logout(authentication);
-				} catch (AccessDeniedRemoteException e) {
-					LOGGER.warn("Could not logout authentication on the repository: {}", authentication);
+				Object principal = authentication.getPrincipal();
+				if (principal instanceof NamedUser) {
+					NamedUser user = (NamedUser) principal;
+					try {
+						userDetailsService.logout(user);
+					} catch (AccessDeniedRemoteException e) {
+						LOGGER.warn("Could not logout authentication on the repository: {}", authentication);
+					}
 				}
 			}
 		}
