@@ -13,9 +13,4 @@
 		<property name="MBeanServer" ref="alfrescoMBeanServer" />
 	</bean>
 	
-	<bean id="webscript.owsi.contentstoreexport.export.get" 
-		class="fr.openwide.alfresco.repository.contentstoreexport.web.script.ContentStoreExportWebScript"
-		parent="webscript">
-		<property name="contentStoreExportService" ref="owsi.service.contentstoreexport"/> 
-	</bean>
 </beans>

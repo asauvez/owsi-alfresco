@@ -1,0 +1,36 @@
+package fr.openwide.alfresco.repository.wsgenerator.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
+public @interface GenerateWebScript {
+	
+	RemoteEndpointMethod method() default RemoteEndpointMethod.POST;
+	
+	String url();
+	
+	String shortName() default "";
+	String description() default "";
+	
+	String family() default "";
+	
+	String format() default "";
+	String formatDefault() default "json";
+	
+	enum GenerateWebScriptAuthentication { NONE, GUEST, USER, ADMIN }
+	GenerateWebScriptAuthentication authentication() default GenerateWebScriptAuthentication.USER;
+	
+	enum GenerateWebScriptTransaction { NONE, REQUIRED, REQUIRESNEW }
+	GenerateWebScriptTransaction transaction() default GenerateWebScriptTransaction.REQUIRED;
+
+	enum GenerateWebScriptTransactionAllow { READONLY, READWRITE }
+	GenerateWebScriptTransactionAllow transactionAllow() default GenerateWebScriptTransactionAllow.READWRITE;
+	
+	String beanParent() default "webscript";
+}

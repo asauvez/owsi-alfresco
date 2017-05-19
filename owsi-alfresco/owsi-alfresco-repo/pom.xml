@@ -14,6 +14,7 @@
 	<description>Composants pour le développement d'extensions dans l'application Alfresco</description>
 
 	<modules>
+		<module>owsi-alfresco-repo-wsgenerator</module>	
 		<module>owsi-alfresco-repo-remote</module>
 		<module>owsi-alfresco-repo-core</module>
 		<module>owsi-alfresco-repo-dictionary</module>
