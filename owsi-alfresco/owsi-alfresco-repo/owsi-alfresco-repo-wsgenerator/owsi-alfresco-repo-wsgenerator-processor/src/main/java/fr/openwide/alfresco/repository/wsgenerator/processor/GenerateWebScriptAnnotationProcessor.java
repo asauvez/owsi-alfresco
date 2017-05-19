@@ -45,19 +45,21 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			if (family.isEmpty()) {
 				family = (url.split("/").length > 1) ? url.split("/")[1] : "root";
 			}
+			String formatDefault = classAnnotation.formatDefault();
 
 			Filer filer = processingEnv.getFiler();
 			try {
 				FileObject descXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
 						"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
-						wsName + "." + method + ".desc.xml");
+						wsName + "." + method + ".desc.xml",
+						annotatedClassElement);
 				try (PrintWriter out = new PrintWriter(descXml.openWriter())) {
 					out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
 					out.println("<webscript>");
 					out.println("	<shortname>" + shortName + "</shortname>");
 					out.println("	<description>" + description + "</description>");
 					out.println("	<url>" + StringEscapeUtils.escapeXml11(url) + "</url>");
-					out.println("	<format default=\"" + classAnnotation.formatDefault() + "\">" + classAnnotation.format().name().toLowerCase() + "</format>");
+					out.println("	<format default=\"" + formatDefault + "\">" + classAnnotation.format().name().toLowerCase() + "</format>");
 					out.println("	<authentication>" + classAnnotation.authentication().name().toLowerCase() + "</authentication>");
 					out.println("	<transaction allow=\"" + classAnnotation.transactionAllow().name().toLowerCase()+ "\">" + classAnnotation.transaction().name().toLowerCase() + "</transaction>");
 					out.println("	<family>" + StringEscapeUtils.escapeXml11(family) + "</family>");
@@ -66,10 +68,11 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 					out.flush();
 				}
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + descXml.toUri() + " a été généré");
-
+				
 				FileObject springContextXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
 						"alfresco.owsi",
-						"wsgenerator" + wsFolder.replace("/", "-") + "-" + wsName + "-" + method + "-context.xml");
+						"wsgenerator" + wsFolder.replace("/", "-") + "-" + wsName + "-" + method + "-context.xml",
+						annotatedClassElement);
 				try (PrintWriter out = new PrintWriter(springContextXml.openWriter())) {
 					out.println("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
 					out.println("<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>");
