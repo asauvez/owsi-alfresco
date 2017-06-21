@@ -1,9 +1,10 @@
 package fr.openwide.alfresco.repo.module.classification.model;
 
+import java.util.function.Supplier;
+
 import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -34,14 +35,18 @@ public class ClassificationWithRootBuilder {
 		return subFolder(new BusinessNode()
 			.properties().name(folderName));
 	}
+	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
+		destinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);
+		return this;
+	}
 	/**
 	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
 	 * du noeud fourni.
 	 */
 	public ClassificationWithRootBuilder subFolder(BusinessNode folderNode) {
-		folderNode.aspect(OwsiModel.deleteIfEmpty);
-		destinationFolder = service.subFolder(folderNode, destinationFolder);
-		return this;
+		return subFolder(
+				folderNode.properties().getName(),
+				() -> folderNode);
 	}
 
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder) {
@@ -127,9 +132,16 @@ public class ClassificationWithRootBuilder {
 	/**
 	 * Créer un lien secondaire dans le répertoire de destination.
 	 */
-	public ClassificationWithRootBuilder createLink() {
-		service.createLink(node.getNodeReference(), destinationFolder);
+	public ClassificationWithRootBuilder createSecondaryParent() {
+		service.createSecondaryParent(node.getNodeReference(), destinationFolder);
 		return this;
 	}
-	
+
+	/**
+	 * Créer un raccourci dans le répertoire de destination.
+	 */
+	public ClassificationWithRootBuilder createFileLink() {
+		service.createFileLink(node.getNodeReference(), destinationFolder, Optional.absent());
+		return this;
+	}
 }

@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
@@ -49,6 +50,7 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
@@ -106,12 +108,24 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	@Override
-	public void reclassify(ContainerModel model) {
-		reclassify(model, 100);
+	public int reclassifyAll(int batchSize) {
+		int total = 0;
+		for (ContainerModel model : models.values()) {
+			total += reclassify(model, batchSize);
+		}
+		return total;
+	}
+	@Override
+	public int reclassify(NameReference modelName, int batchSize) {
+		ContainerModel model = models.get(modelName);
+		if (model == null) {
+			throw new IllegalStateException("Unknown " + modelName);
+		}
+		return reclassify(model, batchSize);
 	}
 	
 	@Override
-	public void reclassify(ContainerModel model, final int batchSize) {
+	public int reclassify(ContainerModel model, final int batchSize) {
 		final RestrictionBuilder restriction = new RestrictionBuilder();
 		if (model instanceof TypeModel) {
 			restriction.isType((TypeModel) model);
@@ -120,7 +134,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 		
 		logger.info("Begin reclassify of " + model);
-		
+
+		int total = 0;
 		for (int batchNumber = 0; ; batchNumber ++) {
 			logger.info("*** Reclassify batch " + batchNumber + " ***");
 			final int firstResult = batchNumber * batchSize;
@@ -144,8 +159,12 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				}
 			}, false, true);
 			
+			total += listSize;
 			if (listSize < batchSize) break;
 		}
+		
+		logger.info("End reclassify of " + model + " (" + total + ")");
+		return total;
 	}
 
 	@Override
@@ -378,14 +397,21 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		getClassifiedNodes().add(copyNodeReference);
 		return copyNodeReference;
 	}
-	public void createLink(NodeReference node, NodeReference destinationFolder) {
+	
+	public void createFileLink(NodeReference nodeReference, NodeReference destinationFolder, Optional<String> linkNameOpt) {
+		String linkName = linkNameOpt.isPresent() ? linkNameOpt.get() 
+				: "Link to " + nodeModelService.getProperty(nodeReference, CmModel.object.name);
+		nodeModelService.create(new BusinessNode(destinationFolder, AppModel.fileLink, linkName)
+				.properties().set(AppModel.fileLink.destination, nodeReference));
+	}
+	
+	public void createSecondaryParent(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Add link from node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
 		nodeModelService.addChild(destinationFolder, node);
 	}
-
-	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
+	public void deleteSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
 		nodeModelService.unlinkSecondaryParents(nodeReference, childAssociationModel);
 	}
 	
@@ -422,20 +448,19 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return newResult;
 	}
 
-	public NodeReference subFolder(final BusinessNode folderNode, NodeReference destinationFolder) {
+	public NodeReference subFolder(String folderName, final Supplier<BusinessNode> folderNodeSupplier, NodeReference destinationFolder) {
 		ChildAssociationModel associationType = CmModel.folder.contains;
 		
-		String folderName = folderNode.properties().getName();
 		Optional<NodeReference> subFolderRef = nodeModelService.getChildByName(destinationFolder, folderName, associationType);
 		if (subFolderRef.isPresent()) {
 			return subFolderRef.get();
 		} else {
+			BusinessNode folderNode = folderNodeSupplier.get();
+			folderNode.properties().name(folderName);
 			if (folderNode.getRepositoryNode().getType() == null) {
 				folderNode.getRepositoryNode().setType(CmModel.folder.getNameReference());
 			}
-			if (folderNode.properties().getTitle() == null) {
-				folderNode.properties().title(folderName);
-			}
+			folderNode.aspect(OwsiModel.deleteIfEmpty);
 			folderNode.assocs().primaryParent(associationType).nodeReference(destinationFolder);
 			try {
 				// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
