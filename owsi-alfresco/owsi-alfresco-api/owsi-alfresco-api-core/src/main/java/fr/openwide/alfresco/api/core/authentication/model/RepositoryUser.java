@@ -48,6 +48,11 @@ public class RepositoryUser implements Serializable {
 	public String getLastName() {
 		return userNode.getProperty(LAST_NAME, String.class);
 	}
+	public String getFullName() {
+		String firstName = getFirstName();
+		String lastName = getLastName();
+		return ((firstName != null) ? firstName : "") + " " + ((lastName != null) ? lastName : "").trim();
+	}
 	public String getEmail() {
 		return userNode.getProperty(EMAIL, String.class);
 	}
