@@ -104,7 +104,7 @@ public class ClassificationBuilder {
 		return unlinkSecondaryParents(CmModel.folder.contains);
 	}
 	public ClassificationBuilder unlinkSecondaryParents(ChildAssociationModel childAssociationModel) {
-		service.unlinkSecondaryParents(node.getNodeReference(), childAssociationModel);
+		service.deleteSecondaryParents(node.getNodeReference(), childAssociationModel);
 		return this;
 	}
 }
