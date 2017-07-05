@@ -30,7 +30,7 @@ public class RestrictionBuilder extends Restriction {
 		super(parent);
 		this.operator = operator;
 	}
-
+	
 	/**
 	 * Permet de faire un OR entre plusieurs conditions :
 	 * <pre>
@@ -93,6 +93,12 @@ public class RestrictionBuilder extends Restriction {
 
 	public <C extends Serializable> MatchRestriction<C> eq(PropertyModel<C> property, C value) {
 		return add(new MatchRestriction<C>(this, property, value).exact(true));
+	}
+	public MatchRestriction<String> startsWith(TextPropertyModel property, String value) {
+		if (value != null) {
+			value += "*";
+		}
+		return add(new MatchRestriction<String>(this, property, value).exact(true));
 	}
 
 	public MatchAllRestriction matchAll(String value) {

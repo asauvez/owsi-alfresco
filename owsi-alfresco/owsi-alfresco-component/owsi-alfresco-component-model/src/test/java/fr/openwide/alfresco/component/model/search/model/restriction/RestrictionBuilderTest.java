@@ -17,6 +17,7 @@ public class RestrictionBuilderTest {
 	public void testGenerateFTS() throws Exception {
 		assertEquals(
 				"=cm\\:name:\"toto\"\n" +
+				"AND =cm\\:name:\"titi*\"\n" +
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
 				"AND ID:workspace\\://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c\n" +
 				"AND =cm\\:contentPropertyName:\"{http://www.alfresco.org/model/content/1.0}content\"\n" +
@@ -30,6 +31,7 @@ public class RestrictionBuilderTest {
 				"	OR =cm\\:name:\"tata\")", 
 			new RestrictionBuilder()
 				.eq(CmModel.object.name, "toto").of()
+				.startsWith(CmModel.object.name, "titi").of()
 				.hasAspect(CmModel.workingCopy).not().of()
 				.id(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
 				.eq(RnModel.thumbnail.contentPropertyName, CmModel.content.content.getNameReference()).of()
