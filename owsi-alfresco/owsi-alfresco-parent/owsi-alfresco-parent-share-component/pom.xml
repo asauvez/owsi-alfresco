@@ -11,16 +11,19 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-		<jdk.version>1.8</jdk.version>
 		<owsi-alfresco.share.alfresco.version>5.1.2</owsi-alfresco.share.alfresco.version>
 		<owsi-alfresco.share.alfresco-core.version>6.1</owsi-alfresco.share.alfresco-core.version>
-		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
+		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
 		<springframework-extensions-surf.version>1.2.0-M18</springframework-extensions-surf.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<jcl-over-slf4j.version>1.7.21</jcl-over-slf4j.version>
 		<jaxen.version>1.1.6</jaxen.version>
 		<spring-surf.version>6.3</spring-surf.version>
 		<commons-beanutils.version>1.7.0</commons-beanutils.version>
+		
+				
+		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
+		<owsi-core.maven-war-plugin.version>2.6</owsi-core.maven-war-plugin.version>
 	</properties>
 		
 	<dependencyManagement>

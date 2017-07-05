@@ -18,10 +18,9 @@
 		<share.webapp.name>share</share.webapp.name>
 		<solr.webapp.name>solr</solr.webapp.name>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
-		<jdk.version>1.8</jdk.version>
 		<owsi-alfresco.repo.alfresco.version>5.2.0</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.alfresco-data-model.version>6.8</owsi-alfresco.alfresco-data-model.version>
-		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
+		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.h2.version>1.4.190</owsi-alfresco.repo.h2.version>
 		
@@ -55,6 +54,9 @@
 		<owsi-alfresco.repo.xpp3.version>1.1.3_8</owsi-alfresco.repo.xpp3.version>
 		
 		<owsi-alfresco.build-helper-maven-plugin.version>1.10</owsi-alfresco.build-helper-maven-plugin.version>
+		
+		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
+		<owsi-core.maven-war-plugin.version>2.6</owsi-core.maven-war-plugin.version>
 	</properties>
 
 	<dependencyManagement>
