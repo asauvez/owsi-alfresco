@@ -65,14 +65,18 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 				sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
 			}
 			
-			ResultSet resultSet = searchService.query(sp);
 			List<RepositoryNode> res = new ArrayList<>();
-			for (NodeRef nodeRef : resultSet.getNodeRefs()) {
-				try {
-					res.add(nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope()));
-				} catch (NoSuchNodeRemoteException e) {
-					// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
+			ResultSet resultSet = searchService.query(sp);
+			try {
+				for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+					try {
+						res.add(nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope()));
+					} catch (NoSuchNodeRemoteException e) {
+						// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
+					}
 				}
+			} finally {
+				resultSet.close();
 			}
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Returning {} result(s)", res.size());
