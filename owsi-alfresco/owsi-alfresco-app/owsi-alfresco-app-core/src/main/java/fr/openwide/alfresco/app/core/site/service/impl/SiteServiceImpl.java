@@ -8,7 +8,6 @@ import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
@@ -16,13 +15,14 @@ import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.site.model.RepositorySite;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 
 public class SiteServiceImpl implements SiteService {
 	
-	private static PostMethodEndpoint<String> CREATE_SITE_ENDPOINT = new PostMethodEndpoint<String>("/modules/create-site") {};
-	
-	private static class DELETE_SITE {
-		public static PostMethodEndpoint<String> ENDPOINT = new PostMethodEndpoint<String>("/modules/delete-site") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/modules/delete-site")
+	private static class DELETE_SITE extends WebScriptParam<Void> {
 		@SuppressWarnings("unused")
 		public String shortName;
 	}
@@ -40,7 +40,7 @@ public class SiteServiceImpl implements SiteService {
 	
 	@Override
 	public SiteReference createSite(RepositorySite site) {
-		shareBinding.builder(CREATE_SITE_ENDPOINT, site).call();
+		shareBinding.builder(site).call();
 		return SiteReference.create(site.getShortName());
 	}
 	
@@ -62,7 +62,7 @@ public class SiteServiceImpl implements SiteService {
 	public void deleteSite(SiteReference siteReference) {
 		DELETE_SITE payload = new DELETE_SITE();
 		payload.shortName = siteReference.getName();
-		shareBinding.builder(DELETE_SITE.ENDPOINT, payload).call();
+		shareBinding.builder(payload).call();
 	}
 
 	@Override

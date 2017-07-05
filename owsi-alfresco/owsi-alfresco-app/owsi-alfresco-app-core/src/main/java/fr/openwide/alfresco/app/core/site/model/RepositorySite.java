@@ -1,8 +1,13 @@
 package fr.openwide.alfresco.app.core.site.model;
 
+import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.api.core.site.model.SiteVisibility;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
-public class RepositorySite {
+@WebScriptEndPoint(method=WebScriptMethod.POST, url="/modules/create-site")
+public class RepositorySite extends WebScriptParam<SiteReference> {
 
 	private String shortName;
 	private String sitePreset = "site-dashboard";

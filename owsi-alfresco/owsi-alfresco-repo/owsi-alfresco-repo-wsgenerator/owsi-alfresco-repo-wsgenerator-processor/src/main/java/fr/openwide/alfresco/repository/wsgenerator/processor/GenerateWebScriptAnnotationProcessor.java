@@ -1,6 +1,10 @@
 package fr.openwide.alfresco.repository.wsgenerator.processor;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -14,6 +18,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
@@ -22,31 +27,78 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes("fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript")
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedAnnotationTypes({
+	"fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint",
+	"fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript"
+})
 public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
+
+	// On écrit dans /tmp les URL, car le build peut se faire en deux fois
+	private File API_FOLDER = new File(System.getProperty("java.io.tmpdir"), getClass().getName());
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(GenerateWebScript.class);
-		for (Element annotatedClassElement : annotatedClasses) {
-			GenerateWebScript classAnnotation = annotatedClassElement.getAnnotation(GenerateWebScript.class);
+		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(WebScriptEndPoint.class)) {
+			WebScriptEndPoint webScriptEndPoint = annotatedClassElement.getAnnotation(WebScriptEndPoint.class);
+			
+			API_FOLDER.mkdirs();
+			File apiUrlFile = new File(API_FOLDER, getFullName(annotatedClassElement));
+			try (PrintWriter out = new PrintWriter(new FileWriter(apiUrlFile))) {
+				out.println(webScriptEndPoint.method().name());
+				out.println(webScriptEndPoint.url());
+				out.flush();
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+		
+		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateWebScript.class)) {
+			GenerateWebScript generateWebScript = annotatedClassElement.getAnnotation(GenerateWebScript.class);
 			Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
 
-			String url = classAnnotation.url();
-			String wsFolder = (! classAnnotation.wsFolder().isEmpty()) ? classAnnotation.wsFolder() : StringUtils.substringBeforeLast(url, "/");
-			String wsName = (! classAnnotation.wsName().isEmpty()) ? classAnnotation.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(url, "/"), "?").replace(".", "-");
-			String method = classAnnotation.method().name().toLowerCase();
-
-			String shortName = (! classAnnotation.shortName().isEmpty()) ? StringEscapeUtils.escapeXml11(classAnnotation.shortName()) : wsName;
-			CharSequence description = (! classAnnotation.description().isEmpty()) ? StringEscapeUtils.escapeXml11(classAnnotation.description()) : className;
-
-			String family = classAnnotation.family();
-			if (family.isEmpty()) {
-				family = (url.split("/").length > 1) ? url.split("/")[1] : "root";
+			String[] urls = generateWebScript.url();
+			String method = generateWebScript.method().name().toLowerCase();
+			
+			try {
+				generateWebScript.paramClass();
+			} catch( MirroredTypeException mte ) {
+				String paramClass = mte.getTypeMirror().toString();
+				if (! WebScriptParam.class.getName().equals(paramClass)) {
+					if (urls.length != 0) {
+						throw new IllegalStateException(getFullName(annotatedClassElement) + " : When declaring @GenerateWebScript.paramClass(), url shoud not be defined.");
+					}
+					if (! "get".equals(method)) {
+						throw new IllegalStateException(getFullName(annotatedClassElement) + " : When declaring @GenerateWebScript.paramClass(), method shoud not be defined.");
+					}
+					File apiUrlFile = new File(API_FOLDER, paramClass);
+					if (! apiUrlFile.canRead()) {
+						throw new IllegalStateException(getFullName(annotatedClassElement) + " : When declaring @GenerateWebScript.paramClass(), API project should be build first.");
+					}
+					try (BufferedReader in = new BufferedReader(new FileReader(apiUrlFile))) {
+						method = in.readLine().toLowerCase();
+						urls = new String[] { in.readLine() };
+					} catch (IOException e) {
+						throw new IllegalStateException(e);
+					}
+				}
 			}
-			String formatDefault = classAnnotation.formatDefault();
+			
+			String firstUrl = (urls.length > 0) ? urls[0] : "";
+			String wsFolder = (! generateWebScript.wsFolder().isEmpty()) ? generateWebScript.wsFolder() : StringUtils.substringBeforeLast(firstUrl, "/");
+			String wsName = (! generateWebScript.wsName().isEmpty()) ? generateWebScript.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(firstUrl, "/"), "?").replace(".", "-");
+
+			String shortName = (! generateWebScript.shortName().isEmpty()) ? StringEscapeUtils.escapeXml11(generateWebScript.shortName()) : wsName;
+			CharSequence description = (! generateWebScript.description().isEmpty()) ? StringEscapeUtils.escapeXml11(generateWebScript.description()) : className;
+
+			String family = generateWebScript.family();
+			if (family.isEmpty()) {
+				family = (firstUrl.split("/").length > 1) ? firstUrl.split("/")[1] : "root";
+			}
+			String formatDefault = generateWebScript.formatDefault();
 
 			Filer filer = processingEnv.getFiler();
 			try {
@@ -59,10 +111,12 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 					out.println("<webscript>");
 					out.println("	<shortname>" + shortName + "</shortname>");
 					out.println("	<description>" + description + "</description>");
-					out.println("	<url>" + StringEscapeUtils.escapeXml11(url) + "</url>");
-					out.println("	<format default=\"" + formatDefault + "\">" + classAnnotation.format().name().toLowerCase() + "</format>");
-					out.println("	<authentication>" + classAnnotation.authentication().name().toLowerCase() + "</authentication>");
-					out.println("	<transaction allow=\"" + classAnnotation.transactionAllow().name().toLowerCase()+ "\">" + classAnnotation.transaction().name().toLowerCase() + "</transaction>");
+					for (String url : urls) {
+						out.println("	<url>" + StringEscapeUtils.escapeXml11(url) + "</url>");
+					}
+					out.println("	<format default=\"" + formatDefault + "\">" + generateWebScript.format().name().toLowerCase() + "</format>");
+					out.println("	<authentication>" + generateWebScript.authentication().name().toLowerCase() + "</authentication>");
+					out.println("	<transaction allow=\"" + generateWebScript.transactionAllow().name().toLowerCase()+ "\">" + generateWebScript.transaction().name().toLowerCase() + "</transaction>");
 					out.println("	<family>" + StringEscapeUtils.escapeXml11(family) + "</family>");
 					out.println("</webscript>");
 
@@ -70,7 +124,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 				}
 				processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + descXml.toUri() + " a été généré");
 				
-				if (classAnnotation.useViewFile()) {
+				if (generateWebScript.useViewFile()) {
 					try {
 						FileObject viewFile = filer.getResource(StandardLocation.CLASS_PATH, 
 								"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
@@ -92,7 +146,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 					out.println("<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>");
 					out.println("<beans>");
 					out.println("	<bean id=\"webscript" + wsFolder.replace("/", ".") + "." + wsName + "." + method 
-							+ "\" parent=\"" + classAnnotation.beanParent() + "\"");
+							+ "\" parent=\"" + generateWebScript.beanParent() + "\"");
 					out.println("		class=\"" + className + "\" />");
 					out.println("</beans>");
 
@@ -106,5 +160,9 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		return true;
 	}
 
+	private String getFullName(Element element) {
+		Element parent = element.getEnclosingElement();
+		return ((parent != null) ? parent + "." : "") + element.getSimpleName().toString();
+	}
 
 }

@@ -42,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
 		request.nodeScope = nodeScope;
 		
-		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
+		return authenticationRemoteBinding.builder(request)
 				.header(authenticationHeader, username)
 				.call();
 	}
@@ -57,7 +57,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
 		request.nodeScope = nodeScope;
 
-		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
+		return requiringExplicitTicketRemoteBinding.builder(request)
 				.urlVariable(ticket)
 				.call();
 	}
@@ -74,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		request.password = password;
 		request.nodeScope = nodeScope;
 		
-		return unauthenticatedRepositoryRemoteBinding.builder(LOGIN_REQUEST_SERVICE.ENDPOINT, request)
+		return unauthenticatedRepositoryRemoteBinding.builder(request)
 				.call();
 	}
 
@@ -89,7 +89,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Override
 	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		requiringExplicitTicketRemoteBinding.builder(LOGOUT_SERVICE_ENDPOINT, ticket)
+		requiringExplicitTicketRemoteBinding.builder(new LOGOUT_SERVICE())
 			.urlVariable(ticket)
 			.call();
 	}

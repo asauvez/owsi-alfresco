@@ -8,58 +8,60 @@ import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.PostMethodEndpoint;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
 public interface NodeRemoteService {
 
 	public static final NameReference PARENT_ASSOCIATION_NAME_HINT = NameReference.create("http://www.openwide.fr/owsi-alfresco", "parentAssociationNameHint"); 
 	
-	class GET_NODE_SERVICE {
-		public static final PostMethodEndpoint<RepositoryNode> ENDPOINT = new PostMethodEndpoint<RepositoryNode>("/owsi/node/get") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/get")
+	class GET_NODE_SERVICE extends WebScriptParam<RepositoryNode> {
 		public NodeReference nodeReference;
 		public NodeScope nodeScope;
 	}
 	RepositoryNode get(NodeReference nodeReference, NodeScope nodeScope) throws NoSuchNodeRemoteException;
 
-	class CHILDREN_NODE_SERVICE {
-		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/children") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/children")
+	class CHILDREN_NODE_SERVICE extends WebScriptParam<List<RepositoryNode>> {
 		public NodeReference nodeReference;
 		public NameReference childAssocTypeName; 
 		public NodeScope nodeScope;
 	}
 	List<RepositoryNode> getChildren(NodeReference nodeReference, NameReference childAssocTypeName, NodeScope nodeScope);
 
-	class TARGET_ASSOC_NODE_SERVICE {
-		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/targetassoc") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/targetassoc")
+	class TARGET_ASSOC_NODE_SERVICE extends WebScriptParam<List<RepositoryNode>> {
 		public NodeReference nodeReference;
 		public NameReference assocName; 
 		public NodeScope nodeScope;
 	}
 	List<RepositoryNode> getTargetAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope);
 
-	class SOURCE_ASSOC_NODE_SERVICE {
-		public static final PostMethodEndpoint<List<RepositoryNode>> ENDPOINT = new PostMethodEndpoint<List<RepositoryNode>>("/owsi/node/sourceassoc") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/sourceassoc")
+	class SOURCE_ASSOC_NODE_SERVICE extends WebScriptParam<List<RepositoryNode>> {
 		public NodeReference nodeReference;
 		public NameReference assocName; 
 		public NodeScope nodeScope;
 	}
 	List<RepositoryNode> getSourceAssocs(NodeReference nodeReference, NameReference assocName, NodeScope nodeScope);
 
-	class CREATE_NODE_SERVICE {
-		public static final PostMethodEndpoint<List<NodeReference>> ENDPOINT = new PostMethodEndpoint<List<NodeReference>>("/owsi/node/create") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/create")
+	class CREATE_NODE_SERVICE extends WebScriptParam<List<NodeReference>> {
 		public List<RepositoryNode> nodes;
 	}
 	List<NodeReference> create(List<RepositoryNode> nodes) throws DuplicateChildNodeNameRemoteException;
 
-	class UPDATE_NODE_SERVICE {
-		public static final PostMethodEndpoint<Void> ENDPOINT = new PostMethodEndpoint<Void>("/owsi/node/update") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/update")
+	class UPDATE_NODE_SERVICE extends WebScriptParam<Void> {
 		public List<RepositoryNode> nodes;
 		public NodeScope nodeScope;
 	}
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException;
 
-	class DELETE_NODE_SERVICE {
-		public static final PostMethodEndpoint<Void> ENDPOINT = new PostMethodEndpoint<Void>("/owsi/node/delete") {};
+	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/node/delete")
+	class DELETE_NODE_SERVICE extends WebScriptParam<Void> {
 		public List<NodeReference> nodeReferences;
 	}
 	void delete(List<NodeReference> nodeReferences);

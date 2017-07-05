@@ -9,7 +9,7 @@ import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
 public interface NodeService extends NodeRemoteService {
 
@@ -25,12 +25,10 @@ public interface NodeService extends NodeRemoteService {
 
 	// TODO ASA ces méthodes utilitaires aurait plutôt leur place dans un NodeSerializationComponent ?
 
-	public RepositoryNode callNodeSerializer(EntityEnclosingRemoteEndpoint<RepositoryNode> endpoint,
-			Object payload, NodeScope nodeScope);
-	public List<RepositoryNode> callNodeListSerializer(EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endpoint,
-			Object payload, NodeScope nodeScope);
+	RepositoryNode callNodeSerializer(WebScriptParam<RepositoryNode> payload, NodeScope nodeScope);
+	List<RepositoryNode> callNodeListSerializer(WebScriptParam<List<RepositoryNode>> payload, NodeScope nodeScope);
 
-	public <R> R callNodeUploadSerializer(EntityEnclosingRemoteEndpoint<R> endpoint, Object payload,
+	<R> R callNodeUploadSerializer(WebScriptParam<R> payload,
 			List<RepositoryNode> nodes, NodeContentSerializationParameters serializationParameters,
 			NodeContentDeserializationParameters deserializationParameters); 
 }

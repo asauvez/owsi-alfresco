@@ -9,12 +9,4 @@
 	<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
 	<packaging>jar</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-api-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
-
 </project>

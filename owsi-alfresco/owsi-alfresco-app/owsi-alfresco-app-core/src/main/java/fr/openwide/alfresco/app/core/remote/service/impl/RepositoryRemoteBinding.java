@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,17 +27,20 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodePayloadCallback;
+import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
 public class RepositoryRemoteBinding {
 
@@ -70,24 +74,31 @@ public class RepositoryRemoteBinding {
 		this.ticketProvider = Optional.fromNullable(ticketProvider);
 	}
 
-	public <R> RepositoryRemoteCallBuilder<R> builder(RemoteEndpoint<R> restCall) {
-		return new RepositoryRemoteCallBuilder<R>(this, restCall);
+	public <R> RepositoryRemoteCallBuilder<R> builder(WebScriptParam<R> content) {
+		return new RepositoryRemoteCallBuilder<R>(this, content);
 	}
-	public <R> RepositoryRemoteCallBuilder<R> builder(EntityEnclosingRemoteEndpoint<R> restCall, Object content) {
-		return new RepositoryRemoteCallBuilder<R>(this, restCall, content);
-	}
-	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(EntityEnclosingRemoteEndpoint<R> restCall) {
-		return new RepositoryNodeRemoteCallBuilder<R>(this, restCall, serializationComponent);
+	public <R> RepositoryNodeRemoteCallBuilder<R> builderWithSerializer(WebScriptParam<R> payload) {
+		return new RepositoryNodeRemoteCallBuilder<R>(this, serializationComponent, payload);
 	}
 
-	public <T> T exchange(String path, RemoteEndpointMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
+	public <R, P extends WebScriptParam<R>> R callPayloadSerializer(
+			final P payload, 
+			final Collection<RepositoryNode> nodes, 
+			final NodePayloadCallback<R> payloadCallback,
+			final NodeContentSerializationParameters serializationParameters,
+			final NodeContentDeserializationParameters deserializationParameters) {
+		RepositoryNodeRemoteCallBuilder<R> remoteCallBuilder = builderWithSerializer(payload);
+		return remoteCallBuilder.callPayloadSerializer(nodes, payloadCallback, serializationParameters, deserializationParameters);
+	}
+	
+	public <T> T exchange(String path, WebScriptMethod method, Object request, HttpHeaders headers, ParameterizedTypeReference<T> responseType, Object... urlVariables) {
 		URI uri = getURI(path, urlVariables);
 		addTicketHeader(headers);
 		HttpEntity<Object> requestEntity = new HttpEntity<Object>(request, headers);
 		return execute(uri, method, requestEntity, null, responseType, null);
 	}
 
-	public <T> T exchange(String path, RemoteEndpointMethod method, final HttpHeaders headers, 
+	public <T> T exchange(String path, WebScriptMethod method, final HttpHeaders headers, 
 			final RequestCallback requestCallback, ResponseExtractor<T> responseExtractor, 
 			Object... urlVariables) {
 		RequestCallback realRequestCallback = new RequestCallback() {
@@ -123,7 +134,7 @@ public class RepositoryRemoteBinding {
 		}
 	}
 
-	private <T> T execute(URI uri, RemoteEndpointMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
+	private <T> T execute(URI uri, WebScriptMethod method, HttpEntity<Object> requestEntity, RequestCallback requestCallback, 
 			ParameterizedTypeReference<T> responseType, ResponseExtractor<T> responseExtractor) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Executing {} method with uri: {}", method, getProtectedURI(uri));

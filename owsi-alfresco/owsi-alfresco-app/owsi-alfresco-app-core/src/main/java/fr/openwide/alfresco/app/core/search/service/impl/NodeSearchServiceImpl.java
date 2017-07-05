@@ -35,7 +35,7 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 		
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
 		payload.searchParameters = searchParameters;
-		return nodeService.callNodeListSerializer(SEARCH_NODE_SERVICE.ENDPOINT, payload, searchParameters.getNodeScope());
+		return nodeService.callNodeListSerializer(payload, searchParameters.getNodeScope());
 	}
 
 }

@@ -25,7 +25,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		GET_USER payload = new GET_USER();
 		payload.userName = userName;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(GET_USER.ENDPOINT, payload, nodeScope);
+		return nodeService.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
@@ -37,14 +37,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		payload.email = email;
 		payload.password = password;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(CREATE_USER.ENDPOINT, payload, nodeScope);
+		return nodeService.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
 	public void deleteUser(String userName) throws NoSuchNodeRemoteException {
 		DELETE_USER payload = new DELETE_USER();
 		payload.userName = userName;
-		nodeService.callNodeUploadSerializer(DELETE_USER.ENDPOINT, payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
@@ -52,14 +52,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		UPDATE_USER_PASSWORD payload = new UPDATE_USER_PASSWORD();
 		payload.userName = userName;
 		payload.newPassword = newPassword;
-		nodeService.callNodeUploadSerializer(UPDATE_USER_PASSWORD.ENDPOINT, payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
 	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
 		GET_CONTAINED_AUTHORITIES payload = new GET_CONTAINED_AUTHORITIES();
 		payload.searchParameters = searchParameters;
-		return nodeService.callNodeListSerializer(GET_CONTAINED_AUTHORITIES.ENDPOINT, payload, searchParameters.getNodeScope());
+		return nodeService.callNodeListSerializer(payload, searchParameters.getNodeScope());
 	}
 	
 	@Override
@@ -67,7 +67,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		GET_GROUP payload = new GET_GROUP();
 		payload.groupShortName = groupShortName;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(GET_GROUP.ENDPOINT, payload, nodeScope);
+		return nodeService.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
@@ -77,14 +77,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		payload.groupShortName = groupShortName;
 		payload.groupDisplayName = groupDisplayName;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(CREATE_ROOT_GROUP.ENDPOINT, payload, nodeScope);
+		return nodeService.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
 	public void deleteGroup(String groupShortName) throws NoSuchNodeRemoteException {
 		DELETE_GROUP payload = new DELETE_GROUP();
 		payload.groupShortName = groupShortName;
-		nodeService.callNodeUploadSerializer(DELETE_GROUP.ENDPOINT, payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
@@ -92,7 +92,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		ADD_TO_GROUP payload = new ADD_TO_GROUP();
 		payload.subAuthorityFullName = subAuthorityFullName;
 		payload.parentGroupShortName = parentGroupShortName;
-		nodeService.callNodeUploadSerializer(ADD_TO_GROUP.ENDPOINT, payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
@@ -100,7 +100,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		REMOVE_FROM_GROUP payload = new REMOVE_FROM_GROUP();
 		payload.subAuthorityFullName = subAuthorityFullName;
 		payload.parentGroupShortName = parentGroupShortName;
-		nodeService.callNodeUploadSerializer(REMOVE_FROM_GROUP.ENDPOINT, payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 
 }

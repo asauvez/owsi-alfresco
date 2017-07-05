@@ -5,15 +5,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint.RemoteEndpointMethod;
+import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface GenerateWebScript {
 	
-	RemoteEndpointMethod method() default RemoteEndpointMethod.GET;
+	@SuppressWarnings("rawtypes")
+	Class<? extends WebScriptParam> paramClass() default WebScriptParam.class; 
 	
-	String url();
+	enum WebScriptMethod { GET, PUT, POST, DELETE, HEAD, OPTIONS; }
+	WebScriptMethod method() default WebScriptMethod.GET;
+
+	String[] url() default {};
 	
 	String shortName() default "";
 	String description() default "";
