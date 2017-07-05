@@ -172,9 +172,8 @@ public class RepositoryRemoteBinding {
 		return (builder.build().getQueryParams().get(ticketParam) != null) ? builder.replaceQueryParam(ticketParam, "[PROTECTED]").build().toUri() : uri;
 	}
 
-	protected URI getURI(String path, Object... uriVars) {
+	protected URI getURI(String path, Object... uriVariables) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(rootUri).path(path);
-		Object[] uriVariables = uriVars;
 		if (ticketParam != null) {
 			builder.queryParam(ticketParam, "{" + ticketParam + "}");
 			if (ticketProvider.isPresent()) {

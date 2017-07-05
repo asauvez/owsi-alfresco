@@ -9,7 +9,17 @@ import com.fasterxml.jackson.databind.type.SimpleType;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.GET_NODE_SERVICE;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
+@GenerateWebScript(
+	paramClass=GET_NODE_SERVICE.class,
+	shortName="get",
+	description="Get a node by reference",
+	formatDefault="json",
+	transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
+	family="OWSI",
+	beanParent="webscript.owsi.node")
 public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_NODE_SERVICE> {
 
 	@Override

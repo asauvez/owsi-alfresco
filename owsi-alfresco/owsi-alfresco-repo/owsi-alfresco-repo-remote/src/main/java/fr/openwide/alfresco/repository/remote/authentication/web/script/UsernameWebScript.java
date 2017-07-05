@@ -2,14 +2,27 @@ package fr.openwide.alfresco.repository.remote.authentication.web.script;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
+import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService.AUTHENTICATED_USERNAME_SERVICE;
 import fr.openwide.alfresco.repository.remote.framework.web.script.AbstractRemoteWebScript;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
+@GenerateWebScript(
+		paramClass=AUTHENTICATED_USERNAME_SERVICE.class,
+		shortName="username",
+		description="Retrieve current username",
+		formatDefault="html",
+		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
+		family="OWSI",
+		beanParent="webscript.owsi.remote")
 public class UsernameWebScript extends AbstractRemoteWebScript<String, Void> {
 
+	@Autowired
 	private AuthenticationRemoteService authenticationRemoteService;
 
 	@Override
@@ -24,10 +37,6 @@ public class UsernameWebScript extends AbstractRemoteWebScript<String, Void> {
 	protected void handleResult(WebScriptResponse res, String resValue) throws IOException {
 		res.setContentType("text/plain;charset=UTF-8");
 		res.getWriter().write(resValue);
-	}
-
-	public void setAuthenticationRemoteService(AuthenticationRemoteService authenticationRemoteService) {
-		this.authenticationRemoteService = authenticationRemoteService;
 	}
 
 }

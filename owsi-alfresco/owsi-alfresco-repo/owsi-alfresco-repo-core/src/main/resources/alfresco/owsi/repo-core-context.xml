@@ -29,8 +29,6 @@
 		<property name="runAsEnabled" value="${owsi-alfresco.run-as.enabled}" />
 	</bean>
 
-	<bean id="webscript.owsi.remote.node.node-get.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repository.core.node.web.script.GetNodeWebScript" />
 	<bean id="webscript.owsi.remote.node.node-children.post" parent="webscript.owsi.node"
 			class="fr.openwide.alfresco.repository.core.node.web.script.ChildrenNodeWebScript" />
 	<bean id="webscript.owsi.remote.node.node-sourceAssoc.post" parent="webscript.owsi.node"
@@ -51,13 +49,6 @@
 		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
 		<property name="searchService" ref="SearchService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
-	</bean>
-
-	<!-- Node search webscripts -->
-
-	<bean id="webscript.owsi.remote.search.search.post" parent="webscript.owsi.remote"
-			class="fr.openwide.alfresco.repository.core.search.web.script.SearchNodeWebScript">
-		<property name="nodeSearchService" ref="owsi.service.nodeSearchService" />
 	</bean>
 
 	<!-- Authority service -->

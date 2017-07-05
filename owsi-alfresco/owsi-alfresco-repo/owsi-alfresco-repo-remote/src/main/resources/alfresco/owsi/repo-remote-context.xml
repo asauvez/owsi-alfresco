@@ -36,21 +36,4 @@
 		<property name="authorityService" ref="AuthorityService" />
 	</bean>
 
-	<!-- Authentication webscripts -->
-
-	<bean id="webscript.owsi.remote.authentication" parent="webscript.owsi.remote" abstract="true">
-		<property name="authenticationRemoteService" ref="owsi.service.authentication" />
-	</bean>
-
-	<bean id="webscript.owsi.remote.authentication.login.post" parent="webscript.owsi.remote.authentication"
-			class="fr.openwide.alfresco.repository.remote.authentication.web.script.LoginWebScript" />
-
-	<bean id="webscript.owsi.remote.authentication.logout.post" parent="webscript.owsi.remote.authentication"
-			class="fr.openwide.alfresco.repository.remote.authentication.web.script.LogoutWebScript" />
-
-	<bean id="webscript.owsi.remote.authentication.user.post" parent="webscript.owsi.remote.authentication"
-			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UserWebScript" />
-	<bean id="webscript.owsi.remote.authentication.username.get" parent="webscript.owsi.remote.authentication"
-			class="fr.openwide.alfresco.repository.remote.authentication.web.script.UsernameWebScript" />
-
 </beans>

@@ -3,6 +3,8 @@ package fr.openwide.alfresco.repository.core.search.web.script;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.SimpleType;
 
@@ -10,10 +12,21 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService.SEARCH_NODE_SERVICE;
 import fr.openwide.alfresco.repository.core.node.web.script.AbstractNodeListWebScript;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
+@GenerateWebScript(
+		paramClass=SEARCH_NODE_SERVICE.class,
+		shortName="search",
+		description="Search nodes with a Lucene query",
+		formatDefault="json",
+		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
+		family="OWSI",
+		beanParent="webscript.owsi.remote")
 public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_SERVICE> {
 
-	protected NodeSearchRemoteService nodeSearchService;
+	@Autowired
+	private NodeSearchRemoteService nodeSearchService;
 
 	@Override
 	protected List<RepositoryNode> execute(SEARCH_NODE_SERVICE parameter) {
@@ -24,10 +37,6 @@ public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_S
 	@Override
 	protected JavaType getParameterType() {
 		return SimpleType.construct(SEARCH_NODE_SERVICE.class);
-	}
-
-	public void setNodeSearchService(NodeSearchRemoteService nodeSearchService) {
-		this.nodeSearchService = nodeSearchService;
 	}
 
 }
