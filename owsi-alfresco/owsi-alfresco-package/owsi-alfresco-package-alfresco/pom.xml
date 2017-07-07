@@ -53,11 +53,6 @@
 							<artifactId>alfresco-aos-module</artifactId>
 							<type>amp</type>
 						</overlay>
-						<overlay>
-							<groupId>org.alfresco.support</groupId>
-							<artifactId>support-tools</artifactId>
-							<type>amp</type>
-						</overlay>
 					</overlays>
 				</configuration>
 			</plugin>
