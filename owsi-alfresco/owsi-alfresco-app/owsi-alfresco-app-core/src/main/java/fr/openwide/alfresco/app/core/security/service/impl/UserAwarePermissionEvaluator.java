@@ -132,10 +132,10 @@ public abstract class UserAwarePermissionEvaluator implements PermissionEvaluato
 		return p;
 	}
 
-	protected boolean hasRole(UserDetails user, RepositoryAuthority authority) {
+	public boolean hasRole(UserDetails user, RepositoryAuthority authority) {
 		return hasRole(user, authority.getName());
 	}
-	protected boolean hasRole(UserDetails user, String role) {
+	public boolean hasRole(UserDetails user, String role) {
 		for(GrantedAuthority auth : getAuthorities(user)) {
 			if(auth.getAuthority().equals(role)) {
 				return true;
