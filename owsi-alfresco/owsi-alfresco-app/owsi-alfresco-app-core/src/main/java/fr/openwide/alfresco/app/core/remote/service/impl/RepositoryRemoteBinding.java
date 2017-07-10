@@ -161,8 +161,8 @@ public class RepositoryRemoteBinding {
 			}
 			throw new IllegalStateException(e);
 		} finally {
-			if (LOGGER_AUDIT.isInfoEnabled()) {
-				LOGGER_AUDIT.info("{} : {} ms", getProtectedURI(uri), System.currentTimeMillis() - before);
+			if (LOGGER_AUDIT.isDebugEnabled()) {
+				LOGGER_AUDIT.debug("{} : {} ms", getProtectedURI(uri), System.currentTimeMillis() - before);
 			}
 		}
 	}
