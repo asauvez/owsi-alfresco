@@ -5,6 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Optional;
 
+import fr.openwide.alfresco.app.core.security.model.NamedUser;
+
 public interface UserService {
 
 	Optional<Authentication> getCurrentAuthentication();
@@ -15,4 +17,6 @@ public interface UserService {
 
 	Optional<String> getCurrentUsername();
 
+	boolean isAuthenticated();
+	NamedUser getAsNamedUser();
 }

@@ -9,7 +9,8 @@ public class RepositoryAuthority implements Serializable {
 
 	private static final long serialVersionUID = -5556589719655849321L;
 
-	public static final String GROUP_PREFIX = "GROUP_"; 
+	public static final String GROUP_PREFIX = "GROUP_";
+	public static final String ROLE_PREFIX = "ROLE_"; 
 	
 	public static final RepositoryAuthority USER_SYSTEM = RepositoryAuthority.authority("System");
 	public static final RepositoryAuthority GROUP_EVERYONE = RepositoryAuthority.group("EVERYONE");
@@ -33,6 +34,9 @@ public class RepositoryAuthority implements Serializable {
 	}
 	public static RepositoryAuthority group(String shortName) {
 		return authority(GROUP_PREFIX + shortName);
+	}
+	public static RepositoryAuthority role(String shortName) {
+		return authority(ROLE_PREFIX + shortName);
 	}
 	public static RepositoryAuthority authority(String authorityName) {
 		return new RepositoryAuthority(authorityName);
