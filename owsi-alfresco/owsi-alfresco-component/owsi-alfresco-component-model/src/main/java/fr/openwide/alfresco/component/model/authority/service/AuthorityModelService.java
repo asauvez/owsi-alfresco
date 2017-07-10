@@ -8,12 +8,15 @@ import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
+import fr.openwide.alfresco.component.model.authority.model.CachedUser;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
 public interface AuthorityModelService {
 
 	BusinessNode getUser(String userName, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException;
+	CachedUser getCachedUser(String userName) throws NoSuchNodeRemoteException;
+	
 	BusinessNode getGroup(RepositoryAuthority group, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException;
 	
 	List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder);

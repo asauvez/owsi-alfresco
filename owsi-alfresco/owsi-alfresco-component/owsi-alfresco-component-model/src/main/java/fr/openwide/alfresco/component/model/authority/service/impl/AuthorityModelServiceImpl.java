@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityType;
@@ -11,6 +12,7 @@ import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
+import fr.openwide.alfresco.component.model.authority.model.CachedUser;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNodeList;
@@ -21,6 +23,15 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	private final AuthorityRemoteService authorityService;
 
+	private Map<String, CachedUser> cacheUsers = new LinkedHashMap<String, CachedUser>() {
+		private static final int CACHE_SIZE = 100;
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<String, CachedUser> eldest) {
+			return size() > CACHE_SIZE;
+		}
+
+	};
+	
 	public AuthorityModelServiceImpl(AuthorityRemoteService authorityService) {
 		this.authorityService = authorityService;
 	}
@@ -29,6 +40,24 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	public BusinessNode getUser(String userName, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		return new BusinessNode(authorityService.getUser(userName, nodeScopeBuilder.getScope()));
 	}
+	
+	@Override
+	public synchronized CachedUser getCachedUser(String userName) throws NoSuchNodeRemoteException {
+		CachedUser user = cacheUsers.get(userName);
+		if (user == null) {
+			BusinessNode node = getUser(userName, new NodeScopeBuilder()
+				.properties().set(CmModel.person.firstName)
+				.properties().set(CmModel.person.lastName)
+				.properties().set(CmModel.person.email));
+			user = new CachedUser(new UserReference(userName), 
+				node.properties().get(CmModel.person.firstName),
+				node.properties().get(CmModel.person.lastName),
+				node.properties().get(CmModel.person.email));
+			cacheUsers.put(userName, user);
+		}
+		return user;
+	}
+	
 	
 	@Override
 	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
