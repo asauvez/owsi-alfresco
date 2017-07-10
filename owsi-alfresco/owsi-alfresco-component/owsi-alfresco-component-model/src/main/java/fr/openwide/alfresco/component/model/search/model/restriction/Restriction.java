@@ -129,7 +129,7 @@ public abstract class Restriction {
 	
 	protected abstract String toFtsQueryInternal();
 
-	protected void addCmisQueryJoin(Set<ContainerModel> containersToJoin) {
+	protected void addCmisQueryJoin(@SuppressWarnings("unused") Set<ContainerModel> containersToJoin) {
 		// nop
 	}
 	protected String toCmisQueryWhereInternal() {

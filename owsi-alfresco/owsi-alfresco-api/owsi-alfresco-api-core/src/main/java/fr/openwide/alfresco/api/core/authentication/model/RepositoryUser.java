@@ -14,8 +14,6 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class RepositoryUser implements Serializable {
 
-	private static final long serialVersionUID = 945185331538453155L;
-
 	public static final NameReference FIRST_NAME = NameReference.create("cm", "firstName"); 
 	public static final NameReference LAST_NAME = NameReference.create("cm", "lastName"); 
 	public static final NameReference EMAIL = NameReference.create("cm", "email"); 
