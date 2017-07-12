@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.authority.service.impl;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +24,13 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	private final AuthorityRemoteService authorityService;
 
-	private Map<String, CachedUser> cacheUsers = new LinkedHashMap<String, CachedUser>() {
+	private Map<String, CachedUser> cacheUsers = Collections.synchronizedMap(new LinkedHashMap<String, CachedUser>() {
 		private static final int CACHE_SIZE = 100;
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, CachedUser> eldest) {
 			return size() > CACHE_SIZE;
 		}
-
-	};
+	});
 	
 	public AuthorityModelServiceImpl(AuthorityRemoteService authorityService) {
 		this.authorityService = authorityService;
@@ -42,7 +42,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	}
 	
 	@Override
-	public synchronized CachedUser getCachedUser(String userName) throws NoSuchNodeRemoteException {
+	public CachedUser getCachedUser(String userName) throws NoSuchNodeRemoteException {
 		CachedUser user = cacheUsers.get(userName);
 		if (user == null) {
 			BusinessNode node = getUser(userName, new NodeScopeBuilder()
@@ -56,6 +56,10 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 			cacheUsers.put(userName, user);
 		}
 		return user;
+	}
+	@Override
+	public void clearCachedUser() {
+		cacheUsers.clear();
 	}
 	
 	

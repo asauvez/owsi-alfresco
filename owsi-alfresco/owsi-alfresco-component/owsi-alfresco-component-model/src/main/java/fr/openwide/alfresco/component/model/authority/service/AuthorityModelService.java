@@ -16,6 +16,7 @@ public interface AuthorityModelService {
 
 	BusinessNode getUser(String userName, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException;
 	CachedUser getCachedUser(String userName) throws NoSuchNodeRemoteException;
+	void clearCachedUser();
 	
 	BusinessNode getGroup(RepositoryAuthority group, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException;
 	
