@@ -4,6 +4,7 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 # Nouveautés
 ## vers 0.5.0
 * authorityModelService.getUser(userName, nodeScopeBuilder) --> authorityModelService.getCachedUser(userName)
+* http://localhost:8080/alfresco/s/owsi/contentstoreexport.zip
 
 # Migration
 
@@ -14,5 +15,5 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 * Le runAsUser() déconnecte l'utilisateur après coup si vous passez un username et non un UserDetails. Avant cela le faisait quand vous étiez en PrincipalType.USER_DETAILS.
 
 ### Divers
-* new RepositoryAuthority(String) --> RepositoryAuthority.create(String)
+* new RepositoryAuthority(String) --> RepositoryAuthority.authority(String)
 * Restriction.toQuery() --> Restriction.toFtsQuery()

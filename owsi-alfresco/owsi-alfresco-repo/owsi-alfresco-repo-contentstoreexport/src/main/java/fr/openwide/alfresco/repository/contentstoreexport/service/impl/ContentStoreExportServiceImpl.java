@@ -39,6 +39,27 @@ import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.repository.contentstoreexport.service.ContentStoreExportService;
 
+/**
+ * Module d'export focalisé par défaut sur les dépôts locaux nécessaire au lancement. 
+ * Il est cependant possible d'enrichir le comportement par défaut de ce module via des paramètres d'url.
+ * 
+ * Pour accéder au service, utilisez l'url: "http://localhost:8080/alfresco/s/owsi/contentstoreexport.zip"
+ * Par défaut le module exporte :
+ * 
+ * - la valeur retournée par le path "app:company_home/app:dictionary", 
+ * - la valeur retournée par la requête "cm:name:surf-config"
+ * - finalement la valeur du nodeRef "system://system".
+ * 
+ * Il est possible d'enrichir le comportement du module en complétant l'url avec des paramètres. 
+ * Chaque paramètres peut contenir plusieurs valeurs séparées par une virgule:
+ * 
+ * - paths: permet d'enrichir le module d'export avec un ou plusieurs path Alfresco. (i.e: .../s/owsi/contentstoreexport.zip?path=app:company_home,app:dictionnary)
+ * - queries: permet d'enrichir le module d'export avec une ou plusieurs requêtes Alfresco.
+ * - nodeRefs: permet d'enrichir le module d'export avec un ou plusieurs NodeRefs? Alfresco.
+ * 
+ * Il est possible d'enrichir plusieurs paramètres en une seule fois :
+ * (i.e .../s/owsi/contentstoreexport.zip?path=app:company_home,app:dictionnary&queries==cm:name:surf-config)
+ */
 public class ContentStoreExportServiceImpl implements ContentStoreExportService {
 
 	private static final String STORE_PREFIX = "store:/";
