@@ -18,14 +18,12 @@ public class ClassificationWithRootBuilder {
 
 	private final ClassificationServiceImpl service;
 	private final BusinessNode node;
-	private NodeReference actualParentFolder;
-	private NodeReference destinationFolder;
+	private final NodeReference destinationFolder;
 
-	public ClassificationWithRootBuilder(ClassificationServiceImpl service, BusinessNode node, NodeReference rootFolder) {
+	public ClassificationWithRootBuilder(ClassificationServiceImpl service, BusinessNode node, NodeReference destinationFolder) {
 		this.service = service;
 		this.node = node;
-		this.actualParentFolder = node.assocs().primaryParent().getNodeReference();
-		this.destinationFolder = rootFolder;
+		this.destinationFolder = destinationFolder;
 	}
 	
 	/**
@@ -36,8 +34,8 @@ public class ClassificationWithRootBuilder {
 			.properties().name(folderName));
 	}
 	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
-		destinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);
-		return this;
+		NodeReference newDestinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);
+		return new ClassificationWithRootBuilder(service, node, newDestinationFolder);
 	}
 	/**
 	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
@@ -112,10 +110,7 @@ public class ClassificationWithRootBuilder {
 	 * Déplace le noeud dans le répertoire de destination. 
 	 */
 	public ClassificationWithRootBuilder moveNode() {
-		if (! actualParentFolder.equals(destinationFolder)) {
-			service.moveNode(node.getNodeReference(), destinationFolder);
-			actualParentFolder = destinationFolder;
-		}
+		service.moveNode(node.getNodeReference(), destinationFolder);
 		return this;
 	}
 	/**

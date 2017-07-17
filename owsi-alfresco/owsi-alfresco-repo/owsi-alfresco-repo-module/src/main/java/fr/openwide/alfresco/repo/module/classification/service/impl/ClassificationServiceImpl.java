@@ -297,6 +297,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public Optional<NodeReference> getHomeFolder() {
 		return nodeModelService.getUserHome();
 	}
+	public NodeReference getCompanyHome() {
+		return nodeModelService.getCompanyHome();
+	}
 	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
 		NodeReference nodeReference = conversionService.get(nodeRef);

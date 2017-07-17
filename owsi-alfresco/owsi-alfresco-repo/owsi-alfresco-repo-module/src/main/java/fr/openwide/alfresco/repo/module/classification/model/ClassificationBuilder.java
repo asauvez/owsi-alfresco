@@ -99,7 +99,14 @@ public class ClassificationBuilder {
 		}
 		return rootFolder(homeFolder.get());
 	}
-	
+
+	/** 
+	 * Défini le noeud racine de la classification comme étant Company home. 
+	 */
+	public ClassificationWithRootBuilder rootCompanyHome() {
+		return rootFolder(service.getCompanyHome());
+	}
+
 	public ClassificationBuilder unlinkSecondaryParents() {
 		return unlinkSecondaryParents(CmModel.folder.contains);
 	}
