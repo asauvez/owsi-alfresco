@@ -242,10 +242,6 @@
 						<artifactId>chemistry-opencmis-commons-impl</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>org.jvnet.staxex</groupId>
-						<artifactId>stax-ex</artifactId>
-					</exclusion>
-					<exclusion>
 						<groupId>org.apache.chemistry.opencmis</groupId>
 						<artifactId>chemistry-opencmis-server-bindings</artifactId>
 					</exclusion>
@@ -933,12 +929,6 @@
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
 				<version>${owsi-alfresco.repo.jaxb.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jvnet.staxex</groupId>
-				<artifactId>stax-ex</artifactId>
-				<version>${owsi-alfresco.repo.stax-ex.version}</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
