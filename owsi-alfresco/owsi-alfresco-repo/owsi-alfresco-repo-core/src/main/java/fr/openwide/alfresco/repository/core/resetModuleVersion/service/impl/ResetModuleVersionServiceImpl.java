@@ -24,6 +24,9 @@ import org.springframework.beans.factory.InitializingBean;
  * owsi.reset-module-version.<moduleName1>=<version1>
  * owsi.reset-module-version.<moduleName2>=<version2>
  * 
+ * If Alfresco start, you can also use :
+ * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}
+ * 
  * @author recol
  *
  */

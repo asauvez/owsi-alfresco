@@ -27,6 +27,8 @@ import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
 /**
  * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}
  * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module=owsi-alfresco-repo-contentstoreexport&version=0.4.0
+ * 
+ * Si Alfresco ne démarre pas, vous pouvez aussi utiliser @see ResetModuleVersionServiceImpl
  */
 @GenerateWebScript(
 		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
