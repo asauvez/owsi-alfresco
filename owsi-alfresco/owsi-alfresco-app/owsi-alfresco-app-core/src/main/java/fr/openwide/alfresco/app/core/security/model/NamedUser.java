@@ -22,9 +22,13 @@ public class NamedUser extends User {
 	public String getFirstName() {
 		return repositoryUser.getFirstName();
 	}
-
 	public String getLastName() {
 		return repositoryUser.getLastName();
+	}
+	public String getFullName() {
+		String firstName = getFirstName();
+		String lastName = getLastName();
+		return ((firstName != null) ? firstName : "") + " " + ((lastName != null) ? lastName : "").trim();
 	}
 
 	public String getEmail() {
