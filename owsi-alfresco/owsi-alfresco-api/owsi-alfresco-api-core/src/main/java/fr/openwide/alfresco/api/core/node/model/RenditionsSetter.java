@@ -17,6 +17,8 @@ public abstract class RenditionsSetter<R> {
 	private static final NameReference AVATAR32_PREVIEW_RENDITION = NameReference.create("cm", "avatar32");
 	// shockwave-flash
 	private static final NameReference WEB_PREVIEW_RENDITION = NameReference.create("cm", "webpreview");
+	// PDF
+	private static final NameReference PDF_RENDITION = NameReference.create("cm", "pdf");
 
 	public abstract R name(NameReference renditionName);
 	
@@ -37,5 +39,8 @@ public abstract class RenditionsSetter<R> {
 	}
 	public R webPreview() {
 		return name(WEB_PREVIEW_RENDITION);
+	}
+	public R pdf() {
+		return name(PDF_RENDITION);
 	}
 }
