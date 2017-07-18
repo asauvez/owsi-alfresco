@@ -20,6 +20,10 @@
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-core</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
