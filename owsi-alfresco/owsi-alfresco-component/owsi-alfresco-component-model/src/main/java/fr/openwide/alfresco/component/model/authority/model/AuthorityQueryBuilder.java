@@ -3,6 +3,7 @@ package fr.openwide.alfresco.component.model.authority.model;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityType;
+import fr.openwide.alfresco.api.core.authority.model.ZoneReference;
 import fr.openwide.alfresco.component.model.node.model.builder.AbstractQueryBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
@@ -29,6 +30,11 @@ public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBu
 
 	public AuthorityQueryBuilder type(RepositoryAuthorityType type) {
 		getParameters().setAuthorityType(type);
+		return this;
+	}
+	
+	public AuthorityQueryBuilder zone(ZoneReference zone) {
+		getParameters().setZone(zone);
 		return this;
 	}
 

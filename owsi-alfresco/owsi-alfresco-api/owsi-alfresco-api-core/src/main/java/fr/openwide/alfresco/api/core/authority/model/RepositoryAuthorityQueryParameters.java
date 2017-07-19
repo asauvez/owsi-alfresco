@@ -5,8 +5,9 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters {
 	
-	private RepositoryAuthority parentAuthority;
+	private RepositoryAuthority parentAuthority = RepositoryAuthority.GROUP_EVERYONE;
 	private RepositoryAuthorityType authorityType;
+	private ZoneReference zone;
 
 	private NameReference filterProperty;
 	private String filterValue;
@@ -25,6 +26,12 @@ public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters 
 	}
 	public void setAuthorityType(RepositoryAuthorityType authorityType) {
 		this.authorityType = authorityType;
+	}
+	public ZoneReference getZone() {
+		return zone;
+	}
+	public void setZone(ZoneReference zone) {
+		this.zone = zone;
 	}
 	public NameReference getFilterProperty() {
 		return filterProperty;

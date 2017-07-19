@@ -2,13 +2,14 @@ package fr.openwide.alfresco.repository.core.authority.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.query.PagingRequest;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -19,6 +20,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.PropertyMap;
 
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
+import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
@@ -96,12 +98,24 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	@Override
 	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
 		AuthorityType authorityType = (searchParameters.getAuthorityType() != null) ? AuthorityType.valueOf(searchParameters.getAuthorityType().name()) : null;
-		Set<String> authorities = authorityService.getContainedAuthorities(authorityType, 
-				searchParameters.getParentAuthority().getName(), 
-				searchParameters.isImmediate());
 		
-		if (searchParameters.isIncludingParent()) {
-			authorities.add(searchParameters.getParentAuthority().getName());
+		Collection<String> authorities;
+		if (RepositoryAuthority.GROUP_EVERYONE.equals(searchParameters.getParentAuthority())) {
+			String zone = (searchParameters.getZone() != null) ? searchParameters.getZone().getName() : null;
+			authorities = authorityService.getAuthorities(authorityType, zone, null, 
+					false, false, new PagingRequest(0, Integer.MAX_VALUE, null)).getPage();
+		} else {
+			if (searchParameters.getZone() != null) {
+				throw new IllegalArgumentException("Zone filter is only supported with GROUP_EVERYONE authoriry.");
+			}
+			
+			authorities = authorityService.getContainedAuthorities(authorityType, 
+					searchParameters.getParentAuthority().getName(), 
+					searchParameters.isImmediate());
+			
+			if (searchParameters.isIncludingParent()) {
+				authorities.add(searchParameters.getParentAuthority().getName());
+			}
 		}
 		
 		Pattern pattern = (searchParameters.getFilterValue() != null) 
