@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.app.core.site.service;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;

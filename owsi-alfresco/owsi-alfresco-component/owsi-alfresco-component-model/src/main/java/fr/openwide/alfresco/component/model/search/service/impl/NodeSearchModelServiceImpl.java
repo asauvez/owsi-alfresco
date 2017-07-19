@@ -2,7 +2,7 @@ package fr.openwide.alfresco.component.model.search.service.impl;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -41,7 +41,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 		if (list.size() > 1) {
 			throw new IllegalStateException("More than one result for " + restrictionBuilder.toFtsQuery());
 		} else if (list.isEmpty()) {
-			return Optional.absent();
+			return Optional.empty();
 		}
 		return Optional.of(list.get(0));
 	}
@@ -50,7 +50,7 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	public Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
 		Optional<BusinessNode> node = searchUnique(restrictionBuilder, new NodeScopeBuilder()
 				.nodeReference());
-		return node.isPresent() ? Optional.of(node.get().getNodeReference()) : Optional.fromNullable((NodeReference) null);
+		return node.isPresent() ? Optional.of(node.get().getNodeReference()) : Optional.ofNullable((NodeReference) null);
 	}
 
 }

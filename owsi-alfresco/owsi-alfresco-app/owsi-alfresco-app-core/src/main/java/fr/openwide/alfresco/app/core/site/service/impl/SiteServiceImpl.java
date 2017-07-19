@@ -2,7 +2,7 @@ package fr.openwide.alfresco.app.core.site.service.impl;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
@@ -55,7 +55,7 @@ public class SiteServiceImpl implements SiteService {
 		if (list.size() > 1) {
 			throw new IllegalStateException(query);
 		}
-		return (list.isEmpty()) ? Optional.<NodeReference>absent() : Optional.of(list.get(0).getNodeReference());
+		return (list.isEmpty()) ? Optional.<NodeReference>empty() : Optional.of(list.get(0).getNodeReference());
 	}
 	
 	@Override

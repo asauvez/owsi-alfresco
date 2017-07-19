@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface RunAsUserManager {
 

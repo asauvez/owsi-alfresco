@@ -21,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
@@ -71,7 +71,7 @@ public class RepositoryRemoteBinding {
 		this.rootUri = rootUri;
 		this.ticketParam = ticketParam;
 		this.ticketHeader = ticketHeader;
-		this.ticketProvider = Optional.fromNullable(ticketProvider);
+		this.ticketProvider = Optional.ofNullable(ticketProvider);
 	}
 
 	public <R> RepositoryRemoteCallBuilder<R> builder(WebScriptParam<R> content) {

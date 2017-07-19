@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.demo.repo.patch;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.demo.business.model.DemoModel;

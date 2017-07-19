@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
@@ -497,7 +497,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			// Vérifie juste que la node existe toujours
 			if (! nodeModelService.exists(nodeReference)) {
 				queryCache.remove(query);
-				return Optional.absent();
+				return Optional.empty();
 			}
 			return Optional.of(nodeReference);
 		}
@@ -519,7 +519,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			// Vérifie juste que la node existe toujours
 			if (! nodeModelService.exists(nodeReference)) {
 				pathCache.remove(cacheKey);
-				return Optional.absent();
+				return Optional.empty();
 			}
 			return Optional.of(nodeReference);
 		}

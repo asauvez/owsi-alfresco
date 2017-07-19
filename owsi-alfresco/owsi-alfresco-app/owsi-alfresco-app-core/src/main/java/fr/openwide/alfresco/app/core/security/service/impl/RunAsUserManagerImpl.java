@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
@@ -36,22 +36,22 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 
 	@Override
 	public Optional<Authentication> getOriginalAuthentication() {
-		Authentication authentication = userService.getCurrentAuthentication().orNull();
+		Authentication authentication = userService.getCurrentAuthentication().orElse(null);
 		if (authentication instanceof RunAsUserToken) {
 			authentication = (Authentication) ((RunAsUserToken) authentication).getCredentials();
 		}
-		return Optional.fromNullable(authentication);
+		return Optional.ofNullable(authentication);
 	}
 
 	@Override
 	public Optional<UserDetails> getOriginalUserDetails() {
-		return userService.getUserDetails(getOriginalAuthentication().orNull());
+		return userService.getUserDetails(getOriginalAuthentication().orElse(null));
 	}
 
 	@Override
 	public Optional<String> getOriginalUsername() {
 		Optional<UserDetails> current = getOriginalUserDetails();
-		return (current.isPresent()) ? Optional.of(current.get().getUsername()) : Optional.<String>absent();
+		return (current.isPresent()) ? Optional.of(current.get().getUsername()) : Optional.<String>empty();
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 
 	protected RunAsUserToken buildRunAs(UserDetails user, Optional<Authentication> originalAuthentication) {
 		Class<? extends Authentication> original = (originalAuthentication.isPresent()) ? originalAuthentication.get().getClass() : null;
-		return new RunAsUserToken(getKey(), user, originalAuthentication.orNull(), user.getAuthorities(), original);
+		return new RunAsUserToken(getKey(), user, originalAuthentication.orElse(null), user.getAuthorities(), original);
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 			return work.call();
 		} finally {
 			// Crucial restore of SecurityContextHolder contents - do this before anything else.
-			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orNull());
+			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orElse(null));
 		}
 	}
 

@@ -14,15 +14,15 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * {@see org.springframework.security.config.annotation.web.configurers.X509Configurer}
  */
 public class KerberosConfigurer<B extends HttpSecurityBuilder<B>> extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, B> {
 
-	private Optional<AuthenticationEntryPoint> authenticationEntryPoint = Optional.absent();
-	private Optional<String> forwardPage = Optional.absent();
+	private Optional<AuthenticationEntryPoint> authenticationEntryPoint = Optional.empty();
+	private Optional<String> forwardPage = Optional.empty();
 	private KerberosTicketValidator kerberosTicketValidator;
 	private UserDetailsService userDetailsService;
 
@@ -56,7 +56,7 @@ public class KerberosConfigurer<B extends HttpSecurityBuilder<B>> extends Securi
 	}
 
 	public KerberosConfigurer<B> entryPoint(String forwardPage) {
-		this.forwardPage = Optional.fromNullable(forwardPage);
+		this.forwardPage = Optional.ofNullable(forwardPage);
 		return entryPoint(new SpnegoEntryPoint(forwardPage));
 	}
 

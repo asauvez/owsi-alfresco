@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.UserService;
@@ -14,14 +14,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Optional<Authentication> getCurrentAuthentication() {
-		return Optional.fromNullable(SecurityContextHolder.getContext().getAuthentication());
+		return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
 	}
 
 	@Override
 	public Optional<UserDetails> getUserDetails(Authentication authentication) {
 		if (authentication instanceof AnonymousAuthenticationToken || authentication == null) {
 			// L'utilisateur n'est pas authentifié
-			return Optional.absent();
+			return Optional.empty();
 		}
 		Object principal = authentication.getPrincipal();
 		if (principal instanceof UserDetails) {
@@ -35,13 +35,13 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Optional<UserDetails> getCurrentUserDetails() {
 		Optional<Authentication> authentication = getCurrentAuthentication();
-		return getUserDetails(authentication.orNull());
+		return getUserDetails(authentication.orElse(null));
 	}
 
 	@Override
 	public Optional<String> getCurrentUsername() {
 		Optional<UserDetails> current = getCurrentUserDetails();
-		return (current.isPresent()) ? Optional.of(current.get().getUsername()) : Optional.<String>absent();
+		return (current.isPresent()) ? Optional.of(current.get().getUsername()) : Optional.<String>empty();
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package fr.openwide.alfresco.repo.module.classification.model;
 
 import java.util.function.Supplier;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -117,7 +117,7 @@ public class ClassificationWithRootBuilder {
 	 * Copie le noeud dans le répertoire de destination. 
 	 */
 	public NodeReference copyNode() {
-		return service.copyNode(node.getNodeReference(), destinationFolder, Optional.<String>absent());
+		return service.copyNode(node.getNodeReference(), destinationFolder, Optional.<String>empty());
 	}
 	public ClassificationWithRootBuilder deletePrevious() {
 		service.deletePrevious(destinationFolder, node.properties().getName());
@@ -136,7 +136,7 @@ public class ClassificationWithRootBuilder {
 	 * Créer un raccourci dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createFileLink() {
-		service.createFileLink(node.getNodeReference(), destinationFolder, Optional.absent());
+		service.createFileLink(node.getNodeReference(), destinationFolder, Optional.empty());
 		return this;
 	}
 }

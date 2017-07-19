@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;

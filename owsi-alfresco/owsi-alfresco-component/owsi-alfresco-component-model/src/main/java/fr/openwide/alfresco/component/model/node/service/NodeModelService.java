@@ -1,10 +1,9 @@
 package fr.openwide.alfresco.component.model.node.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
-
-import com.google.common.base.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;

@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;

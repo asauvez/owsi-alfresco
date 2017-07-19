@@ -20,7 +20,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
 import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
@@ -212,7 +212,7 @@ public class NodeModelRepositoryServiceImpl
 		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(conversionService.getRequired(nodeReference));
 		return (primaryParent != null && primaryParent.getParentRef() != null) 
 				? Optional.of(conversionService.get(primaryParent.getParentRef()))
-				: Optional.<NodeReference>absent();
+				: Optional.<NodeReference>empty();
 	}
 
 	@Override
@@ -231,7 +231,7 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(nodeReference), 
 				conversionService.getRequired(associationType.getNameReference()), 
 				conversionService.getRequired(assocName));
-		return Optional.fromNullable((children.isEmpty()) 
+		return Optional.ofNullable((children.isEmpty()) 
 				? null
 				: conversionService.get(children.get(0).getChildRef()));
 	}
@@ -251,7 +251,7 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(associationType), 
 				QName.createValidLocalName(childName));
 		NodeReference subnodeReference = (subNodeRef != null) ? conversionService.get(subNodeRef) : null;
-		return Optional.fromNullable(subnodeReference);
+		return Optional.ofNullable(subnodeReference);
 	}
 	
 	@Override
@@ -363,7 +363,7 @@ public class NodeModelRepositoryServiceImpl
 		if (userHome != null) {
 			return Optional.of(conversionService.get(userHome));
 		} else {
-			return Optional.absent();
+			return Optional.empty();
 		}
 	}
 

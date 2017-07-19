@@ -20,9 +20,9 @@ public class AuthenticationExposingInterceptor extends HandlerInterceptorAdapter
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
 		if (modelAndView != null) {
 			// add authentication
-			modelAndView.addObject(AUTHENTICATION_ATTRIBUTE_NAME, userService.getCurrentAuthentication().orNull());
+			modelAndView.addObject(AUTHENTICATION_ATTRIBUTE_NAME, userService.getCurrentAuthentication().orElse(null));
 			// add user
-			modelAndView.addObject(USER_ATTRIBUTE_NAME, userService.getCurrentUserDetails().orNull());
+			modelAndView.addObject(USER_ATTRIBUTE_NAME, userService.getCurrentUserDetails().orElse(null));
 			// add can logout
 			modelAndView.addObject(CAN_LOGOUT_ATTRIBUTE_NAME, ! userService.getCurrentUserDetails().isPresent());
 		}

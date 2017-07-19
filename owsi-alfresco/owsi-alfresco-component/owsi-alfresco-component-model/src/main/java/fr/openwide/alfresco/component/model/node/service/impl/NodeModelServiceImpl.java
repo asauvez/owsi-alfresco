@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
@@ -88,7 +88,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 		return new BusinessNodeList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
 	private Optional<BusinessNode> toOptional(List<BusinessNode> list) {
-		if (list.isEmpty()) return Optional.absent();
+		if (list.isEmpty()) return Optional.empty();
 		if (list.size() == 1) return Optional.of(list.get(0));
 		throw new IllegalStateException("list=" + list);
 	}

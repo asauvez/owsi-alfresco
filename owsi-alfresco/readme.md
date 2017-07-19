@@ -19,3 +19,4 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 ### Divers
 * new RepositoryAuthority(String) --> RepositoryAuthority.authority(String)
 * Restriction.toQuery() --> Restriction.toFtsQuery()
+* com.google.common.base.Optional --> java.util.Optional
