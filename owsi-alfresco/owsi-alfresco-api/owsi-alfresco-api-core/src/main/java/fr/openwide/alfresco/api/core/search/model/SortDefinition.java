@@ -7,13 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public class RepositorySortDefinition implements Serializable {
+public class SortDefinition implements Serializable {
 	
 	private final NameReference property;
 	private final boolean ascending;
 
 	@JsonCreator
-	public RepositorySortDefinition(
+	public SortDefinition(
 			@JsonProperty("property") NameReference property, 
 			@JsonProperty("ascending") boolean ascending) {
 		this.property = property;

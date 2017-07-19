@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import com.google.common.base.Strings;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
@@ -21,10 +21,10 @@ public class RepositoryUser implements Serializable {
 	private UserReference userReference;
 
 	private RepositoryNode userNode;
-	private RepositoryTicket ticket;
+	private TicketReference ticket;
 
 	private boolean admin = false;
-	private List<RepositoryAuthority> authorities = new ArrayList<>();
+	private List<AuthorityReference> authorities = new ArrayList<>();
 
 	public UserReference getUserReference() {
 		return userReference;
@@ -55,17 +55,17 @@ public class RepositoryUser implements Serializable {
 		return userNode.getProperty(EMAIL, String.class);
 	}
 	
-	public List<RepositoryAuthority> getAuthorities() {
+	public List<AuthorityReference> getAuthorities() {
 		return authorities;
 	}
-	public void setAuthorities(List<RepositoryAuthority> authorities) {
+	public void setAuthorities(List<AuthorityReference> authorities) {
 		this.authorities = authorities;
 	}
 
-	public RepositoryTicket getTicket() {
+	public TicketReference getTicket() {
 		return ticket;
 	}
-	public void setTicket(RepositoryTicket ticket) {
+	public void setTicket(TicketReference ticket) {
 		this.ticket = ticket;
 	}
 
@@ -108,7 +108,7 @@ public class RepositoryUser implements Serializable {
 		if (authorities != null && ! authorities.isEmpty()) {
 			sb.append("Repository Authorities: ");
 			boolean first = true;
-			for (RepositoryAuthority auth : authorities) {
+			for (AuthorityReference auth : authorities) {
 				if (! first) {
 					sb.append(",");
 				}

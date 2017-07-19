@@ -3,7 +3,7 @@ package fr.openwide.alfresco.api.core.authority.service;
 import java.util.List;
 
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -46,9 +46,9 @@ public interface AuthorityRemoteService {
 
 	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/authority/get-contained-authorities")
 	class GET_CONTAINED_AUTHORITIES extends WebScriptParam<List<RepositoryNode>> {
-		public RepositoryAuthorityQueryParameters searchParameters;
+		public AuthorityQueryParameters searchParameters;
 	}
-	List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters);
+	List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters);
 
 	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/authority/get-group")
 	class GET_GROUP extends WebScriptParam<RepositoryNode> {

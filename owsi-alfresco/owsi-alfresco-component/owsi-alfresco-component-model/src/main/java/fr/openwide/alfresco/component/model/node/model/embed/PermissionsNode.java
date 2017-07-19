@@ -2,10 +2,10 @@ package fr.openwide.alfresco.component.model.node.model.embed;
 
 import java.util.Set;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 
 public class PermissionsNode {
@@ -21,17 +21,17 @@ public class PermissionsNode {
 	/**
 	 * @return true if the current user has the given permission.
 	 */
-	public boolean hasUserPermission(RepositoryPermission permission) {
+	public boolean hasUserPermission(PermissionReference permission) {
 		return repoNode.getUserPermissions().contains(permission);
 	}
 	public boolean hasUserPermissionAddChildren() {
-		return hasUserPermission(RepositoryPermission.ADD_CHILDREN);
+		return hasUserPermission(PermissionReference.ADD_CHILDREN);
 	}
 	public boolean hasUserPermissionWrite() {
-		return hasUserPermission(RepositoryPermission.WRITE);
+		return hasUserPermission(PermissionReference.WRITE);
 	}
 	public boolean hasUserPermissionDelete() {
-		return hasUserPermission(RepositoryPermission.DELETE);
+		return hasUserPermission(PermissionReference.DELETE);
 	}
 	
 	public Boolean getInheritParent() {
@@ -48,26 +48,26 @@ public class PermissionsNode {
 	public Set<RepositoryAccessControl> getAccessControlList() {
 		return repoNode.getAccessControlList();
 	}
-	public BusinessNode addAccessControlCoordinator(RepositoryAuthority authority) {
-		return addAccessControl(authority, RepositoryPermission.COORDINATOR);
+	public BusinessNode addAccessControlCoordinator(AuthorityReference authority) {
+		return addAccessControl(authority, PermissionReference.COORDINATOR);
 	}
-	public BusinessNode addAccessControlCollaborator(RepositoryAuthority authority) {
-		return addAccessControl(authority, RepositoryPermission.COLLABORATOR);
+	public BusinessNode addAccessControlCollaborator(AuthorityReference authority) {
+		return addAccessControl(authority, PermissionReference.COLLABORATOR);
 	}
-	public BusinessNode addAccessControlContributor(RepositoryAuthority authority) {
-		return addAccessControl(authority, RepositoryPermission.CONTRIBUTOR);
+	public BusinessNode addAccessControlContributor(AuthorityReference authority) {
+		return addAccessControl(authority, PermissionReference.CONTRIBUTOR);
 	}
-	public BusinessNode addAccessControlEditor(RepositoryAuthority authority) {
-		return addAccessControl(authority, RepositoryPermission.EDITOR);
+	public BusinessNode addAccessControlEditor(AuthorityReference authority) {
+		return addAccessControl(authority, PermissionReference.EDITOR);
 	}
-	public BusinessNode addAccessControlConsumer(RepositoryAuthority authority) {
-		return addAccessControl(authority, RepositoryPermission.CONSUMER);
+	public BusinessNode addAccessControlConsumer(AuthorityReference authority) {
+		return addAccessControl(authority, PermissionReference.CONSUMER);
 	}
 	
-	public BusinessNode addAccessControl(RepositoryAuthority authority, RepositoryPermission permission) {
+	public BusinessNode addAccessControl(AuthorityReference authority, PermissionReference permission) {
 		return addAccessControl(authority, permission, true);
 	}
-	public BusinessNode addAccessControl(RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
+	public BusinessNode addAccessControl(AuthorityReference authority, PermissionReference permission, boolean allowed) {
 		repoNode.getAccessControlList().add(new RepositoryAccessControl(node.getNodeReference(), authority, permission, allowed));
 		return node;
 	}

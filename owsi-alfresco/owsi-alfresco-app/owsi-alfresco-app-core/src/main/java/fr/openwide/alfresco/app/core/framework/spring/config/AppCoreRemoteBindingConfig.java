@@ -19,7 +19,7 @@ import fr.openwide.alfresco.api.core.node.binding.content.serializer.ByteArrayRe
 import fr.openwide.alfresco.app.core.node.binding.MultipartFileRepositoryContentSerializer;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteExceptionHandler;
-import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
+import fr.openwide.alfresco.app.core.security.service.TicketReferenceProvider;
 
 @Configuration
 public class AppCoreRemoteBindingConfig {
@@ -31,7 +31,7 @@ public class AppCoreRemoteBindingConfig {
 
 	@Bean
 	@Primary
-	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(RepositoryTicketProvider ticketProvider) {
+	public RepositoryRemoteBinding userAwareRepositoryRemoteBinding(TicketReferenceProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.repository.root.uri");
 		String ticketName = environment.getRequiredProperty("application.repository.ticket.name");
 		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, ticketName, null, ticketProvider);
@@ -57,7 +57,7 @@ public class AppCoreRemoteBindingConfig {
 	}
 
 	@Bean(name=SHARE_REMOTE_BINDING)
-	public RepositoryRemoteBinding shareRemoteBinding(RepositoryTicketProvider ticketProvider) {
+	public RepositoryRemoteBinding shareRemoteBinding(TicketReferenceProvider ticketProvider) {
 		String repositoryUri = environment.getRequiredProperty("application.share.root.uri");
 		String ticketName = environment.getRequiredProperty("application.share.ticket.name");
 		return new RepositoryRemoteBinding(remoteRestTemplate(), serializationComponent(), repositoryUri, null, ticketName, ticketProvider);

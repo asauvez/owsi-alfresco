@@ -3,7 +3,7 @@ package fr.openwide.alfresco.component.model.node.model.embed;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
+import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -37,7 +37,7 @@ public class AssociationsNode {
 	}
 	public BusinessNode primaryParent(ChildAssociationModel childAssociationModel) {
 		if (repoNode.getPrimaryParentAssociation() == null) {
-			repoNode.setPrimaryParentAssociation(new RepositoryChildAssociation(
+			repoNode.setPrimaryParentAssociation(new ChildAssociationReference(
 					new RepositoryNode(), 
 					childAssociationModel.getNameReference()));
 		}

@@ -12,7 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
-import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
+import fr.openwide.alfresco.app.core.security.service.TicketReferenceProvider;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.alfresco.app.core.security.service.impl.RepositoryAuthenticationProvider;
@@ -49,8 +49,8 @@ public class AppCoreSecurityConfig {
 	}
 	
 	@Bean
-	public RepositoryTicketProvider ticketProvider() {
-		return new RepositoryTicketProvider(userService(), repositoryAuthenticationUserDetailsService());
+	public TicketReferenceProvider ticketProvider() {
+		return new TicketReferenceProvider(userService(), repositoryAuthenticationUserDetailsService());
 	}
 
 	/**

@@ -15,11 +15,11 @@ import org.alfresco.service.cmr.security.PersonService;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
@@ -55,7 +55,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 
 	private RepositoryUser getCurrentUser(NodeScope nodeScope) {
 		// build ticket
-		RepositoryTicket ticket = new RepositoryTicket(authenticationService.getCurrentTicket());
+		TicketReference ticket = new TicketReference(authenticationService.getCurrentTicket());
 		final String userTicket = ticketComponent.getAuthorityForTicket(ticket.getTicket());
 		UserReference userReference = new UserReference(userTicket);
 		if (! AuthenticationUtil.getFullyAuthenticatedUser().equals(userTicket)) {
@@ -88,10 +88,10 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 		user.setUserReference(userReference);
 		user.setTicket(ticket);
 		user.setUserNode(userNode);
-		user.getAuthorities().addAll(Lists.transform(new ArrayList<>(userAuthorities), new Function<String, RepositoryAuthority>() {
+		user.getAuthorities().addAll(Lists.transform(new ArrayList<>(userAuthorities), new Function<String, AuthorityReference>() {
 			@Override
-			public RepositoryAuthority apply(String autority) {
-				return RepositoryAuthority.authority(autority);
+			public AuthorityReference apply(String autority) {
+				return AuthorityReference.authority(autority);
 			}
 		}));
 		user.setAdmin(userAdmin);
@@ -101,7 +101,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	@Override
 	public String getAuthenticatedUsername() {
 		// build ticket
-		RepositoryTicket ticket = new RepositoryTicket(authenticationService.getCurrentTicket());
+		TicketReference ticket = new TicketReference(authenticationService.getCurrentTicket());
 		String userTicket = ticketComponent.getAuthorityForTicket(ticket.getTicket());
 		UserReference userReference = new UserReference(userTicket);
 		if (! AuthenticationUtil.getFullyAuthenticatedUser().equals(userTicket)) {
@@ -115,7 +115,7 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	 * {@see org.alfresco.repo.web.scripts.bean.LoginTicketDelete}
 	 */
 	@Override
-	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
+	public void logout(TicketReference ticket) throws AccessDeniedRemoteException {
 		String ticketUser;
 		try {
 			ticketUser = ticketComponent.validateTicket(ticket.getTicket());

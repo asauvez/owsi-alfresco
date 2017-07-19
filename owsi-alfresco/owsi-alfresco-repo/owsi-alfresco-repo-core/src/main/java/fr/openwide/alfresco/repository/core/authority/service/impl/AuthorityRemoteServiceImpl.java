@@ -20,15 +20,15 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.PropertyMap;
 
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
-import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
+import fr.openwide.alfresco.api.core.search.model.SortDefinition;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 
 public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
@@ -96,11 +96,11 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
+	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters) {
 		AuthorityType authorityType = (searchParameters.getAuthorityType() != null) ? AuthorityType.valueOf(searchParameters.getAuthorityType().name()) : null;
 		
 		Collection<String> authorities;
-		if (RepositoryAuthority.GROUP_EVERYONE.equals(searchParameters.getParentAuthority())) {
+		if (AuthorityReference.GROUP_EVERYONE.equals(searchParameters.getParentAuthority())) {
 			String zone = (searchParameters.getZone() != null) ? searchParameters.getZone().getName() : null;
 			authorities = authorityService.getAuthorities(authorityType, zone, null, 
 					false, false, new PagingRequest(0, Integer.MAX_VALUE, null)).getPage();
@@ -141,12 +141,12 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 		return nodes;
 	}
 
-	private void sortNodes(List<RepositoryNode> nodes, final List<RepositorySortDefinition> sorts) {
+	private void sortNodes(List<RepositoryNode> nodes, final List<SortDefinition> sorts) {
 		if (! sorts.isEmpty()) {
 			Collections.sort(nodes, new Comparator<RepositoryNode>() {
 				@Override
 				public int compare(RepositoryNode o1, RepositoryNode o2) {
-					for (RepositorySortDefinition sort : sorts) {
+					for (SortDefinition sort : sorts) {
 						QName property = conversionService.getRequired(sort.getProperty());
 						int factor = sort.isAscending() ? 1 : -1;
 						Serializable value1 = nodeService.getProperty(conversionService.getRequired(o1.getNodeReference()), property);

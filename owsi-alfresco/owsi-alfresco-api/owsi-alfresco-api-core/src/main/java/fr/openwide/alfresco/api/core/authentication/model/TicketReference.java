@@ -5,13 +5,13 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class RepositoryTicket implements Serializable {
+public class TicketReference implements Serializable {
 
 	private static final long serialVersionUID = 6119928419258252489L;
 
 	private final String ticket;
 
-	public RepositoryTicket(String ticket) {
+	public TicketReference(String ticket) {
 		this.ticket = ticket;
 	}
 
@@ -33,8 +33,8 @@ public class RepositoryTicket implements Serializable {
 		if (object == this) {
 			return true;
 		}
-		if (object instanceof RepositoryTicket) {
-			RepositoryTicket other = (RepositoryTicket) object;
+		if (object instanceof TicketReference) {
+			TicketReference other = (TicketReference) object;
 			return Objects.equals(ticket, other.getTicket());
 		}
 		return false;

@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.api.core.authentication.service;
 
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
@@ -40,6 +40,6 @@ public interface AuthenticationRemoteService {
 	 */
 	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/authentication/ticket/logout")
 	class LOGOUT_SERVICE extends WebScriptParam<Void> {} 
-	void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException;
+	void logout(TicketReference ticket) throws AccessDeniedRemoteException;
 
 }

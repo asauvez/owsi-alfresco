@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.Striped;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializer;
@@ -46,10 +46,10 @@ import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemote
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
-import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
+import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -166,7 +166,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		if (primaryParentScope != null) {
 			ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 			if (primaryParent.getParentRef() != null) {
-				node.setPrimaryParentAssociation(new RepositoryChildAssociation(
+				node.setPrimaryParentAssociation(new ChildAssociationReference(
 						getRepositoryNode(primaryParent.getParentRef(), primaryParentScope),
 						conversionService.get(primaryParent.getTypeQName())));
 			}
@@ -251,7 +251,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		}
 		
 		// get permissions
-		for (RepositoryPermission permission : scope.getUserPermissions()) {
+		for (PermissionReference permission : scope.getUserPermissions()) {
 			if (permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED) {
 				node.getUserPermissions().add(permission);
 			}
@@ -261,8 +261,8 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			for (AccessPermission accessPermission : permissionService.getAllSetPermissions(nodeRef)) {
 				node.getAccessControlList().add(new RepositoryAccessControl(
 						nodeReference,
-						RepositoryAuthority.authority(accessPermission.getAuthority()),
-						new RepositoryPermission(accessPermission.getPermission()),
+						AuthorityReference.authority(accessPermission.getAuthority()),
+						new PermissionReference(accessPermission.getPermission()),
 						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
 		}
@@ -309,7 +309,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		if (node.getNodeReference() != null) {
 			throw new InvalidPayloadException("Node already has a reference");
 		}
-		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
+		ChildAssociationReference primaryParent = node.getPrimaryParentAssociation();
 		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
 			throw new InvalidPayloadException("A primary parent association is required.");
 		}
@@ -354,7 +354,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			}
 		}
 		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
-		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
+		ChildAssociationReference primaryParent = node.getPrimaryParentAssociation();
 		try {
 			NodeRef parentRef = conversionService.getRequired(primaryParent.getParentNode().getNodeReference());
 			QName assocType = conversionService.getRequired(primaryParent.getType());
@@ -384,7 +384,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			
 			for (Entry<NameReference, List<RepositoryNode>> entry : node.getChildAssociations().entrySet()) {
 				for (RepositoryNode childNode : entry.getValue()) {
-					childNode.setPrimaryParentAssociation(new RepositoryChildAssociation(node, entry.getKey()));
+					childNode.setPrimaryParentAssociation(new ChildAssociationReference(node, entry.getKey()));
 					create(childNode);
 				}
 			}
@@ -438,7 +438,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				if (cmName == null) {
 					cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 				}
-				RepositoryChildAssociation repoPrimaryParent = node.getPrimaryParentAssociation();
+				ChildAssociationReference repoPrimaryParent = node.getPrimaryParentAssociation();
 				NodeRef parentRef = conversionService.getRequired(repoPrimaryParent.getParentNode().getNodeReference());
 				QName assocType = conversionService.getRequired(repoPrimaryParent.getType());
 				QName assocName = createAssociationName(cmName);
@@ -472,7 +472,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			}
 			for (Entry<NameReference, NodeScope> entry : nodeScope.getChildAssociations().entrySet()) {
 				for (RepositoryNode childNode : node.getChildAssociations().get(entry.getKey())) {
-					childNode.setPrimaryParentAssociation(new RepositoryChildAssociation(node, entry.getKey()));
+					childNode.setPrimaryParentAssociation(new ChildAssociationReference(node, entry.getKey()));
 					saveOrUpdate(childNode, entry.getValue());
 				}
 			}
@@ -484,7 +484,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 
 			for (NameReference association : nodeScope.getRecursiveChildAssociations()) {
 				for (RepositoryNode childNode : node.getChildAssociations().get(association)) {
-					childNode.setPrimaryParentAssociation(new RepositoryChildAssociation(node, association));
+					childNode.setPrimaryParentAssociation(new ChildAssociationReference(node, association));
 					saveOrUpdate(childNode, nodeScope);
 				}
 			}
@@ -542,8 +542,8 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			if (oldPermission.isSetDirectly()) {
 				oldPermissions.add(new RepositoryAccessControl(
 					conversionService.get(nodeRef),
-					RepositoryAuthority.authority(oldPermission.getAuthority()),
-					new RepositoryPermission(oldPermission.getPermission()),
+					AuthorityReference.authority(oldPermission.getAuthority()),
+					new PermissionReference(oldPermission.getPermission()),
 					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
 		}

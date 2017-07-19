@@ -18,7 +18,7 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
-import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
+import fr.openwide.alfresco.api.core.search.model.SortDefinition;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repository.remote.framework.exception.InvalidPayloadException;
@@ -61,7 +61,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 				sp.setLimitBy(LimitBy.FINAL_SIZE);
 			}
 			
-			for (RepositorySortDefinition sd : rsp.getSorts()) {
+			for (SortDefinition sd : rsp.getSorts()) {
 				sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
 			}
 			

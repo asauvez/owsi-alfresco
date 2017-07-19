@@ -29,7 +29,7 @@ public class RepositoryNode implements Serializable, RepositoryVisitable<Reposit
 	private NodeReference nodeReference;
 	private String path;
 	private NameReference type;
-	private RepositoryChildAssociation primaryParentAssociation;
+	private ChildAssociationReference primaryParentAssociation;
 	
 	private final Map<NameReference, Serializable> properties = new LinkedHashMap<>();
 	private final Set<NameReference> aspects = new LinkedHashSet<>();
@@ -44,7 +44,7 @@ public class RepositoryNode implements Serializable, RepositoryVisitable<Reposit
 	private final Map<NameReference, List<RepositoryNode>> targetAssocs = new LinkedHashMap<>();
 	private final Map<NameReference, List<RepositoryNode>> sourceAssocs = new LinkedHashMap<>();
 
-	private final Set<RepositoryPermission> userPermissions = new HashSet<>();
+	private final Set<PermissionReference> userPermissions = new HashSet<>();
 	private Boolean inheritParentPermissions;
 	private final Set<RepositoryAccessControl> accessControlList = new LinkedHashSet<>();
 
@@ -101,10 +101,10 @@ public class RepositoryNode implements Serializable, RepositoryVisitable<Reposit
 		this.type = type;
 	}
 
-	public RepositoryChildAssociation getPrimaryParentAssociation() {
+	public ChildAssociationReference getPrimaryParentAssociation() {
 		return primaryParentAssociation;
 	}
-	public void setPrimaryParentAssociation(RepositoryChildAssociation primaryParentAssociation) {
+	public void setPrimaryParentAssociation(ChildAssociationReference primaryParentAssociation) {
 		this.primaryParentAssociation = primaryParentAssociation;
 	}
 
@@ -133,7 +133,7 @@ public class RepositoryNode implements Serializable, RepositoryVisitable<Reposit
 		return sourceAssocs;
 	}
 
-	public Set<RepositoryPermission> getUserPermissions() {
+	public Set<PermissionReference> getUserPermissions() {
 		return userPermissions;
 	}
 	public Boolean getInheritParentPermissions() {

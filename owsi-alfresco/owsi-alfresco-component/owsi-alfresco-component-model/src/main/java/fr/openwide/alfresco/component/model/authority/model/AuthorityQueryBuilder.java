@@ -1,24 +1,24 @@
 package fr.openwide.alfresco.component.model.authority.model;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityType;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityQueryParameters;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityTypeReference;
 import fr.openwide.alfresco.api.core.authority.model.ZoneReference;
 import fr.openwide.alfresco.component.model.node.model.builder.AbstractQueryBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 
-public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBuilder, RepositoryAuthorityQueryParameters, AuthoritySortBuilder> {
+public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBuilder, AuthorityQueryParameters, AuthoritySortBuilder> {
 
 	public AuthorityQueryBuilder() {
-		super(new RepositoryAuthorityQueryParameters(), new AuthoritySortBuilder());
+		super(new AuthorityQueryParameters(), new AuthoritySortBuilder());
 	}
 	
-	public AuthorityQueryBuilder parentAuthority(RepositoryAuthority parentAuthority) {
+	public AuthorityQueryBuilder parentAuthority(AuthorityReference parentAuthority) {
 		getParameters().setParentAuthority(parentAuthority);
 		return this;
 	}
-	public AuthorityQueryBuilder parentAuthorityImmediate(RepositoryAuthority parentAuthority) {
+	public AuthorityQueryBuilder parentAuthorityImmediate(AuthorityReference parentAuthority) {
 		getParameters().setParentAuthority(parentAuthority);
 		getParameters().setImmediate(true);
 		return this;
@@ -28,7 +28,7 @@ public class AuthorityQueryBuilder extends AbstractQueryBuilder<AuthorityQueryBu
 		return this;
 	}
 
-	public AuthorityQueryBuilder type(RepositoryAuthorityType type) {
+	public AuthorityQueryBuilder type(AuthorityTypeReference type) {
 		getParameters().setAuthorityType(type);
 		return this;
 	}

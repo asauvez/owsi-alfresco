@@ -24,7 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -47,7 +47,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 	private ImporterBootstrap importerBootstrap;
 
 	@Override
-	public RepositoryAuthority createGroup(RepositoryAuthority group, RepositoryAuthority ... parentAuthorities) {
+	public AuthorityReference createGroup(AuthorityReference group, AuthorityReference ... parentAuthorities) {
 		logger.debug("Create group " + group);
 		
 		authorityService.createAuthority(AuthorityType.GROUP, group.getGroupShortName());
@@ -55,8 +55,8 @@ public class BootstrapServiceImpl implements BootstrapService {
 		return group;
 	}
 	@Override
-	public RepositoryAuthority createGroup(String groupName, RepositoryAuthority ... parentAuthorities) {
-		return createGroup(RepositoryAuthority.group(groupName), parentAuthorities);
+	public AuthorityReference createGroup(String groupName, AuthorityReference ... parentAuthorities) {
+		return createGroup(AuthorityReference.group(groupName), parentAuthorities);
 	}
 
 	@Override
@@ -73,10 +73,10 @@ public class BootstrapServiceImpl implements BootstrapService {
 					List<String> list = new ArrayList<>();
 					if (split.length > 3) {
 						for (String parentAuthority : split[3].trim().split("/")) {
-							list.add(RepositoryAuthority.GROUP_PREFIX + parentAuthority.trim());
+							list.add(AuthorityReference.GROUP_PREFIX + parentAuthority.trim());
 						}
 					}
-					RepositoryAuthority authority = createGroup(groupName);
+					AuthorityReference authority = createGroup(groupName);
 					authorityService.addAuthority(list, authority.getName());
 				}
 			}
@@ -86,12 +86,12 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 
 	@Override
-	public RepositoryAuthority createTestUser(String username, RepositoryAuthority ... parentAuthorities) {
+	public AuthorityReference createTestUser(String username, AuthorityReference ... parentAuthorities) {
 		return createUser(username, "Test", username, username + "@test.fr", username, parentAuthorities);
 	}
 	
 	@Override
-	public RepositoryAuthority createUser(String username, String firstName, String lastName, String email, String password, RepositoryAuthority ... parentAuthorities) {
+	public AuthorityReference createUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities) {
 		logger.debug("Create user " + username);
 		
 		Map<QName, Serializable> user = new HashMap<QName, Serializable>();
@@ -103,15 +103,15 @@ public class BootstrapServiceImpl implements BootstrapService {
 		
 		authenticationService.createAuthentication(username, password.toCharArray());
 		
-		RepositoryAuthority authority = RepositoryAuthority.user(username);
+		AuthorityReference authority = AuthorityReference.user(username);
 		addAuthority(parentAuthorities, authority);
 		return authority;
 	}
 	
-	private void addAuthority(RepositoryAuthority[] parentAuthorities, RepositoryAuthority authority) {
+	private void addAuthority(AuthorityReference[] parentAuthorities, AuthorityReference authority) {
 		if (parentAuthorities.length > 0) {
 			List<String> list = new ArrayList<>();
-			for (RepositoryAuthority parentAuthority : parentAuthorities) {
+			for (AuthorityReference parentAuthority : parentAuthorities) {
 				list.add(parentAuthority.getName());
 			}
 			authorityService.addAuthority(list, authority.getName());

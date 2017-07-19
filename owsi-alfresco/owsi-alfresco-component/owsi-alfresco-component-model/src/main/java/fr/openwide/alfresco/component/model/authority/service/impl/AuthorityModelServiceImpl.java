@@ -7,8 +7,8 @@ import java.util.Map;
 
 import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityType;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityTypeReference;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -65,7 +65,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	
 	@Override
 	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
-		authorityQueryBuilder.type(RepositoryAuthorityType.USER);
+		authorityQueryBuilder.type(AuthorityTypeReference.USER);
 		
 		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.person.lastName);
@@ -80,7 +80,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	
 	@Override
 	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
-		authorityQueryBuilder.type(RepositoryAuthorityType.GROUP);
+		authorityQueryBuilder.type(AuthorityTypeReference.GROUP);
 		
 		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.authorityContainer.authorityDisplayName);
@@ -105,7 +105,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	}
 
 	@Override
-	public Map<RepositoryAuthority, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder) {
+	public Map<AuthorityReference, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder) {
 		authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
 			.properties().set(CmModel.authorityContainer.authorityName)
 			.properties().set(CmModel.authorityContainer.authorityDisplayName));
@@ -113,12 +113,12 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		return getAsAuthority(groups);
 	}
 
-	private Map<RepositoryAuthority, String> getAsAuthority(List<BusinessNode> groups) {
-		Map<RepositoryAuthority, String> authorities = new LinkedHashMap<>();
+	private Map<AuthorityReference, String> getAsAuthority(List<BusinessNode> groups) {
+		Map<AuthorityReference, String> authorities = new LinkedHashMap<>();
 		for (BusinessNode node : groups) {
 			String authorityName = node.properties().get(CmModel.authorityContainer.authorityName);
 			String authorityDisplayName = node.properties().get(CmModel.authorityContainer.authorityDisplayName);
-			authorities.put(RepositoryAuthority.authority(authorityName), authorityDisplayName);
+			authorities.put(AuthorityReference.authority(authorityName), authorityDisplayName);
 		}
 		return authorities;
 	}
@@ -134,42 +134,42 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	}
 
 	@Override
-	public void deleteUser(RepositoryAuthority user) throws NoSuchNodeRemoteException {
+	public void deleteUser(AuthorityReference user) throws NoSuchNodeRemoteException {
 		authorityService.deleteUser(user.getName());
 	}
 
 	@Override
-	public void updateUserPassword(RepositoryAuthority user, String newPassword) throws NoSuchNodeRemoteException {
+	public void updateUserPassword(AuthorityReference user, String newPassword) throws NoSuchNodeRemoteException {
 		authorityService.updateUserPassword(user.getName(), newPassword);
 	}
 
 	@Override
-	public BusinessNode getGroup(RepositoryAuthority group, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
+	public BusinessNode getGroup(AuthorityReference group, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		return new BusinessNode(authorityService.getGroup(group.getGroupShortName(), nodeScopeBuilder.getScope()));
 	}
 
 	@Override
-	public NodeReference createRootGroup(RepositoryAuthority group, String groupDisplayName) throws AuthorityExistsRemoteException {
+	public NodeReference createRootGroup(AuthorityReference group, String groupDisplayName) throws AuthorityExistsRemoteException {
 		return createRootGroup(group, groupDisplayName, new NodeScopeBuilder().nodeReference()).getNodeReference();
 	}
 	@Override
-	public BusinessNode createRootGroup(RepositoryAuthority group, String groupDisplayName,
+	public BusinessNode createRootGroup(AuthorityReference group, String groupDisplayName,
 			NodeScopeBuilder nodeScopeBuilder) throws AuthorityExistsRemoteException {
 		return new BusinessNode(authorityService.createRootGroup(group.getGroupShortName(), groupDisplayName, nodeScopeBuilder.getScope()));
 	}
 
 	@Override
-	public void deleteGroup(RepositoryAuthority group) throws NoSuchNodeRemoteException {
+	public void deleteGroup(AuthorityReference group) throws NoSuchNodeRemoteException {
 		authorityService.deleteGroup(group.getGroupShortName());
 	}
 
 	@Override
-	public void addToGroup(RepositoryAuthority subAuthority, RepositoryAuthority parentGroup) throws NoSuchNodeRemoteException {
+	public void addToGroup(AuthorityReference subAuthority, AuthorityReference parentGroup) throws NoSuchNodeRemoteException {
 		authorityService.addToGroup(subAuthority.getName(), parentGroup.getGroupShortName());
 	}
 
 	@Override
-	public void removeFromGroup(RepositoryAuthority subAuthority, RepositoryAuthority parentGroup) throws NoSuchNodeRemoteException {
+	public void removeFromGroup(AuthorityReference subAuthority, AuthorityReference parentGroup) throws NoSuchNodeRemoteException {
 		authorityService.removeFromGroup(subAuthority.getName(), parentGroup.getGroupShortName());
 	}
 }

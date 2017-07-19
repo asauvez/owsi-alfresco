@@ -4,16 +4,14 @@ import java.io.Serializable;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public class RepositoryChildAssociation implements Serializable {
-
-	private static final long serialVersionUID = 8802950808307844861L;
+public class ChildAssociationReference implements Serializable {
 
 	private RepositoryNode parentNode;
 	private NameReference type;
 
-	public RepositoryChildAssociation() {}
+	public ChildAssociationReference() {}
 
-	public RepositoryChildAssociation(RepositoryNode parentNode, NameReference type) {
+	public ChildAssociationReference(RepositoryNode parentNode, NameReference type) {
 		this.parentNode = parentNode;
 		this.type = type;
 	}

@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.google.common.base.Joiner;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class RepositoryAccessControl implements Serializable {
@@ -13,13 +13,13 @@ public class RepositoryAccessControl implements Serializable {
 	private static final long serialVersionUID = 1391171626983929282L;
 
 	private NodeReference nodeReference;
-	private RepositoryAuthority authority;
-	private RepositoryPermission permission;
+	private AuthorityReference authority;
+	private PermissionReference permission;
 	private boolean allowed;
 
 	public RepositoryAccessControl() {}
 
-	public RepositoryAccessControl(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission, boolean allowed) {
+	public RepositoryAccessControl(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed) {
 		this.nodeReference = nodeReference;
 		this.authority = authority;
 		this.permission = permission;
@@ -33,17 +33,17 @@ public class RepositoryAccessControl implements Serializable {
 		this.nodeReference = nodeReference;
 	}
 
-	public RepositoryAuthority getAuthority() {
+	public AuthorityReference getAuthority() {
 		return authority;
 	}
-	public void setAuthority(RepositoryAuthority authority) {
+	public void setAuthority(AuthorityReference authority) {
 		this.authority = authority;
 	}
 
-	public RepositoryPermission getPermission() {
+	public PermissionReference getPermission() {
 		return permission;
 	}
-	public void setPermission(RepositoryPermission permission) {
+	public void setPermission(PermissionReference permission) {
 		this.permission = permission;
 	}
 

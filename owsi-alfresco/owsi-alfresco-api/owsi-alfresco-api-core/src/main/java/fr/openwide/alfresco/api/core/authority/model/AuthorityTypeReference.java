@@ -1,7 +1,7 @@
 package fr.openwide.alfresco.api.core.authority.model;
 
 
-public enum RepositoryAuthorityType {
+public enum AuthorityTypeReference {
 	ADMIN,
 	EVERYONE,
 	OWNER,

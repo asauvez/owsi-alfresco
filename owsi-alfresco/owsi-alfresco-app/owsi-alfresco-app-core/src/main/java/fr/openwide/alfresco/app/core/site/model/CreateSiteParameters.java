@@ -7,7 +7,7 @@ import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
 import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
 @WebScriptEndPoint(method=WebScriptMethod.POST, url="/modules/create-site")
-public class RepositorySite extends WebScriptParam<SiteReference> {
+public class CreateSiteParameters extends WebScriptParam<SiteReference> {
 
 	private String shortName;
 	private String sitePreset = "site-dashboard";
@@ -15,13 +15,13 @@ public class RepositorySite extends WebScriptParam<SiteReference> {
 	private String description = "";
 	private SiteVisibility visibility = SiteVisibility.PRIVATE;
 	
-	public RepositorySite() {}
+	public CreateSiteParameters() {}
 	
-	public RepositorySite(String title) {
+	public CreateSiteParameters(String title) {
 		this(title, title.trim().toLowerCase().replaceAll("[\\ ]+", "-").replaceAll("[^0-9a-z\\-]", ""));
 	}
 	
-	public RepositorySite(String title, String shortName) {
+	public CreateSiteParameters(String title, String shortName) {
 		this.title = title;
 		this.shortName = shortName;
 	}

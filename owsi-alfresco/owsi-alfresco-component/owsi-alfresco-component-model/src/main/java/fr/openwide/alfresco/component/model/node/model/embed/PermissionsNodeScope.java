@@ -1,7 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model.embed;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
 public class PermissionsNodeScope {
@@ -14,18 +14,18 @@ public class PermissionsNodeScope {
 		this.scope = builder.getScope();
 	}
 	
-	public NodeScopeBuilder userPermission(RepositoryPermission permission) {
+	public NodeScopeBuilder userPermission(PermissionReference permission) {
 		scope.getUserPermissions().add(permission);
 		return builder;
 	}
 	public NodeScopeBuilder userPermissionAddChildren() {
-		return userPermission(RepositoryPermission.ADD_CHILDREN);
+		return userPermission(PermissionReference.ADD_CHILDREN);
 	}
 	public NodeScopeBuilder userPermissionWrite() {
-		return userPermission(RepositoryPermission.WRITE);
+		return userPermission(PermissionReference.WRITE);
 	}
 	public NodeScopeBuilder userPermissionDelete() {
-		return userPermission(RepositoryPermission.DELETE);
+		return userPermission(PermissionReference.DELETE);
 	}
 	
 	public NodeScopeBuilder accessPermissions() {

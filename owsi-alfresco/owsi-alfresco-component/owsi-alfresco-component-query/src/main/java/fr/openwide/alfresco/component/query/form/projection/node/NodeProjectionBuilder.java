@@ -19,7 +19,7 @@ import fr.openwide.alfresco.component.query.form.view.output.IconOutputFieldView
 import fr.openwide.alfresco.component.query.form.view.output.OutputFieldView;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
@@ -143,7 +143,7 @@ public class NodeProjectionBuilder extends ProjectionBuilder<RepositoryNode, Nod
 		return add(new NodeContentStringProjectionImpl(this, property)); 
 	}
 
-	public Predicate<RepositoryNode> ifHasPermission(RepositoryPermission permission) {
+	public Predicate<RepositoryNode> ifHasPermission(PermissionReference permission) {
 		return new UserPermissionPredicate(permission);
 	}
 

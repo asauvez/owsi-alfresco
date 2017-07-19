@@ -3,10 +3,10 @@ package fr.openwide.alfresco.api.core.authority.model;
 import fr.openwide.alfresco.api.core.node.model.AbstractQueryParameters;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters {
+public class AuthorityQueryParameters extends AbstractQueryParameters {
 	
-	private RepositoryAuthority parentAuthority = RepositoryAuthority.GROUP_EVERYONE;
-	private RepositoryAuthorityType authorityType;
+	private AuthorityReference parentAuthority = AuthorityReference.GROUP_EVERYONE;
+	private AuthorityTypeReference authorityType;
 	private ZoneReference zone;
 
 	private NameReference filterProperty;
@@ -15,16 +15,16 @@ public class RepositoryAuthorityQueryParameters extends AbstractQueryParameters 
 	private boolean immediate;
 	private boolean includingParent;
 
-	public RepositoryAuthority getParentAuthority() {
+	public AuthorityReference getParentAuthority() {
 		return parentAuthority;
 	}
-	public void setParentAuthority(RepositoryAuthority parentAuthority) {
+	public void setParentAuthority(AuthorityReference parentAuthority) {
 		this.parentAuthority = parentAuthority;
 	}
-	public RepositoryAuthorityType getAuthorityType() {
+	public AuthorityTypeReference getAuthorityType() {
 		return authorityType;
 	}
-	public void setAuthorityType(RepositoryAuthorityType authorityType) {
+	public void setAuthorityType(AuthorityTypeReference authorityType) {
 		this.authorityType = authorityType;
 	}
 	public ZoneReference getZone() {

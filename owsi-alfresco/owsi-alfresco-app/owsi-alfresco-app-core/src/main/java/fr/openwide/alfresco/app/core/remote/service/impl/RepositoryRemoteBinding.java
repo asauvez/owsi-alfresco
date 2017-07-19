@@ -26,7 +26,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
@@ -38,7 +38,7 @@ import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
-import fr.openwide.alfresco.app.core.security.service.RepositoryTicketProvider;
+import fr.openwide.alfresco.app.core.security.service.TicketReferenceProvider;
 import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
 
@@ -49,7 +49,7 @@ public class RepositoryRemoteBinding {
 
 	private final RestTemplate restTemplate;
 	private final NodeContentSerializationComponent serializationComponent;
-	private final Optional<RepositoryTicketProvider> ticketProvider;
+	private final Optional<TicketReferenceProvider> ticketProvider;
 	private final String rootUri;
 	private final String ticketParam;
 	private final String ticketHeader;
@@ -65,7 +65,7 @@ public class RepositoryRemoteBinding {
 	}
 
 	public RepositoryRemoteBinding(RestTemplate restTemplate, NodeContentSerializationComponent serializationComponent,
-			String rootUri, String ticketParam, String ticketHeader, RepositoryTicketProvider ticketProvider) {
+			String rootUri, String ticketParam, String ticketHeader, TicketReferenceProvider ticketProvider) {
 		this.restTemplate = restTemplate;
 		this.serializationComponent = serializationComponent;
 		this.rootUri = rootUri;
@@ -129,7 +129,7 @@ public class RepositoryRemoteBinding {
 	private void addTicketHeader(HttpHeaders headers) {
 		if (ticketHeader != null && ticketProvider.isPresent()) {
 			// get ticket
-			RepositoryTicket ticket = ticketProvider.get().getTicket();
+			TicketReference ticket = ticketProvider.get().getTicket();
 			headers.add(ticketHeader, ticket.getTicket());
 		}
 	}
@@ -178,14 +178,14 @@ public class RepositoryRemoteBinding {
 			builder.queryParam(ticketParam, "{" + ticketParam + "}");
 			if (ticketProvider.isPresent()) {
 				// get ticket
-				RepositoryTicket ticket = ticketProvider.get().getTicket();
+				TicketReference ticket = ticketProvider.get().getTicket();
 				uriVariables = ObjectArrays.concat(uriVariables, ticket.getTicket());
 			} else {
 				// check ticket
 				boolean contains = Iterables.any(Arrays.asList(uriVariables), new Predicate<Object>() {
 					@Override
 					public boolean apply(Object input) {
-						return input instanceof RepositoryTicket;
+						return input instanceof TicketReference;
 					}
 				});
 				if (! contains) {

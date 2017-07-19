@@ -20,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.app.core.security.model.PermissionObjectWrapper;
 import fr.openwide.alfresco.app.core.security.service.UserService;
 import fr.openwide.core.jpa.security.business.authority.util.CoreAuthorityConstants;
@@ -132,7 +132,7 @@ public abstract class UserAwarePermissionEvaluator implements PermissionEvaluato
 		return p;
 	}
 
-	public boolean hasRole(UserDetails user, RepositoryAuthority authority) {
+	public boolean hasRole(UserDetails user, AuthorityReference authority) {
 		return hasRole(user, authority.getName());
 	}
 	public boolean hasRole(UserDetails user, String role) {

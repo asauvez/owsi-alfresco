@@ -22,8 +22,8 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 
 import java.util.Optional;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
-import fr.openwide.alfresco.api.core.node.model.RepositoryPermission;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -388,7 +388,7 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
-	public boolean hasPermission(NodeReference nodeReference, RepositoryPermission permission) {
+	public boolean hasPermission(NodeReference nodeReference, PermissionReference permission) {
 		return permissionService.hasPermission(conversionService.getRequired(nodeReference), permission.getName()) == AccessStatus.ALLOWED;
 	}
 	
@@ -397,11 +397,11 @@ public class NodeModelRepositoryServiceImpl
 		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);
 	}
 	@Override
-	public void setPermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission) {
+	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
 		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), true);
 	}
 	@Override
-	public void deletePermission(NodeReference nodeReference, RepositoryAuthority authority, RepositoryPermission permission) {
+	public void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
 		permissionService.deletePermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName());
 	}
 

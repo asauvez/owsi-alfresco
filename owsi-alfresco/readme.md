@@ -17,6 +17,9 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 * Le runAsUser() déconnecte l'utilisateur après coup si vous passez un username et non un UserDetails. Avant cela le faisait quand vous étiez en PrincipalType.USER_DETAILS.
 
 ### Divers
-* new RepositoryAuthority(String) --> RepositoryAuthority.authority(String)
+* RepositoryAuthority --> AuthorityReference
+* RepositoryPermission --> PermissionReference
+* RepositoryTicket --> TicketReference
+* new AuthorityReference(String) --> AuthorityReference.authority(String)
 * Restriction.toQuery() --> Restriction.toFtsQuery()
 * com.google.common.base.Optional --> java.util.Optional

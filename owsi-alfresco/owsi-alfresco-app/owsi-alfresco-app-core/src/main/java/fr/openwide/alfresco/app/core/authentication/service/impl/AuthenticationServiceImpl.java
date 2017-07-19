@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.app.core.authentication.service.impl;
 
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
@@ -48,12 +48,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
+	public RepositoryUser authenticate(TicketReference ticket) throws AccessDeniedRemoteException {
 		return authenticate(ticket, getDefaultUserNodeScope());
 	}
 
 	@Override
-	public RepositoryUser authenticate(RepositoryTicket ticket, NodeScope nodeScope) throws AccessDeniedRemoteException {
+	public RepositoryUser authenticate(TicketReference ticket, NodeScope nodeScope) throws AccessDeniedRemoteException {
 		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
 		request.nodeScope = nodeScope;
 
@@ -88,7 +88,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
+	public void logout(TicketReference ticket) throws AccessDeniedRemoteException {
 		requiringExplicitTicketRemoteBinding.builder(new LOGOUT_SERVICE())
 			.urlVariable(ticket)
 			.call();

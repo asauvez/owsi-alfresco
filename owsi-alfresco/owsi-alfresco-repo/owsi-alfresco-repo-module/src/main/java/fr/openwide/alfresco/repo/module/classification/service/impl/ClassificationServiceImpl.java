@@ -39,7 +39,7 @@ import org.springframework.beans.factory.InitializingBean;
 import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.api.core.node.model.RepositoryChildAssociation;
+import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -251,7 +251,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	 */
 	@Override
 	public void onPreNodeCreationCallback(RepositoryNode node) {
-		RepositoryChildAssociation primaryParent = node.getPrimaryParentAssociation();
+		ChildAssociationReference primaryParent = node.getPrimaryParentAssociation();
 		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
 			if (isClassifiable(node)) {
 				Optional<NodeReference> homeFolder = getHomeFolder();
@@ -260,7 +260,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 						logger.debug("Node without parent is assigned to current user {} home folder. "
 								+ "Will then be moved then to the classify folder.", AuthenticationUtil.getRunAsUser());
 					}
-					node.setPrimaryParentAssociation(new RepositoryChildAssociation(
+					node.setPrimaryParentAssociation(new ChildAssociationReference(
 							new RepositoryNode(homeFolder.get()), 
 							CmModel.folder.contains.getNameReference()));
 				} else {

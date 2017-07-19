@@ -2,7 +2,7 @@ package fr.openwide.alfresco.app.core.node.model;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public class NameReferenceType extends AbstractStringUserType<NameReference> {
+public class NameReferenceJpaType extends AbstractStringUserType<NameReference> {
 
 	@Override
 	public Class<NameReference> returnedClass() {

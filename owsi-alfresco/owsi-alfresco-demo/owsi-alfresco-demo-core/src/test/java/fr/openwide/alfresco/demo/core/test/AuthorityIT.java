@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -25,12 +25,12 @@ public class AuthorityIT extends AbstractDemoIT {
 		Assert.assertEquals("jsnow", authorityModelService.getUser("jsnow", new NodeScopeBuilder()
 				.properties().set(CmModel.person.userName)).properties().get(CmModel.person.userName));
 		
-		authorityModelService.deleteUser(RepositoryAuthority.user("jsnow"));
+		authorityModelService.deleteUser(AuthorityReference.user("jsnow"));
 	}
 
 	@Test
 	public void testGroup() {
-		RepositoryAuthority group = RepositoryAuthority.group("watchmen");
+		AuthorityReference group = AuthorityReference.group("watchmen");
 		authorityModelService.createRootGroup(group, "The watch");
 		
 		Assert.assertEquals("The watch", 
@@ -43,17 +43,17 @@ public class AuthorityIT extends AbstractDemoIT {
 					.parentAuthority(group)).size());
 		
 		authorityModelService.createUser("jsnow", "John", "Snow", "john.snow@watch.org", "ygritte");
-		authorityModelService.addToGroup(RepositoryAuthority.user("jsnow"), group);
+		authorityModelService.addToGroup(AuthorityReference.user("jsnow"), group);
 		Assert.assertEquals(1,
 				authorityModelService.getContainedUsers(new AuthorityQueryBuilder()
 					.parentAuthority(group)).size());
 
-		authorityModelService.removeFromGroup(RepositoryAuthority.user("jsnow"), group);
+		authorityModelService.removeFromGroup(AuthorityReference.user("jsnow"), group);
 		Assert.assertEquals(0,
 				authorityModelService.getContainedUsers(new AuthorityQueryBuilder()
 					.parentAuthority(group)).size());
 		
-		authorityModelService.deleteUser(RepositoryAuthority.user("jsnow"));
+		authorityModelService.deleteUser(AuthorityReference.user("jsnow"));
 		
 		authorityModelService.deleteGroup(group);
 	}
@@ -61,7 +61,7 @@ public class AuthorityIT extends AbstractDemoIT {
 	@Test
 	public void testGetContainedUsers() {
 		List<BusinessNode> users = authorityModelService.getContainedUsers(new AuthorityQueryBuilder()
-				.parentAuthority(RepositoryAuthority.GROUP_ALFRESCO_ADMINISTRATORS)
+				.parentAuthority(AuthorityReference.GROUP_ALFRESCO_ADMINISTRATORS)
 				.nodeScopeBuilder(new NodeScopeBuilder()
 					.properties().set(CmModel.person.userName)));
 		boolean foundAdmin = false;

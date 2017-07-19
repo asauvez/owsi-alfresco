@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.google.common.base.Strings;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
@@ -90,7 +90,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 		}
 		// Add default Authenticated role
 		authorities.add(new SimpleGrantedAuthority(CoreAuthorityConstants.ROLE_AUTHENTICATED));
-		for (RepositoryAuthority autority : repositoryUser.getAuthorities()) {
+		for (AuthorityReference autority : repositoryUser.getAuthorities()) {
 			authorities.add(new SimpleGrantedAuthority(autority.getName()));
 		}
 

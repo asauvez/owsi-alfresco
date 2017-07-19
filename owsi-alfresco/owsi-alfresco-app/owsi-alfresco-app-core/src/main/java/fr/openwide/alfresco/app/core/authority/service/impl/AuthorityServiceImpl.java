@@ -3,7 +3,7 @@ package fr.openwide.alfresco.app.core.authority.service.impl;
 import java.util.List;
 
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthorityQueryParameters;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
@@ -56,7 +56,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedAuthorities(RepositoryAuthorityQueryParameters searchParameters) {
+	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters) {
 		GET_CONTAINED_AUTHORITIES payload = new GET_CONTAINED_AUTHORITIES();
 		payload.searchParameters = searchParameters;
 		return nodeService.callNodeListSerializer(payload, searchParameters.getNodeScope());
