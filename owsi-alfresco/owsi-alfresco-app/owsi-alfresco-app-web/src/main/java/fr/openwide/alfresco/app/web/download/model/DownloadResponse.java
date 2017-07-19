@@ -59,6 +59,10 @@ public abstract class DownloadResponse {
 		return this;
 	}
 
+	
+	public boolean hasContentRange() {
+		return contentRangeStart != null || contentRangeEnd != null;
+	}
 	public Long getContentRangeStart() {
 		return contentRangeStart;
 	}
@@ -92,14 +96,16 @@ public abstract class DownloadResponse {
 		return this;
 	}
 	public long getContentLength(long realContentLength) {
-		if (contentRangeStart == null && contentRangeEnd == null) {
+		if (! hasContentRange()) {
 			return realContentLength;
 		} else {
-			return contentRangeEnd - contentRangeStart + 1;
+			return ((contentRangeEnd != null) ? contentRangeEnd : realContentLength) 
+				 - ((contentRangeStart != null) ? contentRangeStart : 0L) 
+				 + 1L;
 		}
 	}
 	public String getContentRange(long realContentLength) {
-		if (contentRangeStart == null && contentRangeEnd == null) {
+		if (! hasContentRange()) {
 			return null;
 		}
 		return BYTES_PREFIX 

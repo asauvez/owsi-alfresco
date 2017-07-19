@@ -241,7 +241,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		
 		try {
 			ServletOutputStream output = response.getOutputStream();
-			if (! manageRange || (download.getContentRangeStart() == null && download.getContentRangeEnd() == null)) {
+			if (! manageRange || ! download.hasContentRange()) {
 				IOUtils.copy(input, output);
 			} else {
 				long inputOffset = (download.getContentRangeStart() != null) ? download.getContentRangeStart() : 0L;

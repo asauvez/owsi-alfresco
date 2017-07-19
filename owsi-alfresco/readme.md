@@ -2,9 +2,11 @@ Avec owsi-alfresco 0.3.0, je n'arrivais plus à ajouter des projets Share dans t
 Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project-facet-dynamic-web-module-to-3-0-error-in-eclipse/
 
 # Nouveautés
-## vers 0.5.0
+## depuis 0.5.0
 * authorityModelService.getUser(userName, nodeScopeBuilder) --> authorityModelService.getCachedUser(userName)
 * http://localhost:8080/alfresco/s/owsi/contentstoreexport.zip
+* DownloadResponse : Téléchargement par chunk
+* DownloadResponse : Watermark invisible
 
 # Migration
 
