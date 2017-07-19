@@ -12,6 +12,13 @@ public abstract class DownloadResponse {
 	private AlertContainer alertContainer = new AlertContainer();
 	private HttpServletResponse httpServletResponse;
 
+	// Ajouter à la fin du téléchargement. 
+	// Permet d'identifier l'utilisateur ayant téléchargé un document par exemple.
+	private byte[] contentWatermark = null;
+	
+	private Long contentRangeStart = null;
+	private Long contentRangeEnd = null;
+	
 	public DownloadResponse(HttpServletResponse httpServletResponse) {
 		this.httpServletResponse = httpServletResponse;
 	}
@@ -43,5 +50,62 @@ public abstract class DownloadResponse {
 		this.attachmentName = attachmentName;
 		return this;
 	}
+	
+	public byte[] getContentWatermark() {
+		return contentWatermark;
+	}
+	public DownloadResponse contentWatermark(byte[] contentWatermark) {
+		this.contentWatermark = contentWatermark;
+		return this;
+	}
 
+	public Long getContentRangeStart() {
+		return contentRangeStart;
+	}
+	public DownloadResponse contentRangeStart(Long contentRangeStart) {
+		this.contentRangeStart = contentRangeStart;
+		return this;
+	}
+	public Long getContentRangeEnd() {
+		return contentRangeEnd;
+	}
+	public DownloadResponse contentRangeEnd(Long contentRangeEnd) {
+		this.contentRangeEnd = contentRangeEnd;
+		return this;
+	}
+	
+	private static final String BYTES_PREFIX = "bytes=";
+	public DownloadResponse contentRange(String contentRange) {
+		if (contentRange != null) {
+			if (! contentRange.startsWith(BYTES_PREFIX)) {
+				throw new IllegalStateException("Range shoud begin with byte, but start with " + contentRange);
+			}
+			contentRange = contentRange.substring(BYTES_PREFIX.length());
+			int pos = contentRange.indexOf("-");
+			if (pos != 0) {
+				contentRangeStart = Long.parseLong(contentRange.substring(0,  pos).trim());
+			}
+			if (contentRange.length() > pos+1) {
+				contentRangeEnd = Long.parseLong(contentRange.substring(pos+1).trim());
+			}
+		}
+		return this;
+	}
+	public long getContentLength(long realContentLength) {
+		if (contentRangeStart == null && contentRangeEnd == null) {
+			return realContentLength;
+		} else {
+			return contentRangeEnd - contentRangeStart + 1;
+		}
+	}
+	public String getContentRange(long realContentLength) {
+		if (contentRangeStart == null && contentRangeEnd == null) {
+			return null;
+		}
+		return BYTES_PREFIX 
+				+ ((contentRangeStart != null) ? Long.toString(contentRangeStart) : "")
+				+ "-"
+				+ ((contentRangeEnd != null) ? Long.toString(contentRangeEnd) : "")
+				+ "/" + realContentLength;
+	}
 }

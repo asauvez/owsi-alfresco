@@ -140,9 +140,18 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 		Map<Class<?>, NodeContentSerializer<?>> serializersByClass = new HashMap<>();
 		serializersByClass.put(ContentReader.class, new NodeContentSerializer<ContentReader>() {
 			@Override
-			public void serialize(RepositoryNode node, NameReference contentProperty, ContentReader ContentReader, OutputStream outputStream) throws IOException {
-				try (InputStream inputStream = ContentReader.getContentInputStream()) {
-					IOUtils.copy(inputStream, outputStream);
+			public void serialize(RepositoryNode node, NameReference contentProperty, ContentReader contentReader, OutputStream output) throws IOException {
+				RemoteCallParameters remoteCallParameters = RemoteCallParameters.currentParameters();
+				
+				try (InputStream input = contentReader.getContentInputStream()) {
+					if (remoteCallParameters.getContentRangeStart() == null && remoteCallParameters.getContentRangeEnd() == null) {
+						IOUtils.copy(input, output);
+					} else {
+						long inputOffset = (remoteCallParameters.getContentRangeStart() != null) ? remoteCallParameters.getContentRangeStart() : 0L;
+						long length = ((remoteCallParameters.getContentRangeEnd() != null) ? remoteCallParameters.getContentRangeEnd()+1 : Long.MAX_VALUE)
+								 - inputOffset;
+						IOUtils.copyLarge(input, output, inputOffset, length);
+					}
 				}
 			}
 		});
