@@ -18,7 +18,7 @@ import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializati
 import fr.openwide.alfresco.api.core.node.binding.content.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuilder<R> {
 

@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.contentstoreexport.service;
+package fr.openwide.alfresco.repo.contentstoreexport.service;
 
 import java.io.IOException;
 import java.io.OutputStream;

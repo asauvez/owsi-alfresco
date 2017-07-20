@@ -6,6 +6,8 @@ import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -26,10 +28,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		this.authenticationRemoteBinding = authenticationRemoteBinding;
 		this.authenticationHeader = authenticationHeader;
 
-		defaultUserNodeScope = new NodeScope();
-		defaultUserNodeScope.getProperties().add(RepositoryUser.FIRST_NAME);
-		defaultUserNodeScope.getProperties().add(RepositoryUser.LAST_NAME);
-		defaultUserNodeScope.getProperties().add(RepositoryUser.EMAIL);
+		defaultUserNodeScope = new NodeScopeBuilder()
+				.properties().set(CmModel.person.firstName)
+				.properties().set(CmModel.person.lastName)
+				.properties().set(CmModel.person.email)
+				.getScope();
 	}
 
 	@Override

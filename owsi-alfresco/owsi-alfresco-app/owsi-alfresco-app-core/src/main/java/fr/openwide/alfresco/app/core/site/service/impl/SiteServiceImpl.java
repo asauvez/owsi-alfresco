@@ -15,9 +15,9 @@ import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.site.model.CreateSiteParameters;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
-import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 
 public class SiteServiceImpl implements SiteService {
 	

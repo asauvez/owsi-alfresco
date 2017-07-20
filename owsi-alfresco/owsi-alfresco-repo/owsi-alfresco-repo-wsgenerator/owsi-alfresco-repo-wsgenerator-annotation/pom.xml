@@ -8,5 +8,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
 	<packaging>jar</packaging>
+	
+	<name>OWSI Alfresco - Repository - Génération de Webscripts - Annotations</name>
 
 </project>

@@ -9,11 +9,12 @@ import java.util.zip.ZipOutputStream;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public abstract class ZipFileRepositoryContentDeSerializer 
 		implements NodeContentDeserializer<ZipEntry> {
 
-	private NameReference propertyName = NameReference.create("cm", "name");
+	private NameReference propertyName = CmModel.object.name.getNameReference();
 	private final ZipOutputStream outputStream;
 	
 	public ZipFileRepositoryContentDeSerializer(OutputStream outputStream) {

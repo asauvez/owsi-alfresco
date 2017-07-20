@@ -15,10 +15,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-api-dictionary</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-api-module</artifactId>
 		</dependency>
 

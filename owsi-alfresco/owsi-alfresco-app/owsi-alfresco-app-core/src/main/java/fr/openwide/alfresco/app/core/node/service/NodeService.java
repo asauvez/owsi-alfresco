@@ -9,7 +9,7 @@ import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 public interface NodeService extends NodeRemoteService {
 

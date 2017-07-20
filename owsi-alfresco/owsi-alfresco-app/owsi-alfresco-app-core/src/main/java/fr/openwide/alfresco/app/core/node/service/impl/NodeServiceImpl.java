@@ -19,7 +19,7 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
-import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 public class NodeServiceImpl implements NodeService {
 

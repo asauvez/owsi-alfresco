@@ -11,6 +11,14 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 # Migration
 
 ## vers 0.5.0
+### Changement de paquets Maven
+* owsi-alfresco-api-dictionary --> owsi-alfresco-api-core
+* owsi-alfresco-component-model --> owsi-alfresco-api-core
+* owsi-alfresco-repo-dictionary --> owsi-alfresco-repo-core
+* owsi-alfresco-repo-remote --> owsi-alfresco-repo-core
+* owsi-alfresco-parent-repo --> owsi-alfresco-parent-repo-component
+* fr.openwide.alfresco.repository --> fr.openwide.alfresco.repo
+
 ### Authentification
 * Il n'y a plus de PrincipalType. Si vous utilisiez PrincipalType.USER_DETAILS, vous continuez à déclarer un autre AuthenticationProvider que RepositoryAuthenticationProvider dans votre WebApplicationSecurityConfig.
 * Vous pouvez aussi supprimer @bean RepositoryAuthenticationProvider et @bean RepositoryAuthenticationUserDetailsService de votre CoreCommonSecurityConfig. Ils sont intégré dans AppCoreSecurityConfig.

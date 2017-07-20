@@ -7,9 +7,9 @@ import fr.openwide.alfresco.api.core.authority.model.AuthorityQueryParameters;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.WebScriptEndPoint;
-import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 public interface AuthorityRemoteService {
 

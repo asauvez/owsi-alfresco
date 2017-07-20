@@ -12,11 +12,12 @@
 	<name>OWSI Alfresco - Parent - API</name>
 
 	<properties>
-		<owsi-alfresco.api.guava.version>18.0</owsi-alfresco.api.guava.version> <!-- owsi-core version -->
-		<owsi-alfresco.api.jackson.version>2.4.3</owsi-alfresco.api.jackson.version> <!-- owsi-core version -->
-		<owsi-alfresco.api.spring.version>3.2.14.RELEASE</owsi-alfresco.api.spring.version> <!-- alfresco version -->
-		<owsi-alfresco.api.slf4j.version>1.7.5</owsi-alfresco.api.slf4j.version> <!-- alfresco version -->
+		<owsi-alfresco.api.guava.version>11.0.2</owsi-alfresco.api.guava.version> <!-- alfresco version -->
+		<owsi-alfresco.api.jackson.version>2.8.3</owsi-alfresco.api.jackson.version> <!-- alfresco version -->
+		<owsi-alfresco.api.spring.version>3.2.17.RELEASE</owsi-alfresco.api.spring.version> <!-- alfresco version -->
+		<owsi-alfresco.api.slf4j.version>1.7.21</owsi-alfresco.api.slf4j.version> <!-- alfresco version -->
 		<owsi-alfresco.api.junit.version>4.11</owsi-alfresco.api.junit.version> <!-- owsi-core version -->
+		<owsi-alfresco.api.commons-lang3.version>3.3.2</owsi-alfresco.api.commons-lang3.version> <!-- alfresco version -->
 	</properties>
 
 	<dependencyManagement>
@@ -27,6 +28,11 @@
 				<version>0.5.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${owsi-alfresco.api.commons-lang3.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -152,7 +158,7 @@
 							</goals>
 							<configuration>
 								<processors>
-									<processor>fr.openwide.alfresco.repository.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
+									<processor>fr.openwide.alfresco.repo.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
 								</processors>
 							</configuration>
 						</execution>

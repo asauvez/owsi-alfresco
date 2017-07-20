@@ -11,7 +11,7 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 
 /**
  * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}

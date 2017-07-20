@@ -14,7 +14,6 @@
 	<description>Composants optionnels pouvant être intégrés ou dans Alfresco ou dans l'application spécifique sur Alfresco</description>
 
 	<modules>
-		<module>owsi-alfresco-component-model</module>
 		<module>owsi-alfresco-component-kerberos</module>
 		<module>owsi-alfresco-component-query</module>
 	</modules>

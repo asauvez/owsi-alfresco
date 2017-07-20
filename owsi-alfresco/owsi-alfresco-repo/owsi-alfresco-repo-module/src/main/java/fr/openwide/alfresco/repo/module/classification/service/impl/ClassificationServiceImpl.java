@@ -63,9 +63,9 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
-import fr.openwide.alfresco.repository.core.node.model.PreNodeCreationCallback;
-import fr.openwide.alfresco.repository.core.node.service.NodeRepositoryService;
-import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
+import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
+import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
 		OnAddAspectPolicy, OnUpdatePropertiesPolicy, OnDeleteChildAssociationPolicy, OnMoveNodePolicy, OnDeleteNodePolicy, 

@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-repo-contentstoreexport</artifactId>
 
-	<name>OWSI Alfresco - Repository - Module</name>
+	<name>OWSI Alfresco - Repository - Content store export</name>
 
 	<properties>
 		<alfresco.module.name>owsi-alfresco-repo-contentstoreexport</alfresco.module.name>
@@ -23,20 +23,8 @@
 			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-data-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-repository</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
 		</dependency>
 	</dependencies>
 

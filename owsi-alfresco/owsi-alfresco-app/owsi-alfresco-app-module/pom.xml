@@ -17,7 +17,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-app-dictionary</artifactId>
+			<artifactId>owsi-alfresco-app-core</artifactId>
 		</dependency>
 	</dependencies>
 

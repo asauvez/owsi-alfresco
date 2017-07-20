@@ -10,14 +10,11 @@ import com.google.common.base.Strings;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class RepositoryUser implements Serializable {
 
-	public static final NameReference FIRST_NAME = NameReference.create("cm", "firstName"); 
-	public static final NameReference LAST_NAME = NameReference.create("cm", "lastName"); 
-	public static final NameReference EMAIL = NameReference.create("cm", "email"); 
-	
 	private UserReference userReference;
 
 	private RepositoryNode userNode;
@@ -36,15 +33,18 @@ public class RepositoryUser implements Serializable {
 	public RepositoryNode getUserNode() {
 		return userNode;
 	}
+	public BusinessNode getUserBusinessNode() {
+		return new BusinessNode(userNode);
+	}
 	public void setUserNode(RepositoryNode userNode) {
 		this.userNode = userNode;
 	}
 
 	public String getFirstName() {
-		return userNode.getProperty(FIRST_NAME, String.class);
+		return userNode.getProperty(CmModel.person.firstName.getNameReference(), String.class);
 	}
 	public String getLastName() {
-		return userNode.getProperty(LAST_NAME, String.class);
+		return userNode.getProperty(CmModel.person.lastName.getNameReference(), String.class);
 	}
 	public String getFullName() {
 		String firstName = getFirstName();
@@ -52,7 +52,7 @@ public class RepositoryUser implements Serializable {
 		return ((firstName != null) ? firstName : "") + " " + ((lastName != null) ? lastName : "").trim();
 	}
 	public String getEmail() {
-		return userNode.getProperty(EMAIL, String.class);
+		return userNode.getProperty(CmModel.person.email.getNameReference(), String.class);
 	}
 	
 	public List<AuthorityReference> getAuthorities() {

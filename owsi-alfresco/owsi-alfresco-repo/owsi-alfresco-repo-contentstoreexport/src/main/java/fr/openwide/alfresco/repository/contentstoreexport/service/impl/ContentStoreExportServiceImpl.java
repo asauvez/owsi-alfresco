@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.contentstoreexport.service.impl;
+package fr.openwide.alfresco.repo.contentstoreexport.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,7 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.openwide.alfresco.repository.contentstoreexport.service.ContentStoreExportService;
+import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportService;
 
 /**
  * Module d'export focalisé par défaut sur les dépôts locaux nécessaire au lancement. 

@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 			
 	<bean id="owsi.service.contentstoreexport" 
-		class="fr.openwide.alfresco.repository.contentstoreexport.service.impl.ContentStoreExportServiceImpl">
+		class="fr.openwide.alfresco.repo.contentstoreexport.service.impl.ContentStoreExportServiceImpl">
 		<property name="contentstoreexportPaths" value="${contentstoreexport.paths}"/>
 		<property name="contentstoreexportQueries" value="${contentstoreexport.queries}"/>
 		<property name="contentstoreexportVersion" value="${contentstoreexport.version}"/>

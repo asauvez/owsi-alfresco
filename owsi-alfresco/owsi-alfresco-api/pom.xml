@@ -15,7 +15,6 @@
 
 	<modules>
 		<module>owsi-alfresco-api-core</module>
-		<module>owsi-alfresco-api-dictionary</module>
 		<module>owsi-alfresco-api-module</module>
 	</modules>
 

@@ -39,8 +39,8 @@ import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryRemoteCallBuilder;
 import fr.openwide.alfresco.app.core.security.service.TicketReferenceProvider;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
-import fr.openwide.alfresco.repository.wsgenerator.model.WebScriptParam;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 public class RepositoryRemoteBinding {
 

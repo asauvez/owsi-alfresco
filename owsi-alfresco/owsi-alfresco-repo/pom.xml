@@ -3,7 +3,7 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-parent-repo</artifactId>
+		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
 		<version>0.5.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo/pom.xml</relativePath>
 	</parent>
@@ -15,9 +15,7 @@
 
 	<modules>
 		<module>owsi-alfresco-repo-wsgenerator</module>	
-		<module>owsi-alfresco-repo-remote</module>
 		<module>owsi-alfresco-repo-core</module>
-		<module>owsi-alfresco-repo-dictionary</module>
 		<module>owsi-alfresco-repo-module</module>
 		<module>owsi-alfresco-repo-contentstoreexport</module>
 	</modules>

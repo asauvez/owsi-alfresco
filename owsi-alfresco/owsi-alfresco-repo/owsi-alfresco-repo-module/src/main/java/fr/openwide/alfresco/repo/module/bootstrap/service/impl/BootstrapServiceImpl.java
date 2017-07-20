@@ -30,7 +30,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.module.bootstrap.service.BootstrapService;
-import fr.openwide.alfresco.repository.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 
 public class BootstrapServiceImpl implements BootstrapService {

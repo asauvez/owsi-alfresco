@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repository.contentstoreexport.web.script;
+package fr.openwide.alfresco.repo.contentstoreexport.web.script;
 
 import java.io.IOException;
 
@@ -7,9 +7,9 @@ import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
-import fr.openwide.alfresco.repository.contentstoreexport.service.ContentStoreExportService;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript;
-import fr.openwide.alfresco.repository.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
+import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportService;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 @GenerateWebScript(
 		url="/owsi/contentstoreexport.zip",

@@ -9,6 +9,8 @@
 	<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
 	<packaging>jar</packaging>
 
+	<name>OWSI Alfresco - Repository - Génération de Webscripts - Processor</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>

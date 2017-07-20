@@ -25,7 +25,7 @@
 		<module>owsi-alfresco-parent-bom</module>
 		<module>owsi-alfresco-parent-api</module>
 		<module>owsi-alfresco-parent-app</module>
-		<module>owsi-alfresco-parent-repo</module>
+		<module>owsi-alfresco-parent-repo-component</module>
 		<module>owsi-alfresco-parent-alfresco</module>
 		<module>owsi-alfresco-parent-share-component</module>
 		<module>owsi-alfresco-parent-share</module>
