@@ -65,6 +65,7 @@
 		<owsi-alfresco.repo.netcdf.version>4.2.20</owsi-alfresco.repo.netcdf.version>
 		<owsi-alfresco.repo.metadata-extractor.version>2.7.2</owsi-alfresco.repo.metadata-extractor.version>
 		<owsi-alfresco.repo.asm.version>3.1</owsi-alfresco.repo.asm.version>
+		<owsi-alfresco.repo.vaadin.version>3.1</owsi-alfresco.repo.vaadin.version>
 		<owsi-alfresco.repo.woodstox-core-asl.version>4.4.1</owsi-alfresco.repo.woodstox-core-asl.version>
 		<owsi-alfresco.repo.bcprov-jdk15.version>1.46</owsi-alfresco.repo.bcprov-jdk15.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
@@ -533,6 +534,12 @@
 				<groupId>asm</groupId>
 				<artifactId>asm</artifactId>
 				<version>${owsi-alfresco.repo.asm.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin</artifactId>
+				<version>6.8.17</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
