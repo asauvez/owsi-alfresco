@@ -39,7 +39,6 @@
 	
 	<bean id="owsi.service.nodeResetService" class="fr.openwide.alfresco.repo.core.resetModuleVersion.service.impl.ResetModuleVersionServiceImpl">
 		<property name="modules" value="${owsi.reset-module-version.modules}" />
-		<property name="globalProperties" ref="global-properties"/>
 		<property name="registryService" ref="RegistryService" />
 	</bean>
 
