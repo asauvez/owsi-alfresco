@@ -1,21 +1,20 @@
-package fr.openwide.alfresco.app.core.framework.spring.env;
+package fr.openwide.alfresco.repo.core.configurationlogger;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.env.PropertyResolver;
-
-import com.google.common.base.Splitter;
-import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * <p>Ce listener Spring permet de logguer la configuration du contexte Spring lors de l'émission
@@ -32,16 +31,18 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationLogger.class);
 
-	private List<String> propertyNamesForInfoLogLevel = new ArrayList<>();
-	private String logPattern = "%1$35s : %2$s";
-	private ApplicationContext applicationContext;
+	private static List<String> propertyNamesForInfoLogLevel = new ArrayList<>();
 	
-	@Autowired (required=false)
-	private HikariDataSource dataSource;
+	private String logPattern = "%1$45s : %2$s";
+	private ApplicationContext applicationContext;
+	private Properties globalProperties;
+
+	@Autowired
+	private BasicDataSource dataSource;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		if (event.getApplicationContext() != applicationContext) {
+		if (event.getApplicationContext() != applicationContext || globalProperties == null) {
 			return;
 		}
 		LOGGER.info("Configuration logging");
@@ -52,19 +53,26 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 				logPropertyAsInfo("disk." + disk.getAbsolutePath(), getInMo(disk.getUsableSpace()) + " / " + getInMo(disk.getTotalSpace()));
 			}
 		}
+		
 		if (dataSource != null) {
-			logPropertyAsInfo("db.maximumPoolSize", Integer.toString(dataSource.getMaximumPoolSize()));
+			logPropertyAsInfo("db.maximumPoolSize", dataSource.getMaxIdle() + "/" + dataSource.getMaxActive());
 		}
 
-		PropertyResolver resolver = BeanFactoryUtils.beanOfType(applicationContext, PropertyResolver.class);
-		// Logging configured properties
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		StrSubstitutor strSubstitutor = new StrSubstitutor((Map) globalProperties);
 		for (String propertyName : propertyNamesForInfoLogLevel) {
-			logPropertyAsInfo(propertyName, resolver.getRequiredProperty(propertyName));
+			String value = globalProperties.getProperty(propertyName);
+			if (value != null) {
+				value = strSubstitutor.replace(value);
+				logPropertyAsInfo(propertyName, value);
+			} else {
+				throw new IllegalStateException("Property not found " + propertyName);
+			}
 		}
 		LOGGER.info("Configuration logging end");
 	}
 
-	private void logPropertyAsInfo(String propertyName, String value) {
+	protected void logPropertyAsInfo(String propertyName, String value) {
 		LOGGER.info(String.format(logPattern, propertyName, value));
 	}
 
@@ -72,12 +80,16 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		return String.format("%,8d", n/1024/1024) + " Mo"; 
 	}
 	
-	public void setPropertyNamesForInfoLogLevel(String names) {
-		propertyNamesForInfoLogLevel.addAll(Splitter.on(',').splitToList(names));
+	public void setPropertyNamesForInfoLogLevel(List<String> propertyNamesForInfoLogLevel) {
+		ConfigurationLogger.propertyNamesForInfoLogLevel.addAll(propertyNamesForInfoLogLevel);
 	}
 
 	public void setLogPattern(String logPattern) {
 		this.logPattern = logPattern;
+	}
+	
+	public void setGlobalProperties(Properties globalProperties) {
+		this.globalProperties = globalProperties;
 	}
 
 	@Override
