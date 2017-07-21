@@ -2,9 +2,6 @@ package fr.openwide.alfresco.repo.core.authority.web.script;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.CREATE_USER;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -26,8 +23,8 @@ public class CreateUserWebScript extends AbstractNodeWebScript<RepositoryNode, C
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(CREATE_USER.class);
+	protected Class<CREATE_USER> getParameterType() {
+		return CREATE_USER.class;
 	}
 
 	public void setAuthorityRemoteService(AuthorityRemoteService authorityRemoteService) {

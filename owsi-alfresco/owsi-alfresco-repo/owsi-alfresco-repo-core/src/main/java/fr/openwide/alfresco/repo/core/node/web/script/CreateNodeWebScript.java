@@ -4,9 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.CREATE_NODE_SERVICE;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -24,8 +21,8 @@ public class CreateNodeWebScript extends AbstractNodeWebScript<List<NodeReferenc
 	}
 	
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(CREATE_NODE_SERVICE.class);
+	protected Class<CREATE_NODE_SERVICE> getParameterType() {
+		return CREATE_NODE_SERVICE.class;
 	}
 
 }

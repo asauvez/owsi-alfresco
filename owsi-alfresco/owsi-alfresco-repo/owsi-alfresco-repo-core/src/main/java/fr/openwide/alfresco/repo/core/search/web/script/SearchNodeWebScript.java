@@ -5,9 +5,6 @@ import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService.SEARCH_NODE_SERVICE;
@@ -35,8 +32,8 @@ public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_S
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(SEARCH_NODE_SERVICE.class);
+	protected Class<SEARCH_NODE_SERVICE> getParameterType() {
+		return SEARCH_NODE_SERVICE.class;
 	}
 
 }

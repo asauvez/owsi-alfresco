@@ -38,8 +38,9 @@ import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractRemoteWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
-public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScript<RemoteCallPayload<R>, Content> {
+public abstract class AbstractNodeWebScript<R, P extends WebScriptParam<R>> extends AbstractRemoteWebScript<RemoteCallPayload<R>, Content> {
 
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
@@ -63,7 +64,7 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			public Collection<RepositoryNode> extractNodes(P payload) {ll is passed
 	 * as the payload to {@link AbstractRemoteWebScript#executeImpl(WebScriptRequest, WebScriptResponse, Status, Cache)}
 	 */
-	protected abstract JavaType getParameterType();
+	protected abstract Class<P> getParameterType();
 
 	@Override
 	protected Content extractPayload(WebScriptRequest req) {
@@ -104,10 +105,12 @@ public abstract class AbstractNodeWebScript<R, P> extends AbstractRemoteWebScrip
 			}
 		};
 		
+		JavaType javaType = objectMapper.getTypeFactory().constructSimpleType(getParameterType(), new JavaType[0]);
+		
 		try {
 			// L'appel du service se fait dans le callback
 			RemoteCallPayload<P> requestPayload = serializationComponent.deserialize(
-					getParameterType(), payloadCallback, defaultDeserializationParameters,
+					javaType, payloadCallback, defaultDeserializationParameters,
 					payload.getInputStream());
 			return new RemoteCallPayload<R>(resultRef.get(), requestPayload.getRemoteCallParameters());
 		} catch (IOException e) {

@@ -3,9 +3,6 @@ package fr.openwide.alfresco.repo.core.node.web.script;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.SOURCE_ASSOC_NODE_SERVICE;
 
@@ -20,7 +17,7 @@ public class SourceAssocNodeWebScript extends AbstractNodeListWebScript<SOURCE_A
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(SOURCE_ASSOC_NODE_SERVICE.class);
+	protected Class<SOURCE_ASSOC_NODE_SERVICE> getParameterType() {
+		return SOURCE_ASSOC_NODE_SERVICE.class;
 	}
 }

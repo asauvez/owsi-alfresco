@@ -3,9 +3,6 @@ package fr.openwide.alfresco.repo.core.node.web.script;
 import java.util.Collection;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.UPDATE_NODE_SERVICE;
 
@@ -26,8 +23,8 @@ public class UpdateNodeWebScript extends AbstractNodeWebScript<Void, UPDATE_NODE
 	}
 	
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(UPDATE_NODE_SERVICE.class);
+	protected Class<UPDATE_NODE_SERVICE> getParameterType() {
+		return UPDATE_NODE_SERVICE.class;
 	}
 
 }

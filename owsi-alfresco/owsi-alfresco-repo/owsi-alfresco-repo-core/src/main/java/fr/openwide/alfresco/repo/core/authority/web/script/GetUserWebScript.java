@@ -4,9 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.GET_USER;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -24,8 +21,8 @@ public class GetUserWebScript extends AbstractNodeWebScript<RepositoryNode, GET_
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(GET_USER.class);
+	protected Class<GET_USER> getParameterType() {
+		return GET_USER.class;
 	}
 
 	@Override

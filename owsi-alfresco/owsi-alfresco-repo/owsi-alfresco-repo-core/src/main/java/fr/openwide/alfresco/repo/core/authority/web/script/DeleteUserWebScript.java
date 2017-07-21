@@ -2,9 +2,6 @@ package fr.openwide.alfresco.repo.core.authority.web.script;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.DELETE_USER;
 import fr.openwide.alfresco.repo.core.node.web.script.AbstractNodeWebScript;
@@ -21,8 +18,8 @@ public class DeleteUserWebScript extends AbstractNodeWebScript<Void, DELETE_USER
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(DELETE_USER.class);
+	protected Class<DELETE_USER> getParameterType() {
+		return DELETE_USER.class;
 	}
 
 	public void setAuthorityRemoteService(AuthorityRemoteService authorityRemoteService) {

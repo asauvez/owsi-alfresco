@@ -2,9 +2,6 @@ package fr.openwide.alfresco.repo.core.authority.web.script;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.CREATE_ROOT_GROUP;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -23,8 +20,8 @@ public class CreateRootGroupWebScript extends AbstractNodeWebScript<RepositoryNo
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(CREATE_ROOT_GROUP.class);
+	protected Class<CREATE_ROOT_GROUP> getParameterType() {
+		return CREATE_ROOT_GROUP.class;
 	}
 
 	public void setAuthorityRemoteService(AuthorityRemoteService authorityRemoteService) {

@@ -2,9 +2,6 @@ package fr.openwide.alfresco.repo.core.node.web.script;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.DELETE_NODE_SERVICE;
 
 public class DeleteNodeWebScript extends AbstractNodeWebScript<Void, DELETE_NODE_SERVICE> {
@@ -17,8 +14,8 @@ public class DeleteNodeWebScript extends AbstractNodeWebScript<Void, DELETE_NODE
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(DELETE_NODE_SERVICE.class);
+	protected Class<DELETE_NODE_SERVICE> getParameterType() {
+		return DELETE_NODE_SERVICE.class;
 	}
 
 }

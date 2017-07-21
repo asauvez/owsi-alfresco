@@ -2,9 +2,6 @@ package fr.openwide.alfresco.repo.core.authority.web.script;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.REMOVE_FROM_GROUP;
 import fr.openwide.alfresco.repo.core.node.web.script.AbstractNodeWebScript;
@@ -22,8 +19,8 @@ public class RemoveFromGroupWebScript extends AbstractNodeWebScript<Void, REMOVE
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(REMOVE_FROM_GROUP.class);
+	protected Class<REMOVE_FROM_GROUP> getParameterType() {
+		return REMOVE_FROM_GROUP.class;
 	}
 
 	public void setAuthorityRemoteService(AuthorityRemoteService authorityRemoteService) {

@@ -3,9 +3,6 @@ package fr.openwide.alfresco.repo.core.authority.web.script;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService.GET_CONTAINED_AUTHORITIES;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 
@@ -18,8 +15,8 @@ public class GetContainedAuthoritiesWebScript extends AbstractAuthorityWebScript
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(GET_CONTAINED_AUTHORITIES.class);
+	protected Class<GET_CONTAINED_AUTHORITIES> getParameterType() {
+		return GET_CONTAINED_AUTHORITIES.class;
 	}
 
 }
