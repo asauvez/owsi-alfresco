@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,8 +36,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-
-import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
@@ -56,6 +56,8 @@ import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
+import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
+import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationBuilder;
@@ -63,8 +65,7 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
-import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
-import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
+import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
@@ -92,8 +93,28 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
 
-	private Map<String, NodeReference> queryCache = new ConcurrentHashMap<>();
-	private Map<String, NodeReference> pathCache = new ConcurrentHashMap<>();
+	@Value("${classification.queryCache.maxSize:25}") private int queryCacheMaxSize;
+	@Value("${classification.pathCache.maxSize:25}") private int pathCacheMaxSize;
+	@Value("${classification.subFolderCache.maxSize:200}") private int subFolderCacheMaxSize;
+	private ClassificationCache queryCache;
+	private ClassificationCache pathCache;
+	private ClassificationCache subFolderCache;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		queryCache = new ClassificationCache(25);
+		pathCache = new ClassificationCache(25);
+		subFolderCache = new ClassificationCache(100);
+
+		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
+		
+		policyRepositoryService.onDeleteNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onMoveNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onDeleteChildAssociation(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
+		
+		nodeRepositoryService.addPreNodeCreationCallback(this);
+	}
 
 	@Override
 	public <T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy) {
@@ -125,8 +146,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	@Override
-	public int reclassify(ContainerModel model, final int batchSize) {
-		final RestrictionBuilder restriction = new RestrictionBuilder();
+	public int reclassify(ContainerModel model, int batchSize) {
+		clearCaches();
+		
+		RestrictionBuilder restriction = new RestrictionBuilder();
 		if (model instanceof TypeModel) {
 			restriction.isType((TypeModel) model);
 		} else {
@@ -138,7 +161,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		int total = 0;
 		for (int batchNumber = 0; ; batchNumber ++) {
 			logger.info("*** Reclassify batch " + batchNumber + " ***");
-			final int firstResult = batchNumber * batchSize;
+			int firstResult = batchNumber * batchSize;
 			int listSize = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Integer>() {
 				@Override
 				public Integer execute() {
@@ -165,18 +188,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		
 		logger.info("End reclassify of " + model + " (" + total + ")");
 		return total;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
-		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
-		
-		policyRepositoryService.onDeleteNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
-		policyRepositoryService.onMoveNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
-		policyRepositoryService.onDeleteChildAssociation(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
-		
-		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
 
 	@Override
@@ -451,13 +462,13 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return newResult;
 	}
 
-	public NodeReference subFolder(String folderName, final Supplier<BusinessNode> folderNodeSupplier, NodeReference destinationFolder) {
+	public NodeReference subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier, NodeReference destinationFolder) {
 		ChildAssociationModel associationType = CmModel.folder.contains;
-		
-		Optional<NodeReference> subFolderRef = nodeModelService.getChildByName(destinationFolder, folderName, associationType);
-		if (subFolderRef.isPresent()) {
-			return subFolderRef.get();
-		} else {
+
+		String cacheKey = destinationFolder + "/" + associationType + "/" + folderName;
+		return subFolderCache.get(nodeModelService, cacheKey, 
+				() -> nodeModelService.getChildByName(destinationFolder, folderName, associationType),
+				() -> {
 			BusinessNode folderNode = folderNodeSupplier.get();
 			folderNode.properties().name(folderName);
 			if (folderNode.getRepositoryNode().getType() == null) {
@@ -465,6 +476,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			}
 			folderNode.aspect(OwsiModel.deleteIfEmpty);
 			folderNode.assocs().primaryParent(associationType).nodeReference(destinationFolder);
+			
 			try {
 				// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
 				return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeReference>() {
@@ -477,30 +489,24 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
 				return nodeModelService.getChildByName(destinationFolder, folderName, associationType).get();
 			}
-		}
+		});
 	} 
+	
+	@Override
+	public void clearCaches() {
+		queryCache.clear();
+		pathCache.clear();
+		subFolderCache.clear();
+	}
 	
 	public Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
 		return nodeSearchModelService.searchUniqueReference(restrictionBuilder);
 	}
 
 	public Optional<NodeReference> searchUniqueReferenceCached(RestrictionBuilder restrictionBuilder) {
-		String query = restrictionBuilder.toFtsQuery();
-		NodeReference nodeReference = queryCache.get(query);
-		if (nodeReference == null) {
-			Optional<NodeReference> optional = searchUniqueReference(restrictionBuilder);
-			if (optional.isPresent()) {
-				queryCache.put(query, optional.get());
-			}
-			return optional;
-		} else {
-			// Vérifie juste que la node existe toujours
-			if (! nodeModelService.exists(nodeReference)) {
-				queryCache.remove(query);
-				return Optional.empty();
-			}
-			return Optional.of(nodeReference);
-		}
+		String cacheKey = restrictionBuilder.toFtsQuery();
+		return queryCache.get(nodeModelService, cacheKey, 
+				() -> searchUniqueReference(restrictionBuilder));
 	}
 
 	public Optional<NodeReference> getByNamedPath(String ... names) {
@@ -508,21 +514,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public Optional<NodeReference> getByNamedPathCached(String ... names) {
 		String cacheKey = Arrays.toString(names);
-		NodeReference nodeReference = pathCache.get(cacheKey);
-		if (nodeReference == null) {
-			Optional<NodeReference> optional = getByNamedPath(names);
-			if (optional.isPresent()) {
-				pathCache.put(cacheKey, optional.get());
-			}
-			return optional;
-		} else {
-			// Vérifie juste que la node existe toujours
-			if (! nodeModelService.exists(nodeReference)) {
-				pathCache.remove(cacheKey);
-				return Optional.empty();
-			}
-			return Optional.of(nodeReference);
-		}
+		return pathCache.get(nodeModelService, cacheKey, 
+				() -> getByNamedPath(names));
 	}
 	
 	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {

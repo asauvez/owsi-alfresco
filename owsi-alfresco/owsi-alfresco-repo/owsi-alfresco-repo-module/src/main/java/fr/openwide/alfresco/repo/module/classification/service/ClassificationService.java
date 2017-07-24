@@ -18,4 +18,6 @@ public interface ClassificationService {
 	int reclassifyAll(int batchSize);
 	int reclassify(ContainerModel model, int batchSize);
 	int reclassify(NameReference modelName, int batchSize);
+	
+	void clearCaches();
 }
