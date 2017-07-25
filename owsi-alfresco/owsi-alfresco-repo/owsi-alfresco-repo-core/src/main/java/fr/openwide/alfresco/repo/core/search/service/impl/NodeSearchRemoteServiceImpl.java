@@ -34,37 +34,10 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 
 	@Override
 	public List<RepositoryNode> search(RepositorySearchParameters rsp) {
-		if (rsp.getQuery() == null || rsp.getQuery().isEmpty()) {
-			throw new InvalidPayloadException("The query should not be an empty string.");
-		}
 		try {
 			long before = System.currentTimeMillis();
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Searching for query : {}", rsp.getQuery().replace("\n", " "));
-			}
 
-			SearchParameters sp = new SearchParameters();
-			for (StoreReference storeReference : rsp.getStoreReferences()) {
-				sp.addStore(conversionService.getRequired(storeReference));
-			}
-			sp.setLanguage(rsp.getLanguage().getAlfrescoName());
-			sp.setQuery(rsp.getQuery());
-			sp.excludeDataInTheCurrentTransaction(true);
-			sp.setQueryConsistency(QueryConsistency.valueOf(rsp.getQueryConsistency().name()));
-			
-			if (rsp.getFirstResult() != null) {
-				sp.setSkipCount(rsp.getFirstResult());
-				sp.setLimitBy(LimitBy.FINAL_SIZE);
-			}
-			if (rsp.getMaxResults() != null) {
-				sp.setMaxItems(rsp.getMaxResults());
-				sp.setLimitBy(LimitBy.FINAL_SIZE);
-			}
-			
-			for (SortDefinition sd : rsp.getSorts()) {
-				sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
-			}
-			
+			SearchParameters sp = getSearchParameters(rsp);
 			List<RepositoryNode> res = new ArrayList<>();
 			ResultSet resultSet = searchService.query(sp);
 			try {
@@ -90,6 +63,39 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 		}
 	}
 
+	public SearchParameters getSearchParameters(RepositorySearchParameters rsp) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Searching for query : {}", rsp.getQuery().replace("\n", " "));
+		}
+
+		if (rsp.getQuery() == null || rsp.getQuery().isEmpty()) {
+			throw new InvalidPayloadException("The query should not be an empty string.");
+		}
+
+		SearchParameters sp = new SearchParameters();
+		for (StoreReference storeReference : rsp.getStoreReferences()) {
+			sp.addStore(conversionService.getRequired(storeReference));
+		}
+		sp.setLanguage(rsp.getLanguage().getAlfrescoName());
+		sp.setQuery(rsp.getQuery());
+		sp.excludeDataInTheCurrentTransaction(true);
+		sp.setQueryConsistency(QueryConsistency.valueOf(rsp.getQueryConsistency().name()));
+		
+		if (rsp.getFirstResult() != null) {
+			sp.setSkipCount(rsp.getFirstResult());
+			sp.setLimitBy(LimitBy.FINAL_SIZE);
+		}
+		if (rsp.getMaxResults() != null) {
+			sp.setMaxItems(rsp.getMaxResults());
+			sp.setLimitBy(LimitBy.FINAL_SIZE);
+		}
+		
+		for (SortDefinition sd : rsp.getSorts()) {
+			sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
+		}
+		return sp;
+	}
+	
 	public void setNodeRemoteService(NodeRemoteService nodeRemoteService) {
 		this.nodeRemoteService = nodeRemoteService;
 	}

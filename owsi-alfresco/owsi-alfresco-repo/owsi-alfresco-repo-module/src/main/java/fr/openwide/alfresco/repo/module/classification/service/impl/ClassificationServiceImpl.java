@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.alfresco.model.ContentModel;
@@ -52,14 +53,13 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.component.model.repository.model.SysModel;
-import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
-import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
 import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
 import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
+import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
@@ -83,7 +83,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	private NodeModelRepositoryService nodeModelService;
 	private NodeRepositoryService nodeRepositoryService;
-	private NodeSearchModelService nodeSearchModelService;
+	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
 	
 	private ConversionService conversionService;
@@ -129,7 +129,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	@Override
-	public int reclassifyAll(int batchSize) {
+	public int reclassifyAll(Integer batchSize) {
 		int total = 0;
 		for (ContainerModel model : models.values()) {
 			total += reclassify(model, batchSize);
@@ -137,7 +137,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return total;
 	}
 	@Override
-	public int reclassify(NameReference modelName, int batchSize) {
+	public int reclassify(NameReference modelName, Integer batchSize) {
 		ContainerModel model = models.get(modelName);
 		if (model == null) {
 			throw new IllegalStateException("Unknown " + modelName);
@@ -146,7 +146,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	@Override
-	public int reclassify(ContainerModel model, int batchSize) {
+	public int reclassify(ContainerModel model, Integer batchSize) {
 		clearCaches();
 		
 		RestrictionBuilder restriction = new RestrictionBuilder();
@@ -158,36 +158,20 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		
 		logger.info("Begin reclassify of " + model);
 
-		int total = 0;
-		for (int batchNumber = 0; ; batchNumber ++) {
-			logger.info("*** Reclassify batch " + batchNumber + " ***");
-			int firstResult = batchNumber * batchSize;
-			int listSize = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Integer>() {
-				@Override
-				public Integer execute() {
-					List<BusinessNode> list = nodeSearchModelService.search(new SearchQueryBuilder()
-							.restriction(restriction)
-							.firstResult(firstResult)
-							.maxResults(batchSize)
-							.nodeScopeBuilder(new NodeScopeBuilder().nodeReference())
-							.sort().asc(SysModel.referenceable.nodeUuid));
-					int nodeNumber = 0;
-					for (BusinessNode node : list) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Reclassify node " + (nodeNumber ++) + " / " + list.size());
-						}
-						classify(conversionService.getRequired(node.getNodeReference()), ClassificationMode.RECLASSIFY);
-					}
-					return list.size();
-				}
-			}, false, true);
-			
-			total += listSize;
-			if (listSize < batchSize) break;
-		}
-		
-		logger.info("End reclassify of " + model + " (" + total + ")");
-		return total;
+		BatchSearchQueryBuilder searchQueryBuilder = new BatchSearchQueryBuilder();
+		searchQueryBuilder.restriction(restriction);
+		int nbTotal = nodeSearchModelService.searchBatch(searchQueryBuilder
+				.configurationName("reclassify", "reclassify." + model)
+				.frameSize(batchSize)
+				.transactionSize(batchSize)
+				.consumer(new Consumer<NodeReference>() {
+			@Override
+			public void accept(NodeReference nodeReference) {
+				classify(nodeReference, ClassificationMode.RECLASSIFY);
+			}
+		}));
+		logger.info("End reclassify of " + model + " (" + nbTotal + ")");
+		return nbTotal;
 	}
 
 	@Override
@@ -313,8 +297,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
-		NodeReference nodeReference = conversionService.get(nodeRef);
-		
+		classify(conversionService.get(nodeRef), mode);
+	}
+
+	private void classify(NodeReference nodeReference, ClassificationMode mode) {
 		Set<NodeReference> classifiedNodes = getClassifiedNodes();
 		if (! classifiedNodes.add(nodeReference)) {
 			if (logger.isDebugEnabled()) {
@@ -325,7 +311,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		
 		NameReference type = getPolicy(nodeReference);
 		if (type == null) {
-			throw new IllegalStateException("Can't find a policy to classify " + nodeRef);
+			throw new IllegalStateException("Can't find a policy to classify " + nodeReference);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -524,7 +510,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setNodeRepositoryService(NodeRepositoryService nodeRepositoryService) {
 		this.nodeRepositoryService = nodeRepositoryService;
 	}
-	public void setNodeSearchModelService(NodeSearchModelService nodeSearchModelService) {
+	public void setNodeSearchModelService(NodeSearchModelRepositoryService nodeSearchModelService) {
 		this.nodeSearchModelService = nodeSearchModelService;
 	}
 	public void setConversionService(ConversionService conversionService) {

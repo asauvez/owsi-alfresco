@@ -25,6 +25,7 @@ Nouveautés
 * DownloadResponse : Watermark invisible
 * Aspect owsi:deleteIfEmpty : efface un répertoire qui aurait l'aspect s'il devient vide
 * Configuration logger coté Alfresco et applications
+* Batch search coté Alfresco
 
 Migration
 =========

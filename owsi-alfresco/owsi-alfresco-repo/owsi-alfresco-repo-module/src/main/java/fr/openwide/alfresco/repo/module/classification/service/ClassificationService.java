@@ -15,9 +15,9 @@ public interface ClassificationService {
 
 	int DEFAULT_RECLASSIFY_BATCH_SIZE = 100;
 
-	int reclassifyAll(int batchSize);
-	int reclassify(ContainerModel model, int batchSize);
-	int reclassify(NameReference modelName, int batchSize);
+	int reclassifyAll(Integer batchSize);
+	int reclassify(ContainerModel model, Integer batchSize);
+	int reclassify(NameReference modelName, Integer batchSize);
 	
 	void clearCaches();
 }
