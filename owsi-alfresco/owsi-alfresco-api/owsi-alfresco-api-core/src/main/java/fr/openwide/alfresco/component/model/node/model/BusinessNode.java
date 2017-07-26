@@ -19,11 +19,6 @@ public class BusinessNode {
 	
 	public BusinessNode(RepositoryNode node) {
 		this.node = node;
-		propertiesNode = new PropertiesNode(this);
-		associationsNode = new AssociationsNode(this);
-		renditionsNode = new RenditionsNode(this);
-		permissionsNode = new PermissionsNode(this);
-		contentsNode = new ContentsNode(this);
 	}
 
 	public BusinessNode() {
@@ -77,22 +72,37 @@ public class BusinessNode {
 	}
 
 	public PropertiesNode properties() {
+		if (propertiesNode == null) {
+			propertiesNode = new PropertiesNode(this);
+		}
 		return propertiesNode;
 	}
 	
 	public AssociationsNode assocs() {
+		if (associationsNode == null) {
+			associationsNode = new AssociationsNode(this);
+		}
 		return associationsNode;
 	}
 	
 	public RenditionsNode renditions() {
+		if (renditionsNode == null) {
+			renditionsNode = new RenditionsNode(this);
+		}
 		return renditionsNode;
 	}
 
 	public ContentsNode contents() {
+		if (contentsNode == null) {
+			contentsNode = new ContentsNode(this);
+		}
 		return contentsNode;
 	}
 
 	public PermissionsNode permissions() {
+		if (permissionsNode == null) {
+			permissionsNode = new PermissionsNode(this);
+		}
 		return permissionsNode;
 	}
 

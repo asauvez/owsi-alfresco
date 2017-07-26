@@ -11,6 +11,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.JavaType;
 
+import fr.openwide.alfresco.api.core.node.util.RepositoryNodeUtil;
 import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 
 /**
@@ -50,7 +51,10 @@ public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemot
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Serializing result: {}", objectMapper.writeValueAsString(resValue));
 		}
-		objectMapper.writeValue(res.getOutputStream(), resValue);
+		RepositoryNodeUtil.runInReadOnly(() -> {
+			objectMapper.writeValue(res.getOutputStream(), resValue);
+			return null;
+		});
 	}
 
 	protected String getRawPayload(WebScriptRequest req) throws IOException {

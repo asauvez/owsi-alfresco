@@ -31,6 +31,7 @@ import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor;
+import fr.openwide.alfresco.api.core.node.util.RepositoryNodeUtil;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class NodeContentSerializationComponent {
@@ -71,8 +72,8 @@ public class NodeContentSerializationComponent {
 			@Override
 			public void visit(RepositoryNode node) {
 				if (! node.getContents().isEmpty()) {
-					node.getExtensions().put(CONTENT_IDS, new ArrayList<Integer>());
-					node.getExtensions().put(CONTENT_PROPERTIES, new ArrayList<String>());
+					node.setExtension(CONTENT_IDS, new ArrayList<Integer>());
+					node.setExtension(CONTENT_PROPERTIES, new ArrayList<String>());
 				}
 				for (NameReference contentProperty : node.getContents().keySet()) {
 					((List<Integer>) node.getExtension(CONTENT_IDS)).add(nextContentId);
@@ -163,7 +164,10 @@ public class NodeContentSerializationComponent {
 				new JavaType[] { valueType  });
 		RemoteCallPayload<P> remoteCallPayload = objectMapper.readValue(zipIterator.getInputStream(), remoteCallPayloadType);
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Deserializing payload: {}", objectMapper.writeValueAsString(remoteCallPayload));
+			RepositoryNodeUtil.runInReadOnly(() -> {
+				LOGGER.debug("Deserializing payload: {}", objectMapper.writeValueAsString(remoteCallPayload));
+				return null;
+			});
 		}
 		zipIterator.next();
 
@@ -209,7 +213,7 @@ public class NodeContentSerializationComponent {
 				deserializer = defaultDeserializer;
 			}
 			Object content = deserializer.deserialize(wrapper.getNode(), wrapper.getContentProperty(), zipIterator.getInputStream());
-			wrapper.getNode().getContents().put(wrapper.getContentProperty(), content);
+			wrapper.getNode().setContent(wrapper.getContentProperty(), content);
 			
 			zipIterator.next();
 		}

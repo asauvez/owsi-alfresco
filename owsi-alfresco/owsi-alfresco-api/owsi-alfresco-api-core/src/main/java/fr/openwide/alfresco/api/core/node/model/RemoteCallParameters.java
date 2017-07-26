@@ -71,13 +71,16 @@ public class RemoteCallParameters implements Serializable {
 		return (parameters != null) ? parameters : DEFAULT_INSTANCE;
 	}
 	
+	public static void execute(RemoteCallParameters parameters, Runnable runnable) {
+		execute(parameters, () -> { runnable.run(); return null; });
+	}
 	public static <V> V execute(RemoteCallParameters parameters, Callable<V> callable) {
 		RemoteCallParameters oldValue = CURRENT.get();
 		try {
 			CURRENT.set(parameters);
 			return callable.call();
 		} catch (Exception e) {
-			throw new IllegalStateException(e);
+			throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
 		} finally {
 			if (oldValue != null) {
 				CURRENT.set(oldValue);

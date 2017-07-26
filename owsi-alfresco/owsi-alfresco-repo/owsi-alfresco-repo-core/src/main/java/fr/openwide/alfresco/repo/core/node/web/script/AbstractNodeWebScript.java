@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -35,6 +34,7 @@ import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.node.util.RepositoryNodeUtil;
 import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractRemoteWebScript;
@@ -123,15 +123,14 @@ public abstract class AbstractNodeWebScript<R, P extends WebScriptParam<R>> exte
 	protected void handleResult(final WebScriptResponse response, final RemoteCallPayload<R> result) throws IOException {
 		response.setContentType(NodeContentSerializationComponent.CONTENT_TYPE);
 		final Collection<RepositoryNode> outputNodes = getOutputNodes(result.getPayload());
-		RemoteCallParameters.execute(result.getRemoteCallParameters(), new Callable<Void>() {
-			@Override
-			public Void call() throws IOException {
+		RemoteCallParameters.execute(result.getRemoteCallParameters(), () -> {
+			RepositoryNodeUtil.runInReadOnly(() -> {
 				serializationComponent.serialize(result.getPayload(),
 						outputNodes,
 						defaultSerializationParameters,
 						response.getOutputStream());
 				return null;
-			}
+			});
 		});
 	}
 

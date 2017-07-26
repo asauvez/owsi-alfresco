@@ -47,6 +47,7 @@ import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.util.RepositoryNodeUtil;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -342,7 +343,10 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		for (PreNodeCreationCallback callback : preNodeCreationCallbacks) {
 			callback.onPreNodeCreationCallback(node);
 		}
-		
+		return RepositoryNodeUtil.runInReadOnly(() -> _create(node));
+	}
+	
+	protected NodeReference _create(RepositoryNode node) throws DuplicateChildNodeNameRemoteException {
 		validateCreate(node);
 		
 		Map<QName, Serializable> properties = new LinkedHashMap<>();
@@ -426,6 +430,10 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	}
 	
 	protected void update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
+		RepositoryNodeUtil.runInReadOnly(() -> _update(node, nodeScope));
+	}
+	
+	protected void _update(RepositoryNode node, NodeScope nodeScope) throws DuplicateChildNodeNameRemoteException {
 		String cmName = node.getProperty(conversionService.get(ContentModel.PROP_NAME), String.class);
 		try {
 			NodeRef nodeRef = conversionService.getRequired(node.getNodeReference());
