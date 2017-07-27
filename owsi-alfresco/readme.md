@@ -38,6 +38,7 @@ Migration
 * owsi-alfresco-repo-remote --> owsi-alfresco-repo-core
 * owsi-alfresco-parent-repo --> owsi-alfresco-parent-repo-component
 * fr.openwide.alfresco.repository --> fr.openwide.alfresco.repo
+* AppDictionaryServiceConfig --> AppCoreServiceConfig
 
 ### Authentification
 * Il n'y a plus de PrincipalType. Si vous utilisiez PrincipalType.USER_DETAILS, vous continuez à déclarer un autre AuthenticationProvider que RepositoryAuthenticationProvider dans votre WebApplicationSecurityConfig.
