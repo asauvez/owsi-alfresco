@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.app.core.security.service.impl;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.springframework.security.access.ConfigAttribute;
@@ -10,8 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Optional;
 
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
@@ -90,6 +89,14 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 			userDetailsService.logout(user);
 		}
 	}
+	@Override
+	public void runAsUser(String username, Runnable task) {
+		try {
+			runAsUser(username, () -> { task.run(); return null; });
+		} catch (Exception e) {
+			throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public <T> T runAsUser(UserDetails user, Callable<T> work) throws Exception {
@@ -107,4 +114,12 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 		}
 	}
 
+	@Override
+	public void runAsUser(UserDetails user, Runnable task) {
+		try {
+			runAsUser(user, () -> { task.run(); return null; });
+		} catch (Exception e) {
+			throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
+		}
+	}
 }
