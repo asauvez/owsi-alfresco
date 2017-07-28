@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
 import fr.openwide.alfresco.app.core.security.service.RepositoryAuthenticationUserDetailsService;
 import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
@@ -76,15 +77,15 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 	}
 
 	@Override
-	public <T> T runAsUser(String username, Callable<T> work) throws Exception {
+	public <T> T runAsUser(String username, Callable<T> task) throws Exception {
 		Optional<Authentication> originalAuthentication = userService.getCurrentAuthentication();
 		if (originalAuthentication.isPresent() && username.equals(originalAuthentication.get().getName())) {
 			// No runAs if the current authenticated user is the target user
-			return work.call();
+			return task.call();
 		}
 		NamedUser user = userDetailsService.loadUserByUsername(username);
 		try {
-			return runAsUser(user, work);
+			return runAsUser(user, task);
 		} finally {
 			userDetailsService.logout(user);
 		}
@@ -97,9 +98,13 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 			throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
 		}
 	}
+	@Override
+	public <T> T runAsSystem(Callable<T> task) throws Exception {
+		return runAsUser(AuthorityReference.USER_SYSTEM.getName(), task);
+	}
 
 	@Override
-	public <T> T runAsUser(UserDetails user, Callable<T> work) throws Exception {
+	public <T> T runAsUser(UserDetails user, Callable<T> task) throws Exception {
 		Optional<Authentication> originalAuthentication = userService.getCurrentAuthentication();
 		// This acts in fact as a Filter, building token and passing it to authenticationManager before setting the context
 		Authentication runAsAuthentication = buildRunAs(user, originalAuthentication);
@@ -107,7 +112,7 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 		SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext());
 		SecurityContextHolder.getContext().setAuthentication(runAsAuthentication);
 		try {
-			return work.call();
+			return task.call();
 		} finally {
 			// Crucial restore of SecurityContextHolder contents - do this before anything else.
 			SecurityContextHolder.getContext().setAuthentication(originalAuthentication.orElse(null));
@@ -121,5 +126,9 @@ public class RunAsUserManagerImpl extends RunAsManagerImpl implements RunAsUserM
 		} catch (Exception e) {
 			throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
 		}
+	}
+	@Override
+	public void runAsSystem(Runnable task) {
+		runAsUser(AuthorityReference.USER_SYSTEM.getName(), task);
 	}
 }
