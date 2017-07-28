@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.app.core.framework.spring.env;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,7 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 	@Autowired private LicenseService licenceService;
 	@Autowired private RunAsUserManager runAsUserManager;
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if (event.getApplicationContext() != applicationContext) {
@@ -84,7 +86,14 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		
 		LOGGER.info("Configuration logging");
 		
-		logPropertyAsInfo("ram", getInMo(Runtime.getRuntime().totalMemory()) + " / " + getInMo(Runtime.getRuntime().maxMemory()));
+		long vmMemorySize = 0;
+		try {
+			vmMemorySize = ((com.sun.management.OperatingSystemMXBean) ManagementFactory
+			        .getOperatingSystemMXBean()).getTotalPhysicalMemorySize();
+		} catch (Throwable t) {
+			// ignore
+		}
+		logPropertyAsInfo("ram", getInMo(Runtime.getRuntime().totalMemory()) + " / " + getInMo(Runtime.getRuntime().maxMemory()) + "/" + getInMo(vmMemorySize));
 		for (File disk : File.listRoots()) {
 			if (disk.isDirectory()) {
 				logPropertyAsInfo("disk." + disk.getAbsolutePath(), getInMo(disk.getUsableSpace()) + " / " + getInMo(disk.getTotalSpace()));
