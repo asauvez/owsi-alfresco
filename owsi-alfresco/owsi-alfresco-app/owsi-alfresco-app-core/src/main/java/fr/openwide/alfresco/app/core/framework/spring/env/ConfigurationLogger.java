@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,10 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 	private List<String> propertyNamesForInfoLogLevel = new ArrayList<>();
 	private String logPattern = "%1$35s : %2$s";
 	private ApplicationContext applicationContext;
-	
+
+	private LicenseRestrictions lastLicenseRestrictions;
+	private long lastAlfrescoConnectionConnection = 0;
+	private String lastAlfrescoConnectionError = null;
 	private Optional<String> repositoryWarning = Optional.empty();
 	private Optional<String> repositoryError = Optional.empty();;
 	
@@ -59,30 +63,8 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		if (event.getApplicationContext() != applicationContext) {
 			return;
 		}
-		
-		LicenseRestrictions restrictions = null;
-		String alfrescoConnectionError = null;
-		try {
-			restrictions = runAsUserManager.runAsSystem(() -> {
-				return licenceService.getRestrictions();
-			});
-			if (restrictions.isReadOnly()) {
-				String errorReadOnlyMessage = environment.getRequiredProperty("application.repository.errorReadOnly.message");
-				repositoryError = Optional.of(errorReadOnlyMessage);
-				LOGGER.error(repositoryError.get());
-			}
-			int warningLicenseValidForDays = environment.getRequiredProperty("application.repository.warningLicenseValidFor.days", Integer.class);
-			if (restrictions.getLicenseValidForDays() != null && restrictions.getLicenseValidForDays() < warningLicenseValidForDays) {
-				String warningLicenseValidForMessage = environment.getRequiredProperty("application.repository.warningLicenseValidFor.message");
-				repositoryWarning = Optional.of(MessageFormat.format(warningLicenseValidForMessage,
-						restrictions.getLicenseValidForDays(),
-						restrictions.getLicenseValidUntil(),
-						warningLicenseValidForDays));
-				LOGGER.warn(repositoryWarning.get());
-			}
-		} catch (Exception e) {
-			alfrescoConnectionError = e.toString();
-		}
+
+		refreshLicenseRestrictions();
 		
 		LOGGER.info("Configuration logging");
 		
@@ -103,14 +85,14 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 			logPropertyAsInfo("db.maximumPoolSize", dataSource.getMaximumPoolSize());
 		}
 		
-		if (restrictions != null) {
-			logPropertyAsInfo("alfresco.readOnly", restrictions.isReadOnly());
-			logPropertyAsInfo("alfresco.licenseHolder", restrictions.getLicenseHolder());
-			logPropertyAsInfo("alfresco.users", (restrictions.getUsers() != null) ? restrictions.getUsers() : "Unlimited");
-			logPropertyAsInfo("alfresco.licenseValidUntil", restrictions.getLicenseValidUntil());
-			logPropertyAsInfo("alfresco.licenseValidFor.days", restrictions.getLicenseValidForDays());
+		if (lastLicenseRestrictions != null) {
+			logPropertyAsInfo("alfresco.readOnly", lastLicenseRestrictions.isReadOnly());
+			logPropertyAsInfo("alfresco.licenseHolder", lastLicenseRestrictions.getLicenseHolder());
+			logPropertyAsInfo("alfresco.users", (lastLicenseRestrictions.getUsers() != null) ? lastLicenseRestrictions.getUsers() : "Unlimited");
+			logPropertyAsInfo("alfresco.licenseValidUntil", lastLicenseRestrictions.getLicenseValidUntil());
+			logPropertyAsInfo("alfresco.licenseValidFor.days", lastLicenseRestrictions.getLicenseValidForDays());
 		} else {
-			logPropertyAsInfo("alfresco.error", alfrescoConnectionError);
+			logPropertyAsInfo("alfresco.error", lastAlfrescoConnectionError);
 		}
 
 		PropertyResolver resolver = BeanFactoryUtils.beanOfType(applicationContext, PropertyResolver.class);
@@ -137,10 +119,41 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		this.logPattern = logPattern;
 	}
 
+	private void refreshLicenseRestrictions() {
+		int licenseCheckHours = environment.getRequiredProperty("application.repository.licenseCheck.hours", Integer.class);
+		if (System.currentTimeMillis() - lastAlfrescoConnectionConnection >= TimeUnit.MILLISECONDS.convert(licenseCheckHours, TimeUnit.HOURS)) {
+			try {
+				lastLicenseRestrictions = runAsUserManager.runAsSystem(() -> {
+					return licenceService.getRestrictions();
+				});
+				repositoryError = Optional.empty();
+				if (lastLicenseRestrictions.isReadOnly()) {
+					String errorReadOnlyMessage = environment.getRequiredProperty("application.repository.errorReadOnly.message");
+					repositoryError = Optional.of(errorReadOnlyMessage);
+					LOGGER.error(repositoryError.get());
+				}
+				int warningLicenseValidForDays = environment.getRequiredProperty("application.repository.warningLicenseValidFor.days", Integer.class);
+				if (lastLicenseRestrictions.getLicenseValidForDays() != null && lastLicenseRestrictions.getLicenseValidForDays() < warningLicenseValidForDays) {
+					String warningLicenseValidForMessage = environment.getRequiredProperty("application.repository.warningLicenseValidFor.message");
+					repositoryWarning = Optional.of(MessageFormat.format(warningLicenseValidForMessage,
+							lastLicenseRestrictions.getLicenseValidForDays(),
+							lastLicenseRestrictions.getLicenseValidUntil(),
+							warningLicenseValidForDays));
+					LOGGER.warn(repositoryWarning.get());
+				}
+				lastAlfrescoConnectionConnection = System.currentTimeMillis();
+			} catch (Exception e) {
+				lastAlfrescoConnectionError = e.toString();
+				repositoryError = Optional.of(lastAlfrescoConnectionError);
+			}
+		}
+	}
 	public Optional<String> getRepositoryWarning() {
+		refreshLicenseRestrictions();
 		return repositoryWarning;
 	}
 	public Optional<String> getRepositoryError() {
+		refreshLicenseRestrictions();
 		return repositoryError;
 	}
 
