@@ -10,14 +10,14 @@ import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
-import fr.openwide.alfresco.app.core.node.service.NodeService;
+import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 
 public class AuthorityServiceImpl implements AuthorityService {
 
-	private final NodeService nodeService;
+	private final RepositoryRemoteBinding repositoryRemoteBinding;
 
-	public AuthorityServiceImpl(NodeService nodeService) {
-		this.nodeService = nodeService;
+	public AuthorityServiceImpl(RepositoryRemoteBinding repositoryRemoteBinding) {
+		this.repositoryRemoteBinding = repositoryRemoteBinding;
 	}
 	
 	@Override
@@ -25,7 +25,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		GET_USER payload = new GET_USER();
 		payload.userName = userName;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(payload, nodeScope);
+		return repositoryRemoteBinding.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
@@ -37,14 +37,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		payload.email = email;
 		payload.password = password;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(payload, nodeScope);
+		return repositoryRemoteBinding.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
 	public void deleteUser(String userName) throws NoSuchNodeRemoteException {
 		DELETE_USER payload = new DELETE_USER();
 		payload.userName = userName;
-		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		repositoryRemoteBinding.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
@@ -52,14 +52,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		UPDATE_USER_PASSWORD payload = new UPDATE_USER_PASSWORD();
 		payload.userName = userName;
 		payload.newPassword = newPassword;
-		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		repositoryRemoteBinding.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
 	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters) {
 		GET_CONTAINED_AUTHORITIES payload = new GET_CONTAINED_AUTHORITIES();
 		payload.searchParameters = searchParameters;
-		return nodeService.callNodeListSerializer(payload, searchParameters.getNodeScope());
+		return repositoryRemoteBinding.callNodeListSerializer(payload, searchParameters.getNodeScope());
 	}
 	
 	@Override
@@ -67,7 +67,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		GET_GROUP payload = new GET_GROUP();
 		payload.groupShortName = groupShortName;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(payload, nodeScope);
+		return repositoryRemoteBinding.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
@@ -77,14 +77,14 @@ public class AuthorityServiceImpl implements AuthorityService {
 		payload.groupShortName = groupShortName;
 		payload.groupDisplayName = groupDisplayName;
 		payload.nodeScope = nodeScope;
-		return nodeService.callNodeSerializer(payload, nodeScope);
+		return repositoryRemoteBinding.callNodeSerializer(payload, nodeScope);
 	}
 	
 	@Override
 	public void deleteGroup(String groupShortName) throws NoSuchNodeRemoteException {
 		DELETE_GROUP payload = new DELETE_GROUP();
 		payload.groupShortName = groupShortName;
-		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		repositoryRemoteBinding.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
@@ -92,7 +92,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		ADD_TO_GROUP payload = new ADD_TO_GROUP();
 		payload.subAuthorityFullName = subAuthorityFullName;
 		payload.parentGroupShortName = parentGroupShortName;
-		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		repositoryRemoteBinding.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 	
 	@Override
@@ -100,7 +100,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 		REMOVE_FROM_GROUP payload = new REMOVE_FROM_GROUP();
 		payload.subAuthorityFullName = subAuthorityFullName;
 		payload.parentGroupShortName = parentGroupShortName;
-		nodeService.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
+		repositoryRemoteBinding.callNodeUploadSerializer(payload, null, new NodeContentSerializationParameters(), new NodeContentDeserializationParameters());
 	}
 
 }

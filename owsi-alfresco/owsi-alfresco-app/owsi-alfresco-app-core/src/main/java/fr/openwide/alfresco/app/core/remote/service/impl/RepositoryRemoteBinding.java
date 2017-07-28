@@ -5,6 +5,8 @@ import java.net.ConnectException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +24,26 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
+import java.util.Map.Entry;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.ObjectArrays;
 
 import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
+import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
+import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationComponent;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodePayloadCallback;
+import fr.openwide.alfresco.api.core.node.model.ContentPropertyWrapper;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
+import fr.openwide.alfresco.api.core.node.model.RepositoryVisitor;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryIOException;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryNodeRemoteCallBuilder;
@@ -46,6 +56,9 @@ public class RepositoryRemoteBinding {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryRemoteBinding.class);
 	private static final Logger LOGGER_AUDIT = LoggerFactory.getLogger(RepositoryRemoteBinding.class.getName() + "_audit");
+
+	private NodeContentSerializationParameters defaultSerializationParameters = new NodeContentSerializationParameters();
+	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
 
 	private final RestTemplate restTemplate;
 	private final NodeContentSerializationComponent serializationComponent;
@@ -216,4 +229,76 @@ public class RepositoryRemoteBinding {
 		return new RepositoryRemoteException(e);
 	}
 
+	private void initDeserializer(NodeScope nodeScope, final NodeContentDeserializationParameters deserializationParameters) {
+		nodeScope.visit(new RepositoryVisitor<NodeScope>() {
+			@Override
+			public void visit(NodeScope nodeScope) {
+				if (! nodeScope.getContentDeserializers().isEmpty()) {
+					for (Entry<NameReference, NodeContentDeserializer<?>> entry : nodeScope.getContentDeserializers().entrySet()) {
+						push(entry.getKey());
+						deserializationParameters.getDeserializersByPath().put(getCurrentPath(), entry.getValue());
+						pop(entry.getKey());
+					}
+				}
+			}
+			
+		});
+	}
+
+	public <R> R callNodeUploadSerializer(
+			WebScriptParam<R> payload,
+			List<RepositoryNode> nodes,
+			NodeContentSerializationParameters serializationParameters,
+			NodeContentDeserializationParameters deserializationParameters) {
+		return callPayloadSerializer(payload, nodes, null, serializationParameters, deserializationParameters);
+	}
+	
+	public RepositoryNode callNodeSerializer(WebScriptParam<RepositoryNode> payload, NodeScope nodeScope) {
+		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
+		initDeserializer(nodeScope, deserializationParameters);
+		
+		return callPayloadSerializer(payload, null, 
+				new NodePayloadCallback<RepositoryNode>() {
+					@Override
+					public Collection<RepositoryNode> extractNodes(RepositoryNode value) {
+						return Collections.singleton(value);
+					}
+					@Override
+					public void doWithPayload(RemoteCallPayload<RepositoryNode> payload, Collection<ContentPropertyWrapper> wrappers) {
+						// on récupére la valeur en retour de la fonction
+					}
+				}, 
+				defaultSerializationParameters, 
+				deserializationParameters);
+	}
+	
+	public List<RepositoryNode> callNodeListSerializer(
+			WebScriptParam<List<RepositoryNode>> payload,
+			NodeScope nodeScope) {
+		
+		NodeContentDeserializationParameters deserializationParameters = defaultDeserializationParameters.clone();
+		initDeserializer(nodeScope, deserializationParameters);
+		
+		return callPayloadSerializer(
+				payload, null, 
+				new NodePayloadCallback<List<RepositoryNode>>() {
+					@Override
+					public Collection<RepositoryNode> extractNodes(List<RepositoryNode> nodes) {
+						return nodes;
+					}
+					@Override
+					public void doWithPayload(RemoteCallPayload<List<RepositoryNode>> payload, Collection<ContentPropertyWrapper> wrappers) {
+						// on récupére la valeur en retour de la fonction
+					}
+				}, 
+				defaultSerializationParameters, 
+				deserializationParameters);
+	}
+	
+	public NodeContentSerializationParameters getDefaultSerializationParameters() {
+		return defaultSerializationParameters;
+	}
+	public NodeContentDeserializationParameters getDefaultDeserializationParameters() {
+		return defaultDeserializationParameters;
+	}
 }

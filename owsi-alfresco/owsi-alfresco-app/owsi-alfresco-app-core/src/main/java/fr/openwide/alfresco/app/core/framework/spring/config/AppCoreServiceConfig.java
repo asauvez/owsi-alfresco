@@ -38,7 +38,7 @@ public class AppCoreServiceConfig {
 
 	@Bean
 	public AuthorityService authorityService() {
-		return new AuthorityServiceImpl(nodeService());
+		return new AuthorityServiceImpl(appCoreSecurityConfig.userAwareRepositoryRemoteBinding());
 	}
 	@Bean
 	public AuthorityModelService authorityModelService() {
@@ -47,7 +47,7 @@ public class AppCoreServiceConfig {
 
 	@Bean
 	public NodeSearchService nodeSearchService() {
-		return new NodeSearchServiceImpl(nodeService());
+		return new NodeSearchServiceImpl(appCoreSecurityConfig.userAwareRepositoryRemoteBinding());
 	}
 	@Bean
 	public NodeSearchModelService nodeSearchModelService() {
