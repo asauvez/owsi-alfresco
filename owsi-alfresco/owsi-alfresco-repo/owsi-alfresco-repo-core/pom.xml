@@ -20,6 +20,10 @@
 			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-contentstoreexport</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>

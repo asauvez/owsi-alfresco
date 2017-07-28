@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -68,6 +69,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 
 	private final Logger LOGGER = LoggerFactory.getLogger(ContentStoreExportServiceImpl.class);
 
+	public static StringBuilder configurationLogger = new StringBuilder();
+	
 	private DescriptorService descriptorService;
 	private NodeService nodeService;
 	private SearchService searchService;
@@ -108,6 +111,15 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			writer.flush();
 			zipOutPutStream.closeEntry();
 
+			// Ajout du ConfigurationLogger, s'il est disponible
+			if (configurationLogger.length() > 0) {
+				zipOutPutStream.putNextEntry(new ZipEntry("configurationlogger.txt"));
+				OutputStreamWriter out = new OutputStreamWriter(zipOutPutStream, "UTF-8");
+				out.append(configurationLogger.toString());
+				out.flush();
+				zipOutPutStream.closeEntry();
+			}
+			
 			// fin des traitements (aucun traitement supplémentaire ne doit etre fait au dela de ce point)
 			/* calcul du temps d'execution, intégration de la donnée dans le .properties et ajout du .properties
 			dans le zip */

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.alfresco.service.license.LicenseDescriptor;
+import org.alfresco.service.license.LicenseService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
@@ -15,6 +17,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+
+import fr.openwide.alfresco.repo.contentstoreexport.service.impl.ContentStoreExportServiceImpl;
 
 /**
  * <p>Ce listener Spring permet de logguer la configuration du contexte Spring lors de l'émission
@@ -37,8 +41,7 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 	private ApplicationContext applicationContext;
 	private Properties globalProperties;
 
-	@Autowired
-	private BasicDataSource dataSource;
+	@Autowired private BasicDataSource dataSource;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -57,6 +60,14 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		if (dataSource != null) {
 			logPropertyAsInfo("db.maximumPoolSize", dataSource.getMaxIdle() + "/" + dataSource.getMaxActive());
 		}
+		
+		LicenseService licenseService = applicationContext.getBean(LicenseService.class);
+		LicenseDescriptor license = licenseService.getLicense();
+		logPropertyAsInfo("alfresco.licenseValid", licenseService.isLicenseValid());
+		logPropertyAsInfo("alfresco.licenseHolder", license.getIssued());
+		logPropertyAsInfo("alfresco.users", (license.getMaxUsers() != null) ? license.getMaxUsers() : "Unlimited");
+		logPropertyAsInfo("alfresco.licenseValidUntil", license.getValidUntil());
+		logPropertyAsInfo("alfresco.licenseValidFor.days", license.getRemainingDays());
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		StrSubstitutor strSubstitutor = new StrSubstitutor((Map) globalProperties);
@@ -72,8 +83,10 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		LOGGER.info("Configuration logging end");
 	}
 
-	protected void logPropertyAsInfo(String propertyName, String value) {
-		LOGGER.info(String.format(logPattern, propertyName, value));
+	protected void logPropertyAsInfo(String propertyName, Object value) {
+		String line = String.format(logPattern, propertyName, value);
+		ContentStoreExportServiceImpl.configurationLogger.append(line).append("\n");
+		LOGGER.info(line);
 	}
 
 	private static String getInMo(long n) {
