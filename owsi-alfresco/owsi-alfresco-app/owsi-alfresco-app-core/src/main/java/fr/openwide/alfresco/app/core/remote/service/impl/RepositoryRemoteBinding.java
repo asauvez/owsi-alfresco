@@ -141,6 +141,15 @@ public class RepositoryRemoteBinding {
 		}
 		long before = System.currentTimeMillis();
 		HttpMethod httpMethod = HttpMethod.valueOf(method.name());
+		switch (httpMethod) {
+		case POST: case PUT: 
+			break;
+		default:
+			requestEntity = null;
+			break;
+		}
+		
+		
 		try {
 			if (responseExtractor != null) {
 				return restTemplate.execute(uri, httpMethod, requestCallback, responseExtractor);

@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -14,11 +13,14 @@ import fr.openwide.alfresco.app.core.authentication.service.AuthenticationServic
 import fr.openwide.alfresco.app.core.authentication.service.impl.AuthenticationServiceImpl;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.app.core.authority.service.impl.AuthorityServiceImpl;
+import fr.openwide.alfresco.app.core.licence.service.LicenseService;
+import fr.openwide.alfresco.app.core.licence.service.impl.LicenseServiceImpl;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.node.service.impl.NodeServiceImpl;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.app.core.search.service.impl.NodeSearchServiceImpl;
+import fr.openwide.alfresco.app.core.security.service.TicketReferenceProvider;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 import fr.openwide.alfresco.app.core.site.service.impl.SiteServiceImpl;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
@@ -76,9 +78,15 @@ public class AppCoreServiceConfig {
 	}
 
 	@Bean
+	public LicenseService licenceService(TicketReferenceProvider ticketProvider) {
+		return new LicenseServiceImpl(appCoreRemoteBindingConfig.userAwareRepositoryRemoteBinding(ticketProvider));
+	}
+	
+	@Bean
 	public SiteService siteService(AuthorityService authorityService, NodeSearchService nodeSearchService, 
-			@Qualifier(AppCoreRemoteBindingConfig.SHARE_REMOTE_BINDING) RepositoryRemoteBinding shareBinding) {
-		return new SiteServiceImpl(authorityService, nodeSearchService, shareBinding);
+			TicketReferenceProvider ticketProvider) {
+		return new SiteServiceImpl(authorityService, nodeSearchService, 
+				appCoreRemoteBindingConfig.shareRemoteBinding(ticketProvider));
 	}
 
 }
