@@ -44,7 +44,7 @@ public class RepositoryNode implements Serializable, RepositoryVisitable<Reposit
 
 	@JsonDeserialize(as=LinkedHashSet.class) private Set<PermissionReference> userPermissions;
 	private Boolean inheritParentPermissions;
-	private Set<RepositoryAccessControl> accessControlList;
+	@JsonDeserialize(as=LinkedHashSet.class) private Set<RepositoryAccessControl> accessControlList;
 
 	public RepositoryNode() {
 	}
