@@ -1,6 +1,10 @@
 package fr.openwide.alfresco.app.web.download.model;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.http.HttpHeaders;
 
 import fr.openwide.alfresco.app.web.validation.model.AlertContainer;
 
@@ -26,6 +30,15 @@ public abstract class DownloadResponse {
 	public HttpServletResponse getServletResponse() {
 		return httpServletResponse;
 	}
+	public DownloadResponse noCache() {
+		httpServletResponse.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
+		httpServletResponse.setHeader(HttpHeaders.PRAGMA, "no-cache");
+		return this;
+	} 
+	public DownloadResponse cache(int duration, TimeUnit timeUnit) {
+		httpServletResponse.setHeader(HttpHeaders.CACHE_CONTROL, "max-age=" + timeUnit.toSeconds(duration));
+		return this;
+	} 
 	
 	public AlertContainer getAlertContainer() {
 		return alertContainer;
