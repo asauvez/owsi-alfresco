@@ -623,19 +623,21 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 			if (contentData.getLocale() != null) {
 				writer.setLocale(contentData.getLocale());
 			}
-	
-			if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
-				if (contentData.getMimetype() == null) {
-					String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-					writer.guessMimetype(cmName);
-				}
-				if (contentData.getEncoding() == null) {
-					writer.guessEncoding();
-				}
-			}
-			// Nécessaire, car non mis à jour après putContent
-			nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
+		} else {
+			contentData = new RepositoryContentData();
 		}
+		
+		if (contentData.getMimetype() == null || contentData.getEncoding() == null) {
+			if (contentData.getMimetype() == null) {
+				String cmName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+				writer.guessMimetype(cmName);
+			}
+			if (contentData.getEncoding() == null) {
+				writer.guessEncoding();
+			}
+		}
+		// Nécessaire, car non mis à jour après putContent
+		nodeService.setProperty(nodeRef, conversionService.getRequired(contentProperty), writer.getContentData());
 	}
 	
 	@Override
