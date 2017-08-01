@@ -6,19 +6,19 @@ public abstract class RenditionsSetter<R> {
 
 	// cf. thumbnail-service-context.xml
 	// 100x100 
-	private static final NameReference MEDIUM_PREVIEW_RENDITION = NameReference.create("cm", "medium");
+	public static final NameReference MEDIUM_PREVIEW_RENDITION = NameReference.create("cm", "medium");
 	// 100x100 sans enlargement
-	private static final NameReference DOCLIB_PREVIEW_RENDITION = NameReference.create("cm", "doclib");
+	public static final NameReference DOCLIB_PREVIEW_RENDITION = NameReference.create("cm", "doclib");
 	// 960x960
-	private static final NameReference IMG_PREVIEW_RENDITION = NameReference.create("cm", "imgpreview");
+	public static final NameReference IMG_PREVIEW_RENDITION = NameReference.create("cm", "imgpreview");
 	// User avatar 64x64 image thumbnail options
-	private static final NameReference AVATAR_PREVIEW_RENDITION = NameReference.create("cm", "avatar");
+	public static final NameReference AVATAR_PREVIEW_RENDITION = NameReference.create("cm", "avatar");
 	// User avatar 32x32 image thumbnail options
-	private static final NameReference AVATAR32_PREVIEW_RENDITION = NameReference.create("cm", "avatar32");
+	public static final NameReference AVATAR32_PREVIEW_RENDITION = NameReference.create("cm", "avatar32");
 	// shockwave-flash
-	private static final NameReference WEB_PREVIEW_RENDITION = NameReference.create("cm", "webpreview");
+	public static final NameReference WEB_PREVIEW_RENDITION = NameReference.create("cm", "webpreview");
 	// PDF
-	private static final NameReference PDF_RENDITION = NameReference.create("cm", "pdf");
+	public static final NameReference PDF_RENDITION = NameReference.create("cm", "pdf");
 
 	public abstract R name(NameReference renditionName);
 	

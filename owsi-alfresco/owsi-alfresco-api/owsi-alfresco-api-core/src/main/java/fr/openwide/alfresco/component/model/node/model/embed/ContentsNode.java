@@ -1,7 +1,5 @@
 package fr.openwide.alfresco.component.model.node.model.embed;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -40,16 +38,9 @@ public class ContentsNode {
 			content = new byte[0];
 		}
 		repoNode.getContents().put(property.getNameReference(), content);
-		if (contentData == null) {
-			contentData = new RepositoryContentData();
+		if (contentData != null) {
+			repoNode.getProperties().put(property.getNameReference(), contentData);
 		}
-		repoNode.getProperties().put(property.getNameReference(), contentData);
-		
-		if (contentData.getMimetype() == null && content instanceof MultipartFile) {
-			contentData.setMimetype(((MultipartFile) content).getContentType());
-		}
-
-		
 		return node;
 	}
 	

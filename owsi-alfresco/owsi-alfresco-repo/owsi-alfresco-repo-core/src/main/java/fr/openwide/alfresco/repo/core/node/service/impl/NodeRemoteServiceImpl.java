@@ -44,6 +44,7 @@ import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
+import fr.openwide.alfresco.api.core.node.model.RenditionsSetter;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -213,10 +214,10 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		
 		// get associations
 		for (Entry<NameReference, NodeScope> entry : scope.getRenditions().entrySet()) {
-			ChildAssociationRef renditionRef = getRendition(nodeRef, conversionService.getRequired(entry.getKey()));
+			NodeRef renditionRef = getRendition(nodeRef, conversionService.getRequired(entry.getKey()));
 			node.getRenditions().put(
 					entry.getKey(), 
-					getRepositoryNode(renditionRef.getChildRef(), entry.getValue()));
+					getRepositoryNode(renditionRef, entry.getValue()));
 		}
 		for (Entry<NameReference, NodeScope> entry : scope.getChildAssociations().entrySet()) {
 			node.getChildAssociations().put(
@@ -270,7 +271,15 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		return node;
 	}
 
-	private ChildAssociationRef getRendition(final NodeRef nodeRef, final QName renditionName) {
+	private NodeRef getRendition(final NodeRef nodeRef, final QName renditionName) {
+		// Si on demande une rendition PDF et qu'il s'agit déjà d'un PDF, on renvoi le document lui même
+		String contentMimeType = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT).getMimetype();
+		if (   RenditionsSetter.PDF_RENDITION.equals(conversionService.get(renditionName))
+			&& "application/pdf".equals(contentMimeType)) {
+			LOGGER.debug("Ask for a PDF rendition on a PDF. Return the node itself");
+			return nodeRef;
+		}
+		
 		ChildAssociationRef renditionRef = renditionService.getRenditionByName(nodeRef, renditionName);
 		if (renditionRef == null) {
 			// Si la rendition n'est pas encore calculée, on la calcule.
@@ -304,7 +313,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 //				lock.unlock();
 			}
 		}
-		return renditionRef;
+		return renditionRef.getChildRef();
 	}
 	
 	protected void validateCreate(RepositoryNode node) {
