@@ -107,7 +107,13 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
 			zipOutPutStream.putNextEntry(new ZipEntry("jmxdump.txt"));
 			PrintWriter writer = new PrintWriter(zipOutPutStream);
-			JmxDumpUtil.dumpConnection(mbeanServer, writer);
+			try {
+				JmxDumpUtil.dumpConnection(mbeanServer, writer);
+			} catch (Throwable t) {
+				// Si dans une vielle version cela ne passe pas, on ignore
+				LOGGER.error("Ignore ", t);
+				t.printStackTrace(writer);
+			}
 			writer.flush();
 			zipOutPutStream.closeEntry();
 
