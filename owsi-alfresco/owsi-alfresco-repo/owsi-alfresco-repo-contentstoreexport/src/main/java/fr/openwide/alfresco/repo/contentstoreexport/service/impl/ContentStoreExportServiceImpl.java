@@ -99,14 +99,22 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			for (NodeRef root : rootNodesToExport) {
 				count += recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes);
 			}
-			exportLocalFiles(zipOutPutStream, new File(TOMCAT_HOME + "/shared/classes"));
 			LOGGER.info("Nombre de fichiers exportés: " + count);
 			properties.setProperty("nbr.fichiers.exportes", "" + count);
 			LOGGER.info("Fin de l'export.");
+
+			exportLocalFiles(zipOutPutStream, new File(TOMCAT_HOME + "/shared/classes"));
+
+			// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
+			zipOutPutStream.putNextEntry(new ZipEntry("jars.txt"));
+			PrintWriter writer = new PrintWriter(zipOutPutStream);
+			exportListJars(writer, new File(TOMCAT_HOME));
+			writer.flush();
+			zipOutPutStream.closeEntry();
 			
 			// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
 			zipOutPutStream.putNextEntry(new ZipEntry("jmxdump.txt"));
-			PrintWriter writer = new PrintWriter(zipOutPutStream);
+			writer = new PrintWriter(zipOutPutStream);
 			try {
 				JmxDumpUtil.dumpConnection(mbeanServer, writer);
 			} catch (Throwable t) {
@@ -145,7 +153,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		if (root.isDirectory()) {
 			File[] files = root.listFiles();
 			if (files != null) {
-				for (File file:files) {
+				for (File file : files) {
 					String path = file.getAbsolutePath();
 					// substring du path pour n'avoir que shared/classes dans le zip
 					if (path.startsWith(TOMCAT_HOME)) {
@@ -163,6 +171,24 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 						}
 					}
 					exportLocalFiles(zipOutPutStream, file);
+				}
+			}
+		}
+	}
+	
+	private void exportListJars(PrintWriter writer, File root) throws IOException {
+		if (root.isDirectory()) {
+			File[] files = root.listFiles();
+			if (files != null) {
+				for (File file : files) {
+					String path = file.getAbsolutePath();
+					if (path.startsWith(TOMCAT_HOME)) {
+						path = path.substring(TOMCAT_HOME.length()); 
+					}
+					if (!file.isDirectory() && path.endsWith(".jar")) {
+						writer.println(path);
+					}
+					exportListJars(writer, file);
 				}
 			}
 		}
