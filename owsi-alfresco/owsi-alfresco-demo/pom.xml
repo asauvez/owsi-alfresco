@@ -19,7 +19,6 @@
 		<module>owsi-alfresco-demo-alfresco</module>
 		<module>owsi-alfresco-demo-share-component</module>
 		<module>owsi-alfresco-demo-share</module>
-		<module>owsi-alfresco-demo-solr</module>
 		<module>owsi-alfresco-demo-application</module>
 		<module>owsi-alfresco-demo-core</module>
 		<module>owsi-alfresco-demo-webapp</module>
