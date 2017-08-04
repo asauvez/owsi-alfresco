@@ -145,6 +145,9 @@ public class RestrictionBuilder extends Restriction {
 	public TagRestriction tag(String tag) {
 		return add(new TagRestriction(this, tag));
 	}
+	public FingerPrintRestriction fingerPrint(NodeReference nodeReference) {
+		return add(new FingerPrintRestriction(this, nodeReference));
+	}
 
 	public CustomRestriction custom(String customQuery) {
 		return add(new CustomRestriction(this, customQuery));
