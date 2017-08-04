@@ -18,9 +18,9 @@
 		<share.webapp.name>share</share.webapp.name>
 		<solr.webapp.name>solr</solr.webapp.name>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
-		<owsi-alfresco.repo.alfresco.version>5.2.0</owsi-alfresco.repo.alfresco.version>
-		<owsi-alfresco.repo.alfresco-core.version>6.1</owsi-alfresco.repo.alfresco-core.version>
-		<owsi-alfresco.alfresco-data-model.version>6.8</owsi-alfresco.alfresco-data-model.version>
+		<owsi-alfresco.repo.alfresco.version>5.2.1</owsi-alfresco.repo.alfresco.version>
+		<owsi-alfresco.repo.alfresco-core.version>6.11</owsi-alfresco.repo.alfresco-core.version>
+		<owsi-alfresco.alfresco-data-model.version>6.16</owsi-alfresco.alfresco-data-model.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
 		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.h2.version>1.4.190</owsi-alfresco.repo.h2.version>
@@ -572,6 +572,12 @@
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk15</artifactId>
 				<version>${owsi-alfresco.repo.bcprov-jdk15.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcmail-jdk15</artifactId>
+				<version>${owsi-alfresco.repo.bcmail-jdk15.version}</version>
 				<scope>provided</scope>
 			</dependency>
 		</dependencies>

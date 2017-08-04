@@ -14,7 +14,7 @@
 	
 	<properties>
 		<owsi-alfresco.share.alfresco.version>5.1.2</owsi-alfresco.share.alfresco.version>
-		<owsi-alfresco.share.alfresco-core.version>6.1</owsi-alfresco.share.alfresco-core.version>
+		<owsi-alfresco.share.alfresco-core.version>6.5</owsi-alfresco.share.alfresco-core.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
 		<springframework-extensions-surf.version>1.2.0-M18</springframework-extensions-surf.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
@@ -30,6 +30,7 @@
 		<owsi-alfresco.share.commons-fileupload.version>1.3.2</owsi-alfresco.share.commons-fileupload.version>
 		<owsi-alfresco.share.commons-collections.version>3.2.2</owsi-alfresco.share.commons-collections.version>
 		<owsi-alfresco.share.commons-httpclient.version>3.1-HTTPCLIENT-1265</owsi-alfresco.share.commons-httpclient.version>
+		<owsi-alfresco.share.httpclient.version>4.5.1</owsi-alfresco.share.httpclient.version>
 		<owsi-alfresco.share.xml-apis.version>1.4.01</owsi-alfresco.share.xml-apis.version>
 		<owsi-alfresco.share.jaxen.version>1.1.6</owsi-alfresco.share.jaxen.version>
 		<owsi-alfresco.share.json.version>20090211</owsi-alfresco.share.json.version>
@@ -143,6 +144,18 @@
 				<artifactId>commons-httpclient</artifactId>
 				<version>${owsi-alfresco.share.commons-httpclient.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${owsi-alfresco.share.httpclient.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+  						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>xml-apis</groupId>
