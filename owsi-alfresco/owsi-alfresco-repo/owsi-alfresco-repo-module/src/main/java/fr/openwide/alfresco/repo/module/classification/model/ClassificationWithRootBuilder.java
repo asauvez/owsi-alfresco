@@ -18,7 +18,7 @@ public class ClassificationWithRootBuilder {
 
 	private final ClassificationServiceImpl service;
 	private final BusinessNode node;
-	private final NodeReference destinationFolder;
+	private NodeReference destinationFolder;
 
 	public ClassificationWithRootBuilder(ClassificationServiceImpl service, BusinessNode node, NodeReference destinationFolder) {
 		this.service = service;
@@ -34,8 +34,8 @@ public class ClassificationWithRootBuilder {
 			.properties().name(folderName));
 	}
 	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
-		NodeReference newDestinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);
-		return new ClassificationWithRootBuilder(service, node, newDestinationFolder);
+		destinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);
+		return this;
 	}
 	/**
 	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
