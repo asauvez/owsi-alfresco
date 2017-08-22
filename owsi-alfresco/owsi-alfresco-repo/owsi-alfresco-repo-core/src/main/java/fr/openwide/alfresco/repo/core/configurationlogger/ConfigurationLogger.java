@@ -1,11 +1,16 @@
 package fr.openwide.alfresco.repo.core.configurationlogger;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.alfresco.service.license.LicenseDescriptor;
 import org.alfresco.service.license.LicenseService;
@@ -35,6 +40,15 @@ import fr.openwide.alfresco.repo.contentstoreexport.service.impl.ContentStoreExp
 public class ConfigurationLogger implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationLogger.class);
+
+	private static final String MD5_PREFIX = "MD5:";
+	private MessageDigest md5MessageDigest; {
+		try {
+			md5MessageDigest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	private static List<String> propertyNamesForInfoLogLevel = new ArrayList<>();
 	
@@ -83,9 +97,17 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		StrSubstitutor strSubstitutor = new StrSubstitutor((Map) globalProperties);
 		for (String propertyName : propertyNamesForInfoLogLevel) {
+			boolean md5 = propertyName.startsWith(MD5_PREFIX);
+			if (md5) {
+				// Utile pour ne pas logger les passwords, juste leur signature
+				propertyName = propertyName.substring(MD5_PREFIX.length());
+			}
 			String value = globalProperties.getProperty(propertyName);
 			if (value != null) {
 				value = strSubstitutor.replace(value);
+				if (md5) {
+					value = MD5_PREFIX + md5(value);
+				}
 				logPropertyAsInfo(propertyName, value);
 			} else {
 				throw new IllegalStateException("Property not found " + propertyName);
@@ -94,6 +116,14 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		LOGGER.info("Configuration logging end");
 	}
 
+	private String md5(String value) {
+		try {
+			return DatatypeConverter.printHexBinary(md5MessageDigest.digest(value.getBytes("UTF-8"))).toUpperCase();
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+	
 	protected void logPropertyAsInfo(String propertyName, Object value) {
 		String line = String.format(logPattern, propertyName, value);
 		ContentStoreExportServiceImpl.configurationLogger.append(line).append("\n");

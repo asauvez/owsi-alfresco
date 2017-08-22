@@ -1,12 +1,17 @@
 package fr.openwide.alfresco.app.core.framework.spring.env;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +45,15 @@ import fr.openwide.alfresco.app.core.security.service.RunAsUserManager;
 public class ConfigurationLogger implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationLogger.class);
+
+	private static final String MD5_PREFIX = "MD5:";
+	private MessageDigest md5MessageDigest; {
+		try {
+			md5MessageDigest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	private List<String> propertyNamesForInfoLogLevel = new ArrayList<>();
 	private String logPattern = "%1$35s : %2$s";
@@ -98,9 +112,27 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		PropertyResolver resolver = BeanFactoryUtils.beanOfType(applicationContext, PropertyResolver.class);
 		// Logging configured properties
 		for (String propertyName : propertyNamesForInfoLogLevel) {
-			logPropertyAsInfo(propertyName, resolver.getRequiredProperty(propertyName));
+			boolean md5 = propertyName.startsWith(MD5_PREFIX);
+			if (md5) {
+				// Utile pour ne pas logger les passwords, juste leur signature
+				propertyName = propertyName.substring(MD5_PREFIX.length());
+			}
+
+			String value = resolver.getRequiredProperty(propertyName);
+			if (md5) {
+				value = MD5_PREFIX + md5(value);
+			}
+			logPropertyAsInfo(propertyName, value);
 		}
 		LOGGER.info("Configuration logging end");
+	}
+
+	private String md5(String value) {
+		try {
+			return DatatypeConverter.printHexBinary(md5MessageDigest.digest(value.getBytes("UTF-8"))).toUpperCase();
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private void logPropertyAsInfo(String propertyName, Object value) {

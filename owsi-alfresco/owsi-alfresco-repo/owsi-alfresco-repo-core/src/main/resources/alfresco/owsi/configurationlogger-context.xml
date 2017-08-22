@@ -10,7 +10,7 @@
 				<value>owsi-alfresco.version</value>
 				<value>dir.root</value>
 				<value>db.username</value>
-				<!-- value>db.password</value -->
+				<value>MD5:db.password</value>
 				<value>db.driver</value>
 				<value>db.url</value>
 				<!-- value>ftp.enabled</value>
@@ -25,7 +25,7 @@
 				<value>external.authentication.defaultAdministratorUserNames</value>
 
 				<value>ldap.synchronization.java.naming.security.principal</value -->
-				<!-- value>ldap.synchronization.java.naming.security.credentials</value -->
+				<!-- value>MD5:ldap.synchronization.java.naming.security.credentials</value -->
 				<!-- value>ldap.authentication.java.naming.provider.url</value>
 				<value>ldap.synchronization.groupSearchBase</value>
 				<value>ldap.synchronization.groupQuery</value>
