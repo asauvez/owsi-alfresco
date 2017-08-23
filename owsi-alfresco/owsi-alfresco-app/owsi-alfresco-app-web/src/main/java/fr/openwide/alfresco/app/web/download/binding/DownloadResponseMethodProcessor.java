@@ -220,23 +220,23 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		streamInput(download, data.getSize(), false, inputStream, response);
 	}
 
-	protected void streamInput(DownloadResponse download, long contentLength, boolean manageRange, 
+	protected void streamInput(DownloadResponse download, long fullContentLength, boolean manageRange, 
 			InputStream input, HttpServletResponse response) throws IOException {
 		setContentDispositionHeader(download, response);
 
 		if (download.getContentWatermark() != null) {
-			contentLength += download.getContentWatermark().length;
+			fullContentLength += download.getContentWatermark().length;
 			input = new SequenceInputStream(input, new ByteArrayInputStream(download.getContentWatermark()));
 		}
 		
 		// set content-length manually rather than using setContentLength to allow for size as long
-		contentLength = download.getContentLength(contentLength);
-		String range = download.getContentRange(contentLength); 
+		String range = download.getContentRange(fullContentLength); 
+		long packetContentLength = download.getContentLength(fullContentLength);
 
 		response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
-		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(contentLength));
+		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(packetContentLength));
 		if (range != null) {
-			response.setHeader(HttpHeaders.CONTENT_RANGE, download.getContentRange(contentLength));
+			response.setHeader(HttpHeaders.CONTENT_RANGE, range);
 		}
 		
 		try {
@@ -245,7 +245,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 				IOUtils.copy(input, output);
 			} else {
 				long inputOffset = (download.getContentRangeStart() != null) ? download.getContentRangeStart() : 0L;
-				long length = ((download.getContentRangeEnd() != null) ? download.getContentRangeEnd() : contentLength)
+				long length = ((download.getContentRangeEnd() != null) ? download.getContentRangeEnd() : packetContentLength)
 						 - inputOffset;
 				IOUtils.copyLarge(input, output, inputOffset, length);
 			}
