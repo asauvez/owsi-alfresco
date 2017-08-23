@@ -22,6 +22,9 @@ public class AuthorityReference implements Serializable {
 	public static final AuthorityReference GROUP_SITE_ADMINISTRATORS = AuthorityReference.group("SITE_ADMINISTRATORS");
 	
 	public static final AuthorityReference ROLE_ADMINISTRATOR = AuthorityReference.authority("ROLE_ADMINISTRATOR");
+	public static final AuthorityReference ROLE_OWNER = AuthorityReference.authority("ROLE_OWNER");
+	public static final AuthorityReference ROLE_LOCK_OWNER = AuthorityReference.authority("ROLE_LOCK_OWNER");
+	public static final AuthorityReference ROLE_GUEST = AuthorityReference.authority("ROLE_GUEST");
 
 	private String name;
 
