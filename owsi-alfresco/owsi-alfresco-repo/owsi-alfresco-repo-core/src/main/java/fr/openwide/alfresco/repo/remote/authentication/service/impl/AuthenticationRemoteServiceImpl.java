@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repo.remote.authentication.service.impl;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PersonService;
+import org.springframework.beans.factory.InitializingBean;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -26,7 +28,7 @@ import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
-public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteService {
+public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteService, InitializingBean {
 
 	private AuthenticationService authenticationService;
 	private TicketComponent ticketComponent;
@@ -35,6 +37,15 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 	private AuthorityService authorityService;
 	private ConversionService conversionService;
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		URL url = getClass().getResource("/alfresco/extension/templates/webscripts/owsi/authentication/request.post.desc.xml");
+		if (url == null) {
+			throw new IllegalStateException("Les Webscripts n'ont pas été générés automatiquement. "
+				+ "Vous devez lancer un mvn package sur le projet owsi-alfresco-repo-core, puis le raffraichir dans Eclipse.");
+		}
+	}
+	
 	@Override
 	public RepositoryUser authenticate(String username, String password, NodeScope nodeScope) {
 		try {
