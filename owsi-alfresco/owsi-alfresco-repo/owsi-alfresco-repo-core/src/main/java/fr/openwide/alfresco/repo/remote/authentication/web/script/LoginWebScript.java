@@ -4,9 +4,6 @@ import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.SimpleType;
-
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService.LOGIN_REQUEST_SERVICE;
@@ -38,8 +35,8 @@ public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUse
 	}
 
 	@Override
-	protected JavaType getParameterType() {
-		return SimpleType.construct(LOGIN_REQUEST_SERVICE.class);
+	protected Class<LOGIN_REQUEST_SERVICE> getParameterType() {
+		return LOGIN_REQUEST_SERVICE.class;
 	}
 
 }

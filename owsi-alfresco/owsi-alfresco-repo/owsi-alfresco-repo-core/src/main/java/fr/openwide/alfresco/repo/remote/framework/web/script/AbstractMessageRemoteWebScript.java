@@ -65,7 +65,7 @@ public abstract class AbstractMessageRemoteWebScript<R, P> extends AbstractRemot
 	 * Provide {@link JavaType} used to unserialize the only argument. If null, body is not parsed and null is passed
 	 * as the payload to {@link AbstractRemoteWebScript#executeImpl(WebScriptRequest, WebScriptResponse, Status, Cache)}
 	 */
-	protected JavaType getParameterType() {
+	protected Class<P> getParameterType() {
 		return null;
 	}
 
