@@ -12,6 +12,10 @@
 		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="transactionService" ref="transactionService" />
 		<property name="dictionaryService" ref="DictionaryService" />
+		
+		<property name="queryCacheMaxSize" value="${classification.queryCache.maxSize}" />
+		<property name="pathCacheMaxSize" value="${classification.pathCache.maxSize}" />
+		<property name="subFolderCacheMaxSize" value="${classification.subFolderCache.maxSize}" />
 	</bean>
 
 	<bean id="owsi.service.identificationService" class="fr.openwide.alfresco.api.module.identification.service.impl.IdentificationServiceImpl">

@@ -37,7 +37,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
@@ -93,19 +92,12 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
 
-	@Value("${classification.queryCache.maxSize:25}") private int queryCacheMaxSize;
-	@Value("${classification.pathCache.maxSize:25}") private int pathCacheMaxSize;
-	@Value("${classification.subFolderCache.maxSize:200}") private int subFolderCacheMaxSize;
 	private ClassificationCache queryCache;
 	private ClassificationCache pathCache;
 	private ClassificationCache subFolderCache;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		queryCache = new ClassificationCache(25);
-		pathCache = new ClassificationCache(25);
-		subFolderCache = new ClassificationCache(100);
-
 		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
@@ -215,12 +207,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void onDeleteNode(ChildAssociationRef childAssocRef, boolean isNodeArchived) {
 		if (policies.isEmpty()) return;
 		
-		try {
-			if (nodeModelService.get(conversionService.get(childAssocRef.getParentRef()), new NodeScopeBuilder().aspect(OwsiModel.deleteIfEmpty)).hasAspect(OwsiModel.deleteIfEmpty)) {
-				onDeleteChildAssociation(childAssocRef);
-			}
-		} catch (NoSuchNodeRemoteException ex) {
-			// ignore
+		NodeReference nodeReference = conversionService.get(childAssocRef.getParentRef());
+		if (nodeModelService.exists(nodeReference) && nodeModelService.hasAspect(nodeReference, OwsiModel.deleteIfEmpty)) {
+			onDeleteChildAssociation(childAssocRef);
 		}
 	}
 	@Override
@@ -524,6 +513,16 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
 		this.policyRepositoryService = policyRepositoryService;
+	}
+	
+	public void setPathCacheMaxSize(int maxSize) {
+		this.pathCache = new ClassificationCache(maxSize);
+	}
+	public void setQueryCacheMaxSize(int maxSize) {
+		this.queryCache = new ClassificationCache(maxSize);
+	}
+	public void setSubFolderCacheMaxSize(int maxSize) {
+		this.subFolderCache = new ClassificationCache(maxSize);
 	}
 
 	public void deletePrevious(NodeReference destinationFolder, String childName) {
