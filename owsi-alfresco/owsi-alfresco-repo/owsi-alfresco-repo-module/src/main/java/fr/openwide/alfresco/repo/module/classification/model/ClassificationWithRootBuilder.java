@@ -1,8 +1,8 @@
 package fr.openwide.alfresco.repo.module.classification.model;
 
-import java.util.function.Supplier;
-
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -32,6 +32,11 @@ public class ClassificationWithRootBuilder {
 	public ClassificationWithRootBuilder subFolder(String folderName) {
 		return subFolder(new BusinessNode()
 			.properties().name(folderName));
+	}
+	public ClassificationWithRootBuilder subFolder(String folderName, Consumer<BusinessNode> folderNodeConsumer) {
+		BusinessNode node = new BusinessNode();
+		folderNodeConsumer.accept(node);
+		return subFolder(folderName, () -> node);
 	}
 	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
 		destinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);

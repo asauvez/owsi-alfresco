@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.demo.repo.service;
 
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
@@ -20,8 +20,9 @@ public class DemoClassificationPolicy implements ClassificationPolicy<DemoAspect
 			builder
 				.rootFolderIdentifier(DemoModel.DEMO_ROOT_FOLDER)
 				.subFolder("classificationUnique")
-				.subFolder("toto", () -> new BusinessNode()
-					.aspect(CmModel.emailed))
+				.subFolder("toto", node -> node
+					.aspect(CmModel.emailed)
+					.permissions().addAccessControlConsumer(AuthorityReference.GROUP_EVERYONE))
 				.uniqueName()
 				.moveNode();
 			return;
