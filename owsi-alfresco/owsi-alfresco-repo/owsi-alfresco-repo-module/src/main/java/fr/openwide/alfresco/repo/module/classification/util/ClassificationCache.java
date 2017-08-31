@@ -31,7 +31,7 @@ public class ClassificationCache {
 		if (result == null) {
 			Optional<NodeReference> opt = ifNotInCache.get();
 			if (opt.isPresent()) {
-				cache.put(cacheKey, result);
+				put(cacheKey, result);
 			}
 			return opt;
 		} else {
@@ -52,13 +52,15 @@ public class ClassificationCache {
 			return result.get();
 		} else {
 			NodeReference nodeReference = ifNotExist.get();
-			cache.put(cacheKey, nodeReference);
+			put(cacheKey, nodeReference);
 			return nodeReference;
 		}
 	}
 
 	public void put(String key, NodeReference nodeReference) {
-		cache.put(key, nodeReference);
+		if (maxSize > 0) {
+			cache.put(key, nodeReference);
+		}
 	}
 	
 	public void clear() {
