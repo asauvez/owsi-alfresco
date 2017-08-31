@@ -90,6 +90,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private ClassificationCache queryCache;
 	private ClassificationCache pathCache;
 	private ClassificationCache subFolderCache;
+	
+	private boolean addDeleteIfEmptyAspect;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -413,7 +415,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			if (folderNode.getRepositoryNode().getType() == null) {
 				folderNode.getRepositoryNode().setType(CmModel.folder.getNameReference());
 			}
-			folderNode.aspect(OwsiModel.deleteIfEmpty);
+			
+			if (addDeleteIfEmptyAspect) {
+				folderNode.aspect(OwsiModel.deleteIfEmpty);
+			}
+			
 			folderNode.assocs().primaryParent(associationType).nodeReference(destinationFolder);
 			
 			try {
@@ -487,6 +493,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public void setSubFolderCacheMaxSize(int maxSize) {
 		this.subFolderCache = new ClassificationCache(maxSize);
+	}
+	public void setAddDeleteIfEmptyAspect(boolean addDeleteIfEmptyAspect) {
+		this.addDeleteIfEmptyAspect = addDeleteIfEmptyAspect;
 	}
 
 	public void deletePrevious(NodeReference destinationFolder, String childName) {

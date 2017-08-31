@@ -5,9 +5,9 @@
 			
 	<bean id="owsi.service.contentstoreexport" 
 		class="fr.openwide.alfresco.repo.contentstoreexport.service.impl.ContentStoreExportServiceImpl">
-		<property name="contentstoreexportPaths" value="${contentstoreexport.paths}"/>
-		<property name="contentstoreexportQueries" value="${contentstoreexport.queries}"/>
-		<property name="contentstoreexportVersion" value="${contentstoreexport.version}"/>
+		<property name="contentstoreexportPaths" value="${owsi.contentstoreexport.paths}"/>
+		<property name="contentstoreexportQueries" value="${owsi.contentstoreexport.queries}"/>
+		<property name="contentstoreexportVersion" value="${owsi.contentstoreexport.version}"/>
 		<property name="serviceRegistry" ref="ServiceRegistry"/>
 		<property name="descriptorService" ref ="DescriptorService"/>
 		<property name="MBeanServer" ref="alfrescoMBeanServer" />

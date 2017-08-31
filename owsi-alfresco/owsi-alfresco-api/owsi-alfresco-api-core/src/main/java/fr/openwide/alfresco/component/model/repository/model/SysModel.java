@@ -14,6 +14,7 @@ import fr.openwide.alfresco.component.model.repository.model.sys.SysUnmovable;
 public interface SysModel {
 
 	// https://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/model/systemModel.xml
+	// https://github.com/Alfresco/alfresco-repository/blob/develop/src/main/resources/alfresco/model/systemModel.xml
 	NamespaceReference NAMESPACE = NamespaceReference.create("sys", "http://www.alfresco.org/model/system/1.0");
 
 	// ---- Aspects

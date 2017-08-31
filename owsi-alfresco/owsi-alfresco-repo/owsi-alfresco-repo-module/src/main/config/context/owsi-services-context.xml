@@ -13,9 +13,11 @@
 		<property name="transactionService" ref="transactionService" />
 		<property name="dictionaryService" ref="DictionaryService" />
 		
-		<property name="queryCacheMaxSize" value="${classification.queryCache.maxSize}" />
-		<property name="pathCacheMaxSize" value="${classification.pathCache.maxSize}" />
-		<property name="subFolderCacheMaxSize" value="${classification.subFolderCache.maxSize}" />
+		<property name="queryCacheMaxSize" value="${owsi.classification.queryCache.maxSize}" />
+		<property name="pathCacheMaxSize" value="${owsi.classification.pathCache.maxSize}" />
+		<property name="subFolderCacheMaxSize" value="${owsi.classification.subFolderCache.maxSize}" />
+		
+		<property name="addDeleteIfEmptyAspect" value="${owsi.classification.addDeleteIfEmptyAspect}" />
 	</bean>
 
 	<bean id="owsi.service.deleteIfEmptyService" class="fr.openwide.alfresco.repo.module.deleteifempty.service.impl.DeleteIfEmptyServiceImpl"
