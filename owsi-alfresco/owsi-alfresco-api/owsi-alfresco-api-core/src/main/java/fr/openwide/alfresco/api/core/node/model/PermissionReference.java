@@ -5,10 +5,26 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/** http://docs.alfresco.com/5.2/references/permissions_share_components.html */
 public class PermissionReference implements Serializable {
 
-	private static final long serialVersionUID = -783188298176667409L;
+	 /** Lecture seule */
+	public static final PermissionReference CONSUMER = new PermissionReference("Consumer");
+	/** Rajoute doc et édite ses propres doc */
+	public static final PermissionReference CONTRIBUTOR = new PermissionReference("Contributor");
+	/** Edites documents des autres */
+	public static final PermissionReference COLLABORATOR = new PermissionReference("Collaborator");
+	public static final PermissionReference EDITOR = new PermissionReference("Editor");
+	/** Gére permissions */
+	public static final PermissionReference COORDINATOR = new PermissionReference("Coordinator"); // 
+	
+	public static final PermissionReference SITE_MANAGER = new PermissionReference("SiteManager");
+	public static final PermissionReference SITE_COLLABORATOR = new PermissionReference("SiteCollaborator");
+	public static final PermissionReference SITE_CONTRIBUTOR = new PermissionReference("SiteContributor");
+	public static final PermissionReference SITE_CONSUMER = new PermissionReference("SiteConsumer");
 
+	
+	
 	public static final PermissionReference ADD_CHILDREN = new PermissionReference("AddChildren");
 	public static final PermissionReference DELETE = new PermissionReference("Delete"); // Delete children, link
 
@@ -34,17 +50,6 @@ public class PermissionReference implements Serializable {
 	public static final PermissionReference CHECK_OUT = new PermissionReference("CheckOut");
 	public static final PermissionReference CHECK_IN = new PermissionReference("CheckIn");
 	public static final PermissionReference CANCEL_CHECK_OUT = new PermissionReference("CancelCheckOut");
-
-	public static final PermissionReference COORDINATOR = new PermissionReference("Coordinator");
-	public static final PermissionReference COLLABORATOR = new PermissionReference("Collaborator");
-	public static final PermissionReference CONTRIBUTOR = new PermissionReference("Contributor");
-	public static final PermissionReference EDITOR = new PermissionReference("Editor");
-	public static final PermissionReference CONSUMER = new PermissionReference("Consumer");
-
-	public static final PermissionReference SITE_MANAGER = new PermissionReference("SiteManager");
-	public static final PermissionReference SITE_COLLABORATOR = new PermissionReference("SiteCollaborator");
-	public static final PermissionReference SITE_CONTRIBUTOR = new PermissionReference("SiteContributor");
-	public static final PermissionReference SITE_CONSUMER = new PermissionReference("SiteConsumer");
 
 	private String name;
 
