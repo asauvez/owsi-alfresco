@@ -112,6 +112,17 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 		models.put(model.getNameReference(), model);
 	}
+	
+	@Override
+	public <T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> policy) {
+		addClassification(model, new ClassificationPolicy<T>() {
+			@Override public void initNodeScopeBuilder(NodeScopeBuilder nodeScopeBuilder) {}
+			@Override
+			public void classify(ClassificationBuilder builder, T model, ClassificationEvent event) {
+				policy.accept(builder);
+			}
+		});
+	}
 
 	@Override
 	public int reclassifyAll(Integer batchSize) {

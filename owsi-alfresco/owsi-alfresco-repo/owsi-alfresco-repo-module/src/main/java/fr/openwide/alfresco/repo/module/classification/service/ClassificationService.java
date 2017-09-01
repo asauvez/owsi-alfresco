@@ -1,7 +1,10 @@
 package fr.openwide.alfresco.repo.module.classification.service;
 
+import java.util.function.Consumer;
+
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.repo.module.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolicy;
 
 /**
@@ -12,7 +15,8 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolic
 public interface ClassificationService {
 
 	<T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy);
-
+	<T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> builder);
+	
 	int DEFAULT_RECLASSIFY_BATCH_SIZE = 100;
 
 	int reclassifyAll(Integer batchSize);

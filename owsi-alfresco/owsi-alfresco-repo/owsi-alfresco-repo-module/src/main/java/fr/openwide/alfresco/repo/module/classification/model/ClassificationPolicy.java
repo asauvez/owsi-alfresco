@@ -16,8 +16,7 @@ public interface ClassificationPolicy<T extends ContainerModel> {
 	 * 
 	 * @param builder Utilitaire permettant de construire la classification.
 	 * @param model Le modèle de type ou d'aspect pour laquelle la politique s'applique.
-	 * @param node La node concernée avec les informations demandé dans le NodeScopeBuilder.
-	 * @param update Vrai si la node était déjà classé.
+	 * @param event Objet regroupant la node, le mode de classification et autres informations nécessaires.
 	 */
 	void classify(ClassificationBuilder builder, T model, ClassificationEvent event);
 
