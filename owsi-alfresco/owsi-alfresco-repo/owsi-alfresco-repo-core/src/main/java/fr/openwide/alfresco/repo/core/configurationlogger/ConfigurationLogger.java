@@ -89,10 +89,12 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		LicenseService licenseService = applicationContext.getBean(LicenseService.class);
 		LicenseDescriptor license = licenseService.getLicense();
 		logPropertyAsInfo("alfresco.licenseValid", licenseService.isLicenseValid());
-		logPropertyAsInfo("alfresco.licenseHolder", license.getIssued());
-		logPropertyAsInfo("alfresco.users", (license.getMaxUsers() != null) ? license.getMaxUsers() : "Unlimited");
-		logPropertyAsInfo("alfresco.licenseValidUntil", license.getValidUntil());
-		logPropertyAsInfo("alfresco.licenseValidFor.days", license.getRemainingDays());
+		if (license != null) {
+			logPropertyAsInfo("alfresco.licenseHolder", license.getIssued());
+			logPropertyAsInfo("alfresco.users", (license.getMaxUsers() != null) ? license.getMaxUsers() : "Unlimited");
+			logPropertyAsInfo("alfresco.licenseValidUntil", license.getValidUntil());
+			logPropertyAsInfo("alfresco.licenseValidFor.days", license.getRemainingDays());
+		}
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		StrSubstitutor strSubstitutor = new StrSubstitutor((Map) globalProperties);
