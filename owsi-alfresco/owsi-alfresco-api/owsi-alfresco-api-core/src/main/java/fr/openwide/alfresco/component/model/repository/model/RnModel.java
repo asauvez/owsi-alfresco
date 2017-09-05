@@ -8,9 +8,10 @@ import fr.openwide.alfresco.component.model.repository.model.rn.RnRendition;
 import fr.openwide.alfresco.component.model.repository.model.rn.RnRenditioned;
 import fr.openwide.alfresco.component.model.repository.model.rn.RnVisibleRendition;
 
+// https://github.com/Alfresco/alfresco-repository/blob/develop/src/main/resources/alfresco/model/contentModel.xml
 public interface RnModel {
 
-	NamespaceReference NAMESPACE = NamespaceReference.create("rn", "rn://www.alfresco.org/model/rendition/1.0");
+	NamespaceReference NAMESPACE = NamespaceReference.create("rn", "http://www.alfresco.org/model/rendition/1.0");
 
 	// ---- Aspects
 

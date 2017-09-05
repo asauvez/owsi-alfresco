@@ -27,6 +27,9 @@ Nouveautés
 * Configuration logger coté Alfresco et applications
 * LicenseService
 * Batch search coté Alfresco
+* reset version d'un module : owsi.reset-module-version.modules=owsi-alfresco-demo-alfresco-component:0.0.0
+* reset password d'un utilisateur : owsi.reset-user-password.users=admin:admin123
+
 
 Migration
 =========

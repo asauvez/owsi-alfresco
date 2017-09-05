@@ -61,7 +61,7 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 
 	private LicenseRestrictions lastLicenseRestrictions;
 	private long lastAlfrescoConnectionConnection = 0;
-	private String lastAlfrescoConnectionError = null;
+	private String lastAlfrescoConnectionError = "No initial license request";
 	private Optional<String> repositoryWarning = Optional.empty();
 	private Optional<String> repositoryError = Optional.empty();;
 	
@@ -77,8 +77,9 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 		if (event.getApplicationContext() != applicationContext) {
 			return;
 		}
-
-		refreshLicenseRestrictions();
+		if (environment.getProperty("application.repository.licenseCheck.onStartup", Boolean.class, Boolean.TRUE)) {
+			refreshLicenseRestrictions();
+		}
 		
 		LOGGER.info("Configuration logging");
 		

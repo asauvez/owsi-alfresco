@@ -35,11 +35,16 @@
 		<property name="authorityService" ref="AuthorityService" />
 	</bean>
 	
-	<!-- Node service -->
+	<!-- Utilitaires -->
 	
-	<bean id="owsi.service.nodeResetService" class="fr.openwide.alfresco.repo.core.resetModuleVersion.service.impl.ResetModuleVersionServiceImpl">
+	<bean id="owsi.service.resetModuleVersionService" class="fr.openwide.alfresco.repo.core.resetModuleVersion.service.impl.ResetModuleVersionServiceImpl">
 		<property name="modules" value="${owsi.reset-module-version.modules}" />
 		<property name="registryService" ref="RegistryService" />
+	</bean>
+
+	<bean id="owsi.service.resetUserPasswordService" class="fr.openwide.alfresco.repo.core.resetUserPassword.service.impl.ResetUserPasswordServiceImpl">
+		<property name="users" value="${owsi.reset-user-password.users}" />
+		<property name="authenticationService" ref="AuthenticationService" />
 	</bean>
 
 	<!-- Node service -->
