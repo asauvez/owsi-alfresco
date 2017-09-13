@@ -1,7 +1,9 @@
-package fr.openwide.alfresco.repo.module.classification.model;
+package fr.openwide.alfresco.repo.module.classification.model.policy;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
+import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 
 public class ClassificationPolicies {
 

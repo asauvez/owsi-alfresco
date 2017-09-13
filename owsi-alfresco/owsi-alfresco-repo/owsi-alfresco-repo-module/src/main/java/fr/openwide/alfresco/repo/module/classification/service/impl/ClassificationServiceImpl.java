@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.module.classification.service.impl;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,6 +48,8 @@ import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.repository.model.StModel;
+import fr.openwide.alfresco.component.model.search.model.restriction.Restriction;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
 import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
@@ -54,10 +57,12 @@ import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryServ
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
-import fr.openwide.alfresco.repo.module.classification.model.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
-import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolicy;
+import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
+import fr.openwide.alfresco.repo.module.classification.model.policy.CompositeClassificationPolicy;
+import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
@@ -114,16 +119,17 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	@Override
-	public <T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> policy) {
-		addClassification(model, new ClassificationPolicy<T>() {
-			@Override public void initNodeScopeBuilder(NodeScopeBuilder nodeScopeBuilder) {}
-			@Override
-			public void classify(ClassificationBuilder builder, T model, ClassificationEvent event) {
-				policy.accept(builder);
-			}
-		});
+	public <T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> consumer) {
+		addClassification(model, new ConsumerClassificationPolicy<T>(consumer));
 	}
 
+	@Override
+	public <T extends ContainerModel> CompositeClassificationPolicy<T> addClassification(T model) {
+		CompositeClassificationPolicy<T> policy = new CompositeClassificationPolicy<>();
+		addClassification(model, policy);
+		return policy;
+	}
+	
 	@Override
 	public int reclassifyAll(Integer batchSize) {
 		int total = 0;
@@ -142,7 +148,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	@Override
-	public int reclassify(ContainerModel model, Integer batchSize) {
+	public int reclassify(ContainerModel model, Integer batchSize, Restriction ...restrictions) {
 		clearCaches();
 		
 		RestrictionBuilder restriction = new RestrictionBuilder();
@@ -150,6 +156,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			restriction.isType((TypeModel) model);
 		} else {
 			restriction.hasAspect((AspectModel) model);
+		}
+		for (Restriction curRestriction : restrictions) {
+			restriction.and(curRestriction);
 		}
 		
 		logger.info("Begin reclassify of " + model);
@@ -308,6 +317,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		ClassificationEvent event = new ClassificationEvent(node, mode, model);
 		try {
 			policy.classify(builder, model, event);
+			
+			policyRepositoryService.disableBehaviour(OwsiModel.classifiable, 
+				() -> nodeModelService.setProperty(nodeReference, OwsiModel.classifiable.classificationDate, new Date())
+			);
+			
 		} catch (RuntimeException ex) {
 			// On log en debug uniquement, car cela peut être une erreur retryable, qui provoque en relance de la transaction.
 			// Dans ce cas, on ne veut pas avoir l'information en erreur, puisque l'appelant ne verra rien.
@@ -516,6 +530,23 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				logger.debug("Delete previous node {} in {}", childName, destinationFolder);
 			}
 			nodeModelService.delete(child.get());
+		}
+	}
+
+	public void delete(NodeReference nodeReference, boolean permanently) {
+		if (permanently) {
+			nodeModelService.deletePermanently(nodeReference);
+		} else {
+			nodeModelService.delete(nodeReference);
+		}
+	}
+
+	public Optional<NodeReference> getSiteNode(NodeReference nodeReference) {
+		Optional<NodeReference> parent = nodeModelService.getPrimaryParent(nodeReference);
+		if (! parent.isPresent() || nodeModelService.isType(parent.get(), StModel.site)) {
+			return parent;
+		} else {
+			return getSiteNode(parent.get());
 		}
 	}
 

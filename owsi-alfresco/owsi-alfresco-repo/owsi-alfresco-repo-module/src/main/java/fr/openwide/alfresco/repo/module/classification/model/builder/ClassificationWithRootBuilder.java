@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repo.module.classification.model;
+package fr.openwide.alfresco.repo.module.classification.model.builder;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -90,6 +90,10 @@ public class ClassificationWithRootBuilder {
 	public ClassificationWithRootBuilder subFolderMinute() {
 		return subFolder(new SubFolderBuilder(CmModel.auditable.created)
 			.formatMinute());
+	}
+	public ClassificationWithRootBuilder subFolderDate(String pattern) {
+		return subFolder(new SubFolderBuilder(CmModel.auditable.created)
+			.formatDate(pattern));
 	}
 	
 	public NodeReference getDestinationFolder() {

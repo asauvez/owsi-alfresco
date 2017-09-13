@@ -18,7 +18,13 @@
 		<aspect name="owsi:classifiable">
 			<title>OWSI Classifiable</title>
 			<description>Add to a node or declare it as mandatory-aspect in order to indicate trigger the classification of the node</description>
+			<properties>
+				<property name="owsi:classificationDate">
+					<type>d:datetime</type>
+				</property>
+			</properties>
 		</aspect>
+		
 		<aspect name="owsi:deleteIfEmpty">
 			<title>OWSI Delete if empty</title>
 			<description>A folder with the aspect will be deleted if their is no more child node.</description>

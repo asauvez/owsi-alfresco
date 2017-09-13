@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repo.module.classification.model;
+package fr.openwide.alfresco.repo.module.classification.model.builder;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
