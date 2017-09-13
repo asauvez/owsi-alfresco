@@ -52,6 +52,8 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	void removeAspect(NodeReference nodeReference, NameReference aspect);
 	void removeAspect(NodeReference nodeReference, AspectModel aspect);
 	
+	void deletePermanently(NodeReference nodeReference);
+	
 	<C extends Serializable> C getProperty(NodeReference nodeReference, NameReference property);
 	<C extends Serializable> C getProperty(NodeReference nodeReference, SinglePropertyModel<C> property);
 	<E extends Enum<E>> E getProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property);

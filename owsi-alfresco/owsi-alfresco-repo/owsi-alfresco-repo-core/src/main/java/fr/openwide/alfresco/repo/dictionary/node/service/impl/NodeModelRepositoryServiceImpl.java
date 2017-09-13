@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
@@ -19,8 +20,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
-
-import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
@@ -40,8 +39,9 @@ import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextP
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.repo.core.node.service.impl.NodeRemoteServiceImpl;
+import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class NodeModelRepositoryServiceImpl 
@@ -160,6 +160,12 @@ public class NodeModelRepositoryServiceImpl
 	@Override
 	public void removeAspect(NodeReference nodeReference, AspectModel aspect) {
 		removeAspect(nodeReference, aspect.getNameReference());
+	}
+
+	@Override
+	public void deletePermanently(NodeReference nodeReference) {
+		addAspect(nodeReference, SysModel.temporary);
+		delete(nodeReference);
 	}
 
 	@Override
