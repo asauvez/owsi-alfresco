@@ -48,6 +48,7 @@ public interface PolicyRepositoryService {
 	void onDeleteChildAssociation(ContainerModel type, ChildAssociationModel association, NotificationFrequency frequency, OnDeleteChildAssociationPolicy policy);
 
 	<T> T disableBehaviour(ContainerModel type, Callable<T> callable);
+	void disableBehaviour(ContainerModel type, Runnable runnable);
 	
 //    public interface BeforeUpdateNodePolicy extends ClassPolicy
 //    public interface BeforeArchiveNodePolicy extends ClassPolicy

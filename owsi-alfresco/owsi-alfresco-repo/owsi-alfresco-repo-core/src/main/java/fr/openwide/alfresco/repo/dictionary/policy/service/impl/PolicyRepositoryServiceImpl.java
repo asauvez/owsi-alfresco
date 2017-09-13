@@ -128,6 +128,10 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 			policyFilter.enableBehaviour(typeQName);
 		}
 	}
+	@Override
+	public void disableBehaviour(ContainerModel type, Runnable runnable) {
+		disableBehaviour(type, () -> null);
+	}
 
 	public void setPolicyComponent(PolicyComponent policyComponent) {
 		this.policyComponent = policyComponent;
