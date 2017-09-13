@@ -2,16 +2,16 @@ package fr.openwide.alfresco.component.model.search.model.restriction;
 
 public class CustomRestriction extends Restriction {
 
-	private String customQuery;
+	private String customFtsQuery;
 
-	public CustomRestriction(RestrictionBuilder parent, String customQuery) {
+	public CustomRestriction(RestrictionBuilder parent, String customFtsQuery) {
 		super(parent);
-		this.customQuery = customQuery;
+		this.customFtsQuery = customFtsQuery;
 	}
 
 	@Override
 	protected String toFtsQueryInternal() {
-		return customQuery;
+		return customFtsQuery;
 	}
 
 }
