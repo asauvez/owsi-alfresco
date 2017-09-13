@@ -1,6 +1,11 @@
 package fr.openwide.alfresco.repo.dictionary.search.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -8,6 +13,8 @@ import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 
 public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 
+	private final Logger LOGGER = LoggerFactory.getLogger(BatchSearchQueryBuilder.class);
+	
 	private Consumer<NodeReference> consumer = null;
 	private String[] configurationName = new String[0];
 	
@@ -16,6 +23,8 @@ public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 	private Integer frameSize = null;
 	private Integer transactionSize = null;
 	private boolean transactionReadOnly = false;
+	
+	private List<NodeReference> fakeResults = null;
 	
 	public BatchSearchQueryBuilder consumer(Consumer<NodeReference> consumer) {
 		this.consumer = consumer;
@@ -63,4 +72,38 @@ public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 		return transactionReadOnly;
 	}
 	
+	public BatchSearchQueryBuilder replaceFtsQuery(String query) {
+		if (query != null) {
+			LOGGER.warn("Query replaced by " + query);
+			getParameters().setQuery(query);
+		}
+		return this;
+	}
+
+	public BatchSearchQueryBuilder appendFtsQuery(String query) {
+		if (query != null) {
+			getParameters().setQuery("(" + query + ") AND (" + query + ")");
+		}
+		return this;
+	}
+	
+	public BatchSearchQueryBuilder fakeResults(List<NodeReference> fakeResults) {
+		this.fakeResults = fakeResults;
+		return this;
+	}
+	public BatchSearchQueryBuilder fakeResults(String fakeResults) {
+		if (fakeResults != null) {
+			List<NodeReference> list = new ArrayList<>();
+			for (String nodeReference : fakeResults.split(",")) {
+				if (! nodeReference.trim().isEmpty()) {
+					list.add(NodeReference.create(nodeReference.trim()));
+				}
+			}
+			fakeResults(list);
+		}
+		return this;
+	}
+	public List<NodeReference> getFakeResults() {
+		return fakeResults;
+	}
 }

@@ -62,6 +62,9 @@ public class NodeSearchModelRepositoryServiceImpl
 					.frameSize(environment.getProperty(configurationName + ".frameSize", Integer.class, searchBuilder.getFrameSize()))
 					.transactionReadOnly(environment.getProperty(configurationName + ".transactionReadOnly", Boolean.class, searchBuilder.isTransactionReadOnly()))
 					.transactionSize(environment.getProperty(configurationName + ".transactionSize", Integer.class, searchBuilder.getTransactionSize()))
+					.replaceFtsQuery(environment.getProperty(configurationName + ".replaceFtsQuery"))
+					.appendFtsQuery(environment.getProperty(configurationName + ".appendFtsQuery"))
+					.fakeResults(environment.getProperty(configurationName + ".fakeResults"))
 					;
 			}
 			if (searchBuilder.getAlreadyDoneAspect() != null) {
@@ -103,7 +106,9 @@ public class NodeSearchModelRepositoryServiceImpl
 		ResultSet resultSet = searchService.query(sp);
 		int nbInFrame = 0;
 		try {
-			Iterator<ResultSetRow> iterator = resultSet.iterator();
+			Iterator<NodeReference> iterator = (searchBuilder.getFakeResults() == null) 
+					? new ResultSetRowIterator(resultSet.iterator())
+					: searchBuilder.getFakeResults().iterator();
 			if (searchBuilder.getTransactionSize() == null) {
 				nbInFrame += consumeInTransaction(searchBuilder, iterator);
 			} else {
@@ -125,10 +130,23 @@ public class NodeSearchModelRepositoryServiceImpl
 		return nbInFrame;
 	}
 	
-	private int consumeInTransaction(BatchSearchQueryBuilder searchBuilder, Iterator<ResultSetRow> iterator) {
+	private class ResultSetRowIterator implements Iterator<NodeReference> {
+		private final Iterator<ResultSetRow> iterator;
+		public ResultSetRowIterator(Iterator<ResultSetRow> iterator) {
+			this.iterator = iterator;
+		}
+		@Override public boolean hasNext() {
+			return iterator.hasNext();
+		}
+		@Override public NodeReference next() {
+			return conversionService.get(iterator.next().getNodeRef());
+		}
+	}
+	
+	private int consumeInTransaction(BatchSearchQueryBuilder searchBuilder, Iterator<NodeReference> iterator) {
 		int nbInBatch = 0;
 		while (iterator.hasNext() && (searchBuilder.getTransactionSize() == null || nbInBatch < searchBuilder.getTransactionSize())) {
-			NodeReference nodeReference = conversionService.get(iterator.next().getNodeRef());
+			NodeReference nodeReference = iterator.next();
 			if (nodeModelRepositoryService.exists(nodeReference)) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("**** Consume " + nbInBatch + "/" + nodeReference);
