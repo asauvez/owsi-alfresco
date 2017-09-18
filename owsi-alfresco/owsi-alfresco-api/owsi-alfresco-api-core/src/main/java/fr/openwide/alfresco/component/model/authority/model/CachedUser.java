@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import fr.openwide.alfresco.api.core.authentication.model.UserReference;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 
 public class CachedUser implements Serializable {
 
@@ -22,6 +23,9 @@ public class CachedUser implements Serializable {
 	
 	public UserReference getUserReference() {
 		return userReference;
+	}
+	public AuthorityReference getAuthorityReference() {
+		return userReference.toAuthority();
 	}
 	public String getFirstName() {
 		return firstName;

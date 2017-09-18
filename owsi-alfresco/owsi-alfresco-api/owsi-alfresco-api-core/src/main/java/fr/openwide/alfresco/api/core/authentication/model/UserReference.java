@@ -5,6 +5,8 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+
 public class UserReference implements Serializable {
 
 	private static final long serialVersionUID = -3903180477207296871L;
@@ -20,6 +22,10 @@ public class UserReference implements Serializable {
 		return username;
 	}
 
+	public AuthorityReference toAuthority() {
+		return AuthorityReference.user(username);
+	}
+	
 	@Override
 	public String toString() {
 		return username;

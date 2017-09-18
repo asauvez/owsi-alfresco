@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.component.model.authority.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import fr.openwide.alfresco.api.core.authority.service.AuthorityRemoteService;
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.authority.model.AuthorityQueryBuilder;
+import fr.openwide.alfresco.component.model.authority.model.CachedGroup;
 import fr.openwide.alfresco.component.model.authority.model.CachedUser;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -24,10 +26,26 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	private final AuthorityRemoteService authorityService;
 
+	private final NodeScopeBuilder CACHED_USER_NODESCOPEBUILDER = new NodeScopeBuilder()
+			.properties().set(CmModel.person.userName)
+			.properties().set(CmModel.person.firstName)
+			.properties().set(CmModel.person.lastName)
+			.properties().set(CmModel.person.email);
+	private final NodeScopeBuilder CACHED_GROUP_NODESCOPEBUILDER = new NodeScopeBuilder()
+			.properties().set(CmModel.authorityContainer.authorityName)
+			.properties().set(CmModel.authorityContainer.authorityDisplayName);
+	
 	private Map<String, CachedUser> cacheUsers = Collections.synchronizedMap(new LinkedHashMap<String, CachedUser>() {
 		private static final int CACHE_SIZE = 100;
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, CachedUser> eldest) {
+			return size() > CACHE_SIZE;
+		}
+	});
+	private Map<AuthorityReference, CachedGroup> cacheGroups = Collections.synchronizedMap(new LinkedHashMap<AuthorityReference, CachedGroup>() {
+		private static final int CACHE_SIZE = 50;
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<AuthorityReference, CachedGroup> eldest) {
 			return size() > CACHE_SIZE;
 		}
 	});
@@ -45,20 +63,19 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	public CachedUser getCachedUser(String userName) throws NoSuchNodeRemoteException {
 		CachedUser user = cacheUsers.get(userName);
 		if (user == null) {
-			BusinessNode node = getUser(userName, new NodeScopeBuilder()
-				.properties().set(CmModel.person.firstName)
-				.properties().set(CmModel.person.lastName)
-				.properties().set(CmModel.person.email));
-			user = new CachedUser(new UserReference(userName), 
-				node.properties().get(CmModel.person.firstName),
-				node.properties().get(CmModel.person.lastName),
-				node.properties().get(CmModel.person.email));
-			cacheUsers.put(userName, user);
+			BusinessNode node = getUser(userName, CACHED_USER_NODESCOPEBUILDER);
+			cacheUsers.put(userName, nodeToCachedUser(node));
 		}
 		return user;
 	}
+	private CachedUser nodeToCachedUser(BusinessNode node) {
+		return new CachedUser(new UserReference(node.properties().get(CmModel.person.userName)), 
+				node.properties().get(CmModel.person.firstName),
+				node.properties().get(CmModel.person.lastName),
+				node.properties().get(CmModel.person.email));
+	}
 	@Override
-	public void clearCachedUser() {
+	public void clearCachedUsers() {
 		cacheUsers.clear();
 	}
 	
@@ -77,6 +94,16 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		}
 		return getContainedAuthorities(authorityQueryBuilder);
 	}
+	@Override
+	public List<CachedUser> getContainedCachedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
+		authorityQueryBuilder.nodeScopeBuilder(CACHED_USER_NODESCOPEBUILDER);
+		List<BusinessNode> nodes = getContainedUsers(authorityQueryBuilder);
+		List<CachedUser> users = new ArrayList<>();
+		for (BusinessNode node : nodes) {
+			users.add(nodeToCachedUser(node));
+		}
+		return users;
+	}
 	
 	@Override
 	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
@@ -92,7 +119,18 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		}
 		return getContainedAuthorities(authorityQueryBuilder);
 	}
-	
+
+	@Override
+	public List<CachedGroup> getContainedCachedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
+		authorityQueryBuilder.nodeScopeBuilder(CACHED_GROUP_NODESCOPEBUILDER);
+		List<BusinessNode> nodes = getContainedGroups(authorityQueryBuilder);
+		List<CachedGroup> groups = new ArrayList<>();
+		for (BusinessNode node : nodes) {
+			groups.add(nodeToCachedGroup(node));
+		}
+		return groups;
+	}
+
 	@Override
 	public List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder) {
 		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
@@ -136,6 +174,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	@Override
 	public void deleteUser(AuthorityReference user) throws NoSuchNodeRemoteException {
 		authorityService.deleteUser(user.getName());
+		cacheUsers.remove(user.getName());
 	}
 
 	@Override
@@ -146,6 +185,24 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	@Override
 	public BusinessNode getGroup(AuthorityReference group, NodeScopeBuilder nodeScopeBuilder) throws NoSuchNodeRemoteException {
 		return new BusinessNode(authorityService.getGroup(group.getGroupShortName(), nodeScopeBuilder.getScope()));
+	}
+	@Override
+	public CachedGroup getCachedGroup(AuthorityReference groupReference) throws NoSuchNodeRemoteException {
+		CachedGroup group = cacheGroups.get(groupReference);
+		if (group == null) {
+			BusinessNode node = getGroup(groupReference, CACHED_GROUP_NODESCOPEBUILDER);
+			cacheGroups.put(groupReference, nodeToCachedGroup(node));
+		}
+		return group;
+	}
+	private CachedGroup nodeToCachedGroup(BusinessNode node) {
+		return new CachedGroup(
+				AuthorityReference.authority(node.properties().get(CmModel.authorityContainer.authorityName)),
+				node.properties().get(CmModel.authorityContainer.authorityDisplayName));
+	}
+	@Override
+	public void clearCachedGroups() {
+		cacheGroups.clear();
 	}
 
 	@Override
@@ -161,6 +218,7 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	@Override
 	public void deleteGroup(AuthorityReference group) throws NoSuchNodeRemoteException {
 		authorityService.deleteGroup(group.getGroupShortName());
+		cacheGroups.remove(group);
 	}
 
 	@Override
