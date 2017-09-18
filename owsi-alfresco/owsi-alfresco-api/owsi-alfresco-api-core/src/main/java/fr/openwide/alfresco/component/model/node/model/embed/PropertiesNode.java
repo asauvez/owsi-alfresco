@@ -3,6 +3,7 @@ package fr.openwide.alfresco.component.model.node.model.embed;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -42,6 +43,19 @@ public class PropertiesNode {
 	}
 	public BusinessNode description(String name) {
 		return set(CmModel.titled.description, name);
+	}
+	
+	public String getCreator() {
+		return get(CmModel.auditable.creator);
+	}
+	public Date getCreated() {
+		return get(CmModel.auditable.created);
+	}
+	public String getModifier() {
+		return get(CmModel.auditable.modifier);
+	}
+	public Date getModified() {
+		return get(CmModel.auditable.modified);
 	}
 	
 	@SuppressWarnings("unchecked")
