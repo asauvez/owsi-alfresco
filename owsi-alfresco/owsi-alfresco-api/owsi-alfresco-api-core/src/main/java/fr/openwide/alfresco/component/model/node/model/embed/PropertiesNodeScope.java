@@ -26,6 +26,19 @@ public class PropertiesNodeScope {
 		return set(CmModel.titled.description);
 	}
 
+	public NodeScopeBuilder creator() {
+		return set(CmModel.auditable.creator);
+	}
+	public NodeScopeBuilder created() {
+		return set(CmModel.auditable.created);
+	}
+	public NodeScopeBuilder modifier() {
+		return set(CmModel.auditable.modifier);
+	}
+	public NodeScopeBuilder modified() {
+		return set(CmModel.auditable.modified);
+	}
+
 	public NodeScopeBuilder set(PropertyModel<?> propertyModel) {
 		scope.getProperties().add(propertyModel.getNameReference());
 		return builder;
