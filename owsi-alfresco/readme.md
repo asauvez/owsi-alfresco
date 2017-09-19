@@ -29,7 +29,7 @@ Nouveautés
 * Batch search coté Alfresco
 * reset version d'un module : owsi.reset-module-version.modules=owsi-alfresco-demo-alfresco-component:0.0.0
 * reset password d'un utilisateur : owsi.reset-user-password.users=admin:admin123
-
+* Plugin Maven de migration (MigrationMojo) : Permet de savoir si un patch doit être adapté à une nouvelle version d'Alfresco. 
 
 Migration
 =========

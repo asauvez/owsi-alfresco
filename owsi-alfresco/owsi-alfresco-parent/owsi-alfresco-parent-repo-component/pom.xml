@@ -69,6 +69,7 @@
 		<owsi-alfresco.repo.asm.version>3.1</owsi-alfresco.repo.asm.version>
 		<owsi-alfresco.repo.vaadin.version>3.1</owsi-alfresco.repo.vaadin.version>
 		<owsi-alfresco.repo.woodstox-core-asl.version>4.4.1</owsi-alfresco.repo.woodstox-core-asl.version>
+		<owsi-alfresco.repo.plexus-utils.version>3.0.17</owsi-alfresco.repo.plexus-utils.version>
 		<owsi-alfresco.repo.bcprov-jdk15.version>1.46</owsi-alfresco.repo.bcprov-jdk15.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		
@@ -124,7 +125,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.5.0-SNAPSHOT</version>
+				<version>${project.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -569,6 +570,12 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-utils</artifactId>
+				<version>${owsi-alfresco.repo.plexus-utils.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk15</artifactId>
 				<version>${owsi-alfresco.repo.bcprov-jdk15.version}</version>
@@ -588,6 +595,9 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.ori</exclude>
+				</excludes>
 			</resource>
 			<resource>
 				<directory>src/main/config</directory>
@@ -623,36 +633,11 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>build-helper-maven-plugin</artifactId>
-										<versionRange>[${owsi-alfresco.build-helper-maven-plugin.version},)</versionRange>
-										<goals>
-											<goal>regex-property</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnIncremental>true</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
 					<configuration>
 						<failOnMissingWebXml>false</failOnMissingWebXml>
+						
 					</configuration>
 					<dependencies>
 						<dependency>
@@ -670,28 +655,45 @@
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>maven-processor-plugin-default</id>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>process</goal>
-							</goals>
-							<configuration>
-								<processors>
-									<processor>fr.openwide.alfresco.repo.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
-								</processors>
-							</configuration>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>fr.openwide.alfresco</groupId>
-							<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-							<version>0.5.0-SNAPSHOT</version>
-						</dependency>
-					</dependencies>
-				</plugin>
+				<executions>
+					<execution>
+						<id>maven-processor-plugin-default</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<processors>
+								<processor>fr.openwide.alfresco.repo.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
+							</processors>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>fr.openwide.alfresco</groupId>
+						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
+						<id>migration-maven-plugin</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>migration</goal>
+						</goals>
+						<configuration>
+							<createMissingFile>true</createMissingFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
