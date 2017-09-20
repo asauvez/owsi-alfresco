@@ -80,50 +80,52 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				new File(m2Repository, "org/alfresco/"),
 				new File(m2Repository, "org/alfresco-entreprise/")
 		}) {
-			for (File module : alfrescoRepo.listFiles()) {
-				File version = new File(module, alfrescoVersion);
-				if (version.exists()) {
-					File jar = new File(version, module.getName() + "-" + version.getName() + ".jar");
-					if (jar.exists()) {
-						ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar)));
-						try {
-							ZipEntry entry;
-							while ((entry = zip.getNextEntry()) != null) {
-								if (! entry.getName().endsWith(".class")) {
-									resourceInJarByPath.put("/" + entry.getName(), jar);
+			if (alfrescoRepo.exists()) {
+				for (File module : alfrescoRepo.listFiles()) {
+					File version = new File(module, alfrescoVersion);
+					if (version.exists()) {
+						File jar = new File(version, module.getName() + "-" + version.getName() + ".jar");
+						if (jar.exists()) {
+							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar)));
+							try {
+								ZipEntry entry;
+								while ((entry = zip.getNextEntry()) != null) {
+									if (! entry.getName().endsWith(".class")) {
+										resourceInJarByPath.put("/" + entry.getName(), jar);
+									}
 								}
+							} finally {
+								zip.close();
 							}
-						} finally {
-							zip.close();
 						}
-					}
-					File jarClasses = new File(version, module.getName() + "-" + version.getName() + "-classes.jar");
-					if (jarClasses.exists()) {
-						ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarClasses)));
-						try {
-							ZipEntry entry;
-							while ((entry = zip.getNextEntry()) != null) {
-								if (! entry.getName().endsWith(".class")) {
-									resourceInJarByPath.put("/" + entry.getName(), jarClasses);
+						File jarClasses = new File(version, module.getName() + "-" + version.getName() + "-classes.jar");
+						if (jarClasses.exists()) {
+							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarClasses)));
+							try {
+								ZipEntry entry;
+								while ((entry = zip.getNextEntry()) != null) {
+									if (! entry.getName().endsWith(".class")) {
+										resourceInJarByPath.put("/" + entry.getName(), jarClasses);
+									}
 								}
+							} finally {
+								zip.close();
 							}
-						} finally {
-							zip.close();
 						}
-					}
-					
-					File war = new File(version, module.getName() + "-" + version.getName() + ".war");
-					if (war.exists()) {
-						ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(war)));
-						try {
-							ZipEntry entry;
-							while ((entry = zip.getNextEntry()) != null) {
-								if (entry.getName().startsWith(WEB_INF_CLASSES) && ! entry.getName().endsWith(".class")) {
-									resourceInWarByPath.put(entry.getName().substring(WEB_INF_CLASSES.length()), war);
+						
+						File war = new File(version, module.getName() + "-" + version.getName() + ".war");
+						if (war.exists()) {
+							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(war)));
+							try {
+								ZipEntry entry;
+								while ((entry = zip.getNextEntry()) != null) {
+									if (entry.getName().startsWith(WEB_INF_CLASSES) && ! entry.getName().endsWith(".class")) {
+										resourceInWarByPath.put(entry.getName().substring(WEB_INF_CLASSES.length()), war);
+									}
 								}
+							} finally {
+								zip.close();
 							}
-						} finally {
-							zip.close();
 						}
 					}
 				}
