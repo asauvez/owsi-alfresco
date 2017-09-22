@@ -18,7 +18,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family="Demo",
 		beanParent="webscript.owsi.remote")
-public class PermissionsWebScript extends AbstractMessageRemoteWebScript<List<RepositoryAccessControl>, AuthorityReference> {
+public class PermissionsListWebScript extends AbstractMessageRemoteWebScript<List<RepositoryAccessControl>, AuthorityReference> {
 
 	@Autowired
 	private PermissionRepositoryService permissionRepositoryService;

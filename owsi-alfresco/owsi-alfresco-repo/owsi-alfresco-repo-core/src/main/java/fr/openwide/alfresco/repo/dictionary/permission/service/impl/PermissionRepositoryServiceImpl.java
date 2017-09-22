@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -37,7 +38,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	@Override
 	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
-		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), true);
+		setPermission(nodeReference, authority, permission, true);
+	}
+	@Override
+	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed) {
+		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), allowed);
 	}
 	@Override
 	public void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
@@ -77,6 +82,25 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		} catch (SQLException e) {
 			throw new IllegalStateException(sql, e);
 		}
+	}
+	
+	@Override
+	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority) {
+		return replaceAuthority(oldAuthority, newAuthority, Optional.empty());
+	}
+	@Override
+	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem) {
+		int cpt = 0;
+		List<RepositoryAccessControl> list = searchACL(oldAuthority);
+		for (RepositoryAccessControl acl : list) {
+			if (maxItem.isPresent() && maxItem.get() == cpt) {
+				break;
+			}
+			setPermission(acl.getNodeReference(), newAuthority, acl.getPermission(), acl.isAllowed());
+			deletePermission(acl.getNodeReference(), oldAuthority, acl.getPermission());
+			cpt ++;
+		}
+		return cpt;
 	}
 	
 	public void setPermissionService(PermissionService permissionService) {
