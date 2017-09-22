@@ -264,7 +264,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				node.getAccessControlList().add(new RepositoryAccessControl(
 						nodeReference,
 						AuthorityReference.authority(accessPermission.getAuthority()),
-						new PermissionReference(accessPermission.getPermission()),
+						PermissionReference.create(accessPermission.getPermission()),
 						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
 		}
@@ -561,7 +561,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 				oldPermissions.add(new RepositoryAccessControl(
 					conversionService.get(nodeRef),
 					AuthorityReference.authority(oldPermission.getAuthority()),
-					new PermissionReference(oldPermission.getPermission()),
+					PermissionReference.create(oldPermission.getPermission()),
 					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
 			}
 		}

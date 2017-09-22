@@ -2,12 +2,9 @@ package fr.openwide.alfresco.repo.dictionary.node.service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import java.util.Optional;
-
-import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -84,9 +81,4 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	
 	Optional<NodeReference> getByNamedPath(String ... names);
 	String getPath(NodeReference nodeReference);
-	
-	boolean hasPermission(NodeReference nodeReference, PermissionReference permission);
-	void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions);
-	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission);
-	void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission);
 }

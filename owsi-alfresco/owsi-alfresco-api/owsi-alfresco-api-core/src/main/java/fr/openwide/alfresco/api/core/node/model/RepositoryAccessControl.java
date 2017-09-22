@@ -10,8 +10,6 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class RepositoryAccessControl implements Serializable {
 
-	private static final long serialVersionUID = 1391171626983929282L;
-
 	private NodeReference nodeReference;
 	private AuthorityReference authority;
 	private PermissionReference permission;

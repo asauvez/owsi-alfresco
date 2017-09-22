@@ -16,13 +16,9 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
-import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -49,7 +45,6 @@ public class NodeModelRepositoryServiceImpl
 	implements NodeModelRepositoryService {
 
 	private NodeService nodeService;
-	private PermissionService permissionService;
 	private CopyService copyService;
 	private Repository repositoryHelper;
 
@@ -394,33 +389,12 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
-	public boolean hasPermission(NodeReference nodeReference, PermissionReference permission) {
-		return permissionService.hasPermission(conversionService.getRequired(nodeReference), permission.getName()) == AccessStatus.ALLOWED;
-	}
-	
-	@Override
-	public void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions) {
-		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);
-	}
-	@Override
-	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
-		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), true);
-	}
-	@Override
-	public void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
-		permissionService.deletePermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName());
-	}
-
-	@Override
 	public String getPath(NodeReference nodeReference) {
 		return get(nodeReference, new NodeScopeBuilder().path()).getPath();
 	}
 
 	public void setNodeService(NodeService nodeService) {
 		this.nodeService = nodeService;
-	}
-	public void setPermissionService(PermissionService permissionService) {
-		this.permissionService = permissionService;
 	}
 	public void setCopyService(CopyService copyService) {
 		this.copyService = copyService;
