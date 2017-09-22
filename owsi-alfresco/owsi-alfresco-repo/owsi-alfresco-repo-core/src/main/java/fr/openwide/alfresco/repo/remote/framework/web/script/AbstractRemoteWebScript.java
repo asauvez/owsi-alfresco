@@ -32,6 +32,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import fr.openwide.alfresco.api.core.node.exception.NodeExistsRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
@@ -166,6 +167,10 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		res.setStatus(statusCode);
 		// apply cache
 		res.setCache(new Cache(getDescription().getRequiredCache()));
+		
+		String agent = req.getHeader("User-Agent");
+		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, agent != null && agent.contains("Mozilla"));
+		
 		// render response according to model
 		if (resException == null) {
 			handleResult(res, resValue);
