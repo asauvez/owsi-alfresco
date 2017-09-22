@@ -9,52 +9,56 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class PermissionReference implements Serializable {
 
 	 /** Lecture seule */
-	public static final PermissionReference CONSUMER = new PermissionReference("Consumer");
+	public static final PermissionReference CONSUMER = PermissionReference.create("Consumer");
 	/** Rajoute doc et édite ses propres doc */
-	public static final PermissionReference CONTRIBUTOR = new PermissionReference("Contributor");
+	public static final PermissionReference CONTRIBUTOR = PermissionReference.create("Contributor");
 	/** Edites documents des autres */
-	public static final PermissionReference COLLABORATOR = new PermissionReference("Collaborator");
-	public static final PermissionReference EDITOR = new PermissionReference("Editor");
+	public static final PermissionReference COLLABORATOR = PermissionReference.create("Collaborator");
+	public static final PermissionReference EDITOR = PermissionReference.create("Editor");
 	/** Gére permissions */
-	public static final PermissionReference COORDINATOR = new PermissionReference("Coordinator"); // 
+	public static final PermissionReference COORDINATOR = PermissionReference.create("Coordinator"); // 
 	
-	public static final PermissionReference SITE_MANAGER = new PermissionReference("SiteManager");
-	public static final PermissionReference SITE_COLLABORATOR = new PermissionReference("SiteCollaborator");
-	public static final PermissionReference SITE_CONTRIBUTOR = new PermissionReference("SiteContributor");
-	public static final PermissionReference SITE_CONSUMER = new PermissionReference("SiteConsumer");
+	public static final PermissionReference SITE_MANAGER = PermissionReference.create("SiteManager");
+	public static final PermissionReference SITE_COLLABORATOR = PermissionReference.create("SiteCollaborator");
+	public static final PermissionReference SITE_CONTRIBUTOR = PermissionReference.create("SiteContributor");
+	public static final PermissionReference SITE_CONSUMER = PermissionReference.create("SiteConsumer");
 
 	
 	
-	public static final PermissionReference ADD_CHILDREN = new PermissionReference("AddChildren");
-	public static final PermissionReference DELETE = new PermissionReference("Delete"); // Delete children, link
+	public static final PermissionReference ADD_CHILDREN = PermissionReference.create("AddChildren");
+	public static final PermissionReference DELETE = PermissionReference.create("Delete"); // Delete children, link
 
-	public static final PermissionReference READ = new PermissionReference("Read"); // Read properties, content, children
-	public static final PermissionReference READ_PROPERTIES = new PermissionReference("ReadProperties");
-	public static final PermissionReference READ_CONTENT = new PermissionReference("ReadContent");
+	public static final PermissionReference READ = PermissionReference.create("Read"); // Read properties, content, children
+	public static final PermissionReference READ_PROPERTIES = PermissionReference.create("ReadProperties");
+	public static final PermissionReference READ_CONTENT = PermissionReference.create("ReadContent");
 
-	public static final PermissionReference WRITE = new PermissionReference("Write"); // Write properties, content
-	public static final PermissionReference WRITE_PROPERTIES = new PermissionReference("WriteProperties");
-	public static final PermissionReference WRITE_CONTENT = new PermissionReference("WriteContent");
+	public static final PermissionReference WRITE = PermissionReference.create("Write"); // Write properties, content
+	public static final PermissionReference WRITE_PROPERTIES = PermissionReference.create("WriteProperties");
+	public static final PermissionReference WRITE_CONTENT = PermissionReference.create("WriteContent");
 
-	public static final PermissionReference READ_PERMISSIONS = new PermissionReference("ReadPermissions");
-	public static final PermissionReference CHANGE_PERMISSIONS = new PermissionReference("ChangePermissions");
+	public static final PermissionReference READ_PERMISSIONS = PermissionReference.create("ReadPermissions");
+	public static final PermissionReference CHANGE_PERMISSIONS = PermissionReference.create("ChangePermissions");
 
-	public static final PermissionReference CREATE_ASSOCIATIONS = new PermissionReference("CreateAssociations");
-	public static final PermissionReference READ_ASSOCIATIONS = new PermissionReference("ReadAssociations");
-	public static final PermissionReference DELETE_ASSOCIATIONS = new PermissionReference("DeleteAssociations");
+	public static final PermissionReference CREATE_ASSOCIATIONS = PermissionReference.create("CreateAssociations");
+	public static final PermissionReference READ_ASSOCIATIONS = PermissionReference.create("ReadAssociations");
+	public static final PermissionReference DELETE_ASSOCIATIONS = PermissionReference.create("DeleteAssociations");
 
-	public static final PermissionReference TAKE_OWNERSHIP = new PermissionReference("TakeOwnership");
-	public static final PermissionReference SET_OWNER = new PermissionReference("SetOwner");
-	public static final PermissionReference LOCK = new PermissionReference("Lock");
-	public static final PermissionReference UNLOCK = new PermissionReference("Unlock");
-	public static final PermissionReference CHECK_OUT = new PermissionReference("CheckOut");
-	public static final PermissionReference CHECK_IN = new PermissionReference("CheckIn");
-	public static final PermissionReference CANCEL_CHECK_OUT = new PermissionReference("CancelCheckOut");
+	public static final PermissionReference TAKE_OWNERSHIP = PermissionReference.create("TakeOwnership");
+	public static final PermissionReference SET_OWNER = PermissionReference.create("SetOwner");
+	public static final PermissionReference LOCK = PermissionReference.create("Lock");
+	public static final PermissionReference UNLOCK = PermissionReference.create("Unlock");
+	public static final PermissionReference CHECK_OUT = PermissionReference.create("CheckOut");
+	public static final PermissionReference CHECK_IN = PermissionReference.create("CheckIn");
+	public static final PermissionReference CANCEL_CHECK_OUT = PermissionReference.create("CancelCheckOut");
 
 	private String name;
 
-	public PermissionReference(String name) {
+	private PermissionReference(String name) {
 		this.name = name;
+	}
+
+	public static PermissionReference create(String name) {
+		return new PermissionReference(name);
 	}
 
 	@JsonValue
