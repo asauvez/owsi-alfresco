@@ -133,7 +133,7 @@ public class ConfigurationLogger implements ApplicationContextAware, Application
 	}
 
 	private static String getInMo(long n) {
-		return String.format("%,8d", n/1024/1024) + " Mo"; 
+		return String.format("%,8d", n/1024/1024).replace((char) 0xA0, ' ') + " Mo"; 
 	}
 	
 	public void setPropertyNamesForInfoLogLevel(List<String> propertyNamesForInfoLogLevel) {
