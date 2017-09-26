@@ -53,6 +53,8 @@ public abstract  class AbstractConfigurationLogger {
 		logPropertyAsInfo("java.version", System.getProperty("java.vendor") + " / " + System.getProperty("java.version"));
 		logPropertyAsInfo("os.name", System.getProperty("os.name") + " / " + System.getProperty("os.arch") + " / " + System.getProperty("os.version"));
 
+		logCustoms();
+		
 		// Properties
 		for (String propertyName : propertyNamesForInfoLogLevel) {
 			boolean md5 = propertyName.startsWith(MD5_PREFIX);

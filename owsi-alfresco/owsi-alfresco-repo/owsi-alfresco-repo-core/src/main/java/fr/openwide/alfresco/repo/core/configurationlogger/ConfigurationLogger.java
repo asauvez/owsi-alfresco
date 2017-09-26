@@ -54,14 +54,14 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 	@Override
 	protected void logCustoms() {
 		if (dataSource != null) {
-			logPropertyAsInfo("db.maximumPoolSize", dataSource.getMaxIdle() + "/" + dataSource.getMaxActive());
+			logPropertyAsInfo("db.maximumPoolSize", dataSource.getMaxIdle() + " / " + dataSource.getMaxActive());
 		}
 		
 		LicenseService licenseService = applicationContext.getBean(LicenseService.class);
 		LicenseDescriptor license = licenseService.getLicense();
 		logPropertyAsInfo("alfresco.licenseValid", licenseService.isLicenseValid());
 		if (license != null) {
-			logPropertyAsInfo("alfresco.licenseHolder", license.getIssued());
+			logPropertyAsInfo("alfresco.licenseHolder", license.getHolderOrganisation());
 			logPropertyAsInfo("alfresco.users", (license.getMaxUsers() != null) ? license.getMaxUsers() : "Unlimited");
 			logPropertyAsInfo("alfresco.licenseValidUntil", license.getValidUntil());
 			logPropertyAsInfo("alfresco.licenseValidFor.days", license.getRemainingDays());
