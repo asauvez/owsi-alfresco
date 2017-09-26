@@ -76,6 +76,9 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		
 		File userHome = new File(System.getProperty("user.home"));
 		File m2Repository = new File(userHome, ".m2/repository/");
+		if (! m2Repository.exists()) {
+			throw new MojoExecutionException("Maven Repository not found " + m2Repository.getAbsolutePath());
+		}
 		for (File alfrescoRepo : new File[] {
 				new File(m2Repository, "org/alfresco/"),
 				new File(m2Repository, "org/alfresco-entreprise/")
@@ -184,7 +187,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				getLog().warn("Ignore resource " + file.getAbsolutePath());
 				return;
 			} else {
-				error("Original resource not found for " + file.getAbsolutePath());
+				error("Original resource not found for " + file.getAbsolutePath() + ". Create a file with .ignore.ori suffix if it is not a Alfresco patch.");
 				return;
 			}
 		}
