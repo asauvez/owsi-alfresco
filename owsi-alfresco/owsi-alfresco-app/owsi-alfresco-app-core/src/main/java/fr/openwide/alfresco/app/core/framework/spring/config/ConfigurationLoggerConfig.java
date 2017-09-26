@@ -17,6 +17,7 @@ public class ConfigurationLoggerConfig {
 	public ConfigurationLogger configurationLogger() {
 		ConfigurationLogger configurationLogger = new ConfigurationLogger();
 		configurationLogger.setPropertyNamesForInfoLogLevel(environment.getRequiredProperty("application.propertyNamesForInfoLogLevel"));
+		configurationLogger.setAdminUser(environment.getRequiredProperty("application.repository.administrator.name"));
 		return configurationLogger;
 	}
 
