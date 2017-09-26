@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
-import java.time.temporal.TemporalUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -86,12 +85,6 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 	@Override
 	public boolean test(BusinessNode node) {
 		throw new UnsupportedOperationException();
-	}
-	
-	public Restriction toTimeRelativeRestriction(
-			@SuppressWarnings("unused") Integer duration, 
-			@SuppressWarnings("unused") TemporalUnit unit) {
-		return this;
 	}
 	
 	public final String toCmisQueryContent() {

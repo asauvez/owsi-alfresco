@@ -61,7 +61,6 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
-import fr.openwide.alfresco.repo.module.classification.model.policy.CompositeClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
@@ -123,13 +122,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		addClassification(model, new ConsumerClassificationPolicy<T>(consumer));
 	}
 
-	@Override
-	public <T extends ContainerModel> CompositeClassificationPolicy<T> addClassification(T model) {
-		CompositeClassificationPolicy<T> policy = new CompositeClassificationPolicy<>();
-		addClassification(model, policy);
-		return policy;
-	}
-	
 	@Override
 	public int reclassifyAll(Integer batchSize) {
 		int total = 0;
@@ -294,13 +286,15 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		ContainerModel model = models.get(type);
 		
 		if (logger.isDebugEnabled()) {
-			logger.debug("Begin classification of node {} with policy for {}.", nodeReference, model.getNameReference());
+			logger.debug("Begin classification of node {} with policy for {}.", nodeReference, type);
 		}
 		
 		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
 				.nodeReference()
-				.properties().set(CmModel.object)
-				.properties().set(model);
+				.properties().set(CmModel.object);
+		if (model != null) {
+			nodeScopeBuilder.properties().set(model);
+		}
 		nodeScopeBuilder.assocs().primaryParent().nodeReference();
 		
 		policy.initNodeScopeBuilder(nodeScopeBuilder);
@@ -313,8 +307,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return;
 		}
 
-		ClassificationBuilder builder = new ClassificationBuilder(this, node);
 		ClassificationEvent event = new ClassificationEvent(node, mode, model);
+		ClassificationBuilder builder = new ClassificationBuilder(this, event);
 		try {
 			policy.classify(builder, model, event);
 			
@@ -396,7 +390,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	private NameReference getPolicy(NodeReference nodeReference) {
-		NameReference result = null;
+		NameReference result = nodeModelService.getProperty(nodeReference, OwsiModel.classifiable.classificationPolicy);
 
 		NameReference type = nodeModelService.getType(nodeReference);
 		QName typeQName = conversionService.getRequired(type);
@@ -548,6 +542,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		} else {
 			return getSiteNode(parent.get());
 		}
+	}
+
+	public void setClassificicationState(NodeReference nodeReference, String newState) {
+		nodeModelService.setProperty(nodeReference, OwsiModel.classifiable.classificationState, newState);
 	}
 
 }

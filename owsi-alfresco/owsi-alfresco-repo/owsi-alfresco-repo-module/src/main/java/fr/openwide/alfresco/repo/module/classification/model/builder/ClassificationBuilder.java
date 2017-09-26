@@ -5,24 +5,21 @@ import java.util.Optional;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
+import fr.openwide.alfresco.component.model.repository.model.st.StSiteContainer.SiteContainerType;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl;
 
 /**
  * Utilitaire permettant de choisir l'emplacement racine de la classification.
  */
-public class ClassificationBuilder {
+public class ClassificationBuilder extends AbstractClassificationBuilder<ClassificationBuilder> {
 
-	private final ClassificationServiceImpl service;
-	private final BusinessNode node;
-
-	public ClassificationBuilder(ClassificationServiceImpl service, BusinessNode node) {
-		this.service = service;
-		this.node = node;
+	public ClassificationBuilder(ClassificationServiceImpl service, ClassificationEvent event) {
+		super(service, event);
 	}
 	
 	/** 
@@ -30,7 +27,7 @@ public class ClassificationBuilder {
 	 * Si on ne défini pas de noeud racine, la classification se fait à partir de l'emplacement actuel.
 	 */
 	public ClassificationWithRootBuilder rootFolder(NodeReference destinationFolder) {
-		return new ClassificationWithRootBuilder(service, node, destinationFolder);
+		return new ClassificationWithRootBuilder(service, getEvent(), destinationFolder);
 	}
 	private Optional<ClassificationWithRootBuilder> rootFolder(Optional<NodeReference> destinationFolder) {
 		return (destinationFolder.isPresent()) ? Optional.of(rootFolder(destinationFolder.get())) : Optional.empty();
@@ -57,10 +54,10 @@ public class ClassificationBuilder {
 				.path(path).of(), true);
 	}
 	public ClassificationWithRootBuilder rootActualFolder() {
-		return rootFolder(node.assocs().primaryParent().getNodeReference());
+		return rootFolder(getNode().assocs().primaryParent().getNodeReference());
 	}
 	public Optional<ClassificationWithRootBuilder> rootActualSite() {
-		Optional<NodeReference> siteNode = service.getSiteNode(node.getNodeReference());
+		Optional<NodeReference> siteNode = service.getSiteNode(getNodeReference());
 		return (siteNode.isPresent()) ? Optional.of(rootFolder(siteNode.get())) : Optional.empty();
 	}
 
@@ -94,6 +91,10 @@ public class ClassificationBuilder {
 				.isType(StModel.site).of()
 				.eq(StModel.site.name, siteName).of(), true);
 	}
+	public Optional<ClassificationWithRootBuilder> rootSiteDocumentLibrary(String siteName) {
+		return rootSite(siteName)
+			.map(builder -> builder.subFolder(SiteContainerType.DOCUMENT_LIBRARY.getCode()));
+	}
 
 	/** 
 	 * Défini le noeud racine de la classification comme étant le home folder de l'utilisateur en cours. 
@@ -114,14 +115,14 @@ public class ClassificationBuilder {
 		return unlinkSecondaryParents(CmModel.folder.contains);
 	}
 	public ClassificationBuilder unlinkSecondaryParents(ChildAssociationModel childAssociationModel) {
-		service.deleteSecondaryParents(node.getNodeReference(), childAssociationModel);
+		service.deleteSecondaryParents(getNodeReference(), childAssociationModel);
 		return this;
 	}
 	
 	public void delete() {
-		service.delete(node.getNodeReference(), false);
+		service.delete(getNodeReference(), false);
 	}
 	public void deletePermanently() {
-		service.delete(node.getNodeReference(), true);
+		service.delete(getNodeReference(), true);
 	}
 }

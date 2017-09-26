@@ -8,21 +8,19 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl;
 
 /**
  * Utilitaire permettant de choisir le sous chemin de la classification.
  * 
  */
-public class ClassificationWithRootBuilder {
+public class ClassificationWithRootBuilder extends AbstractClassificationBuilder<ClassificationWithRootBuilder> {
 
-	private final ClassificationServiceImpl service;
-	private final BusinessNode node;
 	private NodeReference destinationFolder;
 
-	public ClassificationWithRootBuilder(ClassificationServiceImpl service, BusinessNode node, NodeReference destinationFolder) {
-		this.service = service;
-		this.node = node;
+	public ClassificationWithRootBuilder(ClassificationServiceImpl service, ClassificationEvent event, NodeReference destinationFolder) {
+		super(service, event);
 		this.destinationFolder = destinationFolder;
 	}
 	
@@ -56,7 +54,7 @@ public class ClassificationWithRootBuilder {
 		return subFolder(subFolderBuilder, new BusinessNode());
 	}
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder, BusinessNode folderNode) {
-		String folderName = subFolderBuilder.getFolderName(node);
+		String folderName = subFolderBuilder.getFolderName(getNode());
 		return subFolder(folderNode
 				.properties().name(folderName));
 	}
@@ -101,16 +99,16 @@ public class ClassificationWithRootBuilder {
 	}
 	
 	public ClassificationWithRootBuilder uniqueName() {
-		String currentName = node.properties().getName();
+		String currentName = getNode().properties().getName();
 		String newName = service.getUniqueName(destinationFolder, currentName);
 		return name(newName);
 	}
 	
 	public ClassificationWithRootBuilder name(String newName) {
-		String currentName = node.properties().getName();
+		String currentName = getNode().properties().getName();
 		if (! currentName.equals(newName)) {
-			service.setNewName(node.getNodeReference(), newName);
-			node.properties().name(newName);
+			service.setNewName(getNodeReference(), newName);
+			getNode().properties().name(newName);
 		}
 		return this;
 	}
@@ -119,17 +117,17 @@ public class ClassificationWithRootBuilder {
 	 * Déplace le noeud dans le répertoire de destination. 
 	 */
 	public ClassificationWithRootBuilder moveNode() {
-		service.moveNode(node.getNodeReference(), destinationFolder);
+		service.moveNode(getNodeReference(), destinationFolder);
 		return this;
 	}
 	/**
 	 * Copie le noeud dans le répertoire de destination. 
 	 */
 	public NodeReference copyNode() {
-		return service.copyNode(node.getNodeReference(), destinationFolder, Optional.<String>empty());
+		return service.copyNode(getNodeReference(), destinationFolder, Optional.<String>empty());
 	}
 	public ClassificationWithRootBuilder deletePrevious() {
-		service.deletePrevious(destinationFolder, node.properties().getName());
+		service.deletePrevious(destinationFolder, getNode().properties().getName());
 		return this;
 	}
 	
@@ -137,7 +135,7 @@ public class ClassificationWithRootBuilder {
 	 * Créer un lien secondaire dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createSecondaryParent() {
-		service.createSecondaryParent(node.getNodeReference(), destinationFolder);
+		service.createSecondaryParent(getNodeReference(), destinationFolder);
 		return this;
 	}
 
@@ -145,7 +143,7 @@ public class ClassificationWithRootBuilder {
 	 * Créer un raccourci dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createFileLink() {
-		service.createFileLink(node.getNodeReference(), destinationFolder, Optional.empty());
+		service.createFileLink(getNodeReference(), destinationFolder, Optional.empty());
 		return this;
 	}
 }

@@ -157,15 +157,6 @@ public class RestrictionBuilder extends Restriction {
 		return add(new BetweenRelativeTimeRestriction(this, property, min, max, unit));
 	}
 	
-	@Override
-	public Restriction toTimeRelativeRestriction(Integer duration, TemporalUnit unit) {
-		RestrictionBuilder restrictionBuilder = new RestrictionBuilder(null, operator);
-		for (Restriction restriction: restrictions) {
-			restrictionBuilder.add(restriction.toTimeRelativeRestriction(duration, unit));
-		}
-		return restrictionBuilder;
-	}
-
 	public TagRestriction tag(String tag) {
 		return add(new TagRestriction(this, tag));
 	}

@@ -7,7 +7,6 @@ import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.Restriction;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
-import fr.openwide.alfresco.repo.module.classification.model.policy.CompositeClassificationPolicy;
 
 /**
  * Permet de déplacer des node dans un système de classification.
@@ -18,7 +17,6 @@ public interface ClassificationService {
 
 	<T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy);
 	<T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> builder);
-	<T extends ContainerModel> CompositeClassificationPolicy<T> addClassification(T model);
 	
 	int DEFAULT_RECLASSIFY_BATCH_SIZE = 100;
 
