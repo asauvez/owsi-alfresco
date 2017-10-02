@@ -53,8 +53,6 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 	@Autowired private LicenseService licenceService;
 	@Autowired private RunAsUserManager runAsUserManager;
 	
-	private String adminUser;
-
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if (event.getApplicationContext() != applicationContext) {
@@ -95,7 +93,7 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 		int licenseCheckHours = environment.getRequiredProperty("application.repository.licenseCheck.hours", Integer.class);
 		if (System.currentTimeMillis() - lastAlfrescoConnectionConnection >= TimeUnit.MILLISECONDS.convert(licenseCheckHours, TimeUnit.HOURS)) {
 			try {
-				lastLicenseRestrictions = runAsUserManager.runAsUser(adminUser, () -> {
+				lastLicenseRestrictions = runAsUserManager.runAsSystem(() -> {
 					return licenceService.getRestrictions();
 				});
 				repositoryError = Optional.empty();
@@ -135,9 +133,6 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 	}
 	public void setPropertyNamesForInfoLogLevel(String names) {
 		setPropertyNamesForInfoLogLevel(Splitter.on(',').splitToList(names));
-	}
-	public void setAdminUser(String adminUser) {
-		this.adminUser = adminUser;
 	}
 
 }
