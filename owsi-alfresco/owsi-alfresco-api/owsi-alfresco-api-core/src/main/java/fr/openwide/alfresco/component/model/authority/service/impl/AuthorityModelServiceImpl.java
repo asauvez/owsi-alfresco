@@ -64,7 +64,8 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		CachedUser user = cacheUsers.get(userName);
 		if (user == null) {
 			BusinessNode node = getUser(userName, CACHED_USER_NODESCOPEBUILDER);
-			cacheUsers.put(userName, nodeToCachedUser(node));
+			user = nodeToCachedUser(node);
+			cacheUsers.put(userName, user);
 		}
 		return user;
 	}
