@@ -21,8 +21,8 @@ public class RestrictionBuilderTest {
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
 				"AND ID:workspace\\://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c\n" +
 				"AND =cm\\:contentPropertyName:\"{http://www.alfresco.org/model/content/1.0}content\"\n" +
-				"AND cm\\:modified:<2009-02-14T00\\:31\\:30+01\\:00 TO MAX]\n" +
-				"AND cm\\:modified:[MIN TO 2009-02-14T00\\:31\\:30+01\\:00]\n" +
+				"AND cm\\:modified:<2009-02-13T23:31:30.123Z TO MAX]\n" +
+				"AND cm\\:modified:[MIN TO 2009-02-13T23:31:30.123Z]\n" +
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
 				"AND cm\\:name:[\\\\u0000 TO \"def\"]\n" +
 				"AND FINGERPRINT:aeb883c2-ad52-43f1-ab9f-1bf16137e79c_20_80\n" +
