@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -152,7 +153,8 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 	}
 	protected static <C extends Serializable> String toFtsLuceneValue(PropertyModel<C> propertyModel, C value) {
 		if (propertyModel instanceof DateTimePropertyModel || propertyModel instanceof MultiDateTimePropertyModel) {
-			return ISO8601Utils.format((Date) value, false, TimeZone.getDefault()).replace(":", "\\:");
+			return ISO8601Utils.format((Date) value, true, TimeZone.getTimeZone(ZoneOffset.UTC));
+			//return ISO8601Utils.format((Date) value, true, TimeZone.getDefault()).replace(":", "\\:");
 		} else if (propertyModel instanceof DatePropertyModel || propertyModel instanceof MultiDatePropertyModel) {
 			return dateFormat.format((Date) value);
 		} else if (propertyModel instanceof AbstractNumberPropertyModel || propertyModel instanceof AbstractMultiNumberPropertyModel) {
