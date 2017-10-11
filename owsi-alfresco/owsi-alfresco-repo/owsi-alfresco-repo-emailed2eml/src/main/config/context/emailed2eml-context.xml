@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="owsi.service.email" class="Emailed2EmlServiceImpl" depends-on="dictionaryModelBootstrap" >
+		<property name="policyComponent" ref="policyComponent" />
+		<property name="nodeService" ref="NodeService"/>
+		<property name="contentService" ref="ContentService"/>
+		<property name="transactionService" ref="TransactionService"/>
+		
+		<property name="convertToEml" value="${owsi.emailed2eml.convertToEml}"/>
+		<property name="useHtmlAsBody" value="${owsi.emailed2eml.useHtmlAsBody}"/>
+		<property name="deleteWaitMs" value="${owsi.emailed2eml.deleteWaitMs}"/>
+	</bean>
+	
+</beans>
