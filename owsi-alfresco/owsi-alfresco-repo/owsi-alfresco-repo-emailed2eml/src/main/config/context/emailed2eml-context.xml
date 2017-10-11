@@ -3,7 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="owsi.service.email" class="Emailed2EmlServiceImpl" depends-on="dictionaryModelBootstrap" >
+	<bean id="owsi.service.email" class="fr.openwide.alfresco.repo.emailed2eml.service.Emailed2EmlServiceImpl" depends-on="dictionaryBootstrap" >
 		<property name="policyComponent" ref="policyComponent" />
 		<property name="nodeService" ref="NodeService"/>
 		<property name="contentService" ref="ContentService"/>

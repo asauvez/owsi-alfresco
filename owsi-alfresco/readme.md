@@ -31,6 +31,7 @@ Nouveautés
 * reset password d'un utilisateur : owsi.reset-user-password.users=admin:admin123
 * Plugin Maven de migration (MigrationMojo) : Permet de savoir si un patch doit être adapté à une nouvelle version d'Alfresco.
 * PermissionRepositoryService.searchACL() 
+* owsi-alfresco-repo-emailed2eml : Conversion des emails reçu en fichiers .eml
 
 Migration
 =========

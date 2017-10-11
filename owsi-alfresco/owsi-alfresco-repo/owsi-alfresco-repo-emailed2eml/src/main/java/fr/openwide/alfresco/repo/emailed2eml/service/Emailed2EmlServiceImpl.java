@@ -46,10 +46,29 @@ import org.springframework.beans.factory.InitializingBean;
 /**
  * Convertis les emails reçus en fichier .eml, visible par le plugin Outlook.
  * 
+ * En plaçant l'aspect emailserver:aliasable et la propriété emailserver:alias=mysample sur un dossier, on fait qu'un email
+ * envoyé à mysample@hostname va être stocké avec ses pièces jointes dans ce dossier.
+ * 
+ * Ce module va transformer le mail reçu en un fichier .eml. Le plugin Outlook Alfresco (payant) permet de visualiser 
+ * ce genre de fichier directemetn dans Alfresco :
+ * 
+ * 		<dependency>
+ *			<groupId>external.module.alfresco-outlook</groupId>
+ *			<artifactId>alfresco-outlook-repository</artifactId>
+ *			<type>amp</type>
+ *		</dependency>
+ *
+ *		<dependency>
+ *			<groupId>external.module.alfresco-outlook</groupId>
+ *			<artifactId>alfresco-outlook-share</artifactId>
+ *			<type>amp</type>
+ *		</dependency>
+ * 
  * @author asauvez
  * 
  * Pour tester :
- * telnet localhost 8025
+ * 
+ * cat > /tmp/mail
 helo me
 mail from:admin@alfresco.com
 rcpt to:a123@alfresco.com
@@ -97,6 +116,7 @@ rkJggg==
 
 quit
  * 
+ * cat /tmp/mail | telnet localhost 8025
  *
  */
 public class Emailed2EmlServiceImpl implements InitializingBean, OnAddAspectPolicy {
@@ -150,22 +170,20 @@ public class Emailed2EmlServiceImpl implements InitializingBean, OnAddAspectPoli
 						}
 					}, AuthenticationUtil.getSystemUserName());
 
-					if (creator != null) {
-						AuthenticationUtil.runAs(new RunAsWork<Void>() {
-							@Override
-							public Void doWork() throws Exception {
-								return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>() {
-									@Override
-									public Void execute() throws Exception {
-										transformInEml(emailNodeRef);
-										return null;
-									}
-								}, false, false);
-							}
-						}, creator);
-	
-						LOGGER.debug("Traitement terminé " + emailNodeRef);
-					}
+					AuthenticationUtil.runAs(new RunAsWork<Void>() {
+						@Override
+						public Void doWork() throws Exception {
+							return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>() {
+								@Override
+								public Void execute() throws Exception {
+									transformInEml(emailNodeRef);
+									return null;
+								}
+							}, false, false);
+						}
+					}, creator);
+
+					LOGGER.debug("Traitement terminé " + emailNodeRef);
 				} catch (Exception ex) {
 					// On log, mais en cas d'erreur, on laisse tomber. 
 					// On ne veut pas empecher le mail d'être stocké, même au mauvais format.
@@ -236,7 +254,7 @@ public class Emailed2EmlServiceImpl implements InitializingBean, OnAddAspectPoli
 			ContentData attachmentContentData = (ContentData) nodeService.getProperty(attachmentNode.getTargetRef(), ContentModel.PROP_CONTENT);
 			String mimetype = attachmentContentData.getMimetype();
 			
-			InputStream in = contentService.getReader(emailNodeRef, ContentModel.PROP_CONTENT).getContentInputStream();
+			InputStream in = contentService.getReader(attachmentNode.getTargetRef(), ContentModel.PROP_CONTENT).getContentInputStream();
 			try {
 				MimeBodyPart attachment = new MimeBodyPart();
 				DataSource source = new ByteArrayDataSource(in, mimetype);

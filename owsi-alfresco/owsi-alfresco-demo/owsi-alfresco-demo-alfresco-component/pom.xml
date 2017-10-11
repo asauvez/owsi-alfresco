@@ -19,11 +19,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-core</artifactId>
+			<artifactId>owsi-alfresco-repo-module</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-module</artifactId>
+			<artifactId>owsi-alfresco-repo-emailed2eml</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
