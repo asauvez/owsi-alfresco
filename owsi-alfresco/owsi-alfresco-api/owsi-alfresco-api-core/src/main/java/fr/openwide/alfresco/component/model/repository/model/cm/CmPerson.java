@@ -31,6 +31,7 @@ public class CmPerson extends CmAuthority {
 	public final TextPropertyModel lastName = PropertyModels.newText(this, CmModel.NAMESPACE, "lastName");
 	public final TextPropertyModel middleName = PropertyModels.newText(this, CmModel.NAMESPACE, "middleName");
 	public final TextPropertyModel email = PropertyModels.newText(this, CmModel.NAMESPACE, "email");
+	/** @deprecated Use organization */
 	public final TextPropertyModel organizationId = PropertyModels.newText(this, CmModel.NAMESPACE, "organizationId");
 	public final TextPropertyModel homeFolderProvider = PropertyModels.newText(this, CmModel.NAMESPACE, "homeFolderProvider");
 	public final TextPropertyModel defaultHomeFolderPath = PropertyModels.newText(this, CmModel.NAMESPACE, "defaultHomeFolderPath");
