@@ -24,6 +24,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPreferences;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmStoreSelector;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmSummarizable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTitled;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
@@ -31,7 +32,6 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
 
 public interface CmModel {
 
-	// https://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD/root/projects/repository/config/alfresco/model/contentModel.xml
 	// https://github.com/Alfresco/alfresco-repository/blob/develop/src/main/resources/alfresco/model/contentModel.xml
 	NamespaceReference NAMESPACE = NamespaceReference.create("cm", "http://www.alfresco.org/model/content/1.0");
 
@@ -58,6 +58,8 @@ public interface CmModel {
 	CmCopiedFrom copiedFrom = new CmCopiedFrom();
 	
 	CmWorkingCopy workingCopy = new CmWorkingCopy();
+	
+	CmStoreSelector storeSelector = new CmStoreSelector();
 	
 	CmClassifiable classifiable = new CmClassifiable();
 	

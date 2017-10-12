@@ -112,7 +112,12 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		}
 		return this;
 	}
-	
+
+	public ClassificationWithRootBuilder contentStore(String storeName) {
+		service.setContentStore(getNodeReference(), storeName);
+		return this;
+	}
+
 	/**
 	 * Déplace le noeud dans le répertoire de destination. 
 	 */
