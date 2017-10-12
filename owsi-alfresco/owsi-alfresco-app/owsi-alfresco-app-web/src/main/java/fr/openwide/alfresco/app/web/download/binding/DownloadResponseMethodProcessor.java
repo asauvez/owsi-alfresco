@@ -230,9 +230,11 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		}
 		
 		// set content-length manually rather than using setContentLength to allow for size as long
+		int status = download.getHttpStatus();
 		String range = download.getContentRange(fullContentLength); 
 		long packetContentLength = download.getContentLength(fullContentLength);
 
+		response.setStatus(status);
 		response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
 		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(packetContentLength));
 		if (range != null) {

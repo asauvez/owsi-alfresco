@@ -108,6 +108,11 @@ public abstract class DownloadResponse {
 		}
 		return this;
 	}
+	public int getHttpStatus() {
+		return (hasContentRange()) 
+				? HttpServletResponse.SC_PARTIAL_CONTENT 	// 206
+				: HttpServletResponse.SC_OK; 				// 200
+	}
 	public long getContentLength(long realContentLength) {
 		if (! hasContentRange()) {
 			return realContentLength;
