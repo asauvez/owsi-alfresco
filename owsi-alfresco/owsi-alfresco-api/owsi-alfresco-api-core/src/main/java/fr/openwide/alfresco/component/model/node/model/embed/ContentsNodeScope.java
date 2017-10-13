@@ -2,6 +2,7 @@ package fr.openwide.alfresco.component.model.node.model.embed;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.ByteArrayRepositoryContentSerializer;
@@ -29,6 +30,9 @@ public class ContentsNodeScope {
 	/** Indique que l'on souhaite downloader un fichier. Ici, sous forme de String */
 	public NodeScopeBuilder asString() {
 		return withDeserializer(StringRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder asString(Charset charset) {
+		return withDeserializer(new StringRepositoryContentSerializer(charset));
 	}
 	public NodeScopeBuilder asByteArray() {
 		return withDeserializer(ByteArrayRepositoryContentSerializer.INSTANCE);
