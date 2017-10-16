@@ -23,7 +23,7 @@ public class RealmAwareKerberosTicketValidator extends SunJaasKerberosTicketVali
 	public KerberosTicketValidation validateTicket(byte[] token) {
 		KerberosTicketValidation ticket = super.validateTicket(token);
 		String username = ticket.username().split("@")[0]; // throw away the realm
-		return new KerberosTicketValidation(username, servicePrincipal, token, ticket.getGssContext());
+		return new KerberosTicketValidation(username, servicePrincipal, ticket.responseToken(), ticket.getGssContext());
 	}
 
 	@Override
