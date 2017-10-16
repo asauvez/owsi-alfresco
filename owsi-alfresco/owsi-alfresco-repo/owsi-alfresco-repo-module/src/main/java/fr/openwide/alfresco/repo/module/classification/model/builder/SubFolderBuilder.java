@@ -6,8 +6,9 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
+import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 
 public class SubFolderBuilder {
 	
@@ -53,8 +54,8 @@ public class SubFolderBuilder {
 		return format(new DecimalFormat(pattern));
 	}
 
-	public String getFolderName(BusinessNode node) {
-		Serializable value = node.getRepositoryNode().getProperty(property);
+	public String getFolderName(NodeModelRepositoryService nodeModelService, NodeReference nodeReference) {
+		Serializable value = nodeModelService.getProperty(nodeReference, property);
 		if (value == null) {
 			if (defaultValue == null) {
 				throw new IllegalStateException("Value null and no default value given.");

@@ -54,7 +54,8 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 				.path(path).of(), true);
 	}
 	public ClassificationWithRootBuilder rootActualFolder() {
-		return rootFolder(getNode().assocs().primaryParent().getNodeReference());
+		NodeReference primaryParent = service.getNodeModelService().getPrimaryParent(getNodeReference()).get();
+		return rootFolder(primaryParent);
 	}
 	public Optional<ClassificationWithRootBuilder> rootActualSite() {
 		Optional<NodeReference> siteNode = service.getSiteNode(getNodeReference());

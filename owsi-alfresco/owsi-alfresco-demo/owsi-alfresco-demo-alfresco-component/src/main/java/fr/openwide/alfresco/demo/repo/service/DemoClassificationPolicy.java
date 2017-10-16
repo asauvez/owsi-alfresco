@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.demo.repo.service;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
 import fr.openwide.alfresco.demo.business.model.demo.DemoAspect;
@@ -12,11 +11,8 @@ import fr.openwide.alfresco.repo.module.classification.model.policy.Classificati
 public class DemoClassificationPolicy implements ClassificationPolicy<DemoAspect> {
 
 	@Override
-	public void initNodeScopeBuilder(NodeScopeBuilder nodeScopeBuilder) {}
-
-	@Override
 	public void classify(ClassificationBuilder builder, DemoAspect model, ClassificationEvent event) {
-		if ("unique".equals(event.getNode().properties().get(model.demoProperty))) {
+		if ("unique".equals(builder.getProperty(model.demoProperty))) {
 			builder
 				.rootFolderIdentifier(DemoModel.DEMO_ROOT_FOLDER).get()
 				.subFolder("classificationUnique")

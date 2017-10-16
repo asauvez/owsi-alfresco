@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -289,25 +288,12 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			logger.debug("Begin classification of node {} with policy for {}.", nodeReference, type);
 		}
 		
-		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
-				.nodeReference()
-				.properties().set(CmModel.object);
-		if (model != null) {
-			nodeScopeBuilder.properties().set(model);
-		}
-		nodeScopeBuilder.assocs().primaryParent().nodeReference();
-		
-		policy.initNodeScopeBuilder(nodeScopeBuilder);
-			
-		BusinessNode node;
-		try {
-			node = nodeModelService.get(nodeReference, nodeScopeBuilder);
-		} catch (NoSuchNodeRemoteException ex) {
+		if (! nodeModelService.exists(nodeReference)) {
 			logger.warn("Node {} no longer exists. Ignoring.", nodeReference);
 			return;
 		}
 
-		ClassificationEvent event = new ClassificationEvent(node, mode, model);
+		ClassificationEvent event = new ClassificationEvent(nodeReference, mode, model);
 		ClassificationBuilder builder = new ClassificationBuilder(this, event);
 		try {
 			policy.classify(builder, model, event);
@@ -476,6 +462,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				() -> searchUniqueReference(restrictionBuilder));
 	}
 
+	public NodeModelRepositoryService getNodeModelService() {
+		return nodeModelService;
+	}
+	
 	public Optional<NodeReference> getByNamedPath(String ... names) {
 		return nodeModelService.getByNamedPath(names);
 	}

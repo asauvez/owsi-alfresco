@@ -3,7 +3,6 @@ package fr.openwide.alfresco.repo.module.classification.model.policy;
 import java.util.function.Consumer;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 
@@ -13,11 +12,6 @@ public class ConsumerClassificationPolicy<T extends ContainerModel> implements C
 
 	public ConsumerClassificationPolicy(Consumer<ClassificationBuilder> consumer) {
 		this.consumer = consumer;
-	}
-	
-	@Override 
-	public void initNodeScopeBuilder(NodeScopeBuilder nodeScopeBuilder) {
-		// nop
 	}
 	
 	@Override

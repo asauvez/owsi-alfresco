@@ -1,17 +1,10 @@
 package fr.openwide.alfresco.repo.module.classification.model.policy;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 
 public interface ClassificationPolicy<T extends ContainerModel> {
-
-	/**
-	 * Permet à la policy de choisir ce qui doit être chargé de la node.
-	 * Par défaut sont chargées les propriétés de cm:object et du modèle concernée.
-	 */
-	void initNodeScopeBuilder(NodeScopeBuilder nodeScopeBuilder);
 
 	/**
 	 * Défini la politique de classement pour un type ou aspect donné.

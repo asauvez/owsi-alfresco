@@ -54,7 +54,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return subFolder(subFolderBuilder, new BusinessNode());
 	}
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder, BusinessNode folderNode) {
-		String folderName = subFolderBuilder.getFolderName(getNode());
+		String folderName = subFolderBuilder.getFolderName(service.getNodeModelService(), getNodeReference());
 		return subFolder(folderNode
 				.properties().name(folderName));
 	}
@@ -99,17 +99,13 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder uniqueName() {
-		String currentName = getNode().properties().getName();
+		String currentName = service.getNodeModelService().getProperty(getNodeReference(), CmModel.object.name);
 		String newName = service.getUniqueName(destinationFolder, currentName);
 		return name(newName);
 	}
 	
 	public ClassificationWithRootBuilder name(String newName) {
-		String currentName = getNode().properties().getName();
-		if (! currentName.equals(newName)) {
-			service.setNewName(getNodeReference(), newName);
-			getNode().properties().name(newName);
-		}
+		service.setNewName(getNodeReference(), newName);
 		return this;
 	}
 
@@ -132,7 +128,8 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return service.copyNode(getNodeReference(), destinationFolder, Optional.<String>empty());
 	}
 	public ClassificationWithRootBuilder deletePrevious() {
-		service.deletePrevious(destinationFolder, getNode().properties().getName());
+		String currentName = service.getNodeModelService().getProperty(getNodeReference(), CmModel.object.name);
+		service.deletePrevious(destinationFolder, currentName);
 		return this;
 	}
 	
