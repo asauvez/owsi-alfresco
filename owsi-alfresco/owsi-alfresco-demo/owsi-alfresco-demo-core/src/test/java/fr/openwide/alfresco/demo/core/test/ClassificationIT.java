@@ -1,7 +1,10 @@
 package fr.openwide.alfresco.demo.core.test;
 
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.http.MediaType;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -73,8 +76,8 @@ public class ClassificationIT extends AbstractDemoIT {
 				new BusinessNode(folder).aspect(OwsiModel.deleteIfEmpty),
 				new NodeScopeBuilder().aspect(OwsiModel.deleteIfEmpty));
 
-		NodeReference file1 = nodeModelService.createContent(folder, "demo1.txt", "text/plain", "UTF-8", "hello world");
-		NodeReference file2 = nodeModelService.createContent(folder, "demo2.txt", "text/plain", "UTF-8", "hello world");
+		NodeReference file1 = nodeModelService.createContent(folder, "demo1.txt", MediaType.TEXT_PLAIN, StandardCharsets.UTF_8, "hello world");
+		NodeReference file2 = nodeModelService.createContent(folder, "demo2.txt", MediaType.TEXT_PLAIN, StandardCharsets.UTF_8, "hello world");
 		Assert.assertEquals(1, nodeModelService.getChildren(rootFolder, new NodeScopeBuilder()).size());
 
 		nodeModelService.delete(file1);

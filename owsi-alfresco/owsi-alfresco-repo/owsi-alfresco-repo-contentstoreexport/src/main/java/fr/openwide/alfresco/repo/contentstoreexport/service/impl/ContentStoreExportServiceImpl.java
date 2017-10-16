@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			// Ajout du ConfigurationLogger, s'il est disponible
 			if (configurationLogger.length() > 0) {
 				zipOutPutStream.putNextEntry(new ZipEntry("configurationlogger.txt"));
-				OutputStreamWriter out = new OutputStreamWriter(zipOutPutStream, "UTF-8");
+				OutputStreamWriter out = new OutputStreamWriter(zipOutPutStream, StandardCharsets.UTF_8);
 				out.append(configurationLogger.toString());
 				out.flush();
 				zipOutPutStream.closeEntry();

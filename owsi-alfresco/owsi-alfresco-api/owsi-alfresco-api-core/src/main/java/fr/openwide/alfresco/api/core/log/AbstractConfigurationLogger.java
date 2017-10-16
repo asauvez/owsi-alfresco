@@ -1,8 +1,8 @@
 package fr.openwide.alfresco.api.core.log;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -81,11 +81,7 @@ public abstract  class AbstractConfigurationLogger {
 	}
 
 	private String md5(String value) {
-		try {
-			return DatatypeConverter.printHexBinary(md5MessageDigest.digest(value.getBytes("UTF-8"))).toUpperCase();
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e);
-		}
+		return DatatypeConverter.printHexBinary(md5MessageDigest.digest(value.getBytes(StandardCharsets.UTF_8))).toUpperCase();
 	}
 	
 	protected String getInMo(long n) {

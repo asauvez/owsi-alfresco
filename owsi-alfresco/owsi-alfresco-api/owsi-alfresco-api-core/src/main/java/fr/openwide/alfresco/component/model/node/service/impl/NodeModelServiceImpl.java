@@ -1,9 +1,11 @@
 package fr.openwide.alfresco.component.model.node.service.impl;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -100,6 +102,12 @@ public class NodeModelServiceImpl implements NodeModelService {
 
 	@Override
 	public NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNodeNameRemoteException {
+		return create(new BusinessNode(parentRef, CmModel.content, fileName)
+				.properties().set(CmModel.content.content, new RepositoryContentData(mimeType, encoding))
+				.contents().set(content));
+	}
+	@Override
+	public NodeReference createContent(NodeReference parentRef, String fileName, MediaType mimeType, Charset encoding, Object content) throws DuplicateChildNodeNameRemoteException {
 		return create(new BusinessNode(parentRef, CmModel.content, fileName)
 				.properties().set(CmModel.content.content, new RepositoryContentData(mimeType, encoding))
 				.contents().set(content));

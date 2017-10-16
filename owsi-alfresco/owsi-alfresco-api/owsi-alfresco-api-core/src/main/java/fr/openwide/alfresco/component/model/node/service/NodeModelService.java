@@ -1,8 +1,10 @@
 package fr.openwide.alfresco.component.model.node.service;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
@@ -35,8 +37,9 @@ public interface NodeModelService {
 	Optional<BusinessNode> getTargetAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
 	Optional<BusinessNode> getSourceAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc, NodeScopeBuilder nodeScopeBuilder);
 
-	NodeReference createFolder(NodeReference parent, String folderName) throws DuplicateChildNodeNameRemoteException;
-	NodeReference createContent(NodeReference parent, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNodeNameRemoteException;
+	NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
+	NodeReference createContent(NodeReference parentRef, String fileName, String mimeType, String encoding, Object content) throws DuplicateChildNodeNameRemoteException;
+	NodeReference createContent(NodeReference parentRef, String fileName, MediaType mimeType, Charset encoding, Object content) throws DuplicateChildNodeNameRemoteException;
 
 	NodeReference createContent(NodeReference parent, MultipartFile file) throws DuplicateChildNodeNameRemoteException;
 
