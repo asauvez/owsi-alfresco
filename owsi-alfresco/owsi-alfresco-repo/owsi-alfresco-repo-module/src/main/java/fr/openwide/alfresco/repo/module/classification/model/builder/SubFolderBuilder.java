@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -13,7 +16,7 @@ import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryServ
 public class SubFolderBuilder {
 	
 	private final NameReference property;
-	private Format format = null;
+	private Function<Serializable, String> format = null;
 	private String defaultValue = null;
 
 	public SubFolderBuilder(NameReference property) {
@@ -27,9 +30,15 @@ public class SubFolderBuilder {
 		this.defaultValue = defaultValue;
 		return this;
 	}
-	public SubFolderBuilder format(Format format) {
+	public SubFolderBuilder format(Function<Serializable, String> format) {
+		if (format != null) {
+			throw new IllegalStateException("A format is already set.");
+		}
 		this.format = format;
 		return this;
+	}
+	public SubFolderBuilder format(Format format) {
+		return format(o -> format.format(o));
 	}
 	public SubFolderBuilder formatDate(String pattern) {
 		return format(new SimpleDateFormat(pattern));
@@ -54,6 +63,10 @@ public class SubFolderBuilder {
 		return format(new DecimalFormat(pattern));
 	}
 
+	public SubFolderBuilder prefixBefore(String separator) {
+		return format(s -> StringUtils.substringBefore(s.toString(), separator));
+	}
+	
 	public String getFolderName(NodeModelRepositoryService nodeModelService, NodeReference nodeReference) {
 		Serializable value = nodeModelService.getProperty(nodeReference, property);
 		if (value == null) {
@@ -62,6 +75,6 @@ public class SubFolderBuilder {
 			}
 			return defaultValue;
 		}
-		return (format != null) ? format.format(value) : value.toString();
+		return (format != null) ? format.apply(value) : value.toString();
 	}
 }
