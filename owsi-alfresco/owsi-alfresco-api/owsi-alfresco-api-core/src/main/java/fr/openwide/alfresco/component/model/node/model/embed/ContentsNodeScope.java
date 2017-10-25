@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
+import fr.openwide.alfresco.api.core.node.binding.content.serializer.Base64ContentSerializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.ByteArrayRepositoryContentSerializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.FolderRepositoryContentSerializer;
 import fr.openwide.alfresco.api.core.node.binding.content.serializer.JacksonRepositoryContentSerializer;
@@ -36,6 +37,9 @@ public class ContentsNodeScope {
 	}
 	public NodeScopeBuilder asByteArray() {
 		return withDeserializer(ByteArrayRepositoryContentSerializer.INSTANCE);
+	}
+	public NodeScopeBuilder asBase64(boolean addMimePrefix) {
+		return withDeserializer(new Base64ContentSerializer(addMimePrefix));
 	}
 	public NodeScopeBuilder asTempFile() {
 		return withDeserializer(TempFileRepositoryContentSerializer.INSTANCE);
