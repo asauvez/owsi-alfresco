@@ -14,7 +14,7 @@ public class ClassificationCache {
 	private Map<String, NodeReference> cache 
 			= Collections.synchronizedMap(new LinkedHashMap<String, NodeReference>(16, 10.75f, true) {
 		@Override
-		protected boolean removeEldestEntry(Map.Entry<String,NodeReference> eldest) {
+		protected boolean removeEldestEntry(Map.Entry<String, NodeReference> eldest) {
 			return size() > maxSize;
 		};
 	});

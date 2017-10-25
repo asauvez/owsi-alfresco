@@ -1,8 +1,14 @@
 package fr.openwide.alfresco.repo.module.classification.model.builder;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -17,11 +23,11 @@ import fr.openwide.alfresco.repo.module.classification.service.impl.Classificati
  */
 public class ClassificationWithRootBuilder extends AbstractClassificationBuilder<ClassificationWithRootBuilder> {
 
-	private NodeReference destinationFolder;
+	private List<NodeReference> destinationFolders;
 
-	public ClassificationWithRootBuilder(ClassificationServiceImpl service, ClassificationEvent event, NodeReference destinationFolder) {
+	public ClassificationWithRootBuilder(ClassificationServiceImpl service, ClassificationEvent event, List<NodeReference> destinationFolders) {
 		super(service, event);
-		this.destinationFolder = destinationFolder;
+		this.destinationFolders = destinationFolders;
 	}
 	
 	/**
@@ -37,7 +43,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return subFolder(folderName, () -> node);
 	}
 	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
-		destinationFolder = service.subFolder(folderName, folderNodeSupplier, destinationFolder);
+		destinationFolders = destinationFolders.stream()
+				.map(destinationFolder -> service.subFolder(folderName, folderNodeSupplier, destinationFolder))
+				.collect(Collectors.toList());
 		return this;
 	}
 	/**
@@ -51,22 +59,54 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder) {
-		return subFolder(subFolderBuilder, new BusinessNode());
+		return subFolder(subFolderBuilder, () -> new BusinessNode());
 	}
-	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder, BusinessNode folderNode) {
-		String folderName = subFolderBuilder.getFolderName(service.getNodeModelService(), getNodeReference());
-		return subFolder(folderNode
-				.properties().name(folderName));
+	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder, Supplier<BusinessNode> folderNodeSupplier) {
+		Set<String> foldersName = subFolderBuilder.getFoldersName(this);
+		return subFolders(foldersName, folderNodeSupplier);
+	}
+	public ClassificationWithRootBuilder subFolders(Collection<String> foldersName) {
+		return subFolders(foldersName, () -> new BusinessNode());
+	}
+	public ClassificationWithRootBuilder subFolders(Collection<String> foldersName, Supplier<BusinessNode> folderNodeSupplier) {
+		destinationFolders = destinationFolders.stream()
+			.flatMap(destinationFolder -> 
+				foldersName.stream()
+					.map(folderName -> service.subFolder(folderName, folderNodeSupplier, destinationFolder)))
+			.collect(Collectors.toList());
+		return this;
 	}
 
+	public ClassificationWithRootBuilder forEachSubFolder() {
+		return forEachSubFolder(nodeReference -> true);
+	}
+	public ClassificationWithRootBuilder forEachSubFolder(Predicate<NodeReference> predicate) {
+		return new ClassificationWithRootBuilder(service, getEvent(), destinationFolders.stream()
+				.flatMap(destinationFolder -> service.getNodeModelService().getChildrenAssocsContains(destinationFolder).stream())
+				.filter(destinationFolder -> service.getNodeModelService().isType(destinationFolder, CmModel.folder))
+				.filter(predicate)
+				.collect(Collectors.toList()));
+	}
+	
+	public ClassificationWithRootBuilder forEachTag() {
+		List<NodeReference> tags = getProperty(CmModel.taggable.taggable); 
+		if (tags == null) {
+			tags = Collections.emptyList(); 
+		}
+		Set<String> foldersName = tags.stream()
+				.map(tag -> service.getNodeModelService().getProperty(tag, CmModel.object.name))
+				.collect(Collectors.toSet());
+		return subFolders(foldersName);
+	}
+	
 	/**
 	 * Créer un sous dossier avec comme nom la valeur d'une propriété du noeud à classer.
 	 */
 	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property) {
 		return subFolder(new SubFolderBuilder(property));
 	}
-	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property, BusinessNode folderNode) {
-		return subFolder(new SubFolderBuilder(property), folderNode);
+	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property, Supplier<BusinessNode> folderNodeSupplier) {
+		return subFolder(new SubFolderBuilder(property), folderNodeSupplier);
 	}
 
 	public ClassificationWithRootBuilder subFolderYear() {
@@ -95,13 +135,26 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public NodeReference getDestinationFolder() {
-		return destinationFolder;
+		if (destinationFolders.size() != 1) {
+			throw new IllegalStateException(getDestinationFolders().toString());
+		}
+		return destinationFolders.iterator().next();
+	}
+	public Collection<NodeReference> getDestinationFolders() {
+		return destinationFolders;
 	}
 	
 	public ClassificationWithRootBuilder uniqueName() {
 		String currentName = service.getNodeModelService().getProperty(getNodeReference(), CmModel.object.name);
-		String newName = service.getUniqueName(destinationFolder, currentName);
-		return name(newName);
+		if (destinationFolders.size() > 1) {
+			throw new UnsupportedOperationException(destinationFolders.toString());
+		}
+		for (NodeReference destinationFolder : destinationFolders) {
+			// TODO : avoir un nom pour chaque destination
+			String newName = service.getUniqueName(destinationFolder, currentName);
+			name(newName);
+		}
+		return this;
 	}
 	
 	public ClassificationWithRootBuilder name(String newName) {
@@ -118,18 +171,28 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 * Déplace le noeud dans le répertoire de destination. 
 	 */
 	public ClassificationWithRootBuilder moveNode() {
-		service.moveNode(getNodeReference(), destinationFolder);
+		if (destinationFolders.size() > 1) {
+			throw new UnsupportedOperationException("Can't move a node to more than one folder : " + destinationFolders);
+		}
+		for (NodeReference destinationFolder : destinationFolders) {
+			service.moveNode(getNodeReference(), destinationFolder);
+		}
 		return this;
 	}
 	/**
 	 * Copie le noeud dans le répertoire de destination. 
 	 */
-	public NodeReference copyNode() {
-		return service.copyNode(getNodeReference(), destinationFolder, Optional.<String>empty());
+	public List<NodeReference> copyNode() {
+		return destinationFolders.stream().map(destinationFolder -> 
+			service.copyNode(getNodeReference(), destinationFolder, Optional.<String>empty()))
+				.collect(Collectors.toList());
 	}
+	
 	public ClassificationWithRootBuilder deletePrevious() {
 		String currentName = service.getNodeModelService().getProperty(getNodeReference(), CmModel.object.name);
-		service.deletePrevious(destinationFolder, currentName);
+		for (NodeReference destinationFolder : destinationFolders) {
+			service.deletePrevious(destinationFolder, currentName);
+		}
 		return this;
 	}
 	
@@ -137,7 +200,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 * Créer un lien secondaire dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createSecondaryParent() {
-		service.createSecondaryParent(getNodeReference(), destinationFolder);
+		for (NodeReference destinationFolder : destinationFolders) {
+			service.createSecondaryParent(getNodeReference(), destinationFolder);
+		}
 		return this;
 	}
 
@@ -145,7 +210,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 * Créer un raccourci dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createFileLink() {
-		service.createFileLink(getNodeReference(), destinationFolder, Optional.empty());
+		for (NodeReference destinationFolder : destinationFolders) {
+			service.createFileLink(getNodeReference(), destinationFolder, Optional.empty());
+		}
 		return this;
 	}
 }

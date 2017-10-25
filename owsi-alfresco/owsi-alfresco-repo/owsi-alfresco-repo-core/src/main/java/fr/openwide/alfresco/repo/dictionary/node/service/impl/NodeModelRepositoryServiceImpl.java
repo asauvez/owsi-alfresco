@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.cache.SimpleCache;
@@ -235,6 +236,19 @@ public class NodeModelRepositoryServiceImpl
 		return Optional.ofNullable((children.isEmpty()) 
 				? null
 				: conversionService.get(children.get(0).getChildRef()));
+	}
+	@Override
+	public List<NodeReference> getChildrenAssocsContains(NodeReference nodeReference) {
+		return getChildrenAssocs(nodeReference, CmModel.folder.contains);
+	}
+	@Override
+	public List<NodeReference> getChildrenAssocs(NodeReference nodeReference, ChildAssociationModel associationType) {
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(associationType.getNameReference()), 
+				RegexQNamePattern.MATCH_ALL);
+		return children.stream().map(child -> conversionService.get(child.getChildRef()))
+				.collect(Collectors.toList());
 	}
 	@Override
 	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName) {

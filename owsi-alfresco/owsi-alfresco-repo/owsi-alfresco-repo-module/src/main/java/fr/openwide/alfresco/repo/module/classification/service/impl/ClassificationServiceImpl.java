@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -103,6 +104,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
+	
+	@Override
+	public void autoClassification(ContainerModel containerModel) {
+		policyRepositoryService.onAddAspect(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
+	}
 
 	@Override
 	public <T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy) {
@@ -172,7 +178,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	@Override
 	public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
-		classify(nodeRef, ClassificationMode.CREATE);
+		if (OwsiModel.classifiable.getNameReference().equals(conversionService.get(aspectTypeQName))) {
+			classify(nodeRef, ClassificationMode.CREATE);
+		} else {
+			nodeModelService.addAspect(conversionService.get(nodeRef), OwsiModel.classifiable);
+		}
 	}
 	@Override
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
@@ -414,12 +424,20 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public NodeReference subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier, NodeReference destinationFolder) {
 		ChildAssociationModel associationType = CmModel.folder.contains;
 
-		String cacheKey = destinationFolder + "/" + associationType + "/" + folderName;
+		String cleanFolderName = folderName.replace('"', ' ').replace('?', ' ').replace('*', ' ')
+				.replace('\\', ' ').replace('/', ' ').replace('|', ' ').replace(':', ' ')
+				.replace('<', ' ').replace('>', ' ').trim(); 
+		
+		String cacheKey = destinationFolder + "/" + associationType + "/" + cleanFolderName;
 		return subFolderCache.get(nodeModelService, cacheKey, 
-				() -> nodeModelService.getChildByName(destinationFolder, folderName, associationType),
+				() -> nodeModelService.getChildByName(destinationFolder, cleanFolderName, associationType),
 				() -> {
 			BusinessNode folderNode = folderNodeSupplier.get();
-			folderNode.properties().name(folderName);
+			
+			folderNode.properties().name(cleanFolderName);
+			if (! cleanFolderName.equals(folderName) && folderNode.properties().get(CmModel.titled.title) == null) {
+				folderNode.properties().set(CmModel.titled.title, folderName);
+			}
 			if (folderNode.getRepositoryNode().getType() == null) {
 				folderNode.getRepositoryNode().setType(CmModel.folder.getNameReference());
 			}
@@ -440,7 +458,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				}, false, true);
 			} catch (DuplicateChildNodeNameException ex) {
 				// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-				return nodeModelService.getChildByName(destinationFolder, folderName, associationType).get();
+				return nodeModelService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
 			}
 		});
 	} 
@@ -452,14 +470,14 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		subFolderCache.clear();
 	}
 	
-	public Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
-		return nodeSearchModelService.searchUniqueReference(restrictionBuilder);
+	public List<NodeReference> searchReference(RestrictionBuilder restrictionBuilder) {
+		// Pas de cache
+		return nodeSearchModelService.searchReference(restrictionBuilder); 
 	}
-
-	public Optional<NodeReference> searchUniqueReferenceCached(RestrictionBuilder restrictionBuilder) {
+	public Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
 		String cacheKey = restrictionBuilder.toFtsQuery();
 		return queryCache.get(nodeModelService, cacheKey, 
-				() -> searchUniqueReference(restrictionBuilder));
+				() -> nodeSearchModelService.searchUniqueReference(restrictionBuilder));
 	}
 
 	public NodeModelRepositoryService getNodeModelService() {

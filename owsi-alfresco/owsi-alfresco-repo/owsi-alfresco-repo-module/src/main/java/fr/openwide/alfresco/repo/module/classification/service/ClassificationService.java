@@ -15,6 +15,7 @@ import fr.openwide.alfresco.repo.module.classification.model.policy.Classificati
  */
 public interface ClassificationService {
 
+	void autoClassification(ContainerModel containerModel);
 	<T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy);
 	<T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> builder);
 	

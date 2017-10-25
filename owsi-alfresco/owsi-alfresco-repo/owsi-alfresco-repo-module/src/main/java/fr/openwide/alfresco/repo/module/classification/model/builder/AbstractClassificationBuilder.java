@@ -1,8 +1,11 @@
 package fr.openwide.alfresco.repo.module.classification.model.builder;
 
 import java.io.Serializable;
+import java.util.List;
 
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
@@ -22,7 +25,13 @@ public class AbstractClassificationBuilder<B extends AbstractClassificationBuild
 	public NodeModelRepositoryService getNodeModelService() {
 		return service.getNodeModelService();
 	}
+	public <C extends Serializable> C getProperty(NameReference property) {
+		return getNodeModelService().getProperty(getNodeReference(), property);
+	}
 	public <C extends Serializable> C getProperty(SinglePropertyModel<C> property) {
+		return getNodeModelService().getProperty(getNodeReference(), property);
+	}
+	public <C extends Serializable> List<C> getProperty(MultiPropertyModel<C> property) {
 		return getNodeModelService().getProperty(getNodeReference(), property);
 	}
 	public <E extends Enum<E>> E getProperty(EnumTextPropertyModel<E> property) {

@@ -26,6 +26,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPreferences;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmStoreSelector;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmSummarizable;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmTaggable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTitled;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmVersionable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
@@ -74,6 +75,8 @@ public interface CmModel {
 	CmAttachable attachable = new CmAttachable();
 	
 	CmEmailed emailed = new CmEmailed();
+	
+	CmTaggable taggable = new CmTaggable();
 	
 	// ---- Types
 

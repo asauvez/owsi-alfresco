@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.module.classification.model.builder;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -27,7 +29,10 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	 * Si on ne défini pas de noeud racine, la classification se fait à partir de l'emplacement actuel.
 	 */
 	public ClassificationWithRootBuilder rootFolder(NodeReference destinationFolder) {
-		return new ClassificationWithRootBuilder(service, getEvent(), destinationFolder);
+		return rootFolders(Collections.singletonList(destinationFolder));
+	}
+	public ClassificationWithRootBuilder rootFolders(List<NodeReference> destinationFolders) {
+		return new ClassificationWithRootBuilder(service, getEvent(), destinationFolders);
 	}
 	private Optional<ClassificationWithRootBuilder> rootFolder(Optional<NodeReference> destinationFolder) {
 		return (destinationFolder.isPresent()) ? Optional.of(rootFolder(destinationFolder.get())) : Optional.empty();
@@ -36,22 +41,16 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	 * Défini le noeud racine comme étant le résultat unique que renvoi la requête fournie.
 	 */
 	public Optional<ClassificationWithRootBuilder> rootFolder(RestrictionBuilder restrictionBuilder) {
-		return rootFolder(restrictionBuilder, false);
+		Optional<NodeReference> nodeReference = service.searchUniqueReference(restrictionBuilder);
+		return rootFolder(nodeReference);
 	}
-	
-	/**
-	 * @param cached Si vrai, alors mets en cache mémoire le résultat de la recherche.
-	 */
-	public Optional<ClassificationWithRootBuilder> rootFolder(RestrictionBuilder restrictionBuilder, boolean cached) {
-		Optional<NodeReference> optional = (cached) 
-				? service.searchUniqueReferenceCached(restrictionBuilder) 
-				: service.searchUniqueReference(restrictionBuilder);
-		return rootFolder(optional);
+	public ClassificationWithRootBuilder rootFolders(RestrictionBuilder restrictionBuilder) {
+		return rootFolders(service.searchReference(restrictionBuilder));
 	}
 	
 	public Optional<ClassificationWithRootBuilder> rootFolderPath(String path) {
 		return rootFolder(new RestrictionBuilder()
-				.path(path).of(), true);
+				.path(path).of());
 	}
 	public ClassificationWithRootBuilder rootActualFolder() {
 		NodeReference primaryParent = service.getNodeModelService().getPrimaryParent(getNodeReference()).get();
@@ -81,7 +80,11 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	 */
 	public Optional<ClassificationWithRootBuilder> rootFolderIdentifier(NameReference identifier) {
 		return rootFolder(new RestrictionBuilder()
-				.eq(OwsiModel.identifiable.identifier, identifier).of(), true);
+				.eq(OwsiModel.identifiable.identifier, identifier).of());
+	}
+	public ClassificationWithRootBuilder rootFoldersIdentifier(NameReference identifier) {
+		return rootFolders(new RestrictionBuilder()
+				.eq(OwsiModel.identifiable.identifier, identifier).of());
 	}
 
 	/**
@@ -90,7 +93,7 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	public Optional<ClassificationWithRootBuilder> rootSite(String siteName) {
 		return rootFolder(new RestrictionBuilder()
 				.isType(StModel.site).of()
-				.eq(StModel.site.name, siteName).of(), true);
+				.eq(StModel.site.name, siteName).of());
 	}
 	public Optional<ClassificationWithRootBuilder> rootSiteDocumentLibrary(String siteName) {
 		return rootSite(siteName)

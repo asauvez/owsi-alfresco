@@ -65,6 +65,8 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	List<NodeReference> getParentAssocs(NodeReference nodeReference);
 	
 	Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName);
+	List<NodeReference> getChildrenAssocs(NodeReference nodeReference, ChildAssociationModel associationType);
+	List<NodeReference> getChildrenAssocsContains(NodeReference nodeReference);
 
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);

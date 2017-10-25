@@ -1,9 +1,12 @@
 package fr.openwide.alfresco.repo.dictionary.search.service.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
@@ -18,6 +21,7 @@ import org.springframework.core.env.Environment;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl;
 import fr.openwide.alfresco.repo.core.search.service.impl.NodeSearchRemoteServiceImpl;
@@ -46,6 +50,40 @@ public class NodeSearchModelRepositoryServiceImpl
 	public NodeSearchModelRepositoryServiceImpl(NodeSearchRemoteServiceImpl nodeSearchRemoteService) {
 		super(nodeSearchRemoteService);
 		this.nodeSearchRemoteService = nodeSearchRemoteService;
+	}
+	
+	@Override
+	public List<NodeReference> searchReference(RestrictionBuilder restrictionBuilder) {
+		return searchReference(new SearchQueryBuilder()
+				.restriction(restrictionBuilder));
+	}
+
+	@Override
+	public List<NodeReference> searchReference(SearchQueryBuilder searchBuilder) {
+		RepositorySearchParameters rsp = searchBuilder.getParameters();
+		try {
+			long before = System.currentTimeMillis();
+
+			SearchParameters sp = nodeSearchRemoteService.getSearchParameters(rsp);
+			List<NodeReference> res = new ArrayList<>();
+			ResultSet resultSet = searchService.query(sp);
+			try {
+				for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+					res.add(conversionService.get(nodeRef));
+				}
+			} finally {
+				resultSet.close();
+			}
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Returning {} result(s)", res.size());
+			}
+			if (LOGGER_AUDIT.isInfoEnabled()) {
+				LOGGER.info("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
+			}
+			return res;
+		} catch (FTSQueryException ex) {
+			throw new InvalidPayloadException(rsp.getQuery(), ex);
+		}
 	}
 	
 	@Override
