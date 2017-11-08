@@ -126,7 +126,7 @@ public abstract class DownloadResponse {
 		if (! hasContentRange()) {
 			return null;
 		}
-		return BYTES_PREFIX 
+		return "bytes " 
 				+ ((contentRangeStart != null) ? Long.toString(contentRangeStart) : "")
 				+ "-"
 				+ ((contentRangeEnd != null) ? Long.toString(contentRangeEnd) : "")

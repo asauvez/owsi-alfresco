@@ -252,7 +252,7 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 				IOUtils.copyLarge(input, output, inputOffset, length);
 			}
 		} catch (Exception ex) {
-			if ("org.apache.catalina.connector.ClientAbortException: java.net.SocketException: Connection reset".equals(ex.toString())) {
+			if (ex.toString().startsWith("org.apache.catalina.connector.ClientAbortException: java.net.SocketException: ")) {
 				LOGGER.warn("ClientAbortException : Normal when using pdf.js or when the user close the navigator before the end of the download");
 			} else {
 				throw ex;
