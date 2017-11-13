@@ -2,7 +2,9 @@ package fr.openwide.alfresco.repo.contentstoreexport.web.script;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
@@ -17,9 +19,8 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		description="Export necessary files",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family="OWSI")
-public class ContentStoreExportWebScript extends AbstractWebScript {
+public class ContentStoreExportWebScript extends AbstractWebScript implements ApplicationContextAware {
 
-	@Autowired
 	private ContentStoreExportService contentStoreExportService;
 	
 	@Override
@@ -31,7 +32,8 @@ public class ContentStoreExportWebScript extends AbstractWebScript {
 				req.getParameter("nodeRefs"));
 	}
 	
-	public void setContentStoreExportService(ContentStoreExportService contentStoreExportService) {
-		this.contentStoreExportService = contentStoreExportService;
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		contentStoreExportService = applicationContext.getBean(ContentStoreExportService.class);
 	}
 }
