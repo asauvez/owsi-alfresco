@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.CacheControl;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -59,7 +61,9 @@ public abstract class AppWebMvcConfigurationSupport extends WebMvcConfigurationS
 	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
 		super.addResourceHandlers(registry);
 		String version = environment.getProperty("application.version");
-		registry.addResourceHandler(MessageFormat.format("/static/{0}/**", version)).addResourceLocations("/static/", "classpath:/static/", "/webjars/");
+		registry.addResourceHandler(MessageFormat.format("/static/{0}/**", version))
+		 	    .addResourceLocations("/static/", "classpath:/static/", "/webjars/")
+		 	    .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
 	}
 
 	@Override
