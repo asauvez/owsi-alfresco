@@ -5,6 +5,7 @@ import fr.openwide.alfresco.component.model.search.helper.CustomISO9075;
 
 public class PathRestriction extends Restriction {
 
+	public static final String PATH_ROOT         = "/";
 	public static final String PATH_COMPANY_HOME = "/app:company_home";
 	public static final String PATH_DICTIONARY   = "/app:company_home/app:dictionary";
 	public static final String PATH_GUEST_HOME   = "/app:company_home/app:guest_home";

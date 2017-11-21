@@ -33,7 +33,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
 
 public interface CmModel {
 
-	// https://github.com/Alfresco/alfresco-repository/blob/develop/src/main/resources/alfresco/model/contentModel.xml
+	// https://github.com/Alfresco/alfresco-repository/blob/master/src/main/resources/alfresco/model/contentModel.xml
 	NamespaceReference NAMESPACE = NamespaceReference.create("cm", "http://www.alfresco.org/model/content/1.0");
 
 	// ---- Aspects

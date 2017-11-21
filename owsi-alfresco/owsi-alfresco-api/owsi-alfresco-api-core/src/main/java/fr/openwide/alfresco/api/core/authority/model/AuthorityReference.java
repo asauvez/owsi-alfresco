@@ -50,6 +50,12 @@ public class AuthorityReference implements Serializable {
 		}
 		return name.substring(GROUP_PREFIX.length());
 	}
+	public boolean isGroup() {
+		return name.startsWith(GROUP_PREFIX);
+	}
+	public boolean isRole() {
+		return name.startsWith(ROLE_PREFIX);
+	}
 
 	@JsonValue
 	public String getName() {
