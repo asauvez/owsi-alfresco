@@ -7,24 +7,37 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class PermissionRepositoryServiceImpl implements PermissionRepositoryService {
 
 	private PermissionService permissionService;
+	private AuthorityService authorityService;
+
 	private ConversionService conversionService;
-	
+	private NodeModelRepositoryService nodeModelService;
+	private NodeSearchModelRepositoryService nodeSearchModelService;
+
 	private DataSource dataSource;
 	
 	@Override
@@ -90,9 +103,19 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	@Override
 	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem) {
+		// Ajoute les groupes parents de l'ancien dans le nouveau : Typiquement les groupes de site : site_toto_SiteCollaborator
+		Set<String> containedAuthoritiesOld = authorityService.getContainedAuthorities(AuthorityType.GROUP, oldAuthority.getName(), true);
+		Set<String> containedAuthoritiesNew = authorityService.getContainedAuthorities(AuthorityType.GROUP, newAuthority.getName(), true);
+		Set<String> authoritiesToAdd  = new TreeSet<>(containedAuthoritiesOld);
+		authoritiesToAdd.removeAll(containedAuthoritiesNew);
+		for (String authorityToAdd : authoritiesToAdd) {
+			authorityService.addAuthority(authorityToAdd, newAuthority.getName());
+		}
+
+		// Remplace l'authority dans les ACL
 		int cpt = 0;
-		List<RepositoryAccessControl> list = searchACL(oldAuthority);
-		for (RepositoryAccessControl acl : list) {
+		List<RepositoryAccessControl> listAcl = searchACL(oldAuthority);
+		for (RepositoryAccessControl acl : listAcl) {
 			if (maxItem.isPresent() && maxItem.get() == cpt) {
 				break;
 			}
@@ -100,6 +123,22 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			deletePermission(acl.getNodeReference(), oldAuthority, acl.getPermission());
 			cpt ++;
 		}
+		
+		if (   AuthorityType.getAuthorityType(oldAuthority.getName()) == AuthorityType.USER 
+			&& AuthorityType.getAuthorityType(newAuthority.getName()) == AuthorityType.USER) {
+			List<NodeReference> listNodeOwner = nodeSearchModelService.searchReference(new SearchQueryBuilder()
+					.restriction(new RestrictionBuilder()
+							.eq(CmModel.ownable.owner, oldAuthority.getName()).of())
+					.maxResults(maxItem.orElse(null)));
+			for (NodeReference nodeReference : listNodeOwner) {
+				if (maxItem.isPresent() && maxItem.get() == cpt) {
+					break;
+				}
+				nodeModelService.setProperty(nodeReference, CmModel.ownable.owner, newAuthority.getName());
+				cpt ++;
+			}
+		}
+		
 		return cpt;
 	}
 	
@@ -111,5 +150,14 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
+	}
+	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
+		this.nodeModelService = nodeModelService;
+	}
+	public void setNodeSearchModelService(NodeSearchModelRepositoryService nodeSearchModelService) {
+		this.nodeSearchModelService = nodeSearchModelService;
+	}
+	public void setAuthorityService(AuthorityService authorityService) {
+		this.authorityService = authorityService;
 	}
 }
