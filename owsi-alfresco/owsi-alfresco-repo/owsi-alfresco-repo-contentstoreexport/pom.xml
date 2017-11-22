@@ -15,6 +15,7 @@
 		
 		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.6 -->
 		<jdk.version>1.6</jdk.version>
+		<alfresco.module.version>${project.version}</alfresco.module.version>
 	</properties>
 	
 	<dependencies>
