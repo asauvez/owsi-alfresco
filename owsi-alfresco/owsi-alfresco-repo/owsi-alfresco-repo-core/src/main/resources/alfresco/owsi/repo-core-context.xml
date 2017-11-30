@@ -85,6 +85,7 @@
 		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
 		<property name="searchService" ref="SearchService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
+		<property name="maxPermissionChecks" value="${system.acl.maxPermissionChecks}"/>
 	</bean>
 
 	<!-- Authority service -->

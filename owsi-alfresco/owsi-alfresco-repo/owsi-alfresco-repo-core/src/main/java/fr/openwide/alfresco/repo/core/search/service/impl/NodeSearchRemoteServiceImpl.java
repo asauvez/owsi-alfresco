@@ -31,6 +31,8 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private NodeRemoteService nodeRemoteService;
 	private SearchService searchService;
 	private ConversionService conversionService;
+	
+	private int maxPermissionChecks;
 
 	@Override
 	public List<RepositoryNode> search(RepositorySearchParameters rsp) {
@@ -41,11 +43,13 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			List<RepositoryNode> res = new ArrayList<>();
 			ResultSet resultSet = searchService.query(sp);
 			try {
-				for (NodeRef nodeRef : resultSet.getNodeRefs()) {
+				List<NodeRef> nodeRefs = resultSet.getNodeRefs();
+				for (NodeRef nodeRef : nodeRefs) {
 					try {
 						res.add(nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope()));
 					} catch (NoSuchNodeRemoteException e) {
 						// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
+						LOGGER.warn("Node " + nodeRef + " not found.");
 					}
 				}
 			} finally {
@@ -53,6 +57,9 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			}
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Returning {} result(s)", res.size());
+			}
+			if (res.size() >= maxPermissionChecks) {
+				LOGGER.warn("Search result may not have returned all results : " + res.size() + "/"+ maxPermissionChecks);
 			}
 			if (LOGGER_AUDIT.isInfoEnabled()) {
 				LOGGER.info("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
@@ -105,5 +112,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}
-
+	public void setMaxPermissionChecks(int maxPermissionChecks) {
+		this.maxPermissionChecks = maxPermissionChecks;
+	}
 }
