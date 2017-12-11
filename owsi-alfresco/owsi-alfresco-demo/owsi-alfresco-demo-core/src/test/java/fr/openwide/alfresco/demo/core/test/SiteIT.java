@@ -6,13 +6,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.exception.AuthorityExistsRemoteException;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.site.model.SiteReference;
-import fr.openwide.alfresco.app.core.site.model.RepositorySite;
+import fr.openwide.alfresco.app.core.site.model.CreateSiteParameters;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -34,7 +34,7 @@ public class SiteIT extends AbstractDemoIT {
 	
 	@Test
 	public void testRegexSite(){
-		RepositorySite rs = new RepositorySite("  Ar  ^géèà0-1!  ");
+		CreateSiteParameters rs = new CreateSiteParameters("  Ar  ^géèà0-1!  ");
 		Assert.assertEquals("ar-g0-1", rs.getShortName());
 	}
 
@@ -59,7 +59,7 @@ public class SiteIT extends AbstractDemoIT {
 				nodeScopeBuilder);
 		Assert.assertEquals(0, listBefore.size());
 
-		RepositorySite site = new RepositorySite("SiteIT", siteName);
+		CreateSiteParameters site = new CreateSiteParameters("SiteIT", siteName);
 		SiteReference siteReference = siteService.createSite(site);
 		
 		List<BusinessNode> list = nodeSearchModelService.search(new RestrictionBuilder()
@@ -74,11 +74,11 @@ public class SiteIT extends AbstractDemoIT {
 		try{
 			authorityModelService.createUser("jsnow", "John", "Snow", "john.snow@watch.org", "ygritte");
 		} catch (AuthorityExistsRemoteException aere) {
-			authorityModelService.deleteUser(RepositoryAuthority.user("jsnow"));
+			authorityModelService.deleteUser(AuthorityReference.user("jsnow"));
 			authorityModelService.createUser("jsnow", "John", "Snow", "john.snow@watch.org", "ygritte");
 		}
 		
-		RepositoryAuthority user = RepositoryAuthority.user("jsnow");
+		AuthorityReference user = AuthorityReference.user("jsnow");
 		try {
 			siteService.addManager(siteReference, user);
 			siteService.removeManager(siteReference, user);

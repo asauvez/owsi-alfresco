@@ -1,11 +1,13 @@
 package fr.openwide.alfresco.app.core.authentication.service.impl;
 
-import fr.openwide.alfresco.api.core.authentication.model.RepositoryTicket;
+import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -26,10 +28,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		this.authenticationRemoteBinding = authenticationRemoteBinding;
 		this.authenticationHeader = authenticationHeader;
 
-		defaultUserNodeScope = new NodeScope();
-		defaultUserNodeScope.getProperties().add(RepositoryUser.FIRST_NAME);
-		defaultUserNodeScope.getProperties().add(RepositoryUser.LAST_NAME);
-		defaultUserNodeScope.getProperties().add(RepositoryUser.EMAIL);
+		defaultUserNodeScope = new NodeScopeBuilder()
+				.properties().set(CmModel.person.firstName)
+				.properties().set(CmModel.person.lastName)
+				.properties().set(CmModel.person.email)
+				.getScope();
 	}
 
 	@Override
@@ -42,22 +45,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
 		request.nodeScope = nodeScope;
 		
-		return authenticationRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
+		return authenticationRemoteBinding.builder(request)
 				.header(authenticationHeader, username)
 				.call();
 	}
 
 	@Override
-	public RepositoryUser authenticate(RepositoryTicket ticket) throws AccessDeniedRemoteException {
+	public RepositoryUser authenticate(TicketReference ticket) throws AccessDeniedRemoteException {
 		return authenticate(ticket, getDefaultUserNodeScope());
 	}
 
 	@Override
-	public RepositoryUser authenticate(RepositoryTicket ticket, NodeScope nodeScope) throws AccessDeniedRemoteException {
+	public RepositoryUser authenticate(TicketReference ticket, NodeScope nodeScope) throws AccessDeniedRemoteException {
 		AUTHENTICATED_USER_SERVICE request = new AUTHENTICATED_USER_SERVICE();
 		request.nodeScope = nodeScope;
 
-		return requiringExplicitTicketRemoteBinding.builder(AUTHENTICATED_USER_SERVICE.ENDPOINT, request)
+		return requiringExplicitTicketRemoteBinding.builder(request)
 				.urlVariable(ticket)
 				.call();
 	}
@@ -74,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		request.password = password;
 		request.nodeScope = nodeScope;
 		
-		return unauthenticatedRepositoryRemoteBinding.builder(LOGIN_REQUEST_SERVICE.ENDPOINT, request)
+		return unauthenticatedRepositoryRemoteBinding.builder(request)
 				.call();
 	}
 
@@ -88,8 +91,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public void logout(RepositoryTicket ticket) throws AccessDeniedRemoteException {
-		requiringExplicitTicketRemoteBinding.builder(LOGOUT_SERVICE_ENDPOINT, ticket)
+	public void logout(TicketReference ticket) throws AccessDeniedRemoteException {
+		requiringExplicitTicketRemoteBinding.builder(new LOGOUT_SERVICE())
 			.urlVariable(ticket)
 			.call();
 	}

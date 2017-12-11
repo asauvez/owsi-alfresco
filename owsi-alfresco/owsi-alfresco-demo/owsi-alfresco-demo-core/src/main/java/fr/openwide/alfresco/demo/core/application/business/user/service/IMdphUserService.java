@@ -2,7 +2,7 @@ package fr.openwide.alfresco.demo.core.application.business.user.service;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 
 /**

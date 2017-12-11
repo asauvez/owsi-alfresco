@@ -8,7 +8,6 @@
 	<imports>
 		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
 		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
-		<import uri="http://www.alfresco.org/model/bpm/1.0" prefix="bpm" />
 	</imports>
 
 	<namespaces>
@@ -19,7 +18,29 @@
 		<aspect name="owsi:classifiable">
 			<title>OWSI Classifiable</title>
 			<description>Add to a node or declare it as mandatory-aspect in order to indicate trigger the classification of the node</description>
+			<properties>
+				<property name="owsi:classificationDate">
+					<type>d:datetime</type>
+				</property>
+				<property name="owsi:classificationPolicy">
+					<type>d:qname</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>true</stored>
+						<tokenised>false</tokenised>
+					</index>
+				</property>
+				<property name="owsi:classificationState">
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>true</stored>
+						<tokenised>false</tokenised>
+					</index>
+				</property>
+			</properties>
 		</aspect>
+		
 		<aspect name="owsi:deleteIfEmpty">
 			<title>OWSI Delete if empty</title>
 			<description>A folder with the aspect will be deleted if their is no more child node.</description>

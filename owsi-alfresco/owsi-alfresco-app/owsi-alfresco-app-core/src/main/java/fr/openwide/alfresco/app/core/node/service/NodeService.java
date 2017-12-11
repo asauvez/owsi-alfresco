@@ -2,14 +2,12 @@ package fr.openwide.alfresco.app.core.node.service;
 
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.EntityEnclosingRemoteEndpoint;
 
 public interface NodeService extends NodeRemoteService {
 
@@ -22,15 +20,4 @@ public interface NodeService extends NodeRemoteService {
 	void update(List<RepositoryNode> nodes, NodeScope nodeScope, NodeContentSerializationParameters parameters) throws DuplicateChildNodeNameRemoteException;
 
 	void delete(NodeReference nodeReference);
-
-	// TODO ASA ces méthodes utilitaires aurait plutôt leur place dans un NodeSerializationComponent ?
-
-	public RepositoryNode callNodeSerializer(EntityEnclosingRemoteEndpoint<RepositoryNode> endpoint,
-			Object payload, NodeScope nodeScope);
-	public List<RepositoryNode> callNodeListSerializer(EntityEnclosingRemoteEndpoint<List<RepositoryNode>> endpoint,
-			Object payload, NodeScope nodeScope);
-
-	public <R> R callNodeUploadSerializer(EntityEnclosingRemoteEndpoint<R> endpoint, Object payload,
-			List<RepositoryNode> nodes, NodeContentSerializationParameters serializationParameters,
-			NodeContentDeserializationParameters deserializationParameters); 
 }

@@ -1,7 +1,10 @@
 package fr.openwide.alfresco.api.core.node.model;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Locale;
+
+import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -27,6 +30,10 @@ public class RepositoryContentData implements Serializable {
 		this(mimetype);
 		this.encoding = encoding;
 	}
+	public RepositoryContentData(MediaType mimetype, Charset encoding) {
+		setMimetype(mimetype);
+		setEncoding(encoding);
+	}
 
 	public RepositoryContentData(String mimetype, String mimetypeDisplay, Long size, String encoding, Locale locale) {
 		this(mimetype, encoding);
@@ -40,6 +47,9 @@ public class RepositoryContentData implements Serializable {
 	}
 	public void setMimetype(String mimetype) {
 		this.mimetype = mimetype;
+	}
+	public void setMimetype(MediaType mediaType) {
+		this.mimetype = mediaType.toString();
 	}
 
 	public String getMimetypeDisplay() {
@@ -61,6 +71,9 @@ public class RepositoryContentData implements Serializable {
 	}
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+	public void setEncoding(Charset charset) {
+		this.encoding = charset.name();
 	}
 
 	public Locale getLocale() {

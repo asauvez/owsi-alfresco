@@ -17,26 +17,27 @@ import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializati
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentSerializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodePayloadCallback;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.endpoint.RemoteEndpoint;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
+import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuilder<R> {
 
 	private final NodeContentSerializationComponent serializationComponent;
 
-	public RepositoryNodeRemoteCallBuilder(RepositoryRemoteBinding repositoryRemoteBinding, RemoteEndpoint<R> restCall,
-			NodeContentSerializationComponent serializationComponent) {
-		super(repositoryRemoteBinding, restCall);
+	public RepositoryNodeRemoteCallBuilder(
+			RepositoryRemoteBinding repositoryRemoteBinding, 
+			NodeContentSerializationComponent serializationComponent,
+			WebScriptParam<R> payload) {
+		super(repositoryRemoteBinding, payload);
 		this.serializationComponent = serializationComponent;
 	}
 
-	public R callPayloadSerializer(Object payload) {
-		return callPayloadSerializer(payload, null, null, null, null);
+	public R callPayloadSerializer() {
+		return callPayloadSerializer(null, null, null, null);
 	}
 	
 			
 	public R callPayloadSerializer(
-			final Object payload, 
 			final Collection<RepositoryNode> nodes, 
 			final NodePayloadCallback<R> payloadCallback,
 			final NodeContentSerializationParameters serializationParameters,
@@ -49,7 +50,7 @@ public class RepositoryNodeRemoteCallBuilder<R> extends RepositoryRemoteCallBuil
 			public void doWithRequest(ClientHttpRequest request) throws IOException {
 				try (OutputStream outputStream = request.getBody()) {
 					serializationComponent.serialize(
-							payload, nodes, 
+							getPayload(), nodes, 
 							serializationParameters, 
 							outputStream);
 				}

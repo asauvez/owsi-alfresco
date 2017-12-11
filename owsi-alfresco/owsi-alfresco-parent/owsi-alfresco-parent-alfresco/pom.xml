@@ -3,9 +3,9 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-parent-repo</artifactId>
-		<version>0.4.2</version>
-		<relativePath>../owsi-alfresco-parent-repo/pom.xml</relativePath>
+		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
+		<version>0.5.0</version>
+		<relativePath>../owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-alfresco</artifactId>
 	<packaging>pom</packaging>
@@ -19,6 +19,10 @@
 			<artifactId>owsi-alfresco-package-alfresco</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-core</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -92,6 +96,9 @@
 					<resource>
 						<directory>src/main/resources</directory>
 						<filtering>true</filtering>
+						<excludes>
+							<exclude>**/*.ori</exclude>
+						</excludes>
 					</resource>
 					<resource>
 						<directory>src/main/dev-resources</directory>

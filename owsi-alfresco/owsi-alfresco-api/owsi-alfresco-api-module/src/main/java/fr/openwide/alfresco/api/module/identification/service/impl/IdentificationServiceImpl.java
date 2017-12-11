@@ -3,7 +3,7 @@ package fr.openwide.alfresco.api.module.identification.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;

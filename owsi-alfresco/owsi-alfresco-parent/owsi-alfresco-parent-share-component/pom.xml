@@ -4,24 +4,60 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-api</artifactId>
-		<version>0.4.2</version>
+		<version>0.5.0</version>
 		<relativePath>../owsi-alfresco-parent-api/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share-component</artifactId>
 	<packaging>pom</packaging>
 	
+	<name>OWSI Alfresco - Parent - Share component</name>
+	
 	<properties>
 		<owsi-alfresco.share.alfresco.version>5.1.2</owsi-alfresco.share.alfresco.version>
-		<owsi-alfresco.share.alfresco-core.version>6.1</owsi-alfresco.share.alfresco-core.version>
-		<owsi-alfresco.alfresco-maven-plugin.version>2.1.1</owsi-alfresco.alfresco-maven-plugin.version>
+		<owsi-alfresco.share.alfresco-core.version>6.5</owsi-alfresco.share.alfresco-core.version>
+		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
 		<springframework-extensions-surf.version>1.2.0-M18</springframework-extensions-surf.version>
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<jcl-over-slf4j.version>1.7.21</jcl-over-slf4j.version>
-		<jaxen.version>1.1.6</jaxen.version>
 		<spring-surf.version>6.3</spring-surf.version>
 		<commons-beanutils.version>1.7.0</commons-beanutils.version>
-	</properties>
 		
+		<owsi-alfresco.share.commons-io.version>2.4</owsi-alfresco.share.commons-io.version>
+		<owsi-alfresco.share.commons-logging.version>1.2</owsi-alfresco.share.commons-logging.version>
+		<owsi-alfresco.share.commons-digester.version>2.1</owsi-alfresco.share.commons-digester.version>
+		<owsi-alfresco.share.commons-beanutils.version>1.9.3</owsi-alfresco.share.commons-beanutils.version>
+		<owsi-alfresco.share.commons-codec.version>1.10</owsi-alfresco.share.commons-codec.version>
+		<owsi-alfresco.share.commons-fileupload.version>1.3.2</owsi-alfresco.share.commons-fileupload.version>
+		<owsi-alfresco.share.commons-collections.version>3.2.2</owsi-alfresco.share.commons-collections.version>
+		<owsi-alfresco.share.commons-httpclient.version>3.1-HTTPCLIENT-1265</owsi-alfresco.share.commons-httpclient.version>
+		<owsi-alfresco.share.httpclient.version>4.5.1</owsi-alfresco.share.httpclient.version>
+		<owsi-alfresco.share.xml-apis.version>1.4.01</owsi-alfresco.share.xml-apis.version>
+		<owsi-alfresco.share.jaxen.version>1.1.6</owsi-alfresco.share.jaxen.version>
+		<owsi-alfresco.share.json.version>20090211</owsi-alfresco.share.json.version>
+		<owsi-alfresco.share.json-simple.version>1.1.1</owsi-alfresco.share.json-simple.version>
+		<owsi-alfresco.share.myfaces.version>1.1.10</owsi-alfresco.share.myfaces.version>
+		<owsi-alfresco.share.spring-surf-core.version>6.2</owsi-alfresco.share.spring-surf-core.version>
+		<owsi-alfresco.share.freemarker.version>-2.3.20-alfresco-patched</owsi-alfresco.share.freemarker.version>
+		
+		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
+		<owsi-core.maven-war-plugin.version>2.6</owsi-core.maven-war-plugin.version>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.extensions.surf</groupId>
+			<artifactId>spring-webscripts</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco.surf</groupId>
+			<artifactId>spring-surf</artifactId>
+		</dependency>
+	</dependencies>
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -31,52 +67,8 @@
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
-						<groupId>com.googlecode.json-simple</groupId>
-						<artifactId>json-simple</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-beanutils</groupId>
-						<artifactId>commons-beanutils</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.myfaces.core</groupId>
-						<artifactId>myfaces-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.myfaces.core</groupId>
-						<artifactId>myfaces-impl</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-digester</groupId>
-						<artifactId>commons-digester</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-collections</groupId>
-						<artifactId>commons-collections</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-fileupload</groupId>
-						<artifactId>commons-fileupload</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.alfresco.surf</groupId>
-						<artifactId>spring-surf-core-configservice</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.alfresco.surf</groupId>
-						<artifactId>spring-surf-core</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.freemarker</groupId>
-						<artifactId>freemarker</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
+						<groupId>*</groupId>
+						<artifactId>*</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -87,48 +79,8 @@
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
-						<groupId>commons-beanutils</groupId>
-						<artifactId>commons-beanutils</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-codec</groupId>
-						<artifactId>commons-codec</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-io</groupId>
-						<artifactId>commons-io</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-httpclient</groupId>
-						<artifactId>commons-httpclient</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>rhino</groupId>
-						<artifactId>js</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.json</groupId>
-						<artifactId>json</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>jaxen</groupId>
-						<artifactId>jaxen</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>xml-apis</groupId>
-						<artifactId>xml-apis</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-collections</groupId>
-						<artifactId>commons-collections</artifactId>
+						<groupId>*</groupId>
+						<artifactId>*</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -140,20 +92,134 @@
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
-						<groupId>commons-codec</groupId>
-						<artifactId>commons-codec</artifactId>
+						<groupId>*</groupId>
+						<artifactId>*</artifactId>
 					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${owsi-alfresco.share.commons-io.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>${owsi-alfresco.share.commons-logging.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>${owsi-alfresco.share.commons-digester.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${owsi-alfresco.share.commons-beanutils.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${owsi-alfresco.share.commons-codec.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>${owsi-alfresco.share.commons-fileupload.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${owsi-alfresco.share.commons-collections.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-httpclient</groupId>
+				<artifactId>commons-httpclient</artifactId>
+				<version>${owsi-alfresco.share.commons-httpclient.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${owsi-alfresco.share.httpclient.version}</version>
+				<scope>provided</scope>
+				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
+  						<artifactId>commons-logging</artifactId>
 					</exclusion>
-					<exclusion>
-						<groupId>xml-apis</groupId>
-						<artifactId>xml-apis</artifactId>
-					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+				<version>${owsi-alfresco.share.xml-apis.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>jaxen</groupId>
+				<artifactId>jaxen</artifactId>
+				<version>${owsi-alfresco.share.jaxen.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${owsi-alfresco.share.freemarker.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${owsi-alfresco.share.json.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.googlecode.json-simple</groupId>
+				<artifactId>json-simple</artifactId>
+				<version>${owsi-alfresco.share.json-simple.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.myfaces.core</groupId>
+				<artifactId>myfaces-api</artifactId>
+				<version>${owsi-alfresco.share.myfaces.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.myfaces.core</groupId>
+				<artifactId>myfaces-impl</artifactId>
+				<version>${owsi-alfresco.share.myfaces.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-surf-core</artifactId>
+				<version>${owsi-alfresco.share.spring-surf-core.version}</version>
+				<scope>provided</scope>
+				<exclusions>
 					<exclusion>
 						<groupId>javax.servlet</groupId>
 						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-surf-core-configservice</artifactId>
+				<version>${owsi-alfresco.share.spring-surf-core.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>*</groupId>
+						<artifactId>*</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>

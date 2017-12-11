@@ -3,8 +3,9 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-repo</artifactId>
-		<version>0.4.2</version>
+		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
+		<version>0.5.0</version>
+		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-repo-module</artifactId>
 
@@ -21,34 +22,8 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-dictionary</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-data-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-repository</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+			<artifactId>owsi-alfresco-repo-core</artifactId>
 		</dependency>
 	</dependencies>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-			<resource>
-				<directory>src/main/config</directory>
-				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
-	
 </project>

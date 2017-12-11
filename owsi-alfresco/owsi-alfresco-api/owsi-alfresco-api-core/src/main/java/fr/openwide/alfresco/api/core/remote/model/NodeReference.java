@@ -28,7 +28,10 @@ public class NodeReference implements Serializable {
 		return new NodeReference(reference);
 	}
 	public static NodeReference create(StoreReference storeReference, String uuid) {
-		return new NodeReference(storeReference + "/" + uuid);
+		return create(storeReference + "/" + uuid);
+	}
+	public static NodeReference create(String protocol, String identifier, String uuid) {
+		return create(protocol + "://" + identifier + "/" + uuid);
 	}
 
 	public StoreReference getStoreReference() {

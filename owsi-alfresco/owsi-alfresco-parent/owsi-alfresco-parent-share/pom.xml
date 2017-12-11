@@ -4,11 +4,13 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-share-component</artifactId>
-		<version>0.4.2</version>
+		<version>0.5.0</version>
 		<relativePath>../owsi-alfresco-parent-share-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share</artifactId>
 	<packaging>pom</packaging>
+	
+	<name>OWSI Alfresco - Parent - Share</name>
 	
 	<properties>
 		<share.webapp.name>share</share.webapp.name>
@@ -31,32 +33,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>${jcl-over-slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>${jaxen.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>jaxen</groupId>
-					<artifactId>jaxen</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>${commons-beanutils.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -136,6 +112,9 @@
 					<resource>
 						<directory>src/main/resources</directory>
 						<filtering>true</filtering>
+						<excludes>
+							<exclude>**/*.ori</exclude>
+						</excludes>
 					</resource>
 					<resource>
 						<directory>src/main/dev-resources</directory>

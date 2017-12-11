@@ -4,14 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import fr.openwide.alfresco.app.dictionary.framework.spring.config.AppDictionaryServiceConfig;
+import fr.openwide.alfresco.app.core.framework.spring.config.AppCoreServiceConfig;
 import fr.openwide.alfresco.component.query.search.service.BeanFormQueryService;
 import fr.openwide.alfresco.component.query.search.service.NodeFormQueryService;
 import fr.openwide.alfresco.component.query.search.service.impl.BeanFormQueryServiceImpl;
 import fr.openwide.alfresco.component.query.search.service.impl.NodeFormQueryServiceImpl;
 
 @Configuration
-@Import(AppDictionaryServiceConfig.class)
+@Import(AppCoreServiceConfig.class)
 public class ComponentQueryConfig {
 
 	@Bean

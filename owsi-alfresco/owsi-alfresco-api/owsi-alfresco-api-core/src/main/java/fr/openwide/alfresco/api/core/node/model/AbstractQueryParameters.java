@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.search.model.RepositorySortDefinition;
+import fr.openwide.alfresco.api.core.search.model.SortDefinition;
 
 public abstract class AbstractQueryParameters implements Serializable {
 
 	private NodeScope nodeScope = new NodeScope();
-	private List<RepositorySortDefinition> sorts = new ArrayList<>();
+	private List<SortDefinition> sorts = new ArrayList<>();
 
 	public NodeScope getNodeScope() {
 		return nodeScope;
@@ -18,7 +18,7 @@ public abstract class AbstractQueryParameters implements Serializable {
 		this.nodeScope = nodeScope;
 	}
 
-	public List<RepositorySortDefinition> getSorts() {
+	public List<SortDefinition> getSorts() {
 		return sorts;
 	}
 }

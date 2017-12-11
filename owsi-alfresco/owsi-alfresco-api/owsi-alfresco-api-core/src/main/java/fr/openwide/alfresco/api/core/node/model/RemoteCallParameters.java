@@ -18,9 +18,14 @@ public class RemoteCallParameters implements Serializable {
 
 	private int compressionLevel = DEFAULT_COMPRESSION_LEVEL;
 	private UserReference runAs = null;
+	private Long contentRangeStart = null;
+	private Long contentRangeEnd = null;
 
 	public int getCompressionLevel() {
 		return compressionLevel;
+	}
+	protected void setCompressionLevel(int compressionLevel) { // pour JSon
+		this.compressionLevel = compressionLevel;
 	}
 	public RemoteCallParameters compressionLevel(int compressionLevel) {
 		this.compressionLevel = compressionLevel;
@@ -30,23 +35,52 @@ public class RemoteCallParameters implements Serializable {
 	public UserReference getRunAs() {
 		return runAs;
 	}
+	protected void setRunAs(UserReference runAs) { // pour JSon
+		this.runAs = runAs;
+	}
 	public RemoteCallParameters runAs(UserReference runAs) {
 		this.runAs = runAs;
 		return this;
 	}
+	
+	public Long getContentRangeStart() {
+		return contentRangeStart;
+	}
+	public RemoteCallParameters contentRangeStart(Long contentRangeStart) {
+		this.contentRangeStart = contentRangeStart;
+		return this;
+	}
+	protected void setContentRangeStart(Long contentRangeStart) { // pour JSon
+		this.contentRangeStart = contentRangeStart;
+	}
+	public Long getContentRangeEnd() {
+		return contentRangeEnd;
+	}
+	public RemoteCallParameters contentRangeEnd(Long contentRangeEnd) {
+		this.contentRangeEnd = contentRangeEnd;
+		return this;
+	}
+	protected void setContentRangeEnd(Long contentRangeEnd) { // pour JSon
+		this.contentRangeEnd = contentRangeEnd;
+	}
+
+
 
 	public static RemoteCallParameters currentParameters() {
 		RemoteCallParameters parameters = CURRENT.get();
 		return (parameters != null) ? parameters : DEFAULT_INSTANCE;
 	}
 	
+	public static void execute(RemoteCallParameters parameters, Runnable runnable) {
+		execute(parameters, () -> { runnable.run(); return null; });
+	}
 	public static <V> V execute(RemoteCallParameters parameters, Callable<V> callable) {
 		RemoteCallParameters oldValue = CURRENT.get();
 		try {
 			CURRENT.set(parameters);
 			return callable.call();
 		} catch (Exception e) {
-			throw new IllegalStateException(e);
+			throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
 		} finally {
 			if (oldValue != null) {
 				CURRENT.set(oldValue);

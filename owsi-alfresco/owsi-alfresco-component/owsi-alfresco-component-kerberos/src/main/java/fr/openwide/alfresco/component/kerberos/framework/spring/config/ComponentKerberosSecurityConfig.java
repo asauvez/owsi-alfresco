@@ -32,9 +32,13 @@ public class ComponentKerberosSecurityConfig {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ComponentKerberosSecurityConfig.class);
 
+	public static boolean isEnabled(Environment environment) {
+		return environment.getProperty("application.kerberos.service.enabled", Boolean.class, true);
+	}
+	
 	@Bean
 	public SunJaasKerberosTicketValidator kerberosTicketValidator() {
-		boolean enabled = environment.getProperty("application.kerberos.service.enabled", Boolean.class, true);
+		boolean enabled = isEnabled(environment);
 		SunJaasKerberosTicketValidator ticketValidator = new RealmAwareKerberosTicketValidator(enabled);
 		if (enabled) {
 			ticketValidator.setServicePrincipal(environment.getRequiredProperty("application.kerberos.service.principal"));

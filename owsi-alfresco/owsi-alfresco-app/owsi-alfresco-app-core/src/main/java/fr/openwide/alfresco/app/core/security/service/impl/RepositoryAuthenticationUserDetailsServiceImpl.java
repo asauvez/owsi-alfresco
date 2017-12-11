@@ -10,7 +10,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,10 +17,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.google.common.base.Strings;
 
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.UnauthorizedRemoteException;
-import fr.openwide.alfresco.app.core.authentication.model.RepositoryUserProvider;
 import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
 import fr.openwide.alfresco.app.core.remote.model.RepositoryConnectException;
 import fr.openwide.alfresco.app.core.security.model.NamedUser;
@@ -36,12 +34,12 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	private RoleHierarchy loginTimeRoleHierarchy;
 
 	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService) {
-		this(authenticationService, new NullRoleHierarchy());
+		this(authenticationService, null);
 	}
 	
 	public RepositoryAuthenticationUserDetailsServiceImpl(AuthenticationService authenticationService, RoleHierarchy loginTimeRoleHierarchy) {
 		this.authenticationService = authenticationService;
-		this.loginTimeRoleHierarchy = loginTimeRoleHierarchy;
+		this.loginTimeRoleHierarchy = (loginTimeRoleHierarchy != null) ? loginTimeRoleHierarchy : new NullRoleHierarchy();
 	}
 
 	@Override
@@ -92,7 +90,7 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 		}
 		// Add default Authenticated role
 		authorities.add(new SimpleGrantedAuthority(CoreAuthorityConstants.ROLE_AUTHENTICATED));
-		for (RepositoryAuthority autority : repositoryUser.getAuthorities()) {
+		for (AuthorityReference autority : repositoryUser.getAuthorities()) {
 			authorities.add(new SimpleGrantedAuthority(autority.getName()));
 		}
 
@@ -102,19 +100,13 @@ public class RepositoryAuthenticationUserDetailsServiceImpl implements Repositor
 	}
 
 	@Override
-	public void logout(Authentication authentication) {
-		Object principal = authentication.getPrincipal();
-		if (principal instanceof RepositoryUserProvider) {
-			RepositoryUserProvider userProvider = (RepositoryUserProvider) principal;
-			authenticationService.logout(userProvider.getRepositoryUser().getTicket());
-		} else {
-			throw new IllegalStateException("Invalid authentication principal: " + principal);
-		}
+	public void logout(NamedUser user) {
+		authenticationService.logout(user.getRepositoryUser().getTicket());
 	}
-	
 
 	@Override
-	public void renewTicket(RepositoryUser repositoryUser) {
+	public void renewTicket(NamedUser user) {
+		RepositoryUser repositoryUser = user.getRepositoryUser();
 		try {
 			authenticationService.logout(repositoryUser.getTicket());
 		} catch (UnauthorizedRemoteException ex) {

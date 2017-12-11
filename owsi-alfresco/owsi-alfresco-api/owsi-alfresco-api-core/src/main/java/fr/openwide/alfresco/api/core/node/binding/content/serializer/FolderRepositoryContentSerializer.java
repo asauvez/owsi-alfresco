@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class FolderRepositoryContentSerializer extends AbstractFileRepositoryContentSerializer {
 
@@ -12,7 +13,7 @@ public class FolderRepositoryContentSerializer extends AbstractFileRepositoryCon
 	private final NameReference propertyName;
 
 	public FolderRepositoryContentSerializer(File destinationFolder) {
-		this(destinationFolder, NameReference.create("cm", "name"));
+		this(destinationFolder, CmModel.object.name.getNameReference());
 	}
 	public FolderRepositoryContentSerializer(File destinationFolder, NameReference propertyName) {
 		this.destinationFolder = destinationFolder;

@@ -1,63 +1,68 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 
-import fr.openwide.alfresco.app.core.authentication.service.AuthenticationService;
-import fr.openwide.alfresco.app.core.authentication.service.impl.AuthenticationServiceImpl;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.app.core.authority.service.impl.AuthorityServiceImpl;
+import fr.openwide.alfresco.app.core.licence.service.LicenseService;
+import fr.openwide.alfresco.app.core.licence.service.impl.LicenseServiceImpl;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.core.node.service.impl.NodeServiceImpl;
-import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.search.service.NodeSearchService;
 import fr.openwide.alfresco.app.core.search.service.impl.NodeSearchServiceImpl;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
 import fr.openwide.alfresco.app.core.site.service.impl.SiteServiceImpl;
+import fr.openwide.alfresco.component.model.authority.service.AuthorityModelService;
+import fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl;
+import fr.openwide.alfresco.component.model.node.service.NodeModelService;
+import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
+import fr.openwide.alfresco.component.model.search.service.NodeSearchModelService;
+import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl;
 
 @Configuration
-@Import(AppCoreRemoteBindingConfig.class)
 public class AppCoreServiceConfig {
 
 	@Autowired
-	private AppCoreRemoteBindingConfig appCoreRemoteBindingConfig;
+	private AppCoreSecurityConfig appCoreSecurityConfig;
+
+	@Bean
+	public NodeService nodeService() {
+		return new NodeServiceImpl(appCoreSecurityConfig.userAwareRepositoryRemoteBinding());
+	}
+	@Bean
+	public NodeModelService nodeModelService() {
+		return new NodeModelServiceImpl(nodeService());
+	}
+
+	@Bean
+	public AuthorityService authorityService() {
+		return new AuthorityServiceImpl(appCoreSecurityConfig.userAwareRepositoryRemoteBinding());
+	}
+	@Bean
+	public AuthorityModelService authorityModelService() {
+		return new AuthorityModelServiceImpl(authorityService());
+	}
+
+	@Bean
+	public NodeSearchService nodeSearchService() {
+		return new NodeSearchServiceImpl(appCoreSecurityConfig.userAwareRepositoryRemoteBinding());
+	}
+	@Bean
+	public NodeSearchModelService nodeSearchModelService() {
+		return new NodeSearchModelServiceImpl(nodeSearchService());
+	}
+
+	@Bean
+	public LicenseService licenceService() {
+		return new LicenseServiceImpl(appCoreSecurityConfig.userAwareRepositoryRemoteBinding());
+	}
 	
-	@Autowired
-	private Environment environment;
-
 	@Bean
-	public AuthenticationService authenticationService() {
-		String authenticationHeader = environment.getRequiredProperty("application.authentication.repository.header.name");
-		return new AuthenticationServiceImpl(
-				appCoreRemoteBindingConfig.unauthenticatedRepositoryRemoteBinding(), 
-				appCoreRemoteBindingConfig.requiringExplicitTicketRemoteBinding(),
-				appCoreRemoteBindingConfig.authenticationRemoteBinding(), 
-				authenticationHeader);
-	}
-
-	@Bean
-	public NodeService nodeService(RepositoryRemoteBinding repositoryRemoteBinding) {
-		return new NodeServiceImpl(repositoryRemoteBinding);
-	}
-
-	@Bean
-	public AuthorityService authorityService(NodeService nodeService) {
-		return new AuthorityServiceImpl(nodeService);
-	}
-
-	@Bean
-	public NodeSearchService nodeSearchService(NodeService nodeService) {
-		return new NodeSearchServiceImpl(nodeService);
-	}
-
-	@Bean
-	public SiteService siteService(AuthorityService authorityService, NodeSearchService nodeSearchService, 
-			@Qualifier("shareRemoteBinding") RepositoryRemoteBinding shareBinding) {
-		return new SiteServiceImpl(authorityService, nodeSearchService, shareBinding);
+	public SiteService siteService() {
+		return new SiteServiceImpl(authorityService(), nodeSearchService(), 
+				appCoreSecurityConfig.shareRemoteBinding());
 	}
 
 }

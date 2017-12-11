@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.core.jpa.security.model.NamedPermission;
 
 public class SecurityHierarchyBuilder {
@@ -13,8 +13,8 @@ public class SecurityHierarchyBuilder {
 		}
 		return this;
 	}
-	public SecurityHierarchyBuilder add(RepositoryAuthority ifRole, RepositoryAuthority ... thenRoles) {
-		for (RepositoryAuthority thenRole : thenRoles) {
+	public SecurityHierarchyBuilder add(AuthorityReference ifRole, AuthorityReference ... thenRoles) {
+		for (AuthorityReference thenRole : thenRoles) {
 			sb.append(ifRole.getName()).append(" > ").append(thenRole.getName()).append("\n");
 		}
 		return this;

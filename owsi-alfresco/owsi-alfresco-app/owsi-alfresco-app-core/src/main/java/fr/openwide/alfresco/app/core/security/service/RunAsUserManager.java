@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface RunAsUserManager {
 
@@ -16,7 +16,13 @@ public interface RunAsUserManager {
 	Optional<String> getOriginalUsername();
 
 	<T> T runAsUser(String username, Callable<T> task) throws Exception;
+	void runAsUser(String username, Runnable task);
+
+	<T> T runAsSystem(Callable<T> task) throws Exception;
+	void runAsSystem(Runnable task);
 
 	<T> T runAsUser(UserDetails user, Callable<T> work) throws Exception;
+	void runAsUser(UserDetails user, Runnable task);
+
 
 }

@@ -3,9 +3,9 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-parent-repo</artifactId>
-		<version>0.4.2</version>
-		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo/pom.xml</relativePath>
+		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
+		<version>0.5.0</version>
+		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-repo</artifactId>
 	<packaging>pom</packaging>
@@ -14,10 +14,11 @@
 	<description>Composants pour le développement d'extensions dans l'application Alfresco</description>
 
 	<modules>
-		<module>owsi-alfresco-repo-remote</module>
+		<module>owsi-alfresco-repo-wsgenerator</module>	
 		<module>owsi-alfresco-repo-core</module>
-		<module>owsi-alfresco-repo-dictionary</module>
 		<module>owsi-alfresco-repo-module</module>
+		<module>owsi-alfresco-repo-contentstoreexport</module>
+		<module>owsi-alfresco-repo-emailed2eml</module>
 	</modules>
 
 </project>

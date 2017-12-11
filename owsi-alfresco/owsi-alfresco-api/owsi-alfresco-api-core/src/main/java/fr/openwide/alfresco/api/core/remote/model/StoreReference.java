@@ -21,6 +21,9 @@ public class StoreReference implements Serializable {
 	public static StoreReference create(String reference) {
 		return new StoreReference(reference);
 	}
+	public static StoreReference create(String protocol, String identifier) {
+		return create(protocol + "://" + identifier);
+	}
 
 	@JsonValue
 	public String getReference() {

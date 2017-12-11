@@ -41,7 +41,7 @@ public abstract class RepositoryVisitor<T extends RepositoryVisitable<T>> {
 	}
 	
 	public void visitMap(String name, Map<NameReference, T> map) {
-		if (! map.isEmpty()) {
+		if (map != null && ! map.isEmpty()) {
 			push(name);
 			for (Entry<NameReference, T> entry : map.entrySet()) {
 				push(entry.getKey());
@@ -52,7 +52,7 @@ public abstract class RepositoryVisitor<T extends RepositoryVisitable<T>> {
 		}
 	}
 	public void visitMapList(String name, Map<NameReference, List<T>> map) {
-		if (! map.isEmpty()) {
+		if (map != null && ! map.isEmpty()) {
 			push(name);
 			for (Entry<NameReference, List<T>> entry : map.entrySet()) {
 				push(entry.getKey());

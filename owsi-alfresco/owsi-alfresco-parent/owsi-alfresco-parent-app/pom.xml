@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.4.2</version>
+		<version>0.5.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-app</artifactId>
 	<packaging>pom</packaging>
@@ -31,6 +31,7 @@
 		<owsi-alfresco.webjars.bootstrap-datepicker.version>1.4.0</owsi-alfresco.webjars.bootstrap-datepicker.version>
 		<owsi-alfresco.webjars.select2.version>3.5.2-1</owsi-alfresco.webjars.select2.version>
 		<owsi-alfresco.webjars.select2-bootstrap-css.version>1.4.6</owsi-alfresco.webjars.select2-bootstrap-css.version>
+		<owsi-alfresco.webjars.pdfjs.version>1.8.188</owsi-alfresco.webjars.pdfjs.version>
 	</properties>
 
 	<dependencyManagement>
@@ -38,7 +39,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.4.2</version>
+				<version>0.5.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -156,6 +157,11 @@
 				<groupId>org.webjars</groupId>
 				<artifactId>select2-bootstrap-css</artifactId>
 				<version>${owsi-alfresco.webjars.select2-bootstrap-css.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars.npm</groupId>
+				<artifactId>pdfjs-dist-viewer-min</artifactId>
+				<version>${owsi-alfresco.webjars.pdfjs.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

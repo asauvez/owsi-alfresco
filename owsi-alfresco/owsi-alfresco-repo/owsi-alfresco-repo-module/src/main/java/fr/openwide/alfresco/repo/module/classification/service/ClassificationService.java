@@ -1,7 +1,12 @@
 package fr.openwide.alfresco.repo.module.classification.service;
 
+import java.util.function.Consumer;
+
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolicy;
+import fr.openwide.alfresco.component.model.search.model.restriction.Restriction;
+import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 
 /**
  * Permet de déplacer des node dans un système de classification.
@@ -10,8 +15,15 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationPolic
  */
 public interface ClassificationService {
 
+	void autoClassification(ContainerModel containerModel);
 	<T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy);
+	<T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> builder);
+	
+	int DEFAULT_RECLASSIFY_BATCH_SIZE = 100;
 
-	void reclassify(ContainerModel model);
-	void reclassify(ContainerModel model, int batchSize);
+	int reclassifyAll(Integer batchSize);
+	int reclassify(ContainerModel model, Integer batchSize, Restriction ...restrictions);
+	int reclassify(NameReference modelName, Integer batchSize);
+	
+	void clearCaches();
 }

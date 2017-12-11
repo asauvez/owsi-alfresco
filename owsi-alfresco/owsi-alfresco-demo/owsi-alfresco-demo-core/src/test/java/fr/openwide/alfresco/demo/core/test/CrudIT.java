@@ -1,11 +1,13 @@
 package fr.openwide.alfresco.demo.core.test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
@@ -31,7 +33,7 @@ public class CrudIT extends AbstractDemoIT {
 			.contents().asString();
 		
 		// Create
-		NodeReference demoFile = nodeModelService.createContent(rootFolder, "demo.txt", "text/plain", "UTF-8", "hello world");
+		NodeReference demoFile = nodeModelService.createContent(rootFolder, "demo.txt", MediaType.TEXT_PLAIN, StandardCharsets.UTF_8, "hello world");
 
 		// Read
 		RestrictionBuilder restriction = new RestrictionBuilder()
@@ -93,10 +95,10 @@ public class CrudIT extends AbstractDemoIT {
 		// Create multi
 		nodeModelService.create(Arrays.asList(
 			new BusinessNode(rootFolder, CmModel.content, "demo.txt")
-				.properties().set(CmModel.content.content, new RepositoryContentData("text/plain", "UTF-8"))
+				.properties().set(CmModel.content.content, new RepositoryContentData("text/plain"))
 				.contents().set("hello world 1"),
 			new BusinessNode(rootFolder, CmModel.content, "demo2.txt")
-				.properties().set(CmModel.content.content, new RepositoryContentData("text/plain", "UTF-8"))
+				.properties().set(CmModel.content.content, new RepositoryContentData("text/plain"))
 				.contents().set("hello world 2")));
 		
 		// Download multi content
@@ -117,7 +119,7 @@ public class CrudIT extends AbstractDemoIT {
 			.properties().set(CmModel.titled.title);
 		
 		// Create
-		NodeReference demoFile = nodeModelService.createContent(rootFolder, "demo.txt", "text/plain", "UTF-8", "hello world");
+		NodeReference demoFile = nodeModelService.createContent(rootFolder, "demo.txt", MediaType.TEXT_PLAIN, StandardCharsets.UTF_8, "hello world");
 		
 		BusinessNode buisNodeTest;
 		nodeModelService.update(

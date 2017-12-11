@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 
 public class SiteReference {
 	
@@ -25,17 +25,17 @@ public class SiteReference {
 		return name;
 	}
 
-	public RepositoryAuthority getGroupeCollaborator() {
-		return RepositoryAuthority.group("site_" + getName() + "_SiteCollaborator");
+	public AuthorityReference getGroupeCollaborator() {
+		return AuthorityReference.group("site_" + getName() + "_SiteCollaborator");
 	}
-	public RepositoryAuthority getGroupeConsumer() {
-		return RepositoryAuthority.group("site_" + getName() + "_SiteConsumer");
+	public AuthorityReference getGroupeConsumer() {
+		return AuthorityReference.group("site_" + getName() + "_SiteConsumer");
 	}
-	public RepositoryAuthority getGroupeContributor() {
-		return RepositoryAuthority.group("site_" + getName() + "_SiteContributor");
+	public AuthorityReference getGroupeContributor() {
+		return AuthorityReference.group("site_" + getName() + "_SiteContributor");
 	}
-	public RepositoryAuthority getGroupeManager() {
-		return RepositoryAuthority.group("site_" + getName() + "_SiteManager");
+	public AuthorityReference getGroupeManager() {
+		return AuthorityReference.group("site_" + getName() + "_SiteManager");
 	}
 
 	public String getPath() {

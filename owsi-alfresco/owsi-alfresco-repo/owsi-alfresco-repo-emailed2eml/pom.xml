@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-repo</artifactId>
+		<version>0.5.0</version>
+	</parent>
+	<artifactId>owsi-alfresco-repo-emailed2eml</artifactId>
+
+	<name>OWSI Alfresco - Repository - Conversion cm:emailed to .eml</name>
+
+	<properties>
+		<alfresco.module.name>owsi-alfresco-repo-emailed2eml</alfresco.module.name>
+		
+		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.6 -->
+		<jdk.version>1.6</jdk.version>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+					<!-- Pour avoir module.version=${alfresco.module.version} -->
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+				</plugin>
+		</plugins>
+	</build>
+
+</project>

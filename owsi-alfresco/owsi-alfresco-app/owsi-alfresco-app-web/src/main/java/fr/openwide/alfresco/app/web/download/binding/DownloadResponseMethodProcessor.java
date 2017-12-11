@@ -1,21 +1,27 @@
 package fr.openwide.alfresco.app.web.download.binding;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.SequenceInputStream;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -31,10 +37,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
+import fr.openwide.alfresco.app.core.search.service.impl.NodeSearchServiceImpl;
 import fr.openwide.alfresco.app.web.download.model.ByteArrayDownloadResponse;
 import fr.openwide.alfresco.app.web.download.model.ContentDownloadResponse;
 import fr.openwide.alfresco.app.web.download.model.DownloadResponse;
@@ -46,6 +54,8 @@ import fr.openwide.core.spring.util.StringUtils;
 
 public class DownloadResponseMethodProcessor implements HandlerMethodReturnValueHandler, HandlerMethodArgumentResolver {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(NodeSearchServiceImpl.class);
+	
 	public static final String FILE_DOWNLOAD_TOKEN_NAME = "fileDownloadToken";
 	public static final String FILE_DOWNLOAD_PATH_NAME = "fileDownloadPath";
 
@@ -71,26 +81,31 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 	}
 
 	@Override
-	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+	public DownloadResponse resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+		DownloadResponse downloadResponse;
 		
 		Class<?> parameterType = parameter.getParameterType();
 		if (ByteArrayDownloadResponse.class.equals(parameterType)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			return new ByteArrayDownloadResponse(response, baos);
+			downloadResponse = new ByteArrayDownloadResponse(response, baos);
 		} else if (FileDownloadResponse.class.equals(parameterType)) {
 			File tempFile = File.createTempFile("download", Long.toString(System.nanoTime()));
 			OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
-			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			// store outputStream if needed during the request lifecycle
 			request.setAttribute(getClass().getName(), outputStream);
-			return new FileDownloadResponse(response, tempFile, outputStream);
+			downloadResponse = new FileDownloadResponse(response, tempFile, outputStream);
 		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
-			return new NodeReferenceDownloadResponse(response);
+			downloadResponse = new NodeReferenceDownloadResponse(response);
 		} else {
 			throw new IllegalArgumentException("Invalid type: " + parameterType);
 		}
+
+		downloadResponse.contentRange(request.getHeader("Range"));
+		
+		return downloadResponse;
 	}
 
 	@Override
@@ -102,12 +117,13 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 			mavContainer.setRequestHandled(true);
 			DownloadResponse download = (DownloadResponse) returnValue;
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+			HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+
 			// ensure attachment name
 			ensureAttachmentName(download, request);
 			// deal with AlertContainer for the subsequent request
 			AlertContainer alertContainer = download.getAlertContainer();
 			if (! alertContainer.isEmpty()) {
-				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 				// build flashmap for the specific targetRequestPath or for the next request if no information
 				FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
 				flashMap.put(AlertContainer.ALERTS_FIELD_NAME, alertContainer);
@@ -129,6 +145,10 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 				}
 			} else if (download instanceof NodeReferenceDownloadResponse) {
 				streamNodeReference((NodeReferenceDownloadResponse) download, webRequest);
+			} else {
+				// should not happen
+				throw new UnsupportedOperationException("Unexpected return type: " +
+						returnType.getParameterType().getName() + " in method: " + returnType.getMethod());
 			}
 		} else {
 			// should not happen
@@ -145,10 +165,8 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 		setCookie(webRequest);
 		// set mimetype and length for the content
 		response.setContentType(download.getContentType());
-		// set content-length manually rather than using setContentLength to allow for size as long
-		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(download.getContentLength()));
 		// output downloadable content
-		streamInput(download, download.getWrittableStream(), response);
+		streamInput(download, download.getContentLength(), true, download.getWrittableStream(), response);
 	}
 
 	protected void streamNodeReference(final NodeReferenceDownloadResponse download, final NativeWebRequest webRequest) {
@@ -173,30 +191,73 @@ public class DownloadResponseMethodProcessor implements HandlerMethodReturnValue
 
 				HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
 				RepositoryContentData data = node.getProperty(contentProperty, RepositoryContentData.class);
-				streamContentData(data, response, download, inputStream);
+				streamNodeContentData(data, response, download, inputStream);
 				
 				return null;
 			}
 		});
-		nodeService.get(download.getNodeReference(), nodeScope);
+		
+		// Range géré coté Alfresco
+		download.getRemoteCallParameters().contentRangeStart(download.getContentRangeStart());
+		download.getRemoteCallParameters().contentRangeEnd(download.getContentRangeEnd());
+		
+		RemoteCallParameters.execute(download.getRemoteCallParameters(), new Callable<RepositoryNode>() {
+			@Override
+			public RepositoryNode call() throws Exception {
+				return nodeService.get(download.getNodeReference(), nodeScope);
+			}
+		});
 	}
 
 	/**
 	 * Method can be overriden (not static) to deal with specific input
 	 */
-	protected void streamContentData(RepositoryContentData data, HttpServletResponse response,
+	protected void streamNodeContentData(RepositoryContentData data, HttpServletResponse response,
 			NodeReferenceDownloadResponse download, InputStream inputStream) throws IOException {
 		response.setContentType(data.getMimetype());
 		response.setCharacterEncoding(data.getEncoding());
-		// set content-length manually rather than using setContentLength to allow for size as long
-		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(data.getSize()));
 		
-		streamInput(download, inputStream, response);
+		streamInput(download, data.getSize(), false, inputStream, response);
 	}
 
-	protected void streamInput(DownloadResponse download, InputStream input, HttpServletResponse response) throws IOException {
+	protected void streamInput(DownloadResponse download, long fullContentLength, boolean manageRange, 
+			InputStream input, HttpServletResponse response) throws IOException {
 		setContentDispositionHeader(download, response);
-		IOUtils.copy(input, response.getOutputStream());
+
+		if (download.getContentWatermark() != null) {
+			fullContentLength += download.getContentWatermark().length;
+			input = new SequenceInputStream(input, new ByteArrayInputStream(download.getContentWatermark()));
+		}
+		
+		// set content-length manually rather than using setContentLength to allow for size as long
+		int status = download.getHttpStatus();
+		String range = download.getContentRange(fullContentLength); 
+		long packetContentLength = download.getContentLength(fullContentLength);
+
+		response.setStatus(status);
+		response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+		response.setHeader(HttpHeaders.CONTENT_LENGTH, Long.toString(packetContentLength));
+		if (range != null) {
+			response.setHeader(HttpHeaders.CONTENT_RANGE, range);
+		}
+		
+		try {
+			ServletOutputStream output = response.getOutputStream();
+			if (! manageRange || ! download.hasContentRange()) {
+				IOUtils.copy(input, output);
+			} else {
+				long inputOffset = (download.getContentRangeStart() != null) ? download.getContentRangeStart() : 0L;
+				long length = ((download.getContentRangeEnd() != null) ? download.getContentRangeEnd() : packetContentLength)
+						 - inputOffset;
+				IOUtils.copyLarge(input, output, inputOffset, length);
+			}
+		} catch (Exception ex) {
+			if ("org.apache.catalina.connector.ClientAbortException".equals(ex.getClass().getName())) {
+				LOGGER.warn("ClientAbortException : Normal when using pdf.js or when the user close the navigator before the end of the download");
+			} else {
+				throw ex;
+			}
+		}
 	}
 
 	protected static void setContentDispositionHeader(DownloadResponse download, HttpServletResponse response) {

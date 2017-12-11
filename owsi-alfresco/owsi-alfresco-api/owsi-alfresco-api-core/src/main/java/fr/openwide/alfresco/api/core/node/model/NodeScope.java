@@ -41,7 +41,7 @@ public class NodeScope implements Serializable, RepositoryVisitable<NodeScope> {
 	private Set<NameReference> recursiveChildAssociations = new LinkedHashSet<>();
 	private Set<NameReference> recursiveParentAssociations = new LinkedHashSet<>();
 
-	private Set<RepositoryPermission> userPermissions = new LinkedHashSet<>();
+	private Set<PermissionReference> userPermissions = new LinkedHashSet<>();
 	private boolean accessPermissions = false;
 
 	public boolean isNodeReference() {
@@ -124,7 +124,7 @@ public class NodeScope implements Serializable, RepositoryVisitable<NodeScope> {
 		return recursiveParentAssociations;
 	}
 
-	public Set<RepositoryPermission> getUserPermissions() {
+	public Set<PermissionReference> getUserPermissions() {
 		return userPermissions;
 	}
 	public boolean isAccessPermissions() {

@@ -8,25 +8,20 @@ import java.util.Objects;
 
 import com.google.common.base.Strings;
 
-import fr.openwide.alfresco.api.core.authority.model.RepositoryAuthority;
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class RepositoryUser implements Serializable {
 
-	private static final long serialVersionUID = 945185331538453155L;
-
-	public static final NameReference FIRST_NAME = NameReference.create("cm", "firstName"); 
-	public static final NameReference LAST_NAME = NameReference.create("cm", "lastName"); 
-	public static final NameReference EMAIL = NameReference.create("cm", "email"); 
-	
 	private UserReference userReference;
 
 	private RepositoryNode userNode;
-	private RepositoryTicket ticket;
+	private TicketReference ticket;
 
 	private boolean admin = false;
-	private List<RepositoryAuthority> authorities = new ArrayList<>();
+	private List<AuthorityReference> authorities = new ArrayList<>();
 
 	public UserReference getUserReference() {
 		return userReference;
@@ -38,31 +33,39 @@ public class RepositoryUser implements Serializable {
 	public RepositoryNode getUserNode() {
 		return userNode;
 	}
+	public BusinessNode getUserBusinessNode() {
+		return new BusinessNode(userNode);
+	}
 	public void setUserNode(RepositoryNode userNode) {
 		this.userNode = userNode;
 	}
 
 	public String getFirstName() {
-		return userNode.getProperty(FIRST_NAME, String.class);
+		return userNode.getProperty(CmModel.person.firstName.getNameReference(), String.class);
 	}
 	public String getLastName() {
-		return userNode.getProperty(LAST_NAME, String.class);
+		return userNode.getProperty(CmModel.person.lastName.getNameReference(), String.class);
+	}
+	public String getFullName() {
+		String firstName = getFirstName();
+		String lastName = getLastName();
+		return ((firstName != null) ? firstName : "") + " " + ((lastName != null) ? lastName : "").trim();
 	}
 	public String getEmail() {
-		return userNode.getProperty(EMAIL, String.class);
+		return userNode.getProperty(CmModel.person.email.getNameReference(), String.class);
 	}
 	
-	public List<RepositoryAuthority> getAuthorities() {
+	public List<AuthorityReference> getAuthorities() {
 		return authorities;
 	}
-	public void setAuthorities(List<RepositoryAuthority> authorities) {
+	public void setAuthorities(List<AuthorityReference> authorities) {
 		this.authorities = authorities;
 	}
 
-	public RepositoryTicket getTicket() {
+	public TicketReference getTicket() {
 		return ticket;
 	}
-	public void setTicket(RepositoryTicket ticket) {
+	public void setTicket(TicketReference ticket) {
 		this.ticket = ticket;
 	}
 
@@ -105,7 +108,7 @@ public class RepositoryUser implements Serializable {
 		if (authorities != null && ! authorities.isEmpty()) {
 			sb.append("Repository Authorities: ");
 			boolean first = true;
-			for (RepositoryAuthority auth : authorities) {
+			for (AuthorityReference auth : authorities) {
 				if (! first) {
 					sb.append(",");
 				}
