@@ -83,4 +83,6 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	
 	Optional<NodeReference> getByNamedPath(String ... names);
 	String getPath(NodeReference nodeReference);
+	
+	<C extends Serializable> void removeProperty(NodeReference nodeReference, SinglePropertyModel<C> property);
 }
