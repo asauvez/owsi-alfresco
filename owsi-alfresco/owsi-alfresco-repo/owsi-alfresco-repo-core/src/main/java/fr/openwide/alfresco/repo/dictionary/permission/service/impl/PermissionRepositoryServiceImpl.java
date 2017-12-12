@@ -1,31 +1,41 @@
 package fr.openwide.alfresco.repo.dictionary.permission.service.impl;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
+import org.alfresco.service.cmr.preference.PreferenceService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
@@ -37,6 +47,9 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	private ConversionService conversionService;
 	private NodeModelRepositoryService nodeModelService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
+	private PolicyRepositoryService policyRepositoryService;
+	private PreferenceService preferenceService;
+	private PersonService personService;
 
 	private DataSource dataSource;
 	
@@ -103,13 +116,21 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	@Override
 	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem) {
+		String oldAuthorityName = oldAuthority.getName();
+		if (!authorityService.authorityExists(oldAuthorityName)) {
+			throw new IllegalArgumentException(oldAuthorityName + " doesn't exist");
+		}
+		String newAuthorityName = newAuthority.getName();
+		if (!authorityService.authorityExists(newAuthorityName)) {
+			throw new IllegalArgumentException(newAuthorityName + " doesn't exist");
+		}
 		// Ajoute les groupes parents de l'ancien dans le nouveau : Typiquement les groupes de site : site_toto_SiteCollaborator
-		Set<String> containedAuthoritiesOld = authorityService.getContainedAuthorities(AuthorityType.GROUP, oldAuthority.getName(), true);
-		Set<String> containedAuthoritiesNew = authorityService.getContainedAuthorities(AuthorityType.GROUP, newAuthority.getName(), true);
+		Set<String> containedAuthoritiesOld = authorityService.getContainedAuthorities(AuthorityType.GROUP, oldAuthorityName, true);
+		Set<String> containedAuthoritiesNew = authorityService.getContainedAuthorities(AuthorityType.GROUP, newAuthorityName, true);
 		Set<String> authoritiesToAdd  = new TreeSet<>(containedAuthoritiesOld);
 		authoritiesToAdd.removeAll(containedAuthoritiesNew);
 		for (String authorityToAdd : authoritiesToAdd) {
-			authorityService.addAuthority(authorityToAdd, newAuthority.getName());
+			authorityService.addAuthority(authorityToAdd, newAuthorityName);
 		}
 
 		// Remplace l'authority dans les ACL
@@ -124,22 +145,77 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			cpt ++;
 		}
 		
-		if (   AuthorityType.getAuthorityType(oldAuthority.getName()) == AuthorityType.USER 
-			&& AuthorityType.getAuthorityType(newAuthority.getName()) == AuthorityType.USER) {
-			List<NodeReference> listNodeOwner = nodeSearchModelService.searchReference(new SearchQueryBuilder()
-					.restriction(new RestrictionBuilder()
-							.eq(CmModel.ownable.owner, oldAuthority.getName()).of())
-					.maxResults(maxItem.orElse(null)));
-			for (NodeReference nodeReference : listNodeOwner) {
-				if (maxItem.isPresent() && maxItem.get() == cpt) {
-					break;
-				}
-				nodeModelService.setProperty(nodeReference, CmModel.ownable.owner, newAuthority.getName());
-				cpt ++;
+		if (   AuthorityType.getAuthorityType(oldAuthorityName) == AuthorityType.USER 
+			&& AuthorityType.getAuthorityType(newAuthorityName) == AuthorityType.USER) {
+			List<TextPropertyModel> propertyModels = Arrays.asList(CmModel.ownable.owner, CmModel.auditable.creator, CmModel.auditable.modifier);
+			Integer newMax = null;
+			for (TextPropertyModel propertyModel: propertyModels) {
+				newMax = maxItem.isPresent() ? maxItem.get() - cpt : null;
+				RestrictionBuilder restrictionOnUserNode = new RestrictionBuilder().eq(propertyModel, oldAuthorityName).of();
+				Consumer<NodeReference> changePropPrivileged =  disableBehaviour(getChangePropConsumer(newAuthorityName, propertyModel));
+				cpt += searchAndApply(restrictionOnUserNode, changePropPrivileged, newMax);
 			}
+			
+			// If maxItem is reached, skip copyHome, so we can do it on next iteration
+			if (!maxItem.isPresent() || cpt <= maxItem.get()) {
+				copyHomeFolderContent(oldAuthorityName, newAuthorityName);
+			}
+			
+			// Copy preferences
+			Map<String, Serializable> newPreferences = preferenceService.getPreferences(oldAuthorityName);
+			preferenceService.setPreferences(newAuthorityName, newPreferences);
+		}
+		return cpt;
+	}
+	
+	private NodeReference copyHomeFolderContent(String sourceUserName, String targetUserName) {
+		NodeReference sourceUserNode = conversionService.get(personService.getPerson(sourceUserName, false));
+		NodeReference targetUserNode = conversionService.get(personService.getPerson(targetUserName, false));
+		NodeReference sourceFolder = nodeModelService.getProperty(sourceUserNode, CmModel.person.homeFolder);
+		boolean isSourceFolderEmpty = sourceFolder == null || ! nodeModelService.exists(sourceFolder) || nodeModelService.getChildren(sourceFolder, new NodeScopeBuilder()).isEmpty();
+		if (isSourceFolderEmpty) {
+			// Nothing to do
+			return targetUserNode;
+		}
+		NodeReference targetFolder = nodeModelService.getProperty(targetUserNode, CmModel.person.homeFolder);
+	
+		// If the target user folder doesn't exist, the home folder is replaced, else a subfolder is created inside the home folder named copy-<sourceFolder> 
+		boolean replaceHomeFolder = (targetFolder == null || !nodeModelService.exists(targetFolder));
+		if (replaceHomeFolder) {
+			Optional<NodeReference> userHomes = nodeModelService.getPrimaryParent(sourceFolder);
+			if (!userHomes.isPresent()) {
+				throw new IllegalStateException("The user homes is not present, something is wrong");
+			}
+			targetFolder = userHomes.get();
+			nodeModelService.setProperty(sourceFolder, CmModel.folder.name, targetUserName);
+			nodeModelService.setProperty(targetUserNode, CmModel.person.homeFolder, sourceFolder);
+			targetFolder = sourceFolder;
+		}
+		else {
+			Optional<String> copyFolderName = Optional.empty();
+			copyFolderName = Optional.of("copy-" + nodeModelService.getProperty(sourceFolder, CmModel.folder.name));
+			nodeModelService.copy(sourceFolder, targetFolder, copyFolderName);
+			nodeModelService.delete(sourceFolder);
 		}
 		
-		return cpt;
+		return targetFolder;
+	}
+	
+	public int searchAndApply(RestrictionBuilder restriction, Consumer<NodeReference> consumer, Integer maxItem) {
+		SearchQueryBuilder searchBuilder = new BatchSearchQueryBuilder()
+				.configurationName("userReplaceSearch")
+				.consumer(consumer)
+				.restriction(restriction)
+				.maxResults(maxItem);
+		return nodeSearchModelService.searchBatch((BatchSearchQueryBuilder) searchBuilder);
+	}
+	
+	private Consumer<NodeReference> disableBehaviour(Consumer<NodeReference> consumer) {
+		return nodeReference ->  policyRepositoryService.disableBehaviour(CmModel.auditable, () -> consumer.accept(nodeReference));
+	}
+
+	private Consumer<NodeReference> getChangePropConsumer(String propName, TextPropertyModel propertyModel) {
+		return nodeReference -> {nodeModelService.setProperty(nodeReference, propertyModel, propName);};
 	}
 	
 	public void setPermissionService(PermissionService permissionService) {
@@ -159,5 +235,14 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	public void setAuthorityService(AuthorityService authorityService) {
 		this.authorityService = authorityService;
+	}
+	public void setPreferenceService(PreferenceService preferenceService) {
+		this.preferenceService = preferenceService;
+	}
+	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
+		this.policyRepositoryService = policyRepositoryService;
+	}
+	public void setPersonService(PersonService personService) {
+		this.personService = personService;
 	}
 }

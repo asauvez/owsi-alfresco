@@ -118,6 +118,9 @@
 		<property name="dataSource" ref="dataSource"/>
 		<property name="nodeModelService" ref="owsi.service.nodeModelService"/>
 		<property name="nodeSearchModelService" ref="owsi.service.nodeSearchModelService"/>
+		<property name="policyRepositoryService" ref="owsi.service.policyService"/>
+		<property name="preferenceService" ref="PreferenceService"/>
+		<property name="personService" ref="PersonService"/>
 	</bean>
 
 	<bean id="owsi.service.nodeSearchModelService" class="fr.openwide.alfresco.repo.dictionary.search.service.impl.NodeSearchModelRepositoryServiceImpl">
