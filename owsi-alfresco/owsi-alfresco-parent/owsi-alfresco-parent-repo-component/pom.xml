@@ -707,5 +707,23 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nexus-owsi-alfresco</id>
+			<name>OWSI Alfresco</name>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>nexus-owsi-alfresco-snapshots</id>
+			<name>OWSI Alfresco Snapshots</name>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco-snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>
