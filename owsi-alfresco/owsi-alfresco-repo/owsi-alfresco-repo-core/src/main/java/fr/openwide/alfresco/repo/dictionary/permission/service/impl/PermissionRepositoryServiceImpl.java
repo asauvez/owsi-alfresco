@@ -22,6 +22,8 @@ import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
@@ -41,6 +43,8 @@ import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class PermissionRepositoryServiceImpl implements PermissionRepositoryService {
 
+	private final Logger LOGGER = LoggerFactory.getLogger(PermissionRepositoryServiceImpl.class);
+	
 	private PermissionService permissionService;
 	private AuthorityService authorityService;
 
@@ -158,21 +162,24 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			
 			// If maxItem is reached, skip copyHome, so we can do it on next iteration
 			if (!maxItem.isPresent() || cpt <= maxItem.get()) {
-				copyHomeFolderContent(oldAuthorityName, newAuthorityName);
+				copyHomeFilesAndPreferences(oldAuthorityName, newAuthorityName);
 			}
 			
-			// Copy preferences
-			Map<String, Serializable> newPreferences = preferenceService.getPreferences(oldAuthorityName);
-			preferenceService.setPreferences(newAuthorityName, newPreferences);
 		}
 		return cpt;
 	}
-	
-	private NodeReference copyHomeFolderContent(String sourceUserName, String targetUserName) {
+
+	private NodeReference copyHomeFilesAndPreferences(String sourceUserName, String targetUserName) {
 		NodeReference sourceUserNode = conversionService.get(personService.getPerson(sourceUserName, false));
 		NodeReference targetUserNode = conversionService.get(personService.getPerson(targetUserName, false));
 		NodeReference sourceFolder = nodeModelService.getProperty(sourceUserNode, CmModel.person.homeFolder);
-		boolean isSourceFolderEmpty = sourceFolder == null || ! nodeModelService.exists(sourceFolder) || nodeModelService.getChildren(sourceFolder, new NodeScopeBuilder()).isEmpty();
+		
+		// The preferences copy must run only once
+		if (sourceFolder != null) {
+			copyPreferences(sourceUserName, targetUserName);
+		}
+		
+		boolean isSourceFolderEmpty = isFolderEmpty(sourceFolder);
 		if (isSourceFolderEmpty) {
 			// Nothing to do
 			return targetUserNode;
@@ -180,11 +187,16 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		NodeReference targetFolder = nodeModelService.getProperty(targetUserNode, CmModel.person.homeFolder);
 	
 		// If the target user folder doesn't exist, the home folder is replaced, else a subfolder is created inside the home folder named copy-<sourceFolder> 
-		boolean replaceHomeFolder = (targetFolder == null || !nodeModelService.exists(targetFolder));
+		boolean replaceHomeFolder = isFolderEmpty(targetFolder);
 		if (replaceHomeFolder) {
+			LOGGER.info(String.format("copyHomeFolder: home for target user %s is empty, renaming %s", targetUserName, sourceUserName));
 			Optional<NodeReference> userHomes = nodeModelService.getPrimaryParent(sourceFolder);
 			if (!userHomes.isPresent()) {
 				throw new IllegalStateException("The user homes is not present, something is wrong");
+			}
+			// Si le dossier cible existe, il est vide: on le supprime pour pouvoir renommer le dossier source
+			if (targetFolder != null && nodeModelService.exists(targetFolder)) {
+				nodeModelService.delete(targetFolder);
 			}
 			targetFolder = userHomes.get();
 			nodeModelService.setProperty(sourceFolder, CmModel.folder.name, targetUserName);
@@ -192,13 +204,24 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			targetFolder = sourceFolder;
 		}
 		else {
-			Optional<String> copyFolderName = Optional.empty();
-			copyFolderName = Optional.of("copy-" + nodeModelService.getProperty(sourceFolder, CmModel.folder.name));
+			LOGGER.info(String.format("copyHomeFolder: home for target user %s is not empty, copying %s inside a copy folder", targetUserName, sourceUserName));
+			String folderName = nodeModelService.getProperty(sourceFolder, CmModel.folder.name);
+			Optional<String> copyFolderName = Optional.of("copy-" + folderName);
 			nodeModelService.copy(sourceFolder, targetFolder, copyFolderName);
+			//nodeModelService.getChildrenAssocsContains(sourceFolder).forEach(node -> nodeModelService.delete(node));
 			nodeModelService.delete(sourceFolder);
 		}
-		
+		nodeModelService.setProperty(sourceUserNode, CmModel.person.homeFolder, null);
 		return targetFolder;
+	}
+
+	private void copyPreferences(String oldAuthorityName, String newAuthorityName) {
+		Map<String, Serializable> newPreferences = preferenceService.getPreferences(oldAuthorityName);
+		preferenceService.setPreferences(newAuthorityName, newPreferences);
+	}
+	
+	private boolean isFolderEmpty(NodeReference folderNode) {
+		return folderNode == null || !nodeModelService.exists(folderNode) || nodeModelService.getChildren(folderNode, new NodeScopeBuilder()).isEmpty();
 	}
 	
 	public int searchAndApply(RestrictionBuilder restriction, Consumer<NodeReference> consumer, Integer maxItem) {
