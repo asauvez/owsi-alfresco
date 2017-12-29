@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+import javax.annotation.Resource.AuthenticationType;
+
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractMessageRemoteWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 /**
@@ -39,6 +42,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 			"/owsi/authorityReplace?inputFile={inputFile}",
 			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}"
 		},
+		authentication = GenerateWebScriptAuthentication.ADMIN,
 		shortName="Replace une authority par une autre",
 		transactionAllow=GenerateWebScriptTransactionAllow.READWRITE,
 		family="OWSI",
