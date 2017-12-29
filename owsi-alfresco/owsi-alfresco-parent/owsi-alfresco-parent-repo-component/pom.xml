@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-api</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.6.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent-api/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-repo-component</artifactId>
@@ -125,7 +125,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.5.0-SNAPSHOT</version>
+				<version>0.6.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -673,14 +673,14 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.5.0-SNAPSHOT</version>
+						<version>0.6.0-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-				<version>0.5.0-SNAPSHOT</version>
+				<version>0.6.0-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>
@@ -707,5 +707,23 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nexus-owsi-alfresco</id>
+			<name>OWSI Alfresco</name>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>nexus-owsi-alfresco-snapshots</id>
+			<name>OWSI Alfresco Snapshots</name>
+			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco-snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
 
 </project>

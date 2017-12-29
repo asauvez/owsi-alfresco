@@ -14,7 +14,9 @@ public abstract class Model {
 	}
 
 	public String toLucene() {
-		return nameReference.getNamespace() + "\\:" + nameReference.getName();
+		return nameReference.getNamespace().replace("-", "\\-") 
+			+ "\\:" 
+			+ nameReference.getName().replace("-", "\\-");
 	}
 
 	@Override

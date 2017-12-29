@@ -9,6 +9,7 @@ import org.junit.Test;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.RnModel;
+import fr.openwide.alfresco.component.model.repository.model.SysModel;
 //import fr.openwide.alfresco.demo.business.model.DemoModel;
 
 public class RestrictionBuilderTest {
@@ -17,6 +18,7 @@ public class RestrictionBuilderTest {
 	public void testGenerateFTS() throws Exception {
 		assertEquals(
 				"=cm\\:name:\"toto\"\n" +
+				"AND =sys\\:node\\-dbid:123\n" +
 				"AND =cm\\:name:\"titi*\"\n" +
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
 				"AND ID:workspace\\://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c\n" +
@@ -32,6 +34,7 @@ public class RestrictionBuilderTest {
 				"	OR =cm\\:name:\"tata\")", 
 			new RestrictionBuilder()
 				.eq(CmModel.object.name, "toto").of()
+				.eq(SysModel.referenceable.nodeDbid, 123L).of()
 				.startsWith(CmModel.object.name, "titi").of()
 				.hasAspect(CmModel.workingCopy).not().of()
 				.id(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
