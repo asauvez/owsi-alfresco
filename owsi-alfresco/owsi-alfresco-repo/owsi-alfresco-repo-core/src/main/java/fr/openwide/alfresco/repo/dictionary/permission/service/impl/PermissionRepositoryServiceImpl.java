@@ -129,12 +129,13 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			throw new IllegalArgumentException(newAuthorityName + " doesn't exist");
 		}
 		// Ajoute les groupes parents de l'ancien dans le nouveau : Typiquement les groupes de site : site_toto_SiteCollaborator
-		Set<String> containedAuthoritiesOld = authorityService.getContainedAuthorities(AuthorityType.GROUP, oldAuthorityName, true);
-		Set<String> containedAuthoritiesNew = authorityService.getContainedAuthorities(AuthorityType.GROUP, newAuthorityName, true);
-		Set<String> authoritiesToAdd  = new TreeSet<>(containedAuthoritiesOld);
-		authoritiesToAdd.removeAll(containedAuthoritiesNew);
-		for (String authorityToAdd : authoritiesToAdd) {
-			authorityService.addAuthority(authorityToAdd, newAuthorityName);
+		Set<String> containingAuthoritiesOld = authorityService.getContainingAuthorities(AuthorityType.GROUP, oldAuthorityName, true);
+		Set<String> containingAuthoritiesNew = authorityService.getContainingAuthorities(AuthorityType.GROUP, newAuthorityName, true);
+		
+		Set<String> containerAuthorities  = new TreeSet<>(containingAuthoritiesOld);
+		containerAuthorities.removeAll(containingAuthoritiesNew);
+		for (String containerAuthority : containerAuthorities) {
+			authorityService.addAuthority(containerAuthority, newAuthorityName);
 		}
 
 		// Remplace l'authority dans les ACL
