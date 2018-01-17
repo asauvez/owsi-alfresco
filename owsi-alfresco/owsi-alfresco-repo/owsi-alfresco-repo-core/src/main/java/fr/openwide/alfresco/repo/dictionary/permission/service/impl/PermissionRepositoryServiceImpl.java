@@ -137,6 +137,10 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		for (String containerAuthority : containerAuthorities) {
 			authorityService.addAuthority(containerAuthority, newAuthorityName);
 		}
+		// Supprime les références à l'ancienne authorité dans les groupes parents, on ne peut pas le faire par synchronisation
+		for (String containerAuthorityOld: containingAuthoritiesOld) {
+			authorityService.removeAuthority(containerAuthorityOld, oldAuthorityName);
+		}
 
 		// Remplace l'authority dans les ACL
 		int cpt = 0;
