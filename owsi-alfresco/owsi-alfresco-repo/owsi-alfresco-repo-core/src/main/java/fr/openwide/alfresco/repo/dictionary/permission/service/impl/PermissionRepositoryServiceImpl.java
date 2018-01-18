@@ -115,11 +115,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	
 	@Override
-	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority) {
-		return replaceAuthority(oldAuthority, newAuthority, Optional.empty());
+	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, boolean removeOldInSite) {
+		return replaceAuthority(oldAuthority, newAuthority, Optional.empty(), removeOldInSite);
 	}
 	@Override
-	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem) {
+	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem, boolean removeOldInSite) {
 		String oldAuthorityName = oldAuthority.getName();
 		if (!authorityService.authorityExists(oldAuthorityName)) {
 			throw new IllegalArgumentException(oldAuthorityName + " doesn't exist");
@@ -137,9 +137,12 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		for (String containerAuthority : containerAuthorities) {
 			authorityService.addAuthority(containerAuthority, newAuthorityName);
 		}
-		// Supprime les références à l'ancienne authorité dans les groupes parents, on ne peut pas le faire par synchronisation
-		for (String containerAuthorityOld: containingAuthoritiesOld) {
-			authorityService.removeAuthority(containerAuthorityOld, oldAuthorityName);
+		// Supprime les références à l'ancienne authorité dans les groupes parents
+		if (removeOldInSite) {
+			LOGGER.info("Removing old authority from site containers");
+			for (String containerAuthorityOld: containingAuthoritiesOld) {
+				authorityService.removeAuthority(containerAuthorityOld, oldAuthorityName);
+			}
 		}
 
 		// Remplace l'authority dans les ACL

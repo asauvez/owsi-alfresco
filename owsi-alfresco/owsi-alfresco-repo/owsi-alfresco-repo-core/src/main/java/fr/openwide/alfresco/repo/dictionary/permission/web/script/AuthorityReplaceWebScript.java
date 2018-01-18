@@ -3,11 +3,10 @@ package fr.openwide.alfresco.repo.dictionary.permission.web.script;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-
-import javax.annotation.Resource.AuthenticationType;
 
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.slf4j.Logger;
@@ -38,9 +37,13 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 @GenerateWebScript(
 		url={
 			"/owsi/authorityReplace?old={old}&new={new}",
+			"/owsi/authorityReplace?old={old}&new={new}&removeOldInSite={removeOldInSite}",
 			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}",
+			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}&removeOldInSite={removeOldInSite}",
 			"/owsi/authorityReplace?inputFile={inputFile}",
-			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}"
+			"/owsi/authorityReplace?inputFile={inputFile}&removeOldInSite={removeOldInSite}",
+			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}",
+			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}&removeOldInSite={removeOldInSite}"
 		},
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		shortName="Replace une authority par une autre",
@@ -49,6 +52,10 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		beanParent="webscript.owsi.remote")
 public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<List<String>, WebScriptRequest> {
 
+
+	private static final String PARAM_REMOVE_OLD_IN_SITE = "removeOldInSite";
+
+	private static final String PARAM_FOR_LIST_EXECUTION = "inputFile";
 
 	private final Logger LOGGER = LoggerFactory.getLogger(AuthorityReplaceWebScript.class);
 	
@@ -67,16 +74,18 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		AuthorityReference oldAuthority = AuthorityReference.authority(req.getParameter("old"));
 		AuthorityReference newAuthority = AuthorityReference.authority(req.getParameter("new"));
 		String maxItem = req.getParameter("maxItem");
-		
+		boolean removeOldInSite = isRemoveOldInSite(req);
 		return permissionRepositoryService.replaceAuthority(oldAuthority, newAuthority, 
-				Optional.ofNullable(maxItem).map(Integer::parseInt));
+				Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite);
 	}
 	
 	
 	private List<String> executeList(WebScriptRequest req){
 		List<String> results = new ArrayList<>();
-		String parameter = req.getParameter("inputFile");
-		LOGGER.info(String.format("--> UserDuplicateWebScript execute with %s", parameter));
+		String parameter = req.getParameter(PARAM_FOR_LIST_EXECUTION);
+		
+		boolean removeOldInSite = isRemoveOldInSite(req);
+		LOGGER.info(String.format("--> UserDuplicateWebScript execute with inputFile: %s and removeOldInSite:%s ", parameter, removeOldInSite));
 		if (parameter == null) {
 			results.add("The webscript should be called with an argument inputFile, with inputFile a file in the classpath");
 			return results;
@@ -110,7 +119,7 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 						int userCount = permissionRepositoryService.replaceAuthority(
 								AuthorityReference.authority(oldUserId), 
 								AuthorityReference.authority(newUserId), 
-								Optional.ofNullable(maxItem).map(Integer::parseInt));
+								Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite);
 						count += userCount;
 						results.add(String.format("content from user %s moved to user %s -> items count : %s", oldUserId, newUserId, userCount));
 					} catch (DuplicateChildNodeNameException| IllegalArgumentException e) {
@@ -136,10 +145,19 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		LOGGER.info(String.format("<-- UserDuplicateWebScript execute exit %s item modified", count));
 		return results;
 	}
+
+	private boolean isRemoveOldInSite(WebScriptRequest req) {
+		String removeOldInSiteStr = req.getParameter(PARAM_REMOVE_OLD_IN_SITE);
+		boolean removeOldInSite = true;
+		if (removeOldInSiteStr != null) {
+			removeOldInSite = Boolean.parseBoolean(removeOldInSiteStr);
+		}
+		return removeOldInSite;
+	}
 	
 	@Override
 	protected List<String> execute(WebScriptRequest req) {
-		if (req.getParameterNames().length == 1) {
+		if (Arrays.asList(req.getParameterNames()).contains(PARAM_FOR_LIST_EXECUTION)) {
 			return executeList(req);
 		} else {
 			Integer singleResult = executeSingle(req);
