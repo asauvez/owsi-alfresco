@@ -190,12 +190,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 
 	private void deauthorizeUser(String oldAuthorityName) {
-		try{
+		if (authorizationService.isAuthorized(oldAuthorityName)) {
 			authorizationService.deauthorize(oldAuthorityName);
 			LOGGER.warn(String.format("%s has been deauthorized", oldAuthorityName));
-		} catch (RuntimeException e) {
-			// get the AuthorizationException (which is private)
-			LOGGER.warn(String.format("failed to deauthorize user %s : %s", oldAuthorityName, e.getMessage()));
+		} else {
+			LOGGER.warn(String.format("failed to deauthorize: user %s was never authorized", oldAuthorityName));
 		}
 	}
 
