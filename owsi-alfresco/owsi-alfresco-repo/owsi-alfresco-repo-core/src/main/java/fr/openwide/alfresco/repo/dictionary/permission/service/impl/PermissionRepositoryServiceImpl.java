@@ -16,10 +16,12 @@ import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
+import org.alfresco.enterprise.repo.authorization.AuthorizationService;
 import org.alfresco.service.cmr.preference.PreferenceService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.slf4j.Logger;
@@ -47,15 +49,16 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	
 	private PermissionService permissionService;
 	private AuthorityService authorityService;
-
 	private ConversionService conversionService;
 	private NodeModelRepositoryService nodeModelService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
 	private PreferenceService preferenceService;
 	private PersonService personService;
-
-	private DataSource dataSource;
+	private AuthorizationService authorizationService;
+    
+    private DataSource dataSource;
+	
 	
 	@Override
 	public boolean hasPermission(NodeReference nodeReference, PermissionReference permission) {
@@ -115,11 +118,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	
 	@Override
-	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, boolean removeOldInSite) {
-		return replaceAuthority(oldAuthority, newAuthority, Optional.empty(), removeOldInSite);
+	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, boolean removeOldInSite, boolean deactivateOldUser) {
+		return replaceAuthority(oldAuthority, newAuthority, Optional.empty(), removeOldInSite, deactivateOldUser);
 	}
 	@Override
-	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem, boolean removeOldInSite) {
+	public int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem, boolean removeOldInSite, boolean deactivateOldUser) {
 		String oldAuthorityName = oldAuthority.getName();
 		if (!authorityService.authorityExists(oldAuthorityName)) {
 			throw new IllegalArgumentException(oldAuthorityName + " doesn't exist");
@@ -168,13 +171,32 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 				cpt += searchAndApply(restrictionOnUserNode, changePropPrivileged, newMax);
 			}
 			
+			// Deactivate old user before moving home
+			if ( deactivateOldUser ) {
+				LOGGER.info(String.format("Deauthorize old user before moving home : %s", oldAuthorityName));
+				if (authorityService.authorityExists(oldAuthorityName)){
+					deauthorizeUser(oldAuthorityName);
+				}
+			}
+			
 			// If maxItem is reached, skip copyHome, so we can do it on next iteration
 			if (!maxItem.isPresent() || cpt <= maxItem.get()) {
 				copyHomeFilesAndPreferences(oldAuthorityName, newAuthorityName);
 			}
 			
 		}
+		
 		return cpt;
+	}
+
+	private void deauthorizeUser(String oldAuthorityName) {
+		try{
+			authorizationService.deauthorize(oldAuthorityName);
+			LOGGER.warn(String.format("%s has been deauthorized", oldAuthorityName));
+		} catch (RuntimeException e) {
+			// get the AuthorizationException (which is private)
+			LOGGER.warn(String.format("failed to deauthorize user %s : %s", oldAuthorityName, e.getMessage()));
+		}
 	}
 
 	private NodeReference copyHomeFilesAndPreferences(String sourceUserName, String targetUserName) {
@@ -276,4 +298,9 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	public void setPersonService(PersonService personService) {
 		this.personService = personService;
 	}
+	
+	public void setAuthorizationService(AuthorizationService authorizationService) {
+		this.authorizationService = authorizationService;
+	}
+	
 }

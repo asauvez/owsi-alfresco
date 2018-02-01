@@ -20,6 +20,6 @@ public interface PermissionRepositoryService {
 	
 	List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference);
 	
-	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, boolean removeOldInSite);
-	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem, boolean removeOldInSite);
+	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, boolean removeOldInSite, boolean deactivateOldUser);
+	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem, boolean removeOldInSite, boolean deactivateOldUser);
 }

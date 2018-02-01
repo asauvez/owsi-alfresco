@@ -38,12 +38,16 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		url={
 			"/owsi/authorityReplace?old={old}&new={new}",
 			"/owsi/authorityReplace?old={old}&new={new}&removeOldInSite={removeOldInSite}",
+			"/owsi/authorityReplace?old={old}&new={new}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}",
 			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}",
 			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}&removeOldInSite={removeOldInSite}",
+			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}",
 			"/owsi/authorityReplace?inputFile={inputFile}",
 			"/owsi/authorityReplace?inputFile={inputFile}&removeOldInSite={removeOldInSite}",
+			"/owsi/authorityReplace?inputFile={inputFile}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}",
 			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}",
-			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}&removeOldInSite={removeOldInSite}"
+			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}&removeOldInSite={removeOldInSite}",
+			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}"
 		},
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		shortName="Replace une authority par une autre",
@@ -54,6 +58,8 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 
 
 	private static final String PARAM_REMOVE_OLD_IN_SITE = "removeOldInSite";
+	
+	private static final String PARAM_DEACTIVATE_OLD_USER = "deactivateOldUser";
 
 	private static final String PARAM_FOR_LIST_EXECUTION = "inputFile";
 
@@ -74,9 +80,10 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		AuthorityReference oldAuthority = AuthorityReference.authority(req.getParameter("old"));
 		AuthorityReference newAuthority = AuthorityReference.authority(req.getParameter("new"));
 		String maxItem = req.getParameter("maxItem");
-		boolean removeOldInSite = isRemoveOldInSite(req);
+		boolean removeOldInSite = getBooleanParameter(req, PARAM_REMOVE_OLD_IN_SITE, true);
+		boolean deactivateOldUser = getBooleanParameter(req, PARAM_DEACTIVATE_OLD_USER, true);
 		return permissionRepositoryService.replaceAuthority(oldAuthority, newAuthority, 
-				Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite);
+				Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite, deactivateOldUser);
 	}
 	
 	
@@ -84,8 +91,9 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		List<String> results = new ArrayList<>();
 		String parameter = req.getParameter(PARAM_FOR_LIST_EXECUTION);
 		
-		boolean removeOldInSite = isRemoveOldInSite(req);
-		LOGGER.info(String.format("--> UserDuplicateWebScript execute with inputFile: %s and removeOldInSite:%s ", parameter, removeOldInSite));
+		boolean removeOldInSite = getBooleanParameter(req, PARAM_REMOVE_OLD_IN_SITE, true);
+		boolean deactivateOldUser = getBooleanParameter(req, PARAM_DEACTIVATE_OLD_USER, true);
+		LOGGER.info(String.format("--> UserDuplicateWebScript execute with inputFile: %s ; removeOldInSite:%s ; deactivateOldUser: %s", parameter, removeOldInSite, deactivateOldUser));
 		if (parameter == null) {
 			results.add("The webscript should be called with an argument inputFile, with inputFile a file in the classpath");
 			return results;
@@ -119,7 +127,7 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 						int userCount = permissionRepositoryService.replaceAuthority(
 								AuthorityReference.authority(oldUserId), 
 								AuthorityReference.authority(newUserId), 
-								Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite);
+								Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite, deactivateOldUser);
 						count += userCount;
 						results.add(String.format("content from user %s moved to user %s -> items count : %s", oldUserId, newUserId, userCount));
 					} catch (DuplicateChildNodeNameException| IllegalArgumentException e) {
@@ -146,13 +154,13 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		return results;
 	}
 
-	private boolean isRemoveOldInSite(WebScriptRequest req) {
-		String removeOldInSiteStr = req.getParameter(PARAM_REMOVE_OLD_IN_SITE);
-		boolean removeOldInSite = true;
-		if (removeOldInSiteStr != null) {
-			removeOldInSite = Boolean.parseBoolean(removeOldInSiteStr);
+	private boolean getBooleanParameter(WebScriptRequest req, String param, boolean defaultValue) {
+		String valueStr = req.getParameter(param);
+		boolean value = defaultValue;
+		if (valueStr != null) {
+			value = Boolean.parseBoolean(valueStr);
 		}
-		return removeOldInSite;
+		return value;
 	}
 	
 	@Override
