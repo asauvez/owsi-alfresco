@@ -253,7 +253,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
 		MigrationMojo mojo = new MigrationMojo();
-		mojo.alfrescoVersion = "5.2.1";
+		mojo.alfrescoVersion = "5.2.2";
 		mojo.execute();
 	}
 }
