@@ -3,8 +3,6 @@ package fr.openwide.alfresco.repo.dictionary.search.service.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
