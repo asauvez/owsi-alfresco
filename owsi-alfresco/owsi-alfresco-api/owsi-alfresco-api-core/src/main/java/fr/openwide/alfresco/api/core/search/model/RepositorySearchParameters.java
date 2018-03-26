@@ -6,6 +6,7 @@ import java.util.List;
 
 import fr.openwide.alfresco.api.core.node.model.AbstractQueryParameters;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryGeneralHighlightParameters;
 
 public class RepositorySearchParameters extends AbstractQueryParameters {
 
@@ -13,6 +14,8 @@ public class RepositorySearchParameters extends AbstractQueryParameters {
 	private List<StoreReference> storeReferences = new ArrayList<>(Arrays.asList(StoreReference.STORE_REF_WORKSPACE_SPACESSTORE));
 	private SearchQueryLanguage language = SearchQueryLanguage.FTS_ALFRESCO;
 	private RepositoryQueryConsistency queryConsistency = RepositoryQueryConsistency.DEFAULT;
+	
+	private RepositoryGeneralHighlightParameters highlight;
 	
 	private Integer firstResult;
 	private Integer maxResults;
@@ -58,4 +61,10 @@ public class RepositorySearchParameters extends AbstractQueryParameters {
 		this.queryConsistency = queryConsistency;
 	}
 
+	public RepositoryGeneralHighlightParameters getHighlight() {
+		return highlight;
+	}
+	public void setHighlight(RepositoryGeneralHighlightParameters highlight) {
+		this.highlight = highlight;
+	}
 }

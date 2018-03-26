@@ -1,14 +1,19 @@
 package fr.openwide.alfresco.component.model.search.model;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositoryQueryConsistency;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.builder.AbstractQueryBuilder;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.search.model.highlight.GeneralHighlightBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 
 
@@ -60,4 +65,19 @@ public class SearchQueryBuilder extends AbstractQueryBuilder<SearchQueryBuilder,
 		return this;
 	}
 	
+	public GeneralHighlightBuilder highlight(List<NameReference> fields) {
+		return new GeneralHighlightBuilder(this, fields);
+	}
+	public GeneralHighlightBuilder highlight(PropertyModel<?> ... fields) {
+		return highlight(Arrays.asList(fields).stream()
+				.map(field -> field.getNameReference())
+				.collect(Collectors.toList()));
+	}
+	public GeneralHighlightBuilder highlight() {
+		return highlight(
+				CmModel.object.name,
+				CmModel.titled.title,
+				CmModel.titled.description,
+				CmModel.content.content);
+	}
 }
