@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -83,37 +85,65 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	
 	@Override
 	public List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference) {
-		String sql = "SELECT store.protocol, store.identifier, an.uuid, alfauth.authority, aperm.name as Permission, ace.allowed "
-				+ "FROM alf_node an, alf_acl_member acl_m, alf_access_control_entry ace, alf_authority alfauth, alf_access_control_list acl, alf_permission aperm, alf_store store "
-				+ "WHERE an.acl_id = acl_m.acl_id "
-				+ "  AND acl_m.ace_id = ace.id "
-				+ "  AND alfauth.id = ace.authority_id"
-				+ "  AND acl.id = acl_m.acl_id"
-				+ "  AND aperm.id = ace.permission_id"
-				+ "  AND store.id = an.store_id"
-				+ "  AND acl_m.pos = 0"
-				+ "  AND alfauth.authority = ?";
-		try (Connection conn = dataSource.getConnection()) {
-			try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-				stmt.setString(1, authorityReference.getName());
-				
-				try (ResultSet res = stmt.executeQuery()) {
-					List<RepositoryAccessControl> list = new ArrayList<>();
-					while(res.next()) {
-						int col = 1;
-						NodeReference nodeReference = NodeReference.create(res.getString(col ++), res.getString(col ++), res.getString(col ++));
-						AuthorityReference authority = AuthorityReference.authority(res.getString(col ++));
-						PermissionReference permission = PermissionReference.create(res.getString(col ++));
-						boolean allowed = res.getBoolean(col ++);
-						
-						list.add(new RepositoryAccessControl(nodeReference, authority, permission, allowed));
-					}
-					return list;
-				}
+		return searchACL(Collections.singleton(authorityReference));
+	}
+
+	@Override
+	public List<RepositoryAccessControl> searchACLwithParentAuthorities(AuthorityReference authorityReference) {
+		List<AuthorityReference> authorityReferences = new ArrayList<>();
+		authorityReferences.add(authorityReference);
+		
+		if (! AuthorityReference.GROUP_EVERYONE.equals(authorityReference)) {
+			Set<String> containingAuthorities = authorityService.getContainingAuthorities(AuthorityType.GROUP, authorityReference.getName(), false);
+			for (String containingAuthority : containingAuthorities) {
+				authorityReferences.add(AuthorityReference.authority(containingAuthority));
 			}
-		} catch (SQLException e) {
-			throw new IllegalStateException(sql, e);
 		}
+		return searchACL(authorityReferences);
+	}
+
+	@Override
+	public List<RepositoryAccessControl> searchACL(Collection<AuthorityReference> authorityReferences) {
+		List<RepositoryAccessControl> list = new ArrayList<>();
+		if (! authorityReferences.isEmpty()) {
+			StringBuilder sql = new StringBuilder("SELECT store.protocol, store.identifier, an.uuid, alfauth.authority, aperm.name as Permission, ace.allowed "
+					+ "FROM alf_node an, alf_acl_member acl_m, alf_access_control_entry ace, alf_authority alfauth, alf_access_control_list acl, alf_permission aperm, alf_store store "
+					+ "WHERE an.acl_id = acl_m.acl_id "
+					+ "  AND acl_m.ace_id = ace.id "
+					+ "  AND alfauth.id = ace.authority_id"
+					+ "  AND acl.id = acl_m.acl_id"
+					+ "  AND aperm.id = ace.permission_id"
+					+ "  AND store.id = an.store_id"
+					+ "  AND acl_m.pos = 0"
+					+ "  AND alfauth.authority IN (");
+			for (int parameterIndex = 0; parameterIndex < authorityReferences.size(); parameterIndex ++) {
+				sql.append("?").append((parameterIndex == authorityReferences.size() - 1) ? ")" : ", ");
+			}
+			
+			try (Connection conn = dataSource.getConnection()) {
+				try (PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+					int parameterIndex = 1;
+					for (AuthorityReference authorityReference : authorityReferences) {
+						stmt.setString(parameterIndex ++, authorityReference.getName());
+					}
+					
+					try (ResultSet res = stmt.executeQuery()) {
+						while(res.next()) {
+							int col = 1;
+							NodeReference nodeReference = NodeReference.create(res.getString(col ++), res.getString(col ++), res.getString(col ++));
+							AuthorityReference authority = AuthorityReference.authority(res.getString(col ++));
+							PermissionReference permission = PermissionReference.create(res.getString(col ++));
+							boolean allowed = res.getBoolean(col ++);
+							
+							list.add(new RepositoryAccessControl(nodeReference, authority, permission, allowed));
+						}
+					}
+				}
+			} catch (SQLException e) {
+				throw new IllegalStateException(sql.toString(), e);
+			}
+		}
+		return list;
 	}
 	
 	@Override
