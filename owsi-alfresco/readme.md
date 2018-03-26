@@ -1,7 +1,7 @@
 Description
 ===========
 Owsi-Alfresco est un ensemble d'outils destinés à rendre plus rapide et maintenable les développements autour 
-d'Alfresco 5.2.2.
+d'Alfresco 5.2.3.
 
 FAQ
 ===
@@ -18,6 +18,11 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 
 Nouveautés
 ==========
+
+## depuis 0.6.0
+* Alfresco 5.2.3
+* Permet de demander highlight dans des recherches Solr.
+
 ## depuis 0.5.0
 * authorityModelService.getUser(userName, nodeScopeBuilder) --> authorityModelService.getCachedUser(userName)
 * http://localhost:8080/alfresco/s/owsi/contentstoreexport.zip
