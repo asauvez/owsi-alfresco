@@ -58,10 +58,11 @@ public class RepositoryHighlightResults implements Serializable {
 		}
 	}
 	public static RepositoryHighlightResults extractFromNode(RepositoryNode node) {
-		String s = (String) node.getExtension(HIGHLIGHTING);
+		String highlightint = (String) node.getExtension(HIGHLIGHTING);
 		try {
-			RepositoryHighlightResults highlightResults = objectMapper.readValue(s, RepositoryHighlightResults.class);
-			return (highlightResults != null) ? highlightResults : new RepositoryHighlightResults(Collections.emptyList());
+			return (highlightint != null) 
+					? objectMapper.readValue(highlightint, RepositoryHighlightResults.class) 
+					: new RepositoryHighlightResults(Collections.emptyList());
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
