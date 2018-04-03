@@ -22,6 +22,8 @@ Nouveautés
 ## depuis 0.6.0
 * Alfresco 5.2.3
 * Permet de demander highlight dans des recherches Solr.
+* Alternate DownloadResponseHandler pour customiser comportement
+* Génére un fichier git.properties dans les JAR/WAR
 
 ## depuis 0.5.0
 * authorityModelService.getUser(userName, nodeScopeBuilder) --> authorityModelService.getCachedUser(userName)
