@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model.embed;
 
 import fr.openwide.alfresco.api.core.node.model.NodeScope;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -40,7 +41,10 @@ public class PropertiesNodeScope {
 	}
 
 	public NodeScopeBuilder set(PropertyModel<?> propertyModel) {
-		scope.getProperties().add(propertyModel.getNameReference());
+		return set(propertyModel.getNameReference());
+	}
+	public NodeScopeBuilder set(NameReference property) {
+		scope.getProperties().add(property);
 		return builder;
 	}
 	public NodeScopeBuilder set(ContainerModel type) {
