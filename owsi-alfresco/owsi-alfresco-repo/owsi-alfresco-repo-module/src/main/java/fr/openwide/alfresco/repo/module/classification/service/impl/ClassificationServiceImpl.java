@@ -355,6 +355,12 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setContentStore(NodeReference node, String storeName) {
 		nodeModelService.setProperty(node, CmModel.storeSelector.storeName, storeName);
 	}
+	public void setIndex(NodeReference node, boolean isIndexed) {
+		nodeModelService.setProperty(node, CmModel.indexControl.isIndexed, isIndexed);
+	}
+	public void setIndexContent(NodeReference node, boolean isContentIndexed) {
+		nodeModelService.setProperty(node, CmModel.indexControl.isContentIndexed, isContentIndexed);
+	}
 	
 	public void moveNode(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {

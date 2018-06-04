@@ -1,24 +1,35 @@
 package fr.openwide.alfresco.repo.core.search.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.FieldHighlightParameters;
+import org.alfresco.service.cmr.search.GeneralHighlightParameters;
 import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.QueryConsistency;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SortDefinition;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryFieldHighlightParameters;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryGeneralHighlightParameters;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryHighlightResult;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryHighlightResults;
 import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
@@ -33,7 +44,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private ConversionService conversionService;
 	
 	private int maxPermissionChecks;
-
+	
 	@Override
 	public List<RepositoryNode> search(RepositorySearchParameters rsp) {
 		try {
@@ -43,10 +54,24 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			List<RepositoryNode> res = new ArrayList<>();
 			ResultSet resultSet = searchService.query(sp);
 			try {
+				Map<NodeRef, List<Pair<String, List<String>>>> highlighting = Collections.emptyMap();
+				if (rsp.getHighlight() != null) {
+					highlighting = resultSet.getHighlighting();
+				}
+
 				List<NodeRef> nodeRefs = resultSet.getNodeRefs();
 				for (NodeRef nodeRef : nodeRefs) {
 					try {
-						res.add(nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope()));
+						RepositoryNode node = nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope());
+						res.add(node);
+						
+						List<Pair<String, List<String>>> highlightingForNode = highlighting.get(nodeRef);
+						if (highlightingForNode != null) {
+							List<RepositoryHighlightResult> highlighResults = highlightingForNode.stream()
+								.map(pair -> new RepositoryHighlightResult(NameReference.create(pair.getFirst()), pair.getSecond()))
+								.collect(Collectors.toList());
+							new RepositoryHighlightResults(highlighResults).storeInNode(node);
+						}
 					} catch (NoSuchNodeRemoteException e) {
 						// ignore : cela doit être des noeuds effacés, mais dont l'effacement n'est pas encore pris en compte dans la recherche.
 						LOGGER.warn("Node " + nodeRef + " not found.");
@@ -100,6 +125,30 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 		for (SortDefinition sd : rsp.getSorts()) {
 			sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
 		}
+		
+		RepositoryGeneralHighlightParameters rhighlight = rsp.getHighlight();
+		if (rhighlight != null) {
+			List<FieldHighlightParameters> fields = new ArrayList<>();
+			for (RepositoryFieldHighlightParameters field : rhighlight.getFields()) {
+				fields.add(new FieldHighlightParameters(
+						field.getField().getFullName(), 
+						field.getSnippetCount(), 
+						field.getFragmentSize(), 
+						field.getMergeContiguous(), 
+						field.getPrefix(), 
+						field.getPostfix()));
+			}
+			sp.setHighlight(new GeneralHighlightParameters(
+					rhighlight.getSnippetCount(), 
+					rhighlight.getFragmentSize(), 
+					rhighlight.getMergeContiguous(), 
+					rhighlight.getPrefix(), 
+					rhighlight.getPostfix(),
+					rhighlight.getMaxAnalyzedChars(), 
+					rhighlight.getUsePhraseHighlighter(), 
+					fields));
+		}
+		
 		return sp;
 	}
 	

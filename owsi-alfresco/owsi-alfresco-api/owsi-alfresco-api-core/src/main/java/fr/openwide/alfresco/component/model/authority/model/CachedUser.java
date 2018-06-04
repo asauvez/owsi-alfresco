@@ -2,7 +2,10 @@ package fr.openwide.alfresco.component.model.authority.model;
 
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Objects;
+
+import javax.mail.internet.InternetAddress;
 
 import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
@@ -40,6 +43,13 @@ public class CachedUser implements Serializable {
 	}
 	public String getEmail() {
 		return email;
+	}
+	public InternetAddress getInternetAddress() {
+		try {
+			return new InternetAddress(getEmail(), getFullName());
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 	
 	@Override

@@ -130,7 +130,10 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	}
 	@Override
 	public void disableBehaviour(ContainerModel type, Runnable runnable) {
-		disableBehaviour(type, () -> null);
+		disableBehaviour(type, () -> {
+			runnable.run();
+			return null; 
+		});
 	}
 
 	public void setPolicyComponent(PolicyComponent policyComponent) {

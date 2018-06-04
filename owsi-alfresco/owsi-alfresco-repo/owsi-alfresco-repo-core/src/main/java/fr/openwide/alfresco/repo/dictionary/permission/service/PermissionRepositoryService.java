@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repo.dictionary.permission.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,10 @@ public interface PermissionRepositoryService {
 	void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission);
 	
 	List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference);
+	List<RepositoryAccessControl> searchACLwithParentAuthorities(AuthorityReference authorityReference);
+	List<RepositoryAccessControl> searchACL(Collection<AuthorityReference> authorityReferences);
 	
-	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority);
-	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem);
+	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, boolean removeOldInSite, boolean deactivateOldUser);
+	int replaceAuthority(AuthorityReference oldAuthority, AuthorityReference newAuthority, Optional<Integer> maxItem, boolean removeOldInSite, boolean deactivateOldUser);
+
 }

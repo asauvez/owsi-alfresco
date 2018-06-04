@@ -103,7 +103,7 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 					LOGGER.error(repositoryError.get());
 				}
 				int warningLicenseValidForDays = environment.getRequiredProperty("application.repository.warningLicenseValidFor.days", Integer.class);
-				if (lastLicenseRestrictions.getLicenseValidForDays() != null && lastLicenseRestrictions.getLicenseValidForDays() < warningLicenseValidForDays) {
+				if (lastLicenseRestrictions.getLicenseValidForDays() == null || lastLicenseRestrictions.getLicenseValidForDays() < warningLicenseValidForDays) {
 					String warningLicenseValidForMessage = environment.getRequiredProperty("application.repository.warningLicenseValidFor.message");
 					repositoryWarning = Optional.of(MessageFormat.format(warningLicenseValidForMessage,
 							lastLicenseRestrictions.getLicenseValidForDays(),

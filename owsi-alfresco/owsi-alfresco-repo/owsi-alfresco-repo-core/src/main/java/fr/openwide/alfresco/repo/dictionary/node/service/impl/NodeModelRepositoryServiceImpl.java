@@ -208,6 +208,10 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(property),
 				conversionService.getForRepository(value));
 	}
+	@Override
+	public <C extends Serializable>  void removeProperty(NodeReference nodeReference, SinglePropertyModel<C> property) {
+		nodeService.removeProperty(conversionService.getRequired(nodeReference),conversionService.getRequired( property.getNameReference()));
+	}
 
 	@Override
 	public Optional<NodeReference> getPrimaryParent(NodeReference nodeReference) {
@@ -401,7 +405,7 @@ public class NodeModelRepositoryServiceImpl
 		}
 		return Optional.of(nodeReference);
 	}
-
+	
 	@Override
 	public String getPath(NodeReference nodeReference) {
 		return get(nodeReference, new NodeScopeBuilder().path()).getPath();

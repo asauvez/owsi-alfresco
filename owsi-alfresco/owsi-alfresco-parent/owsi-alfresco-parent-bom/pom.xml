@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.5.0</version>
+		<version>0.6.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-bom</artifactId>
 	<packaging>pom</packaging>
@@ -17,80 +17,80 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-api-core</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-api-module</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-app-core</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-app-core</artifactId>
 				<type>test-jar</type>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-app-module</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-app-web</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-component-kerberos</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-component-query</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-core</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-module</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-package-alfresco</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-package-share</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-contentstoreexport</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-emailed2eml</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

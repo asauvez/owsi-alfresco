@@ -166,6 +166,15 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		service.setContentStore(getNodeReference(), storeName);
 		return this;
 	}
+	/** N'indexe plus le noeud par ne pas surcharger Solr */
+	public ClassificationWithRootBuilder index(boolean isIndexed) {
+		service.setIndex(getNodeReference(), isIndexed);
+		return this;
+	}
+	public ClassificationWithRootBuilder indexContent(boolean isContentIndexed) {
+		service.setIndexContent(getNodeReference(), isContentIndexed);
+		return this;
+	}
 
 	/**
 	 * Déplace le noeud dans le répertoire de destination. 
