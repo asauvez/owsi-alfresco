@@ -19,6 +19,9 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 Nouveautés
 ==========
 
+## depuis 0.7.0
+* ChaosMonkey pour simuler erreurs aléatoires de concurrence.
+
 ## depuis 0.6.0
 * Alfresco 5.2.3
 * Permet de demander highlight dans des recherches Solr.
