@@ -51,6 +51,7 @@
 		<property name="failOccurance" value="${owsi.chaosmonkey.failOccurance}" />
 		<property name="seed" value="${owsi.chaosmonkey.seed}" />
 		<property name="exception" value="${owsi.chaosmonkey.exception}" />
+		<property name="maxRetries" value="${server.transaction.max-retries}"/>
 	</bean>
 
 	<!-- Node service -->

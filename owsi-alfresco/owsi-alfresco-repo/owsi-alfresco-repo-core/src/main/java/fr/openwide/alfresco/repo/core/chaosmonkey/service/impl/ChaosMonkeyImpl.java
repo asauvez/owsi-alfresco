@@ -30,6 +30,7 @@ public class ChaosMonkeyImpl implements InitializingBean, ChaosMonkey {
 	private Random random;
 
 	private double failOccurance = 0.0;
+	private int maxRetries = 0;
 
 	private Class<? extends Throwable> exception = ConcurrentModificationException.class;
 
@@ -50,7 +51,7 @@ public class ChaosMonkeyImpl implements InitializingBean, ChaosMonkey {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		if (failOccurance != 0.0f) {
-			LOG.info("failOccurance = " + failOccurance);
+			LOG.info("failOccurance=" + failOccurance + ". server.transaction.max-retries=" + maxRetries);
 		}
 	}
 	
@@ -89,5 +90,8 @@ public class ChaosMonkeyImpl implements InitializingBean, ChaosMonkey {
 	@SuppressWarnings("unchecked")
 	public void setException(String exception) throws ClassNotFoundException {
 		this.exception = (Class<? extends Throwable>) Class.forName(exception);
+	}
+	public void setMaxRetries(int maxRetries) {
+		this.maxRetries = maxRetries;
 	}
 }
