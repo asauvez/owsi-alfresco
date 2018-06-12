@@ -37,8 +37,11 @@ public class MigrationMojo extends AbstractMigrationMojo {
 
 	@Parameter(defaultValue="true")
 	private boolean createMissingFile = true;
+	
+	@Parameter(defaultValue="false")
+	private boolean createMissingIgnoreFile = false;
 
-	@Parameter(property="alfresco.version", defaultValue="true")
+	@Parameter(property="alfresco.version", defaultValue="5.2.3")
 	private String alfrescoVersion;
 
 	private Map<String, File> resourceInJarByPath = new HashMap<String, File>();
@@ -186,6 +189,11 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			if (ignore.exists()) {
 				getLog().warn("Ignore resource " + file.getAbsolutePath());
 				return;
+			} else if (file.getName().toUpperCase().startsWith("README.")) {
+				return;
+			} else if (createMissingIgnoreFile) {
+				getLog().warn("Create missing file " + ignore);
+				FileUtils.write(ignore, "");
 			} else {
 				error("Original resource not found for " + file.getAbsolutePath() + ". Create a file with .ignore.ori suffix if it is not a Alfresco patch.");
 				return;

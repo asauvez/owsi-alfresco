@@ -246,6 +246,26 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		
+		<plugins>
+			<plugin>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
+				<version>0.7.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>migration-maven-plugin</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>migration</goal>
+						</goals>
+						<configuration>
+							<createMissingFile>true</createMissingFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<repositories>
