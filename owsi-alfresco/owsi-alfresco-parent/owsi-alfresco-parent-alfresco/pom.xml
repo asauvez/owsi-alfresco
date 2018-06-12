@@ -31,7 +31,7 @@
 			<dependency>
 				<groupId>com.metaversant</groupId>
 				<artifactId>share-site-creators-repo</artifactId>
-				<version>0.0.5</version>
+				<version>0.0.7</version>
 				<type>amp</type>
 			</dependency>
 			<dependency>
