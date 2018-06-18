@@ -80,6 +80,11 @@
 		<dependency.alfresco-authorised-users.version>5.2.0.4</dependency.alfresco-authorised-users.version>
 		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
 		<owsi-core.maven-war-plugin.version>2.6</owsi-core.maven-war-plugin.version>
+	
+		<owsi.migration.enabled>true</owsi.migration.enabled>
+		<owsi.migration.createMissingFile>true</owsi.migration.createMissingFile>
+		<owsi.migration.createMissingIgnoreFile>false</owsi.migration.createMissingIgnoreFile>
+		<owsi.migration.deleteIdenticalResources>true</owsi.migration.deleteIdenticalResources>
 	</properties>
 	
 	<dependencies>
@@ -736,7 +741,11 @@
 							<goal>migration</goal>
 						</goals>
 						<configuration>
-							<createMissingFile>true</createMissingFile>
+							<enabled>${owsi.migration.enabled}</enabled>
+							<createMissingFile>${owsi.migration.createMissingFile}</createMissingFile>
+							<createMissingIgnoreFile>${owsi.migration.createMissingIgnoreFile}</createMissingIgnoreFile>
+							<deleteIdenticalResources>${owsi.migration.deleteIdenticalResources}</deleteIdenticalResources>
+							<targetWar>alfresco-enterprise</targetWar>
 						</configuration>
 					</execution>
 				</executions>

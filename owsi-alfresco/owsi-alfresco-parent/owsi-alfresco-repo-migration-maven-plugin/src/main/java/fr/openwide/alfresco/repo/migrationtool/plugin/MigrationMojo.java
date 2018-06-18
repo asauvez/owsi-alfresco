@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repo.migrationtool.plugin;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -36,10 +37,19 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	private static final String WEB_INF_CLASSES = "WEB-INF/classes";
 
 	@Parameter(defaultValue="true")
+	private boolean enabled = true;
+
+	@Parameter(defaultValue="true")
 	private boolean createMissingFile = true;
 	
 	@Parameter(defaultValue="false")
 	private boolean createMissingIgnoreFile = false;
+	
+	@Parameter(defaultValue="true")
+	private boolean deleteIdenticalResources = true;
+
+	@Parameter(property="targetWar")
+	private String targetWar;
 
 	@Parameter(property="alfresco.version", defaultValue="5.2.3")
 	private String alfrescoVersion;
@@ -51,11 +61,16 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (! enabled) {
+			getLog().warn("Migration tools disabled.");
+			return;
+		}
 		try {
 			initAlfrescoJars();
 			
 			// parcours src/main/java/org/alfresco/
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco");
+			visitResources(new File(getBaseDir(), "src/main/webapp"), "");
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.toString(), e);
 		}
@@ -96,8 +111,8 @@ public class MigrationMojo extends AbstractMigrationMojo {
 							try {
 								ZipEntry entry;
 								while ((entry = zip.getNextEntry()) != null) {
-									if (! entry.getName().endsWith(".class")) {
-										resourceInJarByPath.put("/" + entry.getName(), jar);
+									if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
+										put(resourceInJarByPath, "/" + entry.getName(), jar);
 									}
 								}
 							} finally {
@@ -110,8 +125,8 @@ public class MigrationMojo extends AbstractMigrationMojo {
 							try {
 								ZipEntry entry;
 								while ((entry = zip.getNextEntry()) != null) {
-									if (! entry.getName().endsWith(".class")) {
-										resourceInJarByPath.put("/" + entry.getName(), jarClasses);
+									if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
+										put(resourceInJarByPath, "/" + entry.getName(), jarClasses);
 									}
 								}
 							} finally {
@@ -120,13 +135,21 @@ public class MigrationMojo extends AbstractMigrationMojo {
 						}
 						
 						File war = new File(version, module.getName() + "-" + version.getName() + ".war");
-						if (war.exists()) {
+						if (war.exists() && module.getName().equals(targetWar)) {
 							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(war)));
 							try {
 								ZipEntry entry;
 								while ((entry = zip.getNextEntry()) != null) {
-									if (entry.getName().startsWith(WEB_INF_CLASSES) && ! entry.getName().endsWith(".class")) {
-										resourceInWarByPath.put(entry.getName().substring(WEB_INF_CLASSES.length()), war);
+									if (! entry.isDirectory()) {
+										if (entry.getName().startsWith(WEB_INF_CLASSES)) {
+											if (! entry.getName().endsWith(".class")) {
+												put(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), war);
+											}
+										} else if (entry.getName().startsWith("WEB-INF/lib")) {
+											// Ignore librairie externe pour le moment
+										} else {
+											put(resourceInJarByPath, "/" + entry.getName(), war);
+										}
 									}
 								}
 							} finally {
@@ -136,6 +159,17 @@ public class MigrationMojo extends AbstractMigrationMojo {
 					}
 				}
 			}
+		}
+	}
+	
+	private void put(Map<String, File> map, String key, File value) {
+		if (key.startsWith("/META-INF/")) {
+			return;
+		}
+		
+		File oldValue = map.put(key, value);
+		if (oldValue != null) {
+			throw new IllegalStateException("Duplicate key " + key + " in " + value + " and " + oldValue);
 		}
 	}
 	
@@ -153,6 +187,10 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	}
 
 	private void analyzeResource(File file, String path) throws Exception {
+		if (path.startsWith("/extension")) {
+			return;
+		}
+
 		String versionExtension = "." + alfrescoVersion + originalFileExtension;
 		if (path.endsWith(originalFileExtension)) {
 			if (path.endsWith(ignoreFileExtension)) {
@@ -164,9 +202,19 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				File patch = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - versionExtension.length()));
 				if (! patch.exists()) {
 					error("Original file without corresponding patch file: " + file.getAbsolutePath());
+				} else if (Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(patch))) {
+					error("Patch identical to original. You may delete it : " + patch.getAbsolutePath());
 				}
 			} else {
-				error("You should migrate this original file to " + alfrescoVersion + " then delete it: " + file.getAbsolutePath());
+				File currentVersionOriginalFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - versionExtension.length()) + versionExtension);
+				if (   deleteIdenticalResources
+					&& currentVersionOriginalFile.exists() 
+					&& Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(currentVersionOriginalFile))) {
+					getLog().info("Old resource identical to new resource, delete it : " + file.getAbsolutePath());
+					file.delete();
+				} else {
+					error("You should migrate this original file to " + alfrescoVersion + " then delete it: " + file.getAbsolutePath());
+				}
 			}
 			return;
 		}
@@ -262,6 +310,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
 		MigrationMojo mojo = new MigrationMojo();
 		mojo.alfrescoVersion = "5.2.3";
+		mojo.targetWar = "share";
 		mojo.execute();
 	}
 }
