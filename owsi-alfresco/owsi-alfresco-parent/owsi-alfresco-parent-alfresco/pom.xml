@@ -20,6 +20,15 @@
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!-- On tire également ce war pour que MigrationMojo puisse l'examiner -->
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco</artifactId>
+			<version>${owsi-alfresco.repo.alfresco.version}</version>
+			<type>war</type>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>

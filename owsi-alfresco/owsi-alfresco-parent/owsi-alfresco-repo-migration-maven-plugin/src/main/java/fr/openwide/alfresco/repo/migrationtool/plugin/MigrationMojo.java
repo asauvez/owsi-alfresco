@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -16,6 +19,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import fr.openwide.alfresco.repo.migrationtool.plugin.model.Customization;
+import fr.openwide.alfresco.repo.migrationtool.plugin.model.Extension;
+import fr.openwide.alfresco.repo.migrationtool.plugin.model.Module;
 
 /**
  * Plugin Maven d'aide à la migration des patch Alfresco.
@@ -58,6 +65,10 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	private Map<String, File> resourceInWarByPath = new HashMap<String, File>();
 	
 	private StringBuilder errors = new StringBuilder();
+	
+	private Unmarshaller unmarshaller = JAXBContext.newInstance(Extension.class).createUnmarshaller();
+	
+	public MigrationMojo() throws Exception {}
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -190,6 +201,18 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		if (path.startsWith("/extension")) {
 			return;
 		}
+		
+		// Gére customisation share
+		if (path.startsWith("/alfresco/web-extension/site-data/extensions/") && path.endsWith(".xml")) {
+			Extension extension = (Extension) unmarshaller.unmarshal(file);
+			for (Module module : extension.modules.modules) {
+				for (Customization customization : module.customizations.customizations) {
+					File customPackage = new File("src/main/resources/alfresco/web-extension/site-webscripts/" + customization.sourcePackageRoot.replace('.', '/'));
+					String customPath = "/alfresco/site-webscripts/" + customization.targetPackageRoot.replace('.', '/');
+					visitResources(customPackage, customPath);
+				}
+			}
+		}
 
 		String versionExtension = "." + alfrescoVersion + originalFileExtension;
 		if (path.endsWith(originalFileExtension)) {
@@ -307,7 +330,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		return null;
 	}
 	
-	public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
+	public static void main(String[] args) throws Exception {
 		MigrationMojo mojo = new MigrationMojo();
 		mojo.alfrescoVersion = "5.2.3";
 		mojo.targetWar = "share";
