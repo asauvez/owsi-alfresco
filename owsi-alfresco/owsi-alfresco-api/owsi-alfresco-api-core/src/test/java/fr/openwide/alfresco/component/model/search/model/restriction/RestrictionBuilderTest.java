@@ -20,6 +20,7 @@ public class RestrictionBuilderTest {
 				"=cm\\:name:\"toto\"\n" +
 				"AND =sys\\:node\\-dbid:123\n" +
 				"AND =cm\\:name:\"titi*\"\n" +
+				"AND @cm\\:name:\"titi\"~0.9\n" +
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
 				"AND ID:workspace\\://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c\n" +
 				"AND =cm\\:contentPropertyName:\"{http://www.alfresco.org/model/content/1.0}content\"\n" +
@@ -36,6 +37,7 @@ public class RestrictionBuilderTest {
 				.eq(CmModel.object.name, "toto").of()
 				.eq(SysModel.referenceable.nodeDbid, 123L).of()
 				.startsWith(CmModel.object.name, "titi").of()
+				.match(CmModel.object.name, "titi").fuzzy(0.9).of()
 				.hasAspect(CmModel.workingCopy).not().of()
 				.id(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
 				.eq(RnModel.thumbnail.contentPropertyName, CmModel.content.content.getNameReference()).of()
