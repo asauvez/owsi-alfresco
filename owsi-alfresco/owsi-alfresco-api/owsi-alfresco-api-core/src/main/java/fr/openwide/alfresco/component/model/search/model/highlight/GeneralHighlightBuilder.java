@@ -30,6 +30,8 @@ public class GeneralHighlightBuilder {
 	private Integer snippetCount = null;
 	private Integer fragmentSize = null;
 	private Boolean mergeContiguous = null;
+	private Integer maxAnalyzedChars = null;
+	private Boolean usePhraseHighlighter = null;
 
 	public GeneralHighlightBuilder(SearchQueryBuilder searchQueryBuilder, List<NameReference> fields) {
 		this.searchQueryBuilder = searchQueryBuilder;
@@ -64,6 +66,14 @@ public class GeneralHighlightBuilder {
 		this.mergeContiguous = mergeContiguous;
 		return this;
 	}
+	public GeneralHighlightBuilder maxAnalyzedChars(Integer maxAnalyzedChars) {
+		this.maxAnalyzedChars = maxAnalyzedChars;
+		return this;
+	}
+	public GeneralHighlightBuilder usePhraseHighlighter(Boolean usePhraseHighlighter) {
+		this.usePhraseHighlighter = usePhraseHighlighter;
+		return this;
+	}
 	
 	public SearchQueryBuilder of() {
 		searchQueryBuilder.getParameters().setHighlight(getHighlight());
@@ -75,6 +85,6 @@ public class GeneralHighlightBuilder {
 		for (NameReference field : fields) {
 			rfields.add(new RepositoryFieldHighlightParameters(field, null, null, null, null, null));
 		}
-		return new RepositoryGeneralHighlightParameters(snippetCount, fragmentSize, mergeContiguous, prefix, postfix, null, null, rfields);
+		return new RepositoryGeneralHighlightParameters(snippetCount, fragmentSize, mergeContiguous, prefix, postfix, maxAnalyzedChars, usePhraseHighlighter, rfields);
 	}
 }
