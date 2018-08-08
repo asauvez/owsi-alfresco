@@ -140,6 +140,8 @@
 		<constructor-arg ref="owsi.service.authorityService"/>
 	</bean>
 
+	<bean id="owsi.service.workflowContextService" class="fr.openwide.alfresco.repo.dictionary.workflow.service.impl.WorkflowContextServiceImpl"/>
+
 	<bean id="owsi.service.policyService" class="fr.openwide.alfresco.repo.dictionary.policy.service.impl.PolicyRepositoryServiceImpl">
 		<property name="policyComponent" ref="policyComponent" />
 		<property name="policyFilter" ref="policyBehaviourFilter" />
