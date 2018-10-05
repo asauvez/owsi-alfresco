@@ -131,7 +131,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 							}
 						}
 						File jarClasses = new File(version, module.getName() + "-" + version.getName() + "-classes.jar");
-						if (jarClasses.exists()) {
+						if (jarClasses.exists() && module.getName().equals(targetWar)) {
 							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarClasses)));
 							try {
 								ZipEntry entry;
@@ -333,7 +333,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	public static void main(String[] args) throws Exception {
 		MigrationMojo mojo = new MigrationMojo();
 		mojo.alfrescoVersion = "5.2.3";
-		mojo.targetWar = "share";
+		mojo.targetWar = "alfresco";
 		mojo.execute();
 	}
 }
