@@ -17,7 +17,9 @@ public class RestrictionBuilderTest {
 	@Test
 	public void testGenerateFTS() throws Exception {
 		assertEquals(
-				"=cm\\:name:\"toto\"\n" +
+				"PATH:\"/app:company_home/st:sites/cm:swsdp/cm:documentLibrary//.\"\n" +
+				"AND PARENT:workspace\\://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c\n" +
+				"AND =cm\\:name:\"toto\"\n" +
 				"AND =sys\\:node\\-dbid:123\n" +
 				"AND =cm\\:name:\"titi*\"\n" +
 				"AND @cm\\:name:\"titi\"~0.9\n" +
@@ -34,6 +36,8 @@ public class RestrictionBuilderTest {
 				"AND NOT (=cm\\:name:\"titi\"\n" +
 				"	OR =cm\\:name:\"tata\")", 
 			new RestrictionBuilder()
+				.path("/app:company_home/st:sites/cm:swsdp/cm:documentLibrary").orBelow().of()
+				.parent(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
 				.eq(CmModel.object.name, "toto").of()
 				.eq(SysModel.referenceable.nodeDbid, 123L).of()
 				.startsWith(CmModel.object.name, "titi").of()
