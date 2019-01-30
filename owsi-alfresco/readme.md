@@ -16,14 +16,15 @@ Il faut lancer "mvn package" sur owsi-alfresco, puis raffraichir le workspace.
 Le projet n’apparaît pas dans la liste, car il ne veut pas de projet web en 3.1, juste en 3.0. 
 Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project-facet-dynamic-web-module-to-3-0-error-in-eclipse/
 
-* Pour déployer : 
+* Pour déployer :
 mvn clean source:jar deploy -DargLine="" -Ddistribution=owsi-alfresco-release
 
 Nouveautés
 ==========
 
 ## depuis 0.7.0
-* ChaosMonkey pour simuler erreurs aléatoires de concurrence.
+* Alfresco 5.2.4
+* Chaos Monkeys
 
 ## depuis 0.6.0
 * Alfresco 5.2.3
