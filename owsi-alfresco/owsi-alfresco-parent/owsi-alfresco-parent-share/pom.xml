@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-share-component</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
+		<version>0.8.0-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent-share-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share</artifactId>
@@ -103,8 +103,8 @@
 						<regex>false</regex>
 						<replacements>
 							<replacement>
-								<token><![CDATA[<installed facet="jst.web" version="3.1"/>]]></token>
-								<value><![CDATA[<installed facet="jst.web" version="3.0"/>]]></value>
+								<token><![CDATA[<installed facet="jst.web" version="3.1" />]]></token>
+								<value><![CDATA[<installed facet="jst.web" version="3.0" />]]></value>
 							</replacement>
 						</replacements>
 					</configuration>
