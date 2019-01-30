@@ -103,8 +103,8 @@
 						<regex>false</regex>
 						<replacements>
 							<replacement>
-								<token><![CDATA[<installed facet="jst.web" version="3.1"/>]]></token>
-								<value><![CDATA[<installed facet="jst.web" version="3.0"/>]]></value>
+								<token><![CDATA[<installed facet="jst.web" version="3.1" />]]></token>
+								<value><![CDATA[<installed facet="jst.web" version="3.0" />]]></value>
 							</replacement>
 						</replacements>
 					</configuration>
