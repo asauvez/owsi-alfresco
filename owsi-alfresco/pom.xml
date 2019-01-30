@@ -88,34 +88,31 @@
 
 	<repositories>
 		<repository>
-			<id>nexus-owsi-core</id>
-			<name>OWSI Core</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			  <id>nexus.internal.releases</id>
+			  <url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
+			  <snapshots>
+				 <enabled>false</enabled>
+			  </snapshots>
 		</repository>
 		<repository>
-			<id>nexus-owsi-core-snapshots</id>
-			<name>OWSI Core Snapshots</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core-snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
+			  <id>nexus.internal.snapshots</id>
+			  <url>https://nexus.vitry.intranet/content/repositories/InternalSmileSnapshots/</url>
+			  <releases>
+				 <enabled>true</enabled>
+			  </releases>
 		</repository>
+
 		<repository>
-			<id>nexus-owsi-external-alfresco</id>
-			<name>OWSI External alfresco</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-external-alfresco</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<id>nexus.internal.third-party</id>
+			<url>https://nexus.vitry.intranet/content/repositories/nonCentralArtifacts/</url>
 		</repository>
+
+
 	</repositories>
 
 	<organization>
-		<name>Open Wide</name>
-		<url>http://www.openwide.fr/</url>
+		<name>Smile</name>
+		<url>http://www.smile.fr/</url>
 	</organization>
 
 	<licenses>
