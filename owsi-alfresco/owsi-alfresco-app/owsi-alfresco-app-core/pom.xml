@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-app</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-app-core</artifactId>
 
@@ -27,7 +27,7 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>fr.openwide.core.packages</groupId>
+			<groupId>fr.smile.core.packages</groupId>
 			<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
 			<type>pom</type>
 			<exclusions>
@@ -38,6 +38,10 @@
 				<exclusion>
 					<groupId>org.hibernate</groupId>
 					<artifactId>hibernate-search-orm</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-search-engine</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

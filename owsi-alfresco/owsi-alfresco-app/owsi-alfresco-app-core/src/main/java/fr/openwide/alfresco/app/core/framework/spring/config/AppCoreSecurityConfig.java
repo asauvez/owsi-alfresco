@@ -147,7 +147,14 @@ public class AppCoreSecurityConfig {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new RepositoryRemoteExceptionHandler());
 		// do not buffer request objects (not to run out of memory on file upload...)
-		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setBufferRequestBody(false);
+		SimpleClientHttpRequestFactory requestFactory = (SimpleClientHttpRequestFactory) restTemplate.getRequestFactory();
+		requestFactory.setBufferRequestBody(false);
+		
+		int connectTimeout = environment.getRequiredProperty("application.repository.connectTimeout.ms", Integer.class);
+		requestFactory.setConnectTimeout(connectTimeout);
+		
+		int readTimeout = environment.getRequiredProperty("application.repository.readTimeout.ms", Integer.class);
+		requestFactory.setReadTimeout(readTimeout);
 		return restTemplate;
 	}
 

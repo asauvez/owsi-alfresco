@@ -57,6 +57,9 @@ public class NameReference implements Serializable {
 		String uri = NamespaceReference.getUriByPrefix(getNamespace());
 		return "{" + uri + "}" + getName();
 	}
+	public String getWorkflowName() {
+		return namespace + "_" + name;
+	}
 
 	@Override
 	public String toString() {

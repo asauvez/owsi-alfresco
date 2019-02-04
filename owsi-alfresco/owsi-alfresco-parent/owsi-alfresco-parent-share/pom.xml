@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-share-component</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 		<relativePath>../owsi-alfresco-parent-share-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share</artifactId>
@@ -23,6 +23,15 @@
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!-- On tire également ce war pour que MigrationMojo puisse l'examiner -->
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>share</artifactId>
+			<version>${owsi-alfresco.share.alfresco.version}</version>
+			<type>war</type>
+			<scope>runtime</scope>
+		</dependency>		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -45,7 +54,7 @@
 			<dependency>
 				<groupId>com.metaversant</groupId>
 				<artifactId>share-site-creators-share</artifactId>
-				<version>0.0.5</version>
+				<version>0.0.7</version>
 				<type>amp</type>
 			</dependency>
 			<dependency>
@@ -73,7 +82,40 @@
 		<finalName>${share.webapp.name}</finalName>
 		<!-- http://docs.alfresco.com/5.1/tasks/install-share-troubleshooting.html -->
 
+		<pluginManagement>
+			<plugins>
+				<!-- http://crunchify.com/how-to-fix-cannot-change-version-of-project-facet-dynamic-web-module-to-3-0-error-in-eclipse/ -->
+				<plugin>
+					<groupId>com.google.code.maven-replacer-plugin</groupId>
+					<artifactId>replacer</artifactId>
+					<version>1.5.3</version>
+					<executions>
+						<execution>
+							<phase>prepare-package</phase>
+							<goals>
+								<goal>replace</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<ignoreMissingFile>true</ignoreMissingFile>
+						<file>.settings/org.eclipse.wst.common.project.facet.core.xml</file>
+						<regex>false</regex>
+						<replacements>
+							<replacement>
+								<token><![CDATA[<installed facet="jst.web" version="3.1" />]]></token>
+								<value><![CDATA[<installed facet="jst.web" version="3.0" />]]></value>
+							</replacement>
+						</replacements>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>

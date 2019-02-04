@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-app</artifactId>
 	<packaging>pom</packaging>
@@ -15,7 +15,7 @@
 	<properties>
 		<owsi-alfresco.spring-security.version>4.0.1.RELEASE</owsi-alfresco.spring-security.version>
 		
-		<owsi-alfresco.owsi-core.version>0.12.0</owsi-alfresco.owsi-core.version>
+		<owsi-alfresco.owsi-core.version>0.20</owsi-alfresco.owsi-core.version>
 		<owsi-alfresco.app.hibernate-jpamodelgen.version>5.1.0.Final</owsi-alfresco.app.hibernate-jpamodelgen.version>
 		<owsi-alfresco.app.querydsl.version>4.0.9</owsi-alfresco.app.querydsl.version>
 		
@@ -39,7 +39,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.6.0</version>
+				<version>0.7.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -51,7 +51,7 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>fr.openwide.core.parents</groupId>
+				<groupId>fr.smile.core.parents</groupId>
 				<artifactId>owsi-core-parent-maven-configuration-core</artifactId>
 				<version>${owsi-alfresco.owsi-core.version}</version>
 				<type>pom</type>
@@ -59,7 +59,7 @@
 			</dependency>
 			
 			<dependency>
-				<groupId>fr.openwide.core.packages</groupId>
+				<groupId>fr.smile.core.packages</groupId>
 				<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
 				<version>${owsi-alfresco.owsi-core.version}</version>
 				<type>pom</type>
@@ -91,7 +91,7 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>fr.openwide.core.packages</groupId>
+				<groupId>fr.smile.core.packages</groupId>
 				<artifactId>owsi-core-package-web-spring-security</artifactId>
 				<version>${owsi-alfresco.owsi-core.version}</version>
 				<type>pom</type>

@@ -47,6 +47,13 @@
 		<property name="authenticationService" ref="AuthenticationService" />
 	</bean>
 
+	<bean id="owsi.service.chaosMonkey" class="fr.openwide.alfresco.repo.core.chaosmonkey.service.impl.ChaosMonkeyImpl">
+		<property name="failOccurance" value="${owsi.chaosmonkey.failOccurance}" />
+		<property name="seed" value="${owsi.chaosmonkey.seed}" />
+		<property name="exception" value="${owsi.chaosmonkey.exception}" />
+		<property name="maxRetries" value="${server.transaction.max-retries}"/>
+	</bean>
+
 	<!-- Node service -->
 	
 	<bean id="owsi.service.nodeService" class="fr.openwide.alfresco.repo.core.node.service.impl.NodeRemoteServiceImpl">
@@ -56,6 +63,7 @@
 		<property name="renditionService" ref="RenditionService" />
 		<property name="transactionService" ref="transactionService" />
 		<property name="conversionService" ref="owsi.service.conversionService" />
+		<property name="chaosMonkey" ref="owsi.service.chaosMonkey" />
 	</bean>
 
 	<!-- Node webscripts -->
@@ -131,6 +139,8 @@
 	<bean id="owsi.service.authorityModelService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
 		<constructor-arg ref="owsi.service.authorityService"/>
 	</bean>
+
+	<bean id="owsi.service.workflowContextService" class="fr.openwide.alfresco.repo.dictionary.workflow.service.impl.WorkflowContextServiceImpl"/>
 
 	<bean id="owsi.service.policyService" class="fr.openwide.alfresco.repo.dictionary.policy.service.impl.PolicyRepositoryServiceImpl">
 		<property name="policyComponent" ref="policyComponent" />

@@ -53,6 +53,7 @@ import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteExceptio
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import fr.openwide.alfresco.repo.core.chaosmonkey.service.ChaosMonkey;
 import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
 import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repo.core.node.web.script.NodeContentCallback;
@@ -78,6 +79,7 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	private TransactionService transactionService;
 
 	private ConversionService conversionService;
+	private ChaosMonkey chaosMonkey;
 
 	@Override
 	public RepositoryNode get(NodeReference nodeReference, NodeScope scope) throws NoSuchNodeRemoteException {
@@ -137,6 +139,8 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	}
 
 	protected RepositoryNode getRepositoryNode(final NodeRef nodeRef, NodeScope scope) throws NoSuchNodeRemoteException {
+		chaosMonkey.test(0.1);
+		
 		NodeReference nodeReference = conversionService.get(nodeRef);
 		if (! nodeService.exists(nodeRef)) {
 			if (LOGGER.isDebugEnabled()) {
@@ -676,5 +680,8 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;
+	}
+	public void setChaosMonkey(ChaosMonkey chaosMonkey) {
+		this.chaosMonkey = chaosMonkey;
 	}
 }

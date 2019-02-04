@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-repo</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-repo-core</artifactId>
 
@@ -48,6 +48,10 @@
         <dependency>
             <groupId>org.alfresco.authorization</groupId>
 		   	<artifactId>alfresco-authorised-users</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-engine</artifactId>
 		</dependency>
 	</dependencies>
 

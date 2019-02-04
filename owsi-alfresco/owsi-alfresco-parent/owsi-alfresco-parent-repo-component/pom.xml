@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-api</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 		<relativePath>../owsi-alfresco-parent-api/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-repo-component</artifactId>
@@ -18,7 +18,7 @@
 		<share.webapp.name>share</share.webapp.name>
 		<solr.webapp.name>solr</solr.webapp.name>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
-		<owsi-alfresco.repo.alfresco.version>5.2.3</owsi-alfresco.repo.alfresco.version>
+		<owsi-alfresco.repo.alfresco.version>5.2.4</owsi-alfresco.repo.alfresco.version>
 		<owsi-alfresco.repo.alfresco-core.version>6.11</owsi-alfresco.repo.alfresco-core.version>
 		<owsi-alfresco.alfresco-data-model.version>6.16</owsi-alfresco.alfresco-data-model.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
@@ -33,6 +33,8 @@
 		<owsi-alfresco.repo.httpclient.version>4.5.2</owsi-alfresco.repo.httpclient.version>
 		<owsi-alfresco.repo.commons-io.version>2.4</owsi-alfresco.repo.commons-io.version>
 		<owsi-alfresco.repo.commons-lang.version>2.6</owsi-alfresco.repo.commons-lang.version>
+		<owsi-alfresco.repo.commons-collections.version>3.2.2</owsi-alfresco.repo.commons-collections.version>
+		<owsi-alfresco.repo.commons-validator.version>1.5.1</owsi-alfresco.repo.commons-validator.version>
 		<owsi-alfresco.repo.freemarker.version>2.3.20-alfresco-patched</owsi-alfresco.repo.freemarker.version>
 		<owsi-alfresco.repo.javax-activation.version>1.1</owsi-alfresco.repo.javax-activation.version>
 		<owsi-alfresco.repo.javax-mail.version>1.5.5</owsi-alfresco.repo.javax-mail.version>
@@ -52,6 +54,7 @@
 		<owsi-alfresco.repo.quartz.version>1.8.3-alfresco-patched</owsi-alfresco.repo.quartz.version>
 		<owsi-alfresco.repo.spring-social.version>1.0.3.RELEASE</owsi-alfresco.repo.spring-social.version>
 		<owsi-alfresco.repo.spring-surf.version>6.12</owsi-alfresco.repo.spring-surf.version>
+		<owsi-alfresco.repo.spring-context-support.version>3.2.17.RELEASE</owsi-alfresco.repo.spring-context-support.version>
 		<dependency.surf.version>${owsi-alfresco.repo.spring-surf.version}</dependency.surf.version>
 		<owsi-alfresco.repo.spring-social-web.version>1.1.4.RELEASE</owsi-alfresco.repo.spring-social-web.version>
 		<owsi-alfresco.repo.stax-api.version>1.0.1</owsi-alfresco.repo.stax-api.version>
@@ -74,9 +77,14 @@
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		
 		<owsi-alfresco.build-helper-maven-plugin.version>1.10</owsi-alfresco.build-helper-maven-plugin.version>
-		<dependency.alfresco-authorised-users.version>5.2.0.4</dependency.alfresco-authorised-users.version>
+		<dependency.alfresco-authorised-users.version>5.2.0.5</dependency.alfresco-authorised-users.version>
 		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
 		<owsi-core.maven-war-plugin.version>2.6</owsi-core.maven-war-plugin.version>
+	
+		<owsi.migration.enabled>true</owsi.migration.enabled>
+		<owsi.migration.createMissingFile>true</owsi.migration.createMissingFile>
+		<owsi.migration.createMissingIgnoreFile>false</owsi.migration.createMissingIgnoreFile>
+		<owsi.migration.deleteIdenticalResources>true</owsi.migration.deleteIdenticalResources>
 	</properties>
 	
 	<dependencies>
@@ -125,7 +133,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.6.0</version>
+				<version>0.7.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -226,6 +234,13 @@
 			</dependency>
 			
 			<dependency>
+				<groupId>org.activiti</groupId>
+				<artifactId>activiti-engine</artifactId>
+				<version>5.22.0</version>
+				<scope>provided</scope>
+			</dependency>
+			
+			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
 				<version>${owsi-alfresco.repo.commons-logging.version}</version>
@@ -303,6 +318,7 @@
 				<groupId>org.mozilla</groupId>
 				<artifactId>rhino</artifactId>
 				<version>${owsi-alfresco.repo.rhino.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.pdfbox</groupId>
@@ -321,6 +337,24 @@
 				<artifactId>commons-lang</artifactId>
 				<version>${owsi-alfresco.repo.commons-lang.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${owsi-alfresco.repo.commons-collections.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>${owsi-alfresco.repo.commons-validator.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<artifactId>commons-logging</artifactId>
+						<groupId>commons-logging</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -350,6 +384,12 @@
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils</artifactId>
 				<version>${owsi-alfresco.repo.commons-beanutils.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>20110211</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
@@ -507,6 +547,12 @@
 						<groupId>*</groupId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${owsi-alfresco.repo.spring-context-support.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -679,14 +725,14 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.6.0</version>
+						<version>0.7.0</version>
 					</dependency>
 				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-				<version>0.6.0</version>
+				<version>0.7.0</version>
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>
@@ -695,7 +741,11 @@
 							<goal>migration</goal>
 						</goals>
 						<configuration>
-							<createMissingFile>true</createMissingFile>
+							<enabled>${owsi.migration.enabled}</enabled>
+							<createMissingFile>${owsi.migration.createMissingFile}</createMissingFile>
+							<createMissingIgnoreFile>${owsi.migration.createMissingIgnoreFile}</createMissingIgnoreFile>
+							<deleteIdenticalResources>${owsi.migration.deleteIdenticalResources}</deleteIdenticalResources>
+							<targetWar>alfresco-enterprise</targetWar>
 						</configuration>
 					</execution>
 				</executions>

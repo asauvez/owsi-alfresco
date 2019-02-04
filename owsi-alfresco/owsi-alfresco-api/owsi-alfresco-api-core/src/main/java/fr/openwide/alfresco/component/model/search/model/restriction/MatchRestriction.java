@@ -16,6 +16,7 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 
 	private final PropertyModel<C> property;
 	private boolean exact = false;
+	private Double fuzzy = null;
 	protected C value;
 
 	public MatchRestriction(RestrictionBuilder parent, PropertyModel<C> property, C value) {
@@ -50,11 +51,12 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 
 	@Override
 	protected String toFtsQueryInternal() {
-		if (value instanceof String && ((String) value).isEmpty()) {
-			value = null;
+		if (value == null || (value instanceof String && ((String) value).isEmpty())) {
+			return "";
 		}
 		String prefix = exact ? "=" : "@";
-		return (value != null) ? prefix + property.toLucene() + ":" + toFtsLuceneValue(property, value) : "";
+		String fuzzy = (this.fuzzy != null) ? "~" + this.fuzzy : "";
+		return prefix + property.toLucene() + ":" + toFtsLuceneValue(property, value) + fuzzy;
 	}
 	
 	@Override
@@ -76,4 +78,12 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 		return this;
 	}
 
+	/** https://docs.alfresco.com/5.2/concepts/rm-searchsyntax-fuzzy.html */
+	public MatchRestriction<C> fuzzy(Double fuzzy) {
+		if (fuzzy != null && (fuzzy < 0.0 || fuzzy > 1.0)) {
+			throw new IllegalStateException("" + fuzzy);
+		}
+		this.fuzzy = fuzzy;
+		return this;
+	}
 }

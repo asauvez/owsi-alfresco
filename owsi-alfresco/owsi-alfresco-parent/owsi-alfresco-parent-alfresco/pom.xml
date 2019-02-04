@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0</version>
 		<relativePath>../owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-alfresco</artifactId>
@@ -20,6 +20,15 @@
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!-- On tire également ce war pour que MigrationMojo puisse l'examiner -->
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco</artifactId>
+			<version>${owsi-alfresco.repo.alfresco.version}</version>
+			<type>war</type>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>
@@ -31,7 +40,7 @@
 			<dependency>
 				<groupId>com.metaversant</groupId>
 				<artifactId>share-site-creators-repo</artifactId>
-				<version>0.0.5</version>
+				<version>0.0.7</version>
 				<type>amp</type>
 			</dependency>
 			<dependency>
