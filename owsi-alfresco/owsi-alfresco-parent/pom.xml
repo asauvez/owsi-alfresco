@@ -2,9 +2,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>fr.openwide.core.parents</groupId>
+		<groupId>fr.smile.core.parents</groupId>
 		<artifactId>owsi-core-parent-maven-configuration-common</artifactId>
-		<version>0.14</version>
+		<version>0.20</version>
 		<relativePath />
 	</parent>
 
@@ -32,29 +32,6 @@
 		<module>owsi-alfresco-parent-share-component</module>
 		<module>owsi-alfresco-parent-share</module>
 	</modules>
-
-	<profiles>
-		<profile>
-			<activation>
-				<property>
-					<name>distribution</name>
-					<value>owsi-alfresco-release</value>
-				</property>
-			</activation>
-			<distributionManagement>
-				<repository>
-					<id>nexus-owsi-alfresco</id>
-					<name>OWSI Alfresco</name>
-					<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco</url>
-				</repository>
-				<snapshotRepository>
-					<id>nexus-owsi-alfresco-snapshots</id>
-					<name>OWSI Alfresco Snapshots</name>
-					<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco-snapshots</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
 
 	<build>
 		<resources>
@@ -169,24 +146,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>nexus-owsi-core</id>
-			<name>OWSI Core</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>nexus-owsi-core-snapshots</id>
-			<name>OWSI Core Snapshots</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core-snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-	</repositories>
 
 </project>
