@@ -2,9 +2,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>fr.openwide.core.parents</groupId>
+		<groupId>fr.smile.core.parents</groupId>
 		<artifactId>owsi-core-parent-maven-configuration-common</artifactId>
-		<version>0.14</version>
+		<version>0.20</version>
 	</parent>
 
 	<groupId>fr.openwide.alfresco</groupId>
@@ -28,29 +28,6 @@
 		<module>owsi-alfresco-component</module>
 		<module>owsi-alfresco-demo</module>
 	</modules>
-
-	<distributionManagement>
-		<repository>
-			<id>nexus-owsi-alfresco</id>
-			<name>OWSI Alfresco</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus-owsi-alfresco-snapshots</id>
-			<name>OWSI Alfresco Snapshots</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-alfresco-snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<issueManagement>
-		<system>GitLab</system>
-		<url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi/issues</url>
-	</issueManagement>
-
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>https://projects.openwide.fr/services/ci/java/jenkins/view/alfresco/</url>
-	</ciManagement>
 
 	<scm>
 		<developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
@@ -88,34 +65,31 @@
 
 	<repositories>
 		<repository>
-			<id>nexus-owsi-core</id>
-			<name>OWSI Core</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			  <id>nexus.internal.releases</id>
+			  <url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
+			  <snapshots>
+				 <enabled>false</enabled>
+			  </snapshots>
 		</repository>
 		<repository>
-			<id>nexus-owsi-core-snapshots</id>
-			<name>OWSI Core Snapshots</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-core-snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
+			  <id>nexus.internal.snapshots</id>
+			  <url>https://nexus.vitry.intranet/content/repositories/InternalSmileSnapshots/</url>
+			  <releases>
+				 <enabled>false</enabled>
+			  </releases>
 		</repository>
+
 		<repository>
-			<id>nexus-owsi-external-alfresco</id>
-			<name>OWSI External alfresco</name>
-			<url>https://projects.openwide.fr/services/nexus/content/repositories/owsi-external-alfresco</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<id>nexus.internal.third-party</id>
+			<url>https://nexus.vitry.intranet/content/repositories/nonCentralArtifacts/</url>
 		</repository>
+
+
 	</repositories>
 
 	<organization>
-		<name>Open Wide</name>
-		<url>http://www.openwide.fr/</url>
+		<name>Smile</name>
+		<url>http://www.smile.fr/</url>
 	</organization>
 
 	<licenses>

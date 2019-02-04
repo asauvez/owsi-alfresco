@@ -17,7 +17,7 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>fr.openwide.core.packages</groupId>
+			<groupId>fr.smile.core.packages</groupId>
 			<artifactId>owsi-core-package-web-spring-security</artifactId>
 			<type>pom</type>
 		</dependency>

@@ -8,7 +8,7 @@ import java.sql.Types;
 import java.util.Objects;
 
 import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.StringType;
 import org.hibernate.usertype.UserType;
 
@@ -34,7 +34,7 @@ public abstract class AbstractStringUserType<T> implements UserType {
 	}
 	
 	@Override
-	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
+	public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		String value = (String) StringType.INSTANCE.get(rs, names[0], session);
 		if (value == null) {
@@ -46,7 +46,7 @@ public abstract class AbstractStringUserType<T> implements UserType {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session) 
+	public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session)
 			throws HibernateException, SQLException {
 		if (value == null) {
 			StringType.INSTANCE.set(st, null, index, session);
