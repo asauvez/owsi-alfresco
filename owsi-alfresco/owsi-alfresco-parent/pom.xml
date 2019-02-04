@@ -146,5 +146,27 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	<repositories>
+		<repository>
+			<id>nexus.internal.releases</id>
+			<url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>nexus.internal.snapshots</id>
+			<url>https://nexus.vitry.intranet/content/repositories/InternalSmileSnapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
 
+		<repository>
+			<id>nexus.internal.third-party</id>
+			<url>https://nexus.vitry.intranet/content/repositories/nonCentralArtifacts/</url>
+		</repository>
+
+
+	</repositories>
 </project>

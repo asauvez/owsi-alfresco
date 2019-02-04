@@ -27,7 +27,7 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>fr.openwide.core.packages</groupId>
+			<groupId>fr.smile.core.packages</groupId>
 			<artifactId>owsi-core-package-core-spring-jpa-app</artifactId>
 			<type>pom</type>
 			<exclusions>
@@ -38,6 +38,10 @@
 				<exclusion>
 					<groupId>org.hibernate</groupId>
 					<artifactId>hibernate-search-orm</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-search-engine</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
