@@ -19,6 +19,8 @@ Pour corriger : http://crunchify.com/how-to-fix-cannot-change-version-of-project
 * Pour déployer :
 mvn clean source:jar deploy -DargLine="" -Ddistribution=owsi-alfresco-release
 
+Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà le fichier owsi-m2/settings.xml permet d'utiliser OWSI-alfresco
+
 Nouveautés
 ==========
 
