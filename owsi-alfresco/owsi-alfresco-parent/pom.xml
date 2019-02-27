@@ -148,10 +148,10 @@
 	</build>
 
         <repositories>
-                <repository>
-                        <id>alfresco-artifacts-repository</id>
-                        <url>http://artifacts.alfresco.com/nexus/content/groups/private/</url>
-                </repository>
+			<repository>
+				<id>nexus.mirror.alfresco.release.repo</id>
+				<url>http://nexus.vitry.intranet/repository/alfresco-artifacts-repository/</url>
+			</repository>
                 <repository>
                           <id>nexus.internal.releases</id>
                           <url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
