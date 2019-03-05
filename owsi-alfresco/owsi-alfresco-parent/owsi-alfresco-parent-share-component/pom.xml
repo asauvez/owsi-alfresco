@@ -13,7 +13,7 @@
 	<name>OWSI Alfresco - Parent - Share component</name>
 	
 	<properties>
-		<owsi-alfresco.share.alfresco.version>5.2.4</owsi-alfresco.share.alfresco.version>
+		<owsi-alfresco.share.alfresco.version>6.0</owsi-alfresco.share.alfresco.version>
 		<owsi-alfresco.share.alfresco-core.version>6.5</owsi-alfresco.share.alfresco-core.version>
 		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
 		<springframework-extensions-surf.version>1.2.0-M18</springframework-extensions-surf.version>

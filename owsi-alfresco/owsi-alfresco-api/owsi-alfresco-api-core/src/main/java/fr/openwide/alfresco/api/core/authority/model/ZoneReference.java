@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/** http://docs.alfresco.com/5.2/concepts/secur-zones.html */
+/** http://docs.alfresco.com/6.0/concepts/secur-zones.html */
 public class ZoneReference implements Serializable {
 	
 	/** is for authorities defined within Alfresco Content Services and not synchronized from an external source. 

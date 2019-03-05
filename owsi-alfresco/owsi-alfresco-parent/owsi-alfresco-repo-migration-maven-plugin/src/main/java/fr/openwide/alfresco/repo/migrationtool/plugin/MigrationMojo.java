@@ -28,7 +28,7 @@ import fr.openwide.alfresco.repo.migrationtool.plugin.model.Module;
  * Plugin Maven d'aide à la migration des patch Alfresco.
  * 
  * Pour chaque fichier patché de Alfresco, créer un fichier .x.y.z.ori avec le fichier original extrait des JAR Alfresco.
- * Par exemple, pour un fichier contentModel.xml surchargé, le plugin crée un fichier contentModel.xml.5.2.1.ori.
+ * Par exemple, pour un fichier contentModel.xml surchargé, le plugin crée un fichier contentModel.xml.6.0.0.ori.
  * 
  * Le plugin est automatiquement appelé si le pom.xml hérite de owsi-alfresco-parent-repo-component, 
  * owsi-alfresco-parent-alfresco ou owsi-alfresco-parent-share.
@@ -58,7 +58,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	@Parameter(property="targetWar")
 	private String targetWar;
 
-	@Parameter(property="alfresco.version", defaultValue="5.2.3")
+	@Parameter(property="alfresco.version", defaultValue="6.0.0")
 	private String alfrescoVersion;
 
 	private Map<String, File> resourceInJarByPath = new HashMap<String, File>();
@@ -332,7 +332,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	public static void main(String[] args) throws Exception {
 		MigrationMojo mojo = new MigrationMojo();
-		mojo.alfrescoVersion = "5.2.3";
+		mojo.alfrescoVersion = "6.0.0";
 		mojo.targetWar = "alfresco";
 		mojo.execute();
 	}

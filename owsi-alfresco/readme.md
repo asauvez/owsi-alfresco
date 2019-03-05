@@ -1,7 +1,7 @@
 Description
 ===========
 Owsi-Alfresco est un ensemble d'outils destinés à rendre plus rapide et maintenable les développements autour 
-d'Alfresco 5.2.3.
+d'Alfresco 6.0.0.
 
 FAQ
 ===
@@ -21,6 +21,13 @@ mvn clean source:jar deploy -DargLine="" -Ddistribution=owsi-alfresco-release
 
 Nouveautés
 ==========
+
+## depuis 1.0.0
+* Migration ACS 6.0
+* Supression des packages : 
+  - owsi-alfresco-package-alfresco devient org.alfresco:alfresco-enterprise 
+  - owsi-alfresco-package-share devient org.alfresco:share
+* alfresco.module.version devient project.version
 
 ## depuis 0.7.0
 * Alfresco 5.2.4

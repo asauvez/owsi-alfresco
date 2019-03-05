@@ -18,8 +18,8 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-package-share</artifactId>
+			<groupId>org.alfresco</groupId>
+			<artifactId>share</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -31,7 +31,7 @@
 			<version>${owsi-alfresco.share.alfresco.version}</version>
 			<type>war</type>
 			<scope>runtime</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -121,8 +121,8 @@
 				<configuration>
 					<overlays>
 						<overlay>
-							<groupId>fr.openwide.alfresco</groupId>
-							<artifactId>owsi-alfresco-package-share</artifactId>
+							<groupId>org.alfresco</groupId>
+							<artifactId>share</artifactId>
 							<excludes>
 								<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
 							</excludes>
@@ -169,8 +169,8 @@
 						<configuration>
 							<overlays>
 								<overlay>
-									<groupId>fr.openwide.alfresco</groupId>
-									<artifactId>owsi-alfresco-package-share</artifactId>
+									<groupId>org.alfresco</groupId>
+									<artifactId>share</artifactId>
 									<excludes>
 										<!-- Indique de ne pas exclure META-INF/MANIFEST.MF -->
 									</excludes>
