@@ -182,18 +182,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.alfresco.aos-module</groupId>
-				<artifactId>alfresco-aos-module</artifactId>
-				<version>${alfresco.aos-module.version}</version>
-				<type>amp</type>
-			</dependency>
-			<dependency>
-				<groupId>org.alfresco.aos-module</groupId>
-				<artifactId>alfresco-aos-module-distributionzip</artifactId>
-				<version>${alfresco.aos-module.version}</version>
-				<type>zip</type>
-			</dependency>
-			<dependency>
-				<groupId>org.alfresco.aos-module</groupId>
 				<artifactId>alfresco-vti-bin</artifactId>
 				<version>${alfresco.aos-module.version}</version>
 				<type>war</type>
