@@ -88,8 +88,8 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			}
 			
 			String firstUrl = (urls.length > 0) ? urls[0] : "";
-			String wsFolder = (! generateWebScript.wsFolder().isEmpty()) ? generateWebScript.wsFolder() : StringUtils.substringBeforeLast(firstUrl, "/");
-			String wsName = (! generateWebScript.wsName().isEmpty()) ? generateWebScript.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(firstUrl, "/"), "?").replace(".", "-");
+			String wsFolder = (! generateWebScript.wsFolder().isEmpty()) ? generateWebScript.wsFolder() : StringUtils.substringBeforeLast(firstUrl, "/").replace('{', '_').replace('}', '_');
+			String wsName = (! generateWebScript.wsName().isEmpty()) ? generateWebScript.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(firstUrl, "/"), "?").replace(".", "-").replace('{', '_').replace('}', '_');
 
 			String shortName = (! generateWebScript.shortName().isEmpty()) ? StringEscapeUtils.escapeXml11(generateWebScript.shortName()) : wsName;
 			CharSequence description = (! generateWebScript.description().isEmpty()) ? StringEscapeUtils.escapeXml11(generateWebScript.description()) : className;
