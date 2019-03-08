@@ -54,7 +54,7 @@
 		<!-- Fin de l'extrait -->
 		
 		<owsi-alfresco.alfresco-maven-plugin.version>2.2.0</owsi-alfresco.alfresco-maven-plugin.version>
-		<owsi-alfresco.repo.postgresql.version>9.3-1101-jdbc41</owsi-alfresco.repo.postgresql.version>
+		<owsi-alfresco.repo.postgresql.version>9.4.1212</owsi-alfresco.repo.postgresql.version>
 		<owsi-alfresco.repo.jta.version>1.0.1b</owsi-alfresco.repo.jta.version>
 		<owsi-alfresco.repo.commons-dbcp.version>1.4-DBCP330</owsi-alfresco.repo.commons-dbcp.version>
 		<owsi-alfresco.repo.acegi-security.version>0.8.2_patched</owsi-alfresco.repo.acegi-security.version>
