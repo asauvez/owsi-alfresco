@@ -82,6 +82,10 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	public void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
 		permissionService.deletePermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName());
 	}
+	@Override
+	public void deletePermissions(NodeReference nodeReference) {
+		permissionService.deletePermissions(conversionService.getRequired(nodeReference));
+	}
 	
 	@Override
 	public List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference) {

@@ -18,6 +18,7 @@ public interface PermissionRepositoryService {
 	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed);
 	
 	void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission);
+	void deletePermissions(NodeReference nodeReference);
 	
 	List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference);
 	List<RepositoryAccessControl> searchACLwithParentAuthorities(AuthorityReference authorityReference);
