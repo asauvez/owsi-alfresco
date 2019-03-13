@@ -12,6 +12,10 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -76,6 +80,19 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
 	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
 	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
+
+	List<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc);
+	List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc);
+
+	Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc);
+	List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc);
+
+	List<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc);
+	Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc);
+
+	Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc);
+	Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc);
+
 	
 	NodeReference getCompanyHome();
 	NodeReference getDataDictionary();

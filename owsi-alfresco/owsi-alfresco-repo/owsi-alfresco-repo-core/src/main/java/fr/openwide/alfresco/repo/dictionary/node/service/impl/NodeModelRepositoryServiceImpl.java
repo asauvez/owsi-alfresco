@@ -30,6 +30,10 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -349,6 +353,58 @@ public class NodeModelRepositoryServiceImpl
 				conversionService.getRequired(targetRef), 
 				conversionService.getRequired(assocType));
 	}
+	
+	
+	
+	
+	@Override
+	public List<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc) {
+		return _getTargetAssocs(nodeReference, assoc);
+	}
+	@Override
+	public List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc) {
+		return _getSourceAssocs(nodeReference, assoc);
+	}
+	@Override
+	public Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc) {
+		return toOptional(_getTargetAssocs(nodeReference, assoc));
+	}
+	@Override
+	public List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc) {
+		return _getSourceAssocs(nodeReference, assoc);
+	}
+	@Override
+	public List<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc) {
+		return _getTargetAssocs(nodeReference, assoc);
+	}
+	@Override
+	public Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc) {
+		return toOptional(_getSourceAssocs(nodeReference, assoc));
+	}
+	@Override
+	public Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc) {
+		return toOptional(_getTargetAssocs(nodeReference, assoc));
+	}
+	@Override
+	public Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc) {
+		return getSourceAssocs(nodeReference, assoc);
+	}
+	private List<NodeReference> _getTargetAssocs(NodeReference nodeReference, AssociationModel assoc) {
+		return nodeService.getTargetAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(assoc.getNameReference())).stream()
+			.map(assocRef -> conversionService.get(assocRef.getTargetRef()))
+			.collect(Collectors.toList());
+	}
+	private List<NodeReference> _getSourceAssocs(NodeReference nodeReference, AssociationModel assoc) {
+		return nodeService.getSourceAssocs(
+				conversionService.getRequired(nodeReference), 
+				conversionService.getRequired(assoc.getNameReference())).stream()
+			.map(assocRef -> conversionService.get(assocRef.getSourceRef()))
+			.collect(Collectors.toList());
+	}
+	
+	
 	
 	@Override
 	public NodeReference getCompanyHome() {
