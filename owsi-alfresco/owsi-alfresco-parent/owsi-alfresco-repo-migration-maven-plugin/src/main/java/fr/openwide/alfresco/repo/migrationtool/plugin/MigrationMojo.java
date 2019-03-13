@@ -265,6 +265,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			} else if (createMissingIgnoreFile) {
 				getLog().warn("Create missing file " + ignore);
 				FileUtils.write(ignore, "");
+				return;
 			} else {
 				error("Original resource not found for " + file.getAbsolutePath() + ". Create a file with .ignore.ori suffix if it is not a Alfresco patch.");
 				return;
