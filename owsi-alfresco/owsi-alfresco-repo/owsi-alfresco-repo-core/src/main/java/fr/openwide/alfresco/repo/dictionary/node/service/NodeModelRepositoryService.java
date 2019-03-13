@@ -76,6 +76,9 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
 	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
 
+	String getUniqueChildName(NodeReference folder, String originalName);
+	String getUniqueChildName(NodeReference folder, NodeReference document);
+	
 	void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
 	void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
 	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);

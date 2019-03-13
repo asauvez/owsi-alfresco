@@ -19,6 +19,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.apache.commons.io.FilenameUtils;
 
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
@@ -275,6 +276,30 @@ public class NodeModelRepositoryServiceImpl
 				QName.createValidLocalName(childName));
 		NodeReference subnodeReference = (subNodeRef != null) ? conversionService.get(subNodeRef) : null;
 		return Optional.ofNullable(subnodeReference);
+	}
+	
+	@Override
+	public String getUniqueChildName(NodeReference folder, String originalName) {
+		String extension = FilenameUtils.getExtension(originalName);
+		if (! extension.isEmpty()) {
+			extension = "." + extension;
+		}
+		String baseName = FilenameUtils.removeExtension(originalName);
+		String name = originalName;
+		int index = 1;
+		while (getChildByName(folder, name).isPresent()) {
+			name = baseName + "-" + (index ++) + extension;
+		}
+		return name;
+	}
+	@Override
+	public String getUniqueChildName(NodeReference folder, NodeReference document) {
+		String originalName = getProperty(document, CmModel.object.name);
+		Optional<NodeReference> childByName = getChildByName(folder, originalName);
+		if (! childByName.isPresent() || childByName.get().equals(document)) {
+			return originalName;
+		}
+		return getUniqueChildName(folder, originalName);
 	}
 	
 	@Override

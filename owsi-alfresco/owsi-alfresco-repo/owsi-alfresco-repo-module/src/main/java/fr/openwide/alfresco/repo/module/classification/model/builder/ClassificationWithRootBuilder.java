@@ -145,13 +145,11 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder uniqueName() {
-		String currentName = service.getNodeModelService().getProperty(getNodeReference(), CmModel.object.name);
 		if (destinationFolders.size() > 1) {
 			throw new UnsupportedOperationException(destinationFolders.toString());
 		}
 		for (NodeReference destinationFolder : destinationFolders) {
-			// TODO : avoir un nom pour chaque destination
-			String newName = service.getUniqueName(destinationFolder, currentName);
+			String newName = service.getNodeModelService().getUniqueChildName(destinationFolder, getNodeReference());
 			name(newName);
 		}
 		return this;
