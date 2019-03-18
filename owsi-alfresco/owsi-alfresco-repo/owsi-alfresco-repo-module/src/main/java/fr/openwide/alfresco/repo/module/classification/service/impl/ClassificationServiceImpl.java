@@ -33,6 +33,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -43,8 +44,8 @@ import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
@@ -78,8 +79,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
-	private NodeModelRepositoryService nodeModelService;
-	private NodeRepositoryService nodeRepositoryService;
+	@Autowired private NodeModelService nodeModelService;
+	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
+	@Autowired private NodeRepositoryService nodeRepositoryService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
 	
@@ -180,7 +182,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		if (OwsiModel.classifiable.getNameReference().equals(conversionService.get(aspectTypeQName))) {
 			classify(nodeRef, ClassificationMode.CREATE);
 		} else {
-			nodeModelService.addAspect(conversionService.get(nodeRef), OwsiModel.classifiable);
+			nodeModelRepositoryService.addAspect(conversionService.get(nodeRef), OwsiModel.classifiable);
 		}
 	}
 	@Override
@@ -265,10 +267,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public Optional<NodeReference> getHomeFolder() {
-		return nodeModelService.getUserHome();
+		return nodeModelRepositoryService.getUserHome();
 	}
 	public NodeReference getCompanyHome() {
-		return nodeModelService.getCompanyHome();
+		return nodeModelRepositoryService.getCompanyHome();
 	}
 	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
@@ -297,7 +299,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			logger.debug("Begin classification of node {} with policy for {}.", nodeReference, type);
 		}
 		
-		if (! nodeModelService.exists(nodeReference)) {
+		if (! nodeModelRepositoryService.exists(nodeReference)) {
 			logger.warn("Node {} no longer exists. Ignoring.", nodeReference);
 			return;
 		}
@@ -308,7 +310,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			policy.classify(builder, model, event);
 			
 			policyRepositoryService.disableBehaviour(OwsiModel.classifiable, 
-				() -> nodeModelService.setProperty(nodeReference, OwsiModel.classifiable.classificationDate, new Date())
+				() -> nodeModelRepositoryService.setProperty(nodeReference, OwsiModel.classifiable.classificationDate, new Date())
 			);
 			
 		} catch (RuntimeException ex) {
@@ -332,40 +334,40 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	private String getPath(NodeReference nodeReference) {
-		return nodeModelService.get(nodeReference, new NodeScopeBuilder().path()).getPath();
+		return nodeModelRepositoryService.getPath(nodeReference);
 	}
 
 	public void setNewName(NodeReference node, String newName) {
-		nodeModelService.setProperty(node, CmModel.object.name, newName);
+		nodeModelRepositoryService.setProperty(node, CmModel.object.name, newName);
 	}
 	public void setContentStore(NodeReference node, String storeName) {
-		nodeModelService.setProperty(node, CmModel.storeSelector.storeName, storeName);
+		nodeModelRepositoryService.setProperty(node, CmModel.storeSelector.storeName, storeName);
 	}
 	public void setIndex(NodeReference node, boolean isIndexed) {
-		nodeModelService.setProperty(node, CmModel.indexControl.isIndexed, isIndexed);
+		nodeModelRepositoryService.setProperty(node, CmModel.indexControl.isIndexed, isIndexed);
 	}
 	public void setIndexContent(NodeReference node, boolean isContentIndexed) {
-		nodeModelService.setProperty(node, CmModel.indexControl.isContentIndexed, isContentIndexed);
+		nodeModelRepositoryService.setProperty(node, CmModel.indexControl.isContentIndexed, isContentIndexed);
 	}
 	
 	public void moveNode(NodeReference node, NodeReference destinationFolder) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Move node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		nodeModelService.moveNode(node, destinationFolder);
+		nodeModelRepositoryService.moveNode(node, destinationFolder);
 	}
 	public NodeReference copyNode(NodeReference node, NodeReference destinationFolder, Optional<String> newName) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Copy node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		NodeReference copyNodeReference = nodeModelService.copy(node, destinationFolder, newName);
+		NodeReference copyNodeReference = nodeModelRepositoryService.copy(node, destinationFolder, newName);
 		getClassifiedNodes().add(copyNodeReference);
 		return copyNodeReference;
 	}
 	
 	public void createFileLink(NodeReference nodeReference, NodeReference destinationFolder, Optional<String> linkNameOpt) {
 		String linkName = linkNameOpt.isPresent() ? linkNameOpt.get() 
-				: "Link to " + nodeModelService.getProperty(nodeReference, CmModel.object.name);
+				: "Link to " + nodeModelRepositoryService.getProperty(nodeReference, CmModel.object.name);
 		nodeModelService.create(new BusinessNode(destinationFolder, AppModel.fileLink, linkName)
 				.properties().set(AppModel.fileLink.destination, nodeReference));
 	}
@@ -374,16 +376,16 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		if (logger.isDebugEnabled()) {
 			logger.debug("Add link from node {} to {} : {}.", node.getReference(), destinationFolder, getPath(destinationFolder));
 		}
-		nodeModelService.addChild(destinationFolder, node);
+		nodeModelRepositoryService.addChild(destinationFolder, node);
 	}
 	public void deleteSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
-		nodeModelService.unlinkSecondaryParents(nodeReference, childAssociationModel);
+		nodeModelRepositoryService.unlinkSecondaryParents(nodeReference, childAssociationModel);
 	}
 	
 	private NameReference getPolicy(NodeReference nodeReference) {
-		NameReference result = nodeModelService.getProperty(nodeReference, OwsiModel.classifiable.classificationPolicy);
+		NameReference result = nodeModelRepositoryService.getProperty(nodeReference, OwsiModel.classifiable.classificationPolicy);
 
-		NameReference type = nodeModelService.getType(nodeReference);
+		NameReference type = nodeModelRepositoryService.getType(nodeReference);
 		QName typeQName = conversionService.getRequired(type);
 		
 		// Cherche parmi les super types
@@ -398,7 +400,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		
 		// Cherche parmi les aspects
 		for (NameReference aspect : policies.keySet()) {
-			if (nodeModelService.hasAspect(nodeReference, aspect)) {
+			if (nodeModelRepositoryService.hasAspect(nodeReference, aspect)) {
 				result = setResult(nodeReference, result, aspect);
 			}
 		}
@@ -421,8 +423,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				.replace('<', ' ').replace('>', ' ').trim(); 
 		
 		String cacheKey = destinationFolder + "/" + associationType + "/" + cleanFolderName;
-		return subFolderCache.get(nodeModelService, cacheKey, 
-				() -> nodeModelService.getChildByName(destinationFolder, cleanFolderName, associationType),
+		return subFolderCache.get(nodeModelRepositoryService, cacheKey, 
+				() -> nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType),
 				() -> {
 			BusinessNode folderNode = folderNodeSupplier.get();
 			
@@ -450,7 +452,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				}, false, true);
 			} catch (DuplicateChildNodeNameException ex) {
 				// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-				return nodeModelService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
+				return nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
 			}
 		});
 	} 
@@ -468,29 +470,23 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
 		String cacheKey = restrictionBuilder.toFtsQuery();
-		return queryCache.get(nodeModelService, cacheKey, 
+		return queryCache.get(nodeModelRepositoryService, cacheKey, 
 				() -> nodeSearchModelService.searchUniqueReference(restrictionBuilder));
 	}
 
 	public NodeModelRepositoryService getNodeModelService() {
-		return nodeModelService;
+		return nodeModelRepositoryService;
 	}
 	
 	public Optional<NodeReference> getByNamedPath(String ... names) {
-		return nodeModelService.getByNamedPath(names);
+		return nodeModelRepositoryService.getByNamedPath(names);
 	}
 	public Optional<NodeReference> getByNamedPathCached(String ... names) {
 		String cacheKey = Arrays.toString(names);
-		return pathCache.get(nodeModelService, cacheKey, 
+		return pathCache.get(nodeModelRepositoryService, cacheKey, 
 				() -> getByNamedPath(names));
 	}
 	
-	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
-		this.nodeModelService = nodeModelService; 
-	}
-	public void setNodeRepositoryService(NodeRepositoryService nodeRepositoryService) {
-		this.nodeRepositoryService = nodeRepositoryService;
-	}
 	public void setNodeSearchModelService(NodeSearchModelRepositoryService nodeSearchModelService) {
 		this.nodeSearchModelService = nodeSearchModelService;
 	}
@@ -521,26 +517,26 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public void deletePrevious(NodeReference destinationFolder, String childName) {
-		Optional<NodeReference> child = nodeModelService.getChildByName(destinationFolder, childName);
+		Optional<NodeReference> child = nodeModelRepositoryService.getChildByName(destinationFolder, childName);
 		if (child.isPresent()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Delete previous node {} in {}", childName, destinationFolder);
 			}
-			nodeModelService.delete(child.get());
+			nodeModelRepositoryService.deleteNode(child.get());
 		}
 	}
 
 	public void delete(NodeReference nodeReference, boolean permanently) {
 		if (permanently) {
-			nodeModelService.deletePermanently(nodeReference);
+			nodeModelRepositoryService.deleteNodePermanently(nodeReference);
 		} else {
-			nodeModelService.delete(nodeReference);
+			nodeModelRepositoryService.deleteNode(nodeReference);
 		}
 	}
 
 	public Optional<NodeReference> getSiteNode(NodeReference nodeReference) {
-		Optional<NodeReference> parent = nodeModelService.getPrimaryParent(nodeReference);
-		if (! parent.isPresent() || nodeModelService.isType(parent.get(), StModel.site)) {
+		Optional<NodeReference> parent = nodeModelRepositoryService.getPrimaryParent(nodeReference);
+		if (! parent.isPresent() || nodeModelRepositoryService.isType(parent.get(), StModel.site)) {
 			return parent;
 		} else {
 			return getSiteNode(parent.get());
@@ -548,7 +544,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public void setClassificicationState(NodeReference nodeReference, String newState) {
-		nodeModelService.setProperty(nodeReference, OwsiModel.classifiable.classificationState, newState);
+		nodeModelRepositoryService.setProperty(nodeReference, OwsiModel.classifiable.classificationState, newState);
 	}
 
 }

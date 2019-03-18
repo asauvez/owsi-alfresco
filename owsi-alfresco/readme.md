@@ -22,12 +22,14 @@ mvn clean source:jar deploy -DargLine="" -Ddistribution=owsi-alfresco-release
 Nouveautés
 ==========
 
-## depuis 1.0.0
+## depuis 0.8.0
 * Migration ACS 6.0
 * Supression des packages : 
   - owsi-alfresco-package-alfresco devient org.alfresco:alfresco-enterprise 
   - owsi-alfresco-package-share devient org.alfresco:share
 * alfresco.module.version devient project.version
+* NodeModelRepositoryService n'etends plus NodeServiceImpl
+* delete() devient deleteNode()
 
 ## depuis 0.7.0
 * Alfresco 5.2.4

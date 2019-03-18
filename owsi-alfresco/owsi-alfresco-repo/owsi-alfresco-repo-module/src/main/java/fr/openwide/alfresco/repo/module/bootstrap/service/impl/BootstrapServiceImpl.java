@@ -23,10 +23,12 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.module.bootstrap.service.BootstrapService;
@@ -37,8 +39,9 @@ public class BootstrapServiceImpl implements BootstrapService {
 
 	private final Logger logger = LoggerFactory.getLogger(BootstrapServiceImpl.class);
 	
-	private NodeModelRepositoryService nodeModelService;
-	private ConversionService conversionService;
+	@Autowired private NodeModelService nodeModelService;
+	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
+	@Autowired private ConversionService conversionService;
 	
 	private MutableAuthenticationService authenticationService;
 	private PersonService personService;
@@ -149,7 +152,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 	public void importView(NodeReference parentRef, String viewFileName, String messageFileName) {
 		logger.debug("Import view "  + viewFileName);
 		
-		String path = nodeModelService.getPath(parentRef);
+		String path = nodeModelRepositoryService.getPath(parentRef);
 		
 		List<Properties> bootstrapViews = new ArrayList<Properties>(1);
 		Properties bootstrapView = new Properties();
@@ -166,7 +169,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 	// --- Injections ------------------------------------------------------------------------------------------------
 
 	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
-		this.nodeModelService = nodeModelService;
+		this.nodeModelRepositoryService = nodeModelService;
 	}
 	public void setConversionService(ConversionService conversionService) {
 		this.conversionService = conversionService;

@@ -20,15 +20,15 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAssociationModel;
@@ -39,29 +39,29 @@ import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
-import fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl;
+import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.repo.core.node.service.impl.NodeRemoteServiceImpl;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
-public class NodeModelRepositoryServiceImpl 
-	extends NodeModelServiceImpl
-	implements NodeModelRepositoryService {
+public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryService {
 
-	private NodeService nodeService;
-	private CopyService copyService;
+	@Autowired private NodeModelService nodeModelService;
+	@Autowired private NodeService nodeService;
+	@Autowired private CopyService copyService;
 	private Repository repositoryHelper;
 
-	private ConversionService conversionService;
+	@Autowired private ConversionService conversionService;
 	
 	private String dataDictionaryChildName;
 	private SimpleCache<String, NodeReference> singletonCache; // eg. for dataDictionaryNodeRef
 	private final String KEY_DATADICTIONARY_NODEREF = "owsi.key.datadictionary.noderef";
 	
-	public NodeModelRepositoryServiceImpl(NodeRemoteService nodeService) {
-		super(nodeService);
+	@Override
+	public NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
+		return nodeModelService.createFolder(parentRef, folderName);
 	}
 	
 	@Override
@@ -164,9 +164,13 @@ public class NodeModelRepositoryServiceImpl
 	}
 
 	@Override
-	public void deletePermanently(NodeReference nodeReference) {
+	public void deleteNode(NodeReference nodeReference) {
+		nodeService.deleteNode(conversionService.getRequired(nodeReference));
+	}
+	@Override
+	public void deleteNodePermanently(NodeReference nodeReference) {
 		addAspect(nodeReference, SysModel.temporary);
-		delete(nodeReference);
+		deleteNode(nodeReference);
 	}
 
 	@Override
@@ -428,7 +432,11 @@ public class NodeModelRepositoryServiceImpl
 			.map(assocRef -> conversionService.get(assocRef.getSourceRef()))
 			.collect(Collectors.toList());
 	}
-	
+	private <T> Optional<T> toOptional(List<T> list) {
+		if (list.isEmpty()) return Optional.empty();
+		if (list.size() == 1) return Optional.of(list.get(0));
+		throw new IllegalStateException("list=" + list);
+	}	
 	
 	
 	@Override
@@ -489,23 +497,14 @@ public class NodeModelRepositoryServiceImpl
 	
 	@Override
 	public String getPath(NodeReference nodeReference) {
-		return get(nodeReference, new NodeScopeBuilder().path()).getPath();
+		return nodeService.getPath(conversionService.getRequired(nodeReference)).toString();
 	}
 
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
-	}
-	public void setCopyService(CopyService copyService) {
-		this.copyService = copyService;
-	}
 	public void setRepositoryHelper(Repository repositoryHelper) {
 		this.repositoryHelper = repositoryHelper;
 	}
 	public void setDataDictionaryChildName(String dataDictionaryChildName) {
 		this.dataDictionaryChildName = dataDictionaryChildName;
-	}
-	public void setConversionService(ConversionService conversionService) {
-		this.conversionService = conversionService;
 	}
 	public void setSingletonCache(SimpleCache<String, NodeReference> singletonCache) {
 		this.singletonCache = singletonCache;

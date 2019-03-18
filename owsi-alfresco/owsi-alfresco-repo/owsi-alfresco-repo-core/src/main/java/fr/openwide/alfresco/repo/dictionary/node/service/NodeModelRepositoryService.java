@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -19,10 +20,11 @@ import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssoc
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
-import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 
-public interface NodeModelRepositoryService extends NodeModelService {
+public interface NodeModelRepositoryService {
 
+	NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
+	
 	boolean exists(NodeReference nodeReference);
 	void moveNode(NodeReference nodeReference, NodeReference newParentRef);
 	NodeReference copy(NodeReference nodeReference, NodeReference newParentRef, Optional<String> newName);
@@ -53,7 +55,8 @@ public interface NodeModelRepositoryService extends NodeModelService {
 	void removeAspect(NodeReference nodeReference, NameReference aspect);
 	void removeAspect(NodeReference nodeReference, AspectModel aspect);
 	
-	void deletePermanently(NodeReference nodeReference);
+	void deleteNode(NodeReference nodeReference);
+	void deleteNodePermanently(NodeReference nodeReference);
 	
 	<C extends Serializable> C getProperty(NodeReference nodeReference, NameReference property);
 	<C extends Serializable> C getProperty(NodeReference nodeReference, SinglePropertyModel<C> property);

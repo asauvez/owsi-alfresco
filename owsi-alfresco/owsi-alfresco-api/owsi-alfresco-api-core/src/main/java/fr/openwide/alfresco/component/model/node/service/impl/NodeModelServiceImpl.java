@@ -89,7 +89,7 @@ public class NodeModelServiceImpl implements NodeModelService {
 	private List<BusinessNode> _getSourceAssocs(NodeReference nodeReference, AssociationModel assoc, NodeScopeBuilder nodeScopeBuilder) {
 		return new BusinessNodeList(nodeService.getSourceAssocs(nodeReference, assoc.getNameReference(), nodeScopeBuilder.getScope()));
 	}
-	protected <T> Optional<T> toOptional(List<T> list) {
+	private <T> Optional<T> toOptional(List<T> list) {
 		if (list.isEmpty()) return Optional.empty();
 		if (list.size() == 1) return Optional.of(list.get(0));
 		throw new IllegalStateException("list=" + list);

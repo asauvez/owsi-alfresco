@@ -27,12 +27,12 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
@@ -51,7 +51,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	private PermissionService permissionService;
 	private AuthorityService authorityService;
 	private ConversionService conversionService;
-	private NodeModelRepositoryService nodeModelService;
+	@Autowired private NodeModelRepositoryService nodeModelService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
 	private PreferenceService preferenceService;
@@ -258,7 +258,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			}
 			// Si le dossier cible existe, il est vide: on le supprime pour pouvoir renommer le dossier source
 			if (targetFolder != null && nodeModelService.exists(targetFolder)) {
-				nodeModelService.delete(targetFolder);
+				nodeModelService.deleteNode(targetFolder);
 			}
 			targetFolder = userHomes.get();
 			nodeModelService.setProperty(sourceFolder, CmModel.folder.name, targetUserName);
@@ -271,7 +271,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			Optional<String> copyFolderName = Optional.of("copy-" + folderName);
 			nodeModelService.copy(sourceFolder, targetFolder, copyFolderName);
 			//nodeModelService.getChildrenAssocsContains(sourceFolder).forEach(node -> nodeModelService.delete(node));
-			nodeModelService.delete(sourceFolder);
+			nodeModelService.deleteNode(sourceFolder);
 		}
 		nodeModelService.setProperty(sourceUserNode, CmModel.person.homeFolder, null);
 		return targetFolder;
@@ -283,7 +283,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	
 	private boolean isFolderEmpty(NodeReference folderNode) {
-		return folderNode == null || !nodeModelService.exists(folderNode) || nodeModelService.getChildren(folderNode, new NodeScopeBuilder()).isEmpty();
+		return folderNode == null || !nodeModelService.exists(folderNode) || nodeModelService.getChildrenAssocsContains(folderNode).isEmpty();
 	}
 	
 	public int searchAndApply(RestrictionBuilder restriction, Consumer<NodeReference> consumer, Integer maxItem) {
@@ -311,9 +311,6 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-	}
-	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
-		this.nodeModelService = nodeModelService;
 	}
 	public void setNodeSearchModelService(NodeSearchModelRepositoryService nodeSearchModelService) {
 		this.nodeSearchModelService = nodeSearchModelService;
