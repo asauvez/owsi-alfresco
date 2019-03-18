@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
@@ -17,95 +18,101 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAss
 import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 
 public interface NodeModelRepositoryService {
 
-	NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
+	NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
 	
-	boolean exists(NodeReference nodeReference);
-	void moveNode(NodeReference nodeReference, NodeReference newParentRef);
-	NodeReference copy(NodeReference nodeReference, NodeReference newParentRef, Optional<String> newName);
+	boolean exists(NodeRef nodeRef);
+	void moveNode(NodeRef nodeRef, NodeRef newParentRef);
+	NodeRef copy(NodeRef nodeRef, NodeRef newParentRef, Optional<String> newName);
 
-	void addChild(NodeReference parentRef, NodeReference childRef);
-	void addChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType);
-	void addChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
+	void addChild(NodeRef parentRef, NodeRef childRef);
+	void addChild(NodeRef parentRef, NodeRef childRef, ChildAssociationModel assocType);
+	void addChild(NodeRef parentRef, NodeRef childRef, NameReference assocType);
 
-	void removeChild(NodeReference parentRef, NodeReference childRef);
-	void removeChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType);
-	void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType);
-	void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel);
+	void removeChild(NodeRef parentRef, NodeRef childRef);
+	void removeChild(NodeRef parentRef, NodeRef childRef, ChildAssociationModel assocType);
+	void removeChild(NodeRef parentRef, NodeRef childRef, NameReference assocType);
+	void unlinkSecondaryParents(NodeRef nodeRef, ChildAssociationModel childAssociationModel);
 
-	boolean isType(NodeReference nodeReference, TypeModel typeModel);
-	NameReference getType(NodeReference nodeReference);
-	void setType(NodeReference nodeReference, NameReference type);
-	void setType(NodeReference nodeReference, TypeModel type);
+	boolean isType(NodeRef nodeRef, TypeModel typeModel);
+	NameReference getType(NodeRef nodeRef);
+	void setType(NodeRef nodeRef, NameReference type);
+	void setType(NodeRef nodeRef, TypeModel type);
 	
-	Set<NameReference> getAspects(NodeReference nodeReference);
-	boolean hasAspect(NodeReference nodeReference, NameReference aspect);
-	boolean hasAspect(NodeReference nodeReference, AspectModel aspect);
+	Set<NameReference> getAspects(NodeRef nodeRef);
+	boolean hasAspect(NodeRef nodeRef, NameReference aspect);
+	boolean hasAspect(NodeRef nodeRef, AspectModel aspect);
 	
-	void addAspect(NodeReference nodeReference, NameReference aspect);
-	void addAspect(NodeReference nodeReference, AspectModel aspect);
-	void addAspect(NodeReference nodeReference, NameReference aspect, BusinessNode node);
-	void addAspect(NodeReference nodeReference, AspectModel aspect, BusinessNode node);
+	void addAspect(NodeRef nodeRef, NameReference aspect);
+	void addAspect(NodeRef nodeRef, AspectModel aspect);
+	void addAspect(NodeRef nodeRef, NameReference aspect, BusinessNode node);
+	void addAspect(NodeRef nodeRef, AspectModel aspect, BusinessNode node);
 	
-	void removeAspect(NodeReference nodeReference, NameReference aspect);
-	void removeAspect(NodeReference nodeReference, AspectModel aspect);
+	void removeAspect(NodeRef nodeRef, NameReference aspect);
+	void removeAspect(NodeRef nodeRef, AspectModel aspect);
 	
-	void deleteNode(NodeReference nodeReference);
-	void deleteNodePermanently(NodeReference nodeReference);
+	void deleteNode(NodeRef nodeRef);
+	void deleteNodePermanently(NodeRef nodeRef);
 	
-	<C extends Serializable> C getProperty(NodeReference nodeReference, NameReference property);
-	<C extends Serializable> C getProperty(NodeReference nodeReference, SinglePropertyModel<C> property);
-	<E extends Enum<E>> E getProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property);
-	<C extends Serializable> List<C> getProperty(NodeReference nodeReference, MultiPropertyModel<C> property);
+	<C extends Serializable> C getProperty(NodeRef nodeRef, NameReference property);
+	<C extends Serializable> C getProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
+	NodeRef getProperty(NodeRef nodeRef, NodeReferencePropertyModel property);
+	<E extends Enum<E>> E getProperty(NodeRef nodeRef, EnumTextPropertyModel<E> property);
+	<C extends Serializable> List<C> getProperty(NodeRef nodeRef, MultiPropertyModel<C> property);
+	List<NodeRef> getProperty(NodeRef nodeRef, MultiNodeReferencePropertyModel property);
 	
-	<C extends Serializable> void setProperty(NodeReference nodeReference, SinglePropertyModel<C> property, C value);
-	<E extends Enum<E>> void setProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property, E value);
-	<C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value);
-	<C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value);
+	<C extends Serializable> void setProperty(NodeRef nodeRef, SinglePropertyModel<C> property, C value);
+	void setProperty(NodeRef nodeRef, NodeReferencePropertyModel property, NodeRef value);
+	<E extends Enum<E>> void setProperty(NodeRef nodeRef, EnumTextPropertyModel<E> property, E value);
+	<C extends Serializable> void setProperty(NodeRef nodeRef, MultiPropertyModel<C> property, List<C> value);
+	<C extends Serializable> void setProperty(NodeRef nodeRef, NameReference property, C value);
+	void setProperty(NodeRef nodeRef, MultiNodeReferencePropertyModel property, List<NodeRef> value);
 
-	Optional<NodeReference> getPrimaryParent(NodeReference nodeReference);
-	List<NodeReference> getParentAssocs(NodeReference nodeReference);
+	Optional<NodeRef> getPrimaryParent(NodeRef nodeRef);
+	List<NodeRef> getParentAssocs(NodeRef nodeRef);
 	
-	Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName);
-	List<NodeReference> getChildrenAssocs(NodeReference nodeReference, ChildAssociationModel associationType);
-	List<NodeReference> getChildrenAssocsContains(NodeReference nodeReference);
+	Optional<NodeRef> getChildAssocs(NodeRef nodeRef, ChildAssociationModel associationType, NameReference assocName);
+	List<NodeRef> getChildrenAssocs(NodeRef nodeRef, ChildAssociationModel associationType);
+	List<NodeRef> getChildrenAssocsContains(NodeRef nodeRef);
 
-	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName);
-	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType);
-	Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType);
+	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName);
+	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, ChildAssociationModel associationType);
+	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, NameReference associationType);
 
-	String getUniqueChildName(NodeReference folder, String originalName);
-	String getUniqueChildName(NodeReference folder, NodeReference document);
+	String getUniqueChildName(NodeRef folder, String originalName);
+	String getUniqueChildName(NodeRef folder, NodeRef document);
 	
-	void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
-	void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
-	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType);
-	void removeAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType);
+	void createAssociation(NodeRef sourceRef, NodeRef targetRef, AssociationModel assocType);
+	void createAssociation(NodeRef sourceRef, NodeRef targetRef, NameReference assocType);
+	void removeAssociation(NodeRef sourceRef, NodeRef targetRef, AssociationModel assocType);
+	void removeAssociation(NodeRef sourceRef, NodeRef targetRef, NameReference assocType);
 
-	List<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc);
-	List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc);
+	List<NodeRef> getTargetAssocs(NodeRef nodeRef, ManyToManyAssociationModel assoc);
+	List<NodeRef> getSourceAssocs(NodeRef nodeRef, ManyToManyAssociationModel assoc);
 
-	Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc);
-	List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc);
+	Optional<NodeRef> getTargetAssocs(NodeRef nodeRef, ManyToOneAssociationModel assoc);
+	List<NodeRef> getSourceAssocs(NodeRef nodeRef, ManyToOneAssociationModel assoc);
 
-	List<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc);
-	Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc);
+	List<NodeRef> getTargetAssocs(NodeRef nodeRef, OneToManyAssociationModel assoc);
+	Optional<NodeRef> getSourceAssocs(NodeRef nodeRef, OneToManyAssociationModel assoc);
 
-	Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc);
-	Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc);
+	Optional<NodeRef> getTargetAssocs(NodeRef nodeRef, OneToOneAssociationModel assoc);
+	Optional<NodeRef> getSourceAssocs(NodeRef nodeRef, OneToOneAssociationModel assoc);
 
 	
-	NodeReference getCompanyHome();
-	NodeReference getDataDictionary();
-	Optional<NodeReference> getUserHome();
+	NodeRef getCompanyHome();
+	NodeRef getDataDictionary();
+	Optional<NodeRef> getUserHome();
 	
-	Optional<NodeReference> getByNamedPath(String ... names);
-	String getPath(NodeReference nodeReference);
+	Optional<NodeRef> getByNamedPath(String ... names);
+	String getPath(NodeRef nodeRef);
 	
-	<C extends Serializable> void removeProperty(NodeReference nodeReference, SinglePropertyModel<C> property);
+	<C extends Serializable> void removeProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
 }

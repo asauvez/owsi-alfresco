@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.repo.module.classification.model.builder;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -10,7 +9,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -23,9 +23,9 @@ import fr.openwide.alfresco.repo.module.classification.service.impl.Classificati
  */
 public class ClassificationWithRootBuilder extends AbstractClassificationBuilder<ClassificationWithRootBuilder> {
 
-	private List<NodeReference> destinationFolders;
+	private List<NodeRef> destinationFolders;
 
-	public ClassificationWithRootBuilder(ClassificationServiceImpl service, ClassificationEvent event, List<NodeReference> destinationFolders) {
+	public ClassificationWithRootBuilder(ClassificationServiceImpl service, ClassificationEvent event, List<NodeRef> destinationFolders) {
 		super(service, event);
 		this.destinationFolders = destinationFolders;
 	}
@@ -78,9 +78,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 
 	public ClassificationWithRootBuilder forEachSubFolder() {
-		return forEachSubFolder(nodeReference -> true);
+		return forEachSubFolder(nodeRef -> true);
 	}
-	public ClassificationWithRootBuilder forEachSubFolder(Predicate<NodeReference> predicate) {
+	public ClassificationWithRootBuilder forEachSubFolder(Predicate<NodeRef> predicate) {
 		return new ClassificationWithRootBuilder(service, getEvent(), destinationFolders.stream()
 				.flatMap(destinationFolder -> service.getNodeModelService().getChildrenAssocsContains(destinationFolder).stream())
 				.filter(destinationFolder -> service.getNodeModelService().isType(destinationFolder, CmModel.folder))
@@ -89,14 +89,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder forEachTag() {
-		List<NodeReference> tags = getProperty(CmModel.taggable.taggable); 
-		if (tags == null) {
-			tags = Collections.emptyList(); 
-		}
-		Set<String> foldersName = tags.stream()
-				.map(tag -> service.getNodeModelService().getProperty(tag, CmModel.object.name))
-				.collect(Collectors.toSet());
-		return subFolders(foldersName);
+		return subFolders(service.getTagsName(getNodeRef()));
 	}
 	
 	/**
@@ -134,13 +127,13 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 			.formatDate(pattern));
 	}
 	
-	public NodeReference getDestinationFolder() {
+	public NodeRef getDestinationFolder() {
 		if (destinationFolders.size() != 1) {
 			throw new IllegalStateException(getDestinationFolders().toString());
 		}
 		return destinationFolders.iterator().next();
 	}
-	public Collection<NodeReference> getDestinationFolders() {
+	public Collection<NodeRef> getDestinationFolders() {
 		return destinationFolders;
 	}
 	
@@ -148,29 +141,29 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		if (destinationFolders.size() > 1) {
 			throw new UnsupportedOperationException(destinationFolders.toString());
 		}
-		for (NodeReference destinationFolder : destinationFolders) {
-			String newName = service.getNodeModelService().getUniqueChildName(destinationFolder, getNodeReference());
+		for (NodeRef destinationFolder : destinationFolders) {
+			String newName = service.getNodeModelService().getUniqueChildName(destinationFolder, getNodeRef());
 			name(newName);
 		}
 		return this;
 	}
 	
 	public ClassificationWithRootBuilder name(String newName) {
-		service.setNewName(getNodeReference(), newName);
+		service.setNewName(getNodeRef(), newName);
 		return this;
 	}
 
 	public ClassificationWithRootBuilder contentStore(String storeName) {
-		service.setContentStore(getNodeReference(), storeName);
+		service.setContentStore(getNodeRef(), storeName);
 		return this;
 	}
 	/** N'indexe plus le noeud par ne pas surcharger Solr */
 	public ClassificationWithRootBuilder index(boolean isIndexed) {
-		service.setIndex(getNodeReference(), isIndexed);
+		service.setIndex(getNodeRef(), isIndexed);
 		return this;
 	}
 	public ClassificationWithRootBuilder indexContent(boolean isContentIndexed) {
-		service.setIndexContent(getNodeReference(), isContentIndexed);
+		service.setIndexContent(getNodeRef(), isContentIndexed);
 		return this;
 	}
 
@@ -181,23 +174,23 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		if (destinationFolders.size() > 1) {
 			throw new UnsupportedOperationException("Can't move a node to more than one folder : " + destinationFolders);
 		}
-		for (NodeReference destinationFolder : destinationFolders) {
-			service.moveNode(getNodeReference(), destinationFolder);
+		for (NodeRef destinationFolder : destinationFolders) {
+			service.moveNode(getNodeRef(), destinationFolder);
 		}
 		return this;
 	}
 	/**
 	 * Copie le noeud dans le répertoire de destination. 
 	 */
-	public List<NodeReference> copyNode() {
+	public List<NodeRef> copyNode() {
 		return destinationFolders.stream().map(destinationFolder -> 
-			service.copyNode(getNodeReference(), destinationFolder, Optional.<String>empty()))
+			service.copyNode(getNodeRef(), destinationFolder, Optional.<String>empty()))
 				.collect(Collectors.toList());
 	}
 	
 	public ClassificationWithRootBuilder deletePrevious() {
-		String currentName = service.getNodeModelService().getProperty(getNodeReference(), CmModel.object.name);
-		for (NodeReference destinationFolder : destinationFolders) {
+		String currentName = service.getNodeModelService().getProperty(getNodeRef(), CmModel.object.name);
+		for (NodeRef destinationFolder : destinationFolders) {
 			service.deletePrevious(destinationFolder, currentName);
 		}
 		return this;
@@ -207,8 +200,8 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 * Créer un lien secondaire dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createSecondaryParent() {
-		for (NodeReference destinationFolder : destinationFolders) {
-			service.createSecondaryParent(getNodeReference(), destinationFolder);
+		for (NodeRef destinationFolder : destinationFolders) {
+			service.createSecondaryParent(getNodeRef(), destinationFolder);
 		}
 		return this;
 	}
@@ -217,8 +210,8 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 * Créer un raccourci dans le répertoire de destination.
 	 */
 	public ClassificationWithRootBuilder createFileLink() {
-		for (NodeReference destinationFolder : destinationFolders) {
-			service.createFileLink(getNodeReference(), destinationFolder, Optional.empty());
+		for (NodeRef destinationFolder : destinationFolders) {
+			service.createFileLink(getNodeRef(), destinationFolder, Optional.empty());
 		}
 		return this;
 	}

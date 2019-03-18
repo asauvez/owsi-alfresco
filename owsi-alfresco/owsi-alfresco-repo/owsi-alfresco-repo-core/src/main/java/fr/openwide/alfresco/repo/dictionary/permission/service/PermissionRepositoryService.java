@@ -4,21 +4,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public interface PermissionRepositoryService {
 
-	boolean hasPermission(NodeReference nodeReference, PermissionReference permission);
+	boolean hasPermission(NodeRef nodeRef, PermissionReference permission);
 	
-	void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions);
-	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission);
-	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed);
+	void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
+	public void setPermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission);
+	public void setPermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission, boolean allowed);
 	
-	void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission);
-	void deletePermissions(NodeReference nodeReference);
+	void deletePermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission);
+	void deletePermissions(NodeRef nodeRef);
 	
 	List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference);
 	List<RepositoryAccessControl> searchACLwithParentAuthorities(AuthorityReference authorityReference);

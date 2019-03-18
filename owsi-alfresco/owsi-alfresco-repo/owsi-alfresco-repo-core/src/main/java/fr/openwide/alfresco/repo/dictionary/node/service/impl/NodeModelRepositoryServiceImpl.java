@@ -36,8 +36,10 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAsso
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -56,68 +58,67 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	@Autowired private ConversionService conversionService;
 	
 	private String dataDictionaryChildName;
-	private SimpleCache<String, NodeReference> singletonCache; // eg. for dataDictionaryNodeRef
+	private SimpleCache<String, NodeRef> singletonCache; // eg. for dataDictionaryNodeRef
 	private final String KEY_DATADICTIONARY_NODEREF = "owsi.key.datadictionary.noderef";
 	
 	@Override
-	public NodeReference createFolder(NodeReference parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
-		return nodeModelService.createFolder(parentRef, folderName);
+	public NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
+		return conversionService.getRequired(nodeModelService.createFolder(conversionService.get(parentRef), folderName));
 	}
 	
 	@Override
-	public boolean exists(NodeReference nodeReference) {
-		return nodeService.exists(conversionService.getRequired(nodeReference));
+	public boolean exists(NodeRef nodeRef) {
+		return nodeService.exists(nodeRef);
 	}
 	
 	@Override
-	public void moveNode(NodeReference nodeReference, NodeReference newParentRef) {
-		String nodeName = getProperty(nodeReference, CmModel.object.name);
-		nodeService.moveNode(conversionService.getRequired(nodeReference), 
-				conversionService.getRequired(newParentRef), 
+	public void moveNode(NodeRef nodeRef, NodeRef newParentRef) {
+		String nodeName = getProperty(nodeRef, CmModel.object.name);
+		nodeService.moveNode(nodeRef, 
+				newParentRef, 
 				conversionService.getRequired(CmModel.folder.contains.getNameReference()), 
 				NodeRemoteServiceImpl.createAssociationName(nodeName));
 	}
 
 	@Override
-	public NodeReference copy(NodeReference nodeReference, NodeReference newParentRef, Optional<String> newName) {
-		NodeRef nodeRef = conversionService.getRequired(nodeReference);
+	public NodeRef copy(NodeRef nodeRef, NodeRef newParentRef, Optional<String> newName) {
 		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 		QName name = newName.isPresent() 
 				? NodeRemoteServiceImpl.createAssociationName(newName.get())
 				: primaryParent.getQName();
 		NodeRef copy = copyService.copy(
 			nodeRef, 
-			conversionService.getRequired(newParentRef), 
+			newParentRef, 
 			primaryParent.getTypeQName(), 
 			name, 
 			true);
 		nodeService.setProperty(copy, ContentModel.PROP_NAME, newName.isPresent() 
 				? newName.get()
 				: nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
-		return conversionService.get(copy);
+		return copy;
 	}
 
 	@Override
-	public boolean isType(NodeReference nodeReference, TypeModel typeModel) {
-		return typeModel.getNameReference().equals(getType(nodeReference));
+	public boolean isType(NodeRef nodeRef, TypeModel typeModel) {
+		return typeModel.getNameReference().equals(getType(nodeRef));
 	}
 	@Override
-	public NameReference getType(NodeReference nodeReference) {
-		return conversionService.get(nodeService.getType(conversionService.getRequired(nodeReference)));
-	}
-
-	@Override
-	public void setType(NodeReference nodeReference, NameReference type) {
-		nodeService.setType(conversionService.getRequired(nodeReference), conversionService.getRequired(type));
-	}
-	@Override
-	public void setType(NodeReference nodeReference, TypeModel type) {
-		setType(nodeReference, type.getNameReference());
+	public NameReference getType(NodeRef nodeRef) {
+		return conversionService.get(nodeService.getType(nodeRef));
 	}
 
 	@Override
-	public Set<NameReference> getAspects(NodeReference nodeReference) {
-		Set<QName> aspects = nodeService.getAspects(conversionService.getRequired(nodeReference));
+	public void setType(NodeRef nodeRef, NameReference type) {
+		nodeService.setType(nodeRef, conversionService.getRequired(type));
+	}
+	@Override
+	public void setType(NodeRef nodeRef, TypeModel type) {
+		setType(nodeRef, type.getNameReference());
+	}
+
+	@Override
+	public Set<NameReference> getAspects(NodeRef nodeRef) {
+		Set<QName> aspects = nodeService.getAspects(nodeRef);
 		Set<NameReference> nameReferences = new LinkedHashSet<>();
 		for (QName aspect : aspects) {
 			nameReferences.add(conversionService.get(aspect));
@@ -126,164 +127,181 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 
 	@Override
-	public boolean hasAspect(NodeReference nodeReference, NameReference aspect) {
-		return nodeService.hasAspect(conversionService.getRequired(nodeReference), conversionService.getRequired(aspect));
+	public boolean hasAspect(NodeRef nodeRef, NameReference aspect) {
+		return nodeService.hasAspect(nodeRef, conversionService.getRequired(aspect));
 	}
 	@Override
-	public boolean hasAspect(NodeReference nodeReference, AspectModel aspect) {
-		return hasAspect(nodeReference, aspect.getNameReference());
+	public boolean hasAspect(NodeRef nodeRef, AspectModel aspect) {
+		return hasAspect(nodeRef, aspect.getNameReference());
 	}
 
 	@Override
-	public void addAspect(NodeReference nodeReference, AspectModel aspect) {
-		addAspect(nodeReference, aspect, new BusinessNode());
+	public void addAspect(NodeRef nodeRef, AspectModel aspect) {
+		addAspect(nodeRef, aspect, new BusinessNode());
 	}
 	@Override
-	public void addAspect(NodeReference nodeReference, NameReference aspect) {
-		addAspect(nodeReference, aspect, new BusinessNode());
+	public void addAspect(NodeRef nodeRef, NameReference aspect) {
+		addAspect(nodeRef, aspect, new BusinessNode());
 	}
 	@Override
-	public void addAspect(NodeReference nodeReference, NameReference aspect, BusinessNode node) {
-		nodeService.addAspect(conversionService.getRequired(nodeReference), 
+	public void addAspect(NodeRef nodeRef, NameReference aspect, BusinessNode node) {
+		nodeService.addAspect(nodeRef, 
 				conversionService.getRequired(aspect), 
 				conversionService.getForRepository(node.getRepositoryNode().getProperties()));
 	}
 	@Override
-	public void addAspect(NodeReference nodeReference, AspectModel aspect, BusinessNode node) {
-		addAspect(nodeReference, aspect.getNameReference(), node);
+	public void addAspect(NodeRef nodeRef, AspectModel aspect, BusinessNode node) {
+		addAspect(nodeRef, aspect.getNameReference(), node);
 	}
 	
 	@Override
-	public void removeAspect(NodeReference nodeReference, NameReference aspect) {
-		nodeService.removeAspect(conversionService.getRequired(nodeReference), 
+	public void removeAspect(NodeRef nodeRef, NameReference aspect) {
+		nodeService.removeAspect(nodeRef, 
 				conversionService.getRequired(aspect));
 	}
 	@Override
-	public void removeAspect(NodeReference nodeReference, AspectModel aspect) {
-		removeAspect(nodeReference, aspect.getNameReference());
+	public void removeAspect(NodeRef nodeRef, AspectModel aspect) {
+		removeAspect(nodeRef, aspect.getNameReference());
 	}
 
 	@Override
-	public void deleteNode(NodeReference nodeReference) {
-		nodeService.deleteNode(conversionService.getRequired(nodeReference));
+	public void deleteNode(NodeRef nodeRef) {
+		nodeService.deleteNode(nodeRef);
 	}
 	@Override
-	public void deleteNodePermanently(NodeReference nodeReference) {
-		addAspect(nodeReference, SysModel.temporary);
-		deleteNode(nodeReference);
+	public void deleteNodePermanently(NodeRef nodeRef) {
+		addAspect(nodeRef, SysModel.temporary);
+		deleteNode(nodeRef);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(NodeReference nodeReference, NameReference property) {
+	public <C extends Serializable> C getProperty(NodeRef nodeRef, NameReference property) {
 		return (C) conversionService.getForApplication(nodeService.getProperty(
-				conversionService.getRequired(nodeReference),
+				nodeRef,
 				conversionService.getRequired(property)));
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(NodeReference nodeReference, SinglePropertyModel<C> property) {
-		return (C) getProperty(nodeReference, property.getNameReference());
+	public <C extends Serializable> C getProperty(NodeRef nodeRef, SinglePropertyModel<C> property) {
+		return (C) getProperty(nodeRef, property.getNameReference());
 	}
 	@Override
-	public <E extends Enum<E>> E getProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property) {
-		return PropertiesNode.textToEnum(property, (String) getProperty(nodeReference, property.getNameReference()));
+	public NodeRef getProperty(NodeRef nodeRef, NodeReferencePropertyModel property) {
+		return conversionService.getRequired((NodeReference) getProperty(nodeRef, property.getNameReference()));
+	}
+	@Override
+	public <E extends Enum<E>> E getProperty(NodeRef nodeRef, EnumTextPropertyModel<E> property) {
+		return PropertiesNode.textToEnum(property, (String) getProperty(nodeRef, property.getNameReference()));
 	}
 	@Override
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> List<C> getProperty(NodeReference nodeReference, MultiPropertyModel<C> property) {
-		return (List<C>) getProperty(nodeReference, property.getNameReference());
+	public <C extends Serializable> List<C> getProperty(NodeRef nodeRef, MultiPropertyModel<C> property) {
+		return (List<C>) getProperty(nodeRef, property.getNameReference());
+	}
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<NodeRef> getProperty(NodeRef nodeRef, MultiNodeReferencePropertyModel property) {
+		return (List<NodeRef>) getProperty(nodeRef, property.getNameReference());
 	}
 
 	@Override
-	public <C extends Serializable> void setProperty(NodeReference nodeReference, SinglePropertyModel<C> property, C value) {
-		setProperty(nodeReference, property.getNameReference(), value);
+	public <C extends Serializable> void setProperty(NodeRef nodeRef, SinglePropertyModel<C> property, C value) {
+		setProperty(nodeRef, property.getNameReference(), value);
 	}
 	@Override
-	public <E extends Enum<E>> void setProperty(NodeReference nodeReference, EnumTextPropertyModel<E> property, E value) {
+	public void setProperty(NodeRef nodeRef, NodeReferencePropertyModel property, NodeRef value) {
+		setProperty(nodeRef, property.getNameReference(), conversionService.get(nodeRef));
+	}
+	@Override
+	public <E extends Enum<E>> void setProperty(NodeRef nodeRef, EnumTextPropertyModel<E> property, E value) {
 		String code = PropertiesNode.enumToText(value);
-		setProperty(nodeReference, property.getNameReference(), code);
+		setProperty(nodeRef, property.getNameReference(), code);
 	}
 	@Override
-	public <C extends Serializable> void setProperty(NodeReference nodeReference, MultiPropertyModel<C> property, List<C> value) {
-		setProperty(nodeReference, property.getNameReference(), (Serializable) value);
+	public <C extends Serializable> void setProperty(NodeRef nodeRef, MultiPropertyModel<C> property, List<C> value) {
+		setProperty(nodeRef, property.getNameReference(), (Serializable) value);
+	}
+	@Override
+	public void setProperty(NodeRef nodeRef, MultiNodeReferencePropertyModel property, List<NodeRef> value) {
+		setProperty(nodeRef, property.getNameReference(), (Serializable) value);
 	}
 
 	@Override
-	public <C extends Serializable> void setProperty(NodeReference nodeReference, NameReference property, C value) {
+	public <C extends Serializable> void setProperty(NodeRef nodeRef, NameReference property, C value) {
 		nodeService.setProperty(
-				conversionService.getRequired(nodeReference),
+				nodeRef,
 				conversionService.getRequired(property),
 				conversionService.getForRepository(value));
 	}
 	@Override
-	public <C extends Serializable>  void removeProperty(NodeReference nodeReference, SinglePropertyModel<C> property) {
-		nodeService.removeProperty(conversionService.getRequired(nodeReference),conversionService.getRequired( property.getNameReference()));
+	public <C extends Serializable>  void removeProperty(NodeRef nodeRef, SinglePropertyModel<C> property) {
+		nodeService.removeProperty(nodeRef,conversionService.getRequired( property.getNameReference()));
 	}
 
 	@Override
-	public Optional<NodeReference> getPrimaryParent(NodeReference nodeReference) {
-		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(conversionService.getRequired(nodeReference));
+	public Optional<NodeRef> getPrimaryParent(NodeRef nodeRef) {
+		ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
 		return (primaryParent != null && primaryParent.getParentRef() != null) 
-				? Optional.of(conversionService.get(primaryParent.getParentRef()))
-				: Optional.<NodeReference>empty();
+				? Optional.of(primaryParent.getParentRef())
+				: Optional.<NodeRef>empty();
 	}
 
 	@Override
-	public List<NodeReference> getParentAssocs(NodeReference nodeReference) {
-		List<ChildAssociationRef> children = nodeService.getParentAssocs(conversionService.getRequired(nodeReference));
-		List<NodeReference> list = new ArrayList<>();
+	public List<NodeRef> getParentAssocs(NodeRef nodeRef) {
+		List<ChildAssociationRef> children = nodeService.getParentAssocs(nodeRef);
+		List<NodeRef> list = new ArrayList<>();
 		for (ChildAssociationRef child : children) {
-			list.add(conversionService.get(child.getParentRef()));
+			list.add(child.getParentRef());
 		}
 		return list;
 	}
 
 	@Override
-	public Optional<NodeReference> getChildAssocs(NodeReference nodeReference, ChildAssociationModel associationType, NameReference assocName) {
+	public Optional<NodeRef> getChildAssocs(NodeRef nodeRef, ChildAssociationModel associationType, NameReference assocName) {
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(
-				conversionService.getRequired(nodeReference), 
+				nodeRef, 
 				conversionService.getRequired(associationType.getNameReference()), 
 				conversionService.getRequired(assocName));
 		return Optional.ofNullable((children.isEmpty()) 
 				? null
-				: conversionService.get(children.get(0).getChildRef()));
+				: children.get(0).getChildRef());
 	}
 	@Override
-	public List<NodeReference> getChildrenAssocsContains(NodeReference nodeReference) {
-		return getChildrenAssocs(nodeReference, CmModel.folder.contains);
+	public List<NodeRef> getChildrenAssocsContains(NodeRef nodeRef) {
+		return getChildrenAssocs(nodeRef, CmModel.folder.contains);
 	}
 	@Override
-	public List<NodeReference> getChildrenAssocs(NodeReference nodeReference, ChildAssociationModel associationType) {
+	public List<NodeRef> getChildrenAssocs(NodeRef nodeRef, ChildAssociationModel associationType) {
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(
-				conversionService.getRequired(nodeReference), 
+				nodeRef, 
 				conversionService.getRequired(associationType.getNameReference()), 
 				RegexQNamePattern.MATCH_ALL);
-		return children.stream().map(child -> conversionService.get(child.getChildRef()))
+		return children.stream().map(child -> child.getChildRef())
 				.collect(Collectors.toList());
 	}
 	@Override
-	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName) {
-		return getChildByName(nodeReference, childName, CmModel.folder.contains);
+	public Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName) {
+		return getChildByName(nodeRef, childName, CmModel.folder.contains);
 	}
 	@Override
-	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, ChildAssociationModel associationType) {
-		return getChildByName(nodeReference, childName, associationType.getNameReference());
+	public Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, ChildAssociationModel associationType) {
+		return getChildByName(nodeRef, childName, associationType.getNameReference());
 	}
 
 	@Override
-	public Optional<NodeReference> getChildByName(NodeReference nodeReference, String childName, NameReference associationType) {
+	public Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, NameReference associationType) {
 		NodeRef subNodeRef = nodeService.getChildByName(
-				conversionService.getRequired(nodeReference), 
+				nodeRef, 
 				conversionService.getRequired(associationType), 
 				QName.createValidLocalName(childName));
-		NodeReference subnodeReference = (subNodeRef != null) ? conversionService.get(subNodeRef) : null;
-		return Optional.ofNullable(subnodeReference);
+		NodeRef subnodeRef = (subNodeRef != null) ? subNodeRef : null;
+		return Optional.ofNullable(subnodeRef);
 	}
 	
 	@Override
-	public String getUniqueChildName(NodeReference folder, String originalName) {
+	public String getUniqueChildName(NodeRef folder, String originalName) {
 		String extension = FilenameUtils.getExtension(originalName);
 		if (! extension.isEmpty()) {
 			extension = "." + extension;
@@ -297,9 +315,9 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		return name;
 	}
 	@Override
-	public String getUniqueChildName(NodeReference folder, NodeReference document) {
+	public String getUniqueChildName(NodeRef folder, NodeRef document) {
 		String originalName = getProperty(document, CmModel.object.name);
-		Optional<NodeReference> childByName = getChildByName(folder, originalName);
+		Optional<NodeRef> childByName = getChildByName(folder, originalName);
 		if (! childByName.isPresent() || childByName.get().equals(document)) {
 			return originalName;
 		}
@@ -307,40 +325,39 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	
 	@Override
-	public void addChild(NodeReference parentRef, NodeReference childRef) {
+	public void addChild(NodeRef parentRef, NodeRef childRef) {
 		addChild(parentRef, childRef, CmModel.folder.contains);
 	}
 	@Override
-	public void addChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType) {
+	public void addChild(NodeRef parentRef, NodeRef childRef, ChildAssociationModel assocType) {
 		addChild(parentRef, childRef, assocType.getNameReference());
 	}
 	@Override
-	public void addChild(NodeReference parentRef, NodeReference childRef, NameReference assocType) {
+	public void addChild(NodeRef parentRef, NodeRef childRef, NameReference assocType) {
 		String childName = getProperty(childRef, CmModel.object.name);
-		nodeService.addChild(conversionService.getRequired(parentRef), 
-				conversionService.getRequired(childRef), 
+		nodeService.addChild(parentRef, 
+				childRef, 
 				conversionService.getRequired(assocType), 
 				NodeRemoteServiceImpl.createAssociationName(childName));
 	}
 	
 	@Override
-	public void removeChild(NodeReference parentRef, NodeReference childRef) {
+	public void removeChild(NodeRef parentRef, NodeRef childRef) {
 		removeChild(parentRef, childRef, CmModel.folder.contains);
 	}
 	@Override
-	public void removeChild(NodeReference parentRef, NodeReference childRef, ChildAssociationModel assocType) {
+	public void removeChild(NodeRef parentRef, NodeRef childRef, ChildAssociationModel assocType) {
 		removeChild(parentRef, childRef, assocType.getNameReference());
 	}
 	@Override
-	public void removeChild(NodeReference parentRef, NodeReference childRef, NameReference assocType) {
+	public void removeChild(NodeRef parentRef, NodeRef childRef, NameReference assocType) {
 		String childName = getProperty(childRef, CmModel.object.name);
 		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
-				conversionService.getRequired(parentRef), 
+				parentRef, 
 				conversionService.getRequired(assocType), 
 				NodeRemoteServiceImpl.createAssociationName(childName));
-		NodeRef child = conversionService.getRequired(childRef);
 		for (ChildAssociationRef assoc : assocs) {
-			if (assoc.getChildRef().equals(child)) {
+			if (assoc.getChildRef().equals(childRef)) {
 				nodeService.removeChildAssociation(assoc);
 				return;
 			}
@@ -348,9 +365,9 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		throw new IllegalStateRemoteException("Can't find secondary child association " + parentRef + "/" + childRef);
 	}
 	@Override
-	public void unlinkSecondaryParents(NodeReference nodeReference, ChildAssociationModel childAssociationModel) {
+	public void unlinkSecondaryParents(NodeRef nodeRef, ChildAssociationModel childAssociationModel) {
 		List<ChildAssociationRef> parentAssocs = nodeService.getParentAssocs(
-				conversionService.getRequired(nodeReference), 
+				nodeRef, 
 				conversionService.getRequired(childAssociationModel.getNameReference()), 
 				RegexQNamePattern.MATCH_ALL);
 		for (ChildAssociationRef assoc : parentAssocs) {
@@ -361,25 +378,25 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	
 	@Override
-	public void createAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType) {
+	public void createAssociation(NodeRef sourceRef, NodeRef targetRef, AssociationModel assocType) {
 		createAssociation(sourceRef, targetRef, assocType.getNameReference());
 	}
 	@Override
-	public void createAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType) {
+	public void createAssociation(NodeRef sourceRef, NodeRef targetRef, NameReference assocType) {
 		nodeService.createAssociation(
-				conversionService.getRequired(sourceRef), 
-				conversionService.getRequired(targetRef), 
+				sourceRef, 
+				targetRef, 
 				conversionService.getRequired(assocType));
 	}
 	@Override
-	public void removeAssociation(NodeReference sourceRef, NodeReference targetRef, AssociationModel assocType) {
+	public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, AssociationModel assocType) {
 		removeAssociation(sourceRef, targetRef, assocType.getNameReference());
 	}
 	@Override
-	public void removeAssociation(NodeReference sourceRef, NodeReference targetRef, NameReference assocType) {
+	public void removeAssociation(NodeRef sourceRef, NodeRef targetRef, NameReference assocType) {
 		nodeService.removeAssociation(
-				conversionService.getRequired(sourceRef), 
-				conversionService.getRequired(targetRef), 
+				sourceRef, 
+				targetRef, 
 				conversionService.getRequired(assocType));
 	}
 	
@@ -387,49 +404,49 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	
 	
 	@Override
-	public List<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc) {
-		return _getTargetAssocs(nodeReference, assoc);
+	public List<NodeRef> getTargetAssocs(NodeRef nodeRef, ManyToManyAssociationModel assoc) {
+		return _getTargetAssocs(nodeRef, assoc);
 	}
 	@Override
-	public List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToManyAssociationModel assoc) {
-		return _getSourceAssocs(nodeReference, assoc);
+	public List<NodeRef> getSourceAssocs(NodeRef nodeRef, ManyToManyAssociationModel assoc) {
+		return _getSourceAssocs(nodeRef, assoc);
 	}
 	@Override
-	public Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc) {
-		return toOptional(_getTargetAssocs(nodeReference, assoc));
+	public Optional<NodeRef> getTargetAssocs(NodeRef nodeRef, ManyToOneAssociationModel assoc) {
+		return toOptional(_getTargetAssocs(nodeRef, assoc));
 	}
 	@Override
-	public List<NodeReference> getSourceAssocs(NodeReference nodeReference, ManyToOneAssociationModel assoc) {
-		return _getSourceAssocs(nodeReference, assoc);
+	public List<NodeRef> getSourceAssocs(NodeRef nodeRef, ManyToOneAssociationModel assoc) {
+		return _getSourceAssocs(nodeRef, assoc);
 	}
 	@Override
-	public List<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc) {
-		return _getTargetAssocs(nodeReference, assoc);
+	public List<NodeRef> getTargetAssocs(NodeRef nodeRef, OneToManyAssociationModel assoc) {
+		return _getTargetAssocs(nodeRef, assoc);
 	}
 	@Override
-	public Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToManyAssociationModel assoc) {
-		return toOptional(_getSourceAssocs(nodeReference, assoc));
+	public Optional<NodeRef> getSourceAssocs(NodeRef nodeRef, OneToManyAssociationModel assoc) {
+		return toOptional(_getSourceAssocs(nodeRef, assoc));
 	}
 	@Override
-	public Optional<NodeReference> getTargetAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc) {
-		return toOptional(_getTargetAssocs(nodeReference, assoc));
+	public Optional<NodeRef> getTargetAssocs(NodeRef nodeRef, OneToOneAssociationModel assoc) {
+		return toOptional(_getTargetAssocs(nodeRef, assoc));
 	}
 	@Override
-	public Optional<NodeReference> getSourceAssocs(NodeReference nodeReference, OneToOneAssociationModel assoc) {
-		return getSourceAssocs(nodeReference, assoc);
+	public Optional<NodeRef> getSourceAssocs(NodeRef nodeRef, OneToOneAssociationModel assoc) {
+		return getSourceAssocs(nodeRef, assoc);
 	}
-	private List<NodeReference> _getTargetAssocs(NodeReference nodeReference, AssociationModel assoc) {
+	private List<NodeRef> _getTargetAssocs(NodeRef nodeRef, AssociationModel assoc) {
 		return nodeService.getTargetAssocs(
-				conversionService.getRequired(nodeReference), 
+				nodeRef, 
 				conversionService.getRequired(assoc.getNameReference())).stream()
-			.map(assocRef -> conversionService.get(assocRef.getTargetRef()))
+			.map(assocRef -> assocRef.getTargetRef())
 			.collect(Collectors.toList());
 	}
-	private List<NodeReference> _getSourceAssocs(NodeReference nodeReference, AssociationModel assoc) {
+	private List<NodeRef> _getSourceAssocs(NodeRef nodeRef, AssociationModel assoc) {
 		return nodeService.getSourceAssocs(
-				conversionService.getRequired(nodeReference), 
+				nodeRef, 
 				conversionService.getRequired(assoc.getNameReference())).stream()
-			.map(assocRef -> conversionService.get(assocRef.getSourceRef()))
+			.map(assocRef -> assocRef.getSourceRef())
 			.collect(Collectors.toList());
 	}
 	private <T> Optional<T> toOptional(List<T> list) {
@@ -440,17 +457,17 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	
 	
 	@Override
-	public NodeReference getCompanyHome() {
-		return conversionService.get(repositoryHelper.getCompanyHome());
+	public NodeRef getCompanyHome() {
+		return repositoryHelper.getCompanyHome();
 	}
 	@Override
-	public NodeReference getDataDictionary() {
-		NodeReference dataDictionaryRef = singletonCache.get(KEY_DATADICTIONARY_NODEREF);
+	public NodeRef getDataDictionary() {
+		NodeRef dataDictionaryRef = singletonCache.get(KEY_DATADICTIONARY_NODEREF);
 		if (dataDictionaryRef == null) {
-			dataDictionaryRef = AuthenticationUtil.runAs(new RunAsWork<NodeReference>() {
+			dataDictionaryRef = AuthenticationUtil.runAs(new RunAsWork<NodeRef>() {
 				@Override
-				public NodeReference doWork() throws Exception {
-					NodeReference parent = getCompanyHome();
+				public NodeRef doWork() throws Exception {
+					NodeRef parent = getCompanyHome();
 					return getChildAssocs(parent, CmModel.folder.contains, NameReference.create(dataDictionaryChildName)).get();
 				}
 			}, AuthenticationUtil.getSystemUserName());
@@ -465,14 +482,9 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	 * Cela ne tient pas compte de possible runAs.
 	 */
 	@Override
-	public Optional<NodeReference> getUserHome() {
+	public Optional<NodeRef> getUserHome() {
 		NodeRef person = repositoryHelper.getFullyAuthenticatedPerson();
-		NodeRef userHome = repositoryHelper.getUserHome(person);
-		if (userHome != null) {
-			return Optional.of(conversionService.get(userHome));
-		} else {
-			return Optional.empty();
-		}
+		return Optional.ofNullable(repositoryHelper.getUserHome(person));
 	}
 
 	/**
@@ -481,23 +493,23 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	 * Cette méthode n'utilise pas de recherche Lucene.
 	 */
 	@Override
-	public Optional<NodeReference> getByNamedPath(String ... names) {
-		NodeReference nodeReference = conversionService.get(repositoryHelper.getCompanyHome());
+	public Optional<NodeRef> getByNamedPath(String ... names) {
+		NodeRef nodeRef = repositoryHelper.getCompanyHome();
 		for (String name : names) {
 			if (! name.isEmpty()) {
-				Optional<NodeReference> optional = getChildByName(nodeReference, name);
+				Optional<NodeRef> optional = getChildByName(nodeRef, name);
 				if (! optional.isPresent()) {
 					return optional;
 				}
-				nodeReference = optional.get();
+				nodeRef = optional.get();
 			}
 		}
-		return Optional.of(nodeReference);
+		return Optional.of(nodeRef);
 	}
 	
 	@Override
-	public String getPath(NodeReference nodeReference) {
-		return nodeService.getPath(conversionService.getRequired(nodeReference)).toString();
+	public String getPath(NodeRef nodeRef) {
+		return nodeService.getPath(nodeRef).toString();
 	}
 
 	public void setRepositoryHelper(Repository repositoryHelper) {
@@ -506,7 +518,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	public void setDataDictionaryChildName(String dataDictionaryChildName) {
 		this.dataDictionaryChildName = dataDictionaryChildName;
 	}
-	public void setSingletonCache(SimpleCache<String, NodeReference> singletonCache) {
+	public void setSingletonCache(SimpleCache<String, NodeRef> singletonCache) {
 		this.singletonCache = singletonCache;
 	}
 

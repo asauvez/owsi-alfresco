@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.importer.ImporterBootstrap;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -26,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -122,34 +122,34 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 
 	@Override
-	public NodeReference createRootCategory(String categoryName) {
+	public NodeRef createRootCategory(String categoryName) {
 		logger.debug("Create root category " + categoryName);
 		
-		return conversionService.get(categoryService.createRootCategory(
+		return categoryService.createRootCategory(
 				StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, 
 				ContentModel.ASPECT_GEN_CLASSIFIABLE, 
-				categoryName));
+				categoryName);
 	}
 
 	@Override
-	public NodeReference createCategory(NodeReference parentCategory, String categoryName) {
+	public NodeRef createCategory(NodeRef parentCategory, String categoryName) {
 		logger.debug("Create category " + categoryName);
 		
-		return conversionService.get(categoryService.createCategory(conversionService.getRequired(parentCategory), categoryName));
+		return categoryService.createCategory(parentCategory, categoryName);
 	}
 
 	@Override
-	public NodeReference importFileFromClassPath(NodeReference parentRef, String fileName) {
+	public NodeRef importFileFromClassPath(NodeRef parentRef, String fileName) {
 		try (InputStream content = getClass().getClassLoader().getResourceAsStream(fileName)) {
-			return nodeModelService.create(new BusinessNode(parentRef, CmModel.content, FilenameUtils.getName(fileName))
-					.contents().set(content));
+			return conversionService.getRequired(nodeModelService.create(new BusinessNode(conversionService.get(parentRef), CmModel.content, FilenameUtils.getName(fileName))
+					.contents().set(content)));
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 	
 	@Override
-	public void importView(NodeReference parentRef, String viewFileName, String messageFileName) {
+	public void importView(NodeRef parentRef, String viewFileName, String messageFileName) {
 		logger.debug("Import view "  + viewFileName);
 		
 		String path = nodeModelRepositoryService.getPath(parentRef);

@@ -2,7 +2,8 @@ package fr.openwide.alfresco.demo.repo.patch;
 
 import java.util.Optional;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.demo.business.model.DemoModel;
 import fr.openwide.alfresco.repo.module.bootstrap.patch.AbstractBootstrapPatch;
 
@@ -12,12 +13,12 @@ public class DemoPatch extends AbstractBootstrapPatch {
 
 	@Override
 	protected void executeInternal() throws Throwable {
-		NodeReference companyHome = nodeModelService.getCompanyHome();
-		Optional<NodeReference> demoFolder = nodeModelService.getChildByName(companyHome, DEMO_FOLDER_NAME);
+		NodeRef companyHome = nodeModelService.getCompanyHome();
+		Optional<NodeRef> demoFolder = nodeModelService.getChildByName(companyHome, DEMO_FOLDER_NAME);
 		if (! demoFolder.isPresent()) {
 			demoFolder = Optional.of(nodeModelService.createFolder(companyHome, DEMO_FOLDER_NAME));
 		}
-		identificationService.setIdentifier(demoFolder.get(), DemoModel.DEMO_ROOT_FOLDER);
+		identificationService.setIdentifier(conversionService.get(demoFolder.get()), DemoModel.DEMO_ROOT_FOLDER);
 	}
 
 }

@@ -21,7 +21,6 @@
 	<bean id="owsi.service.deleteIfEmptyService" class="fr.openwide.alfresco.repo.module.deleteifempty.service.impl.DeleteIfEmptyServiceImpl"
 			depends-on="owsi.dictionaryBootstrap">
 		<property name="policyRepositoryService" ref="owsi.service.policyService"/>
-		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 
 	<bean id="owsi.service.identificationService" class="fr.openwide.alfresco.api.module.identification.service.impl.IdentificationServiceImpl">

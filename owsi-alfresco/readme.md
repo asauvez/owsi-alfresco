@@ -30,6 +30,7 @@ Nouveautés
 * alfresco.module.version devient project.version
 * NodeModelRepositoryService n'etends plus NodeServiceImpl
 * delete() devient deleteNode()
+* NodeModelRepositoryService utilise des NodeRef au lieu de NodeReference
 
 ## depuis 0.7.0
 * Alfresco 5.2.4
@@ -58,6 +59,9 @@ Nouveautés
 
 Migration
 =========
+
+## vers 0.8.0
+* NodeModelRepositoryService utilise des NodeRef au lieu de NodeReference
 
 ## vers 0.5.0
 ### Changement de paquets Maven
