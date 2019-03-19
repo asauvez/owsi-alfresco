@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.7.0</version>
+		<version>0.8.0</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-api</artifactId>
 	<packaging>pom</packaging>
@@ -13,10 +13,10 @@
 
 	<properties>
 		<owsi-alfresco.api.guava.version>11.0.2</owsi-alfresco.api.guava.version> <!-- alfresco version -->
-		<owsi-alfresco.api.jackson.version>2.8.3</owsi-alfresco.api.jackson.version> <!-- alfresco version -->
-		<owsi-alfresco.api.spring.version>3.2.17.RELEASE</owsi-alfresco.api.spring.version> <!-- alfresco version -->
+		<owsi-alfresco.api.jackson.version>2.9.5</owsi-alfresco.api.jackson.version> <!-- alfresco version -->
+		<owsi-alfresco.api.spring.version>5.0.4.RELEASE</owsi-alfresco.api.spring.version> <!-- alfresco version -->
 		<owsi-alfresco.api.slf4j.version>1.7.21</owsi-alfresco.api.slf4j.version> <!-- alfresco version -->
-		<owsi-alfresco.api.junit.version>4.11</owsi-alfresco.api.junit.version> <!-- owsi-core version -->
+		<owsi-alfresco.api.junit.version>4.12</owsi-alfresco.api.junit.version> <!-- owsi-core version -->
 		<owsi-alfresco.api.commons-lang3.version>3.3.2</owsi-alfresco.api.commons-lang3.version> <!-- alfresco version -->
 	</properties>
 
@@ -25,7 +25,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.7.0</version>
+				<version>0.8.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -33,47 +33,56 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>${owsi-alfresco.api.commons-lang3.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>${owsi-alfresco.api.guava.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
 				<version>${owsi-alfresco.api.jackson.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-aop</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-asm</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-beans</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context-support</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-core</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
@@ -85,37 +94,44 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-expression</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-jdbc</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-orm</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-tx</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-web</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-webmvc</artifactId>
 				<version>${owsi-alfresco.api.spring.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${owsi-alfresco.api.slf4j.version}</version>
+				<scope>provided</scope>
 			</dependency>
 			
 			<dependency>
@@ -167,7 +183,7 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.7.0</version>
+						<version>0.8.0</version>
 					</dependency>
 				</dependencies>
 			</plugin>

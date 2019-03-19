@@ -1,7 +1,8 @@
 package fr.openwide.alfresco.repo.module.bootstrap.service;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 
 public interface BootstrapService {
@@ -13,10 +14,10 @@ public interface BootstrapService {
 	AuthorityReference createUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities);
 	AuthorityReference createTestUser(String username, AuthorityReference ... parentAuthorities);
 
-	NodeReference createRootCategory(String categoryName);
-	NodeReference createCategory(NodeReference parentCategory, String categoryName);
+	NodeRef createRootCategory(String categoryName);
+	NodeRef createCategory(NodeRef parentCategory, String categoryName);
 
-	NodeReference importFileFromClassPath(NodeReference parentRef, String fileName);
-	void importView(NodeReference parentRef, String viewFileName, String messageFileName);
+	NodeRef importFileFromClassPath(NodeRef parentRef, String fileName);
+	void importView(NodeRef parentRef, String viewFileName, String messageFileName);
 
 }

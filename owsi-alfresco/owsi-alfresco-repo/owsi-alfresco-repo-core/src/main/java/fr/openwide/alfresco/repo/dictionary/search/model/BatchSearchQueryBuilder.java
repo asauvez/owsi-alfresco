@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 
@@ -15,7 +15,7 @@ public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(BatchSearchQueryBuilder.class);
 	
-	private Consumer<NodeReference> consumer = null;
+	private Consumer<NodeRef> consumer = null;
 	private String[] configurationName = new String[0];
 	
 	private AspectModel alreadyDoneAspect = null;
@@ -24,13 +24,13 @@ public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 	private Integer transactionSize = null;
 	private boolean transactionReadOnly = false;
 	
-	private List<NodeReference> fakeResults = null;
+	private List<NodeRef> fakeResults = null;
 	
-	public BatchSearchQueryBuilder consumer(Consumer<NodeReference> consumer) {
+	public BatchSearchQueryBuilder consumer(Consumer<NodeRef> consumer) {
 		this.consumer = consumer;
 		return this;
 	}
-	public Consumer<NodeReference> getConsumer() {
+	public Consumer<NodeRef> getConsumer() {
 		return consumer;
 	}
 	
@@ -87,23 +87,23 @@ public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 		return this;
 	}
 	
-	public BatchSearchQueryBuilder fakeResults(List<NodeReference> fakeResults) {
+	public BatchSearchQueryBuilder fakeResults(List<NodeRef> fakeResults) {
 		this.fakeResults = fakeResults;
 		return this;
 	}
 	public BatchSearchQueryBuilder fakeResults(String fakeResults) {
 		if (fakeResults != null) {
-			List<NodeReference> list = new ArrayList<>();
+			List<NodeRef> list = new ArrayList<>();
 			for (String nodeReference : fakeResults.split(",")) {
 				if (! nodeReference.trim().isEmpty()) {
-					list.add(NodeReference.create(nodeReference.trim()));
+					list.add(new NodeRef(nodeReference.trim()));
 				}
 			}
 			fakeResults(list);
 		}
 		return this;
 	}
-	public List<NodeReference> getFakeResults() {
+	public List<NodeRef> getFakeResults() {
 		return fakeResults;
 	}
 }

@@ -88,11 +88,11 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			}
 			
 			String firstUrl = (urls.length > 0) ? urls[0] : "";
-			String wsFolder = (! generateWebScript.wsFolder().isEmpty()) ? generateWebScript.wsFolder() : StringUtils.substringBeforeLast(firstUrl, "/");
-			String wsName = (! generateWebScript.wsName().isEmpty()) ? generateWebScript.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(firstUrl, "/"), "?").replace(".", "-");
+			String wsFolder = (! generateWebScript.wsFolder().isEmpty()) ? generateWebScript.wsFolder() : StringUtils.substringBeforeLast(firstUrl, "/").replace('{', '_').replace('}', '_');
+			String wsName = (! generateWebScript.wsName().isEmpty()) ? generateWebScript.wsName() : StringUtils.substringBefore(StringUtils.substringAfterLast(firstUrl, "/"), "?").replace(".", "-").replace('{', '_').replace('}', '_');
 
-			String shortName = (! generateWebScript.shortName().isEmpty()) ? StringEscapeUtils.escapeXml11(generateWebScript.shortName()) : wsName;
-			CharSequence description = (! generateWebScript.description().isEmpty()) ? StringEscapeUtils.escapeXml11(generateWebScript.description()) : className;
+			String shortName = (! generateWebScript.shortName().isEmpty()) ? StringEscapeUtils.escapeXml10(generateWebScript.shortName()) : wsName;
+			CharSequence description = (! generateWebScript.description().isEmpty()) ? StringEscapeUtils.escapeXml10(generateWebScript.description()) : className;
 
 			String family = generateWebScript.family();
 			if (family.isEmpty()) {
@@ -113,12 +113,12 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 					out.println("	<shortname>" + shortName + "</shortname>");
 					out.println("	<description>" + description + "</description>");
 					for (String url : urls) {
-						out.println("	<url>" + StringEscapeUtils.escapeXml11(url) + "</url>");
+						out.println("	<url>" + StringEscapeUtils.escapeXml10(url) + "</url>");
 					}
 					out.println("	<format default=\"" + formatDefault + "\">" + generateWebScript.format().name().toLowerCase() + "</format>");
 					out.println("	<authentication>" + generateWebScript.authentication().name().toLowerCase() + "</authentication>");
 					out.println("	<transaction allow=\"" + generateWebScript.transactionAllow().name().toLowerCase()+ "\">" + generateWebScript.transaction().name().toLowerCase() + "</transaction>");
-					out.println("	<family>" + StringEscapeUtils.escapeXml11(family) + "</family>");
+					out.println("	<family>" + StringEscapeUtils.escapeXml10(family) + "</family>");
 					out.println("</webscript>");
 
 					out.flush();

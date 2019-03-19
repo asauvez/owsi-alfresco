@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.alfresco.enterprise.repo.authorization.AuthorizationService;
 import org.alfresco.service.cmr.preference.PreferenceService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
@@ -27,12 +28,12 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
@@ -51,7 +52,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	private PermissionService permissionService;
 	private AuthorityService authorityService;
 	private ConversionService conversionService;
-	private NodeModelRepositoryService nodeModelService;
+	@Autowired private NodeModelRepositoryService nodeModelService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
 	private PreferenceService preferenceService;
@@ -62,25 +63,29 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	
 	
 	@Override
-	public boolean hasPermission(NodeReference nodeReference, PermissionReference permission) {
-		return permissionService.hasPermission(conversionService.getRequired(nodeReference), permission.getName()) == AccessStatus.ALLOWED;
+	public boolean hasPermission(NodeRef nodeRef, PermissionReference permission) {
+		return permissionService.hasPermission(nodeRef, permission.getName()) == AccessStatus.ALLOWED;
 	}
 	
 	@Override
-	public void setInheritParentPermissions(NodeReference nodeReference, boolean inheritParentPermissions) {
-		permissionService.setInheritParentPermissions(conversionService.getRequired(nodeReference), inheritParentPermissions);
+	public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions) {
+		permissionService.setInheritParentPermissions(nodeRef, inheritParentPermissions);
 	}
 	@Override
-	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
-		setPermission(nodeReference, authority, permission, true);
+	public void setPermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission) {
+		setPermission(nodeRef, authority, permission, true);
 	}
 	@Override
-	public void setPermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed) {
-		permissionService.setPermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName(), allowed);
+	public void setPermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission, boolean allowed) {
+		permissionService.setPermission(nodeRef, authority.getName(), permission.getName(), allowed);
 	}
 	@Override
-	public void deletePermission(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission) {
-		permissionService.deletePermission(conversionService.getRequired(nodeReference), authority.getName(), permission.getName());
+	public void deletePermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission) {
+		permissionService.deletePermission(nodeRef, authority.getName(), permission.getName());
+	}
+	@Override
+	public void deletePermissions(NodeRef nodeRef) {
+		permissionService.deletePermissions(nodeRef);
 	}
 	
 	@Override
@@ -184,8 +189,8 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			if (maxItem.isPresent() && maxItem.get() == cpt) {
 				break;
 			}
-			setPermission(acl.getNodeReference(), newAuthority, acl.getPermission(), acl.isAllowed());
-			deletePermission(acl.getNodeReference(), oldAuthority, acl.getPermission());
+			setPermission(conversionService.getRequired(acl.getNodeReference()), newAuthority, acl.getPermission(), acl.isAllowed());
+			deletePermission(conversionService.getRequired(acl.getNodeReference()), oldAuthority, acl.getPermission());
 			cpt ++;
 		}
 		
@@ -196,7 +201,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			for (TextPropertyModel propertyModel: propertyModels) {
 				newMax = maxItem.isPresent() ? maxItem.get() - cpt : null;
 				RestrictionBuilder restrictionOnUserNode = new RestrictionBuilder().eq(propertyModel, oldAuthorityName).of();
-				Consumer<NodeReference> changePropPrivileged =  disableBehaviour(getChangePropConsumer(newAuthorityName, propertyModel));
+				Consumer<NodeRef> changePropPrivileged =  disableBehaviour(getChangePropConsumer(newAuthorityName, propertyModel));
 				cpt += searchAndApply(restrictionOnUserNode, changePropPrivileged, newMax);
 			}
 			
@@ -227,10 +232,10 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		}
 	}
 
-	private NodeReference copyHomeFilesAndPreferences(String sourceUserName, String targetUserName) {
-		NodeReference sourceUserNode = conversionService.get(personService.getPerson(sourceUserName, false));
-		NodeReference targetUserNode = conversionService.get(personService.getPerson(targetUserName, false));
-		NodeReference sourceFolder = nodeModelService.getProperty(sourceUserNode, CmModel.person.homeFolder);
+	private NodeRef copyHomeFilesAndPreferences(String sourceUserName, String targetUserName) {
+		NodeRef sourceUserNode = personService.getPerson(sourceUserName, false);
+		NodeRef targetUserNode = personService.getPerson(targetUserName, false);
+		NodeRef sourceFolder = nodeModelService.getProperty(sourceUserNode, CmModel.person.homeFolder);
 		
 		// The preferences copy must run only once
 		if (sourceFolder != null) {
@@ -242,19 +247,19 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			// Nothing to do
 			return targetUserNode;
 		}
-		NodeReference targetFolder = nodeModelService.getProperty(targetUserNode, CmModel.person.homeFolder);
+		NodeRef targetFolder = nodeModelService.getProperty(targetUserNode, CmModel.person.homeFolder);
 	
 		// If the target user folder doesn't exist, the home folder is replaced, else a subfolder is created inside the home folder named copy-<sourceFolder> 
 		boolean replaceHomeFolder = isFolderEmpty(targetFolder);
 		if (replaceHomeFolder) {
 			LOGGER.info(String.format("copyHomeFolder: home for target user %s is empty, renaming %s", targetUserName, sourceUserName));
-			Optional<NodeReference> userHomes = nodeModelService.getPrimaryParent(sourceFolder);
+			Optional<NodeRef> userHomes = nodeModelService.getPrimaryParent(sourceFolder);
 			if (!userHomes.isPresent()) {
 				throw new IllegalStateException("The user homes is not present, something is wrong");
 			}
 			// Si le dossier cible existe, il est vide: on le supprime pour pouvoir renommer le dossier source
 			if (targetFolder != null && nodeModelService.exists(targetFolder)) {
-				nodeModelService.delete(targetFolder);
+				nodeModelService.deleteNode(targetFolder);
 			}
 			targetFolder = userHomes.get();
 			nodeModelService.setProperty(sourceFolder, CmModel.folder.name, targetUserName);
@@ -267,9 +272,9 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			Optional<String> copyFolderName = Optional.of("copy-" + folderName);
 			nodeModelService.copy(sourceFolder, targetFolder, copyFolderName);
 			//nodeModelService.getChildrenAssocsContains(sourceFolder).forEach(node -> nodeModelService.delete(node));
-			nodeModelService.delete(sourceFolder);
+			nodeModelService.deleteNode(sourceFolder);
 		}
-		nodeModelService.setProperty(sourceUserNode, CmModel.person.homeFolder, null);
+		nodeModelService.setProperty(sourceUserNode, CmModel.person.homeFolder, (NodeRef) null);
 		return targetFolder;
 	}
 
@@ -278,11 +283,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		preferenceService.setPreferences(newAuthorityName, newPreferences);
 	}
 	
-	private boolean isFolderEmpty(NodeReference folderNode) {
-		return folderNode == null || !nodeModelService.exists(folderNode) || nodeModelService.getChildren(folderNode, new NodeScopeBuilder()).isEmpty();
+	private boolean isFolderEmpty(NodeRef folderNode) {
+		return folderNode == null || !nodeModelService.exists(folderNode) || nodeModelService.getChildrenAssocsContains(folderNode).isEmpty();
 	}
 	
-	public int searchAndApply(RestrictionBuilder restriction, Consumer<NodeReference> consumer, Integer maxItem) {
+	public int searchAndApply(RestrictionBuilder restriction, Consumer<NodeRef> consumer, Integer maxItem) {
 		SearchQueryBuilder searchBuilder = new BatchSearchQueryBuilder()
 				.configurationName("userReplaceSearch")
 				.consumer(consumer)
@@ -291,11 +296,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		return nodeSearchModelService.searchBatch((BatchSearchQueryBuilder) searchBuilder);
 	}
 	
-	private Consumer<NodeReference> disableBehaviour(Consumer<NodeReference> consumer) {
+	private Consumer<NodeRef> disableBehaviour(Consumer<NodeRef> consumer) {
 		return nodeReference ->  policyRepositoryService.disableBehaviour(CmModel.auditable, () -> consumer.accept(nodeReference));
 	}
 
-	private Consumer<NodeReference> getChangePropConsumer(String propName, TextPropertyModel propertyModel) {
+	private Consumer<NodeRef> getChangePropConsumer(String propName, TextPropertyModel propertyModel) {
 		return nodeReference -> {nodeModelService.setProperty(nodeReference, propertyModel, propName);};
 	}
 	
@@ -307,9 +312,6 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-	}
-	public void setNodeModelService(NodeModelRepositoryService nodeModelService) {
-		this.nodeModelService = nodeModelService;
 	}
 	public void setNodeSearchModelService(NodeSearchModelRepositoryService nodeSearchModelService) {
 		this.nodeSearchModelService = nodeSearchModelService;

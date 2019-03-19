@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
-		<version>0.7.0</version>
+		<version>0.8.0</version>
 		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-repo-module</artifactId>
@@ -23,6 +23,18 @@
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco.surf</groupId>
+			<artifactId>spring-surf-core</artifactId>
 		</dependency>
 	</dependencies>
 

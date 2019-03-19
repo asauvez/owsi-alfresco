@@ -78,7 +78,7 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 		return this;
 	}
 
-	/** https://docs.alfresco.com/5.2/concepts/rm-searchsyntax-fuzzy.html */
+	/** https://docs.alfresco.com/6.0/concepts/rm-searchsyntax-fuzzy.html */
 	public MatchRestriction<C> fuzzy(Double fuzzy) {
 		if (fuzzy != null && (fuzzy < 0.0 || fuzzy > 1.0)) {
 			throw new IllegalStateException("" + fuzzy);

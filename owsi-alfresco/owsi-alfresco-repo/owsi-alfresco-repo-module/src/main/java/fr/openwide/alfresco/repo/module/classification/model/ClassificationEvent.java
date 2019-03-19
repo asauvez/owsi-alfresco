@@ -1,23 +1,24 @@
 package fr.openwide.alfresco.repo.module.classification.model;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
 
 public class ClassificationEvent {
 
-	private final NodeReference nodeReference;
+	private final NodeRef nodeRef;
 	private final ClassificationMode mode;
 	private final ContainerModel model;
 
-	public ClassificationEvent(NodeReference nodeReference, ClassificationMode mode, ContainerModel model) {
-		this.nodeReference = nodeReference;
+	public ClassificationEvent(NodeRef nodeRef, ClassificationMode mode, ContainerModel model) {
+		this.nodeRef = nodeRef;
 		this.mode = mode;
 		this.model = model;
 	}
 	
-	public NodeReference getNodeReference() {
-		return nodeReference;
+	public NodeRef getNodeRef() {
+		return nodeRef;
 	}
 	public ClassificationMode getMode() {
 		return mode;

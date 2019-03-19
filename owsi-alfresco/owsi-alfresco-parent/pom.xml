@@ -10,7 +10,7 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.7.0</version>
+	<version>0.8.0</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
@@ -60,55 +60,6 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!-- Integration test -->
-				<plugin>
-					<groupId>org.apache.tomcat.maven</groupId>
-					<artifactId>tomcat7-maven-plugin</artifactId>
-					<version>2.2</version>
-					<configuration>
-						<fork>true</fork>
-						<port>8080</port>
-						<ignorePackaging>true</ignorePackaging>
-					</configuration>
-					<executions>
-						<execution>
-							<id>launch-tomcat</id>
-							<phase>pre-integration-test</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>stop-tomcat</id>
-							<phase>post-integration-test</phase>
-							<goals>
-								<goal>shutdown</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.19.1</version>
-					<executions>
-						<execution>
-							<id>integration-test</id>
-							<phase>pre-integration-test</phase>
-							<goals>
-								<goal>integration-test</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>verify-integration-test</id>
-							<phase>post-integration-test</phase>
-							<goals>
-								<goal>verify</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-
 				<plugin>
 					<groupId>external.atlassian.jgitflow</groupId>
 					<artifactId>jgitflow-maven-plugin</artifactId>
@@ -146,7 +97,12 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
 	<repositories>
+		<repository>
+			<id>alfresco-artifacts-repository</id>
+			<url>http://artifacts.alfresco.com/nexus/content/groups/private/</url>
+		</repository>
 		<repository>
 			<id>nexus.internal.releases</id>
 			<url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
@@ -166,7 +122,23 @@
 			<id>nexus.internal.third-party</id>
 			<url>https://nexus.vitry.intranet/content/repositories/nonCentralArtifacts/</url>
 		</repository>
-
-
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nexus.internal.releases</id>
+			<url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>nexus.internal.snapshots</id>
+			<url>https://nexus.vitry.intranet/content/repositories/InternalSmileSnapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+
+
 </project>
