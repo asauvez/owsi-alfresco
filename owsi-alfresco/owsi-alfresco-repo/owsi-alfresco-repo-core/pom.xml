@@ -41,6 +41,15 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.alfresco.surf</groupId>
+			<artifactId>spring-surf-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		
+		<dependency>
             <groupId>org.acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
             <scope>provided</scope>

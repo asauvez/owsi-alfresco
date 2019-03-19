@@ -4,8 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -28,21 +29,21 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	 * Défini un noeud racine de la classification. 
 	 * Si on ne défini pas de noeud racine, la classification se fait à partir de l'emplacement actuel.
 	 */
-	public ClassificationWithRootBuilder rootFolder(NodeReference destinationFolder) {
+	public ClassificationWithRootBuilder rootFolder(NodeRef destinationFolder) {
 		return rootFolders(Collections.singletonList(destinationFolder));
 	}
-	public ClassificationWithRootBuilder rootFolders(List<NodeReference> destinationFolders) {
+	public ClassificationWithRootBuilder rootFolders(List<NodeRef> destinationFolders) {
 		return new ClassificationWithRootBuilder(service, getEvent(), destinationFolders);
 	}
-	private Optional<ClassificationWithRootBuilder> rootFolder(Optional<NodeReference> destinationFolder) {
+	private Optional<ClassificationWithRootBuilder> rootFolder(Optional<NodeRef> destinationFolder) {
 		return (destinationFolder.isPresent()) ? Optional.of(rootFolder(destinationFolder.get())) : Optional.empty();
 	}
 	/**
 	 * Défini le noeud racine comme étant le résultat unique que renvoi la requête fournie.
 	 */
 	public Optional<ClassificationWithRootBuilder> rootFolder(RestrictionBuilder restrictionBuilder) {
-		Optional<NodeReference> nodeReference = service.searchUniqueReference(restrictionBuilder);
-		return rootFolder(nodeReference);
+		Optional<NodeRef> nodeRef = service.searchUniqueReference(restrictionBuilder);
+		return rootFolder(nodeRef);
 	}
 	public ClassificationWithRootBuilder rootFolders(RestrictionBuilder restrictionBuilder) {
 		return rootFolders(service.searchReference(restrictionBuilder));
@@ -53,11 +54,11 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 				.path(path).of());
 	}
 	public ClassificationWithRootBuilder rootActualFolder() {
-		NodeReference primaryParent = service.getNodeModelService().getPrimaryParent(getNodeReference()).get();
+		NodeRef primaryParent = service.getNodeModelService().getPrimaryParent(getNodeRef()).get();
 		return rootFolder(primaryParent);
 	}
 	public Optional<ClassificationWithRootBuilder> rootActualSite() {
-		Optional<NodeReference> siteNode = service.getSiteNode(getNodeReference());
+		Optional<NodeRef> siteNode = service.getSiteNode(getNodeRef());
 		return (siteNode.isPresent()) ? Optional.of(rootFolder(siteNode.get())) : Optional.empty();
 	}
 
@@ -69,7 +70,7 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 		return rootFolderNamedPath(true, names);
 	}
 	public Optional<ClassificationWithRootBuilder> rootFolderNamedPath(boolean cached, String ... names) {
-		Optional<NodeReference> optional = (cached) 
+		Optional<NodeRef> optional = (cached) 
 				? service.getByNamedPathCached(names)
 				: service.getByNamedPath(names);
 		return rootFolder(optional);
@@ -104,7 +105,7 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	 * Défini le noeud racine de la classification comme étant le home folder de l'utilisateur en cours. 
 	 */
 	public Optional<ClassificationWithRootBuilder> rootHomeFolder() {
-		Optional<NodeReference> homeFolder = service.getHomeFolder();
+		Optional<NodeRef> homeFolder = service.getHomeFolder();
 		return rootFolder(homeFolder);
 	}
 
@@ -119,14 +120,14 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 		return unlinkSecondaryParents(CmModel.folder.contains);
 	}
 	public ClassificationBuilder unlinkSecondaryParents(ChildAssociationModel childAssociationModel) {
-		service.deleteSecondaryParents(getNodeReference(), childAssociationModel);
+		service.deleteSecondaryParents(getNodeRef(), childAssociationModel);
 		return this;
 	}
 	
 	public void delete() {
-		service.delete(getNodeReference(), false);
+		service.delete(getNodeRef(), false);
 	}
 	public void deletePermanently() {
-		service.delete(getNodeReference(), true);
+		service.delete(getNodeRef(), true);
 	}
 }

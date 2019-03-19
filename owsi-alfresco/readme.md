@@ -1,7 +1,7 @@
 Description
 ===========
 Owsi-Alfresco est un ensemble d'outils destinés à rendre plus rapide et maintenable les développements autour 
-d'Alfresco 5.2.3.
+d'Alfresco 6.0.0.
 
 FAQ
 ===
@@ -23,6 +23,16 @@ Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà l
 
 Nouveautés
 ==========
+
+## depuis 0.8.0
+* Migration ACS 6.0
+* Supression des packages : 
+  - owsi-alfresco-package-alfresco devient org.alfresco:alfresco-enterprise 
+  - owsi-alfresco-package-share devient org.alfresco:share
+* alfresco.module.version devient project.version
+* NodeModelRepositoryService n'etends plus NodeServiceImpl
+* delete() devient deleteNode()
+* NodeModelRepositoryService utilise des NodeRef au lieu de NodeReference
 
 ## depuis 0.7.0
 * Alfresco 5.2.4
@@ -51,6 +61,9 @@ Nouveautés
 
 Migration
 =========
+
+## vers 0.8.0
+* NodeModelRepositoryService utilise des NodeRef au lieu de NodeReference
 
 ## vers 0.5.0
 ### Changement de paquets Maven

@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
@@ -28,7 +27,6 @@ import fr.openwide.alfresco.repo.core.search.service.impl.NodeSearchRemoteServic
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 
 public class NodeSearchModelRepositoryServiceImpl 
@@ -43,7 +41,6 @@ public class NodeSearchModelRepositoryServiceImpl
 	@Autowired private Environment environment;
 	
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
-	@Autowired private ConversionService conversionService;
 	
 	private NodeSearchRemoteServiceImpl nodeSearchRemoteService;
 	
@@ -53,24 +50,22 @@ public class NodeSearchModelRepositoryServiceImpl
 	}
 	
 	@Override
-	public List<NodeReference> searchReference(RestrictionBuilder restrictionBuilder) {
+	public List<NodeRef> searchReference(RestrictionBuilder restrictionBuilder) {
 		return searchReference(new SearchQueryBuilder()
 				.restriction(restrictionBuilder));
 	}
 
 	@Override
-	public List<NodeReference> searchReference(SearchQueryBuilder searchBuilder) {
+	public List<NodeRef> searchReference(SearchQueryBuilder searchBuilder) {
 		RepositorySearchParameters rsp = searchBuilder.getParameters();
 		try {
 			long before = System.currentTimeMillis();
 
 			SearchParameters sp = nodeSearchRemoteService.getSearchParameters(rsp);
-			List<NodeReference> res = new ArrayList<>();
+			List<NodeRef> res = new ArrayList<>();
 			ResultSet resultSet = searchService.query(sp);
 			try {
-				for (NodeRef nodeRef : resultSet.getNodeRefs()) {
-					res.add(conversionService.get(nodeRef));
-				}
+				res = resultSet.getNodeRefs();
 			} finally {
 				resultSet.close();
 			}
@@ -144,7 +139,7 @@ public class NodeSearchModelRepositoryServiceImpl
 		ResultSet resultSet = searchService.query(sp);
 		int nbInFrame = 0;
 		try {
-			Iterator<NodeReference> iterator = (searchBuilder.getFakeResults() == null) 
+			Iterator<NodeRef> iterator = (searchBuilder.getFakeResults() == null) 
 					? new ResultSetRowIterator(resultSet.iterator())
 					: searchBuilder.getFakeResults().iterator();
 			if (searchBuilder.getTransactionSize() == null) {
@@ -168,7 +163,7 @@ public class NodeSearchModelRepositoryServiceImpl
 		return nbInFrame;
 	}
 	
-	private class ResultSetRowIterator implements Iterator<NodeReference> {
+	private class ResultSetRowIterator implements Iterator<NodeRef> {
 		private final Iterator<ResultSetRow> iterator;
 		public ResultSetRowIterator(Iterator<ResultSetRow> iterator) {
 			this.iterator = iterator;
@@ -176,15 +171,15 @@ public class NodeSearchModelRepositoryServiceImpl
 		@Override public boolean hasNext() {
 			return iterator.hasNext();
 		}
-		@Override public NodeReference next() {
-			return conversionService.get(iterator.next().getNodeRef());
+		@Override public NodeRef next() {
+			return iterator.next().getNodeRef();
 		}
 	}
 	
-	private int consumeInTransaction(BatchSearchQueryBuilder searchBuilder, Iterator<NodeReference> iterator) {
+	private int consumeInTransaction(BatchSearchQueryBuilder searchBuilder, Iterator<NodeRef> iterator) {
 		int nbInBatch = 0;
 		while (iterator.hasNext() && (searchBuilder.getTransactionSize() == null || nbInBatch < searchBuilder.getTransactionSize())) {
-			NodeReference nodeReference = iterator.next();
+			NodeRef nodeReference = iterator.next();
 			if (nodeModelRepositoryService.exists(nodeReference)) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("**** Consume " + nbInBatch + "/" + nodeReference);

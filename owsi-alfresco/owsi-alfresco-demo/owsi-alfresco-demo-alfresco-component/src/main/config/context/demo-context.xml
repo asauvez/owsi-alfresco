@@ -25,12 +25,5 @@
 			</list>
 		</property>
 	</bean>
-	<bean id="demo.webconfig.bootstrap" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
-		<property name="configs">
-			<list>
-				<value>alfresco/module/${alfresco.module.name}/model/web-client-config.xml</value>
-			</list>
-		</property>
-	</bean>
 	
 </beans>

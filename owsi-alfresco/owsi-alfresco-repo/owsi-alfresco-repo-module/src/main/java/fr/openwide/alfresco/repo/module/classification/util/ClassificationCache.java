@@ -6,15 +6,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 
 public class ClassificationCache {
 	
-	private Map<String, NodeReference> cache 
-			= Collections.synchronizedMap(new LinkedHashMap<String, NodeReference>(16, 10.75f, true) {
+	private Map<String, NodeRef> cache 
+			= Collections.synchronizedMap(new LinkedHashMap<String, NodeRef>(16, 10.75f, true) {
 		@Override
-		protected boolean removeEldestEntry(Map.Entry<String, NodeReference> eldest) {
+		protected boolean removeEldestEntry(Map.Entry<String, NodeRef> eldest) {
 			return size() > maxSize;
 		};
 	});
@@ -25,11 +26,11 @@ public class ClassificationCache {
 		this.maxSize = maxSize;
 	}
 	
-	public Optional<NodeReference> get(NodeModelRepositoryService nodeModelService, String cacheKey, 
-			Supplier<Optional<NodeReference>> ifNotInCache) {
-		NodeReference result = cache.get(cacheKey);
+	public Optional<NodeRef> get(NodeModelRepositoryService nodeModelService, String cacheKey, 
+			Supplier<Optional<NodeRef>> ifNotInCache) {
+		NodeRef result = cache.get(cacheKey);
 		if (result == null) {
-			Optional<NodeReference> opt = ifNotInCache.get();
+			Optional<NodeRef> opt = ifNotInCache.get();
 			if (opt.isPresent()) {
 				put(cacheKey, result);
 			}
@@ -44,22 +45,22 @@ public class ClassificationCache {
 		}
 	}
 
-	public NodeReference get(NodeModelRepositoryService nodeModelService, String cacheKey, 
-			Supplier<Optional<NodeReference>> ifNotInCache,
-			Supplier<NodeReference> ifNotExist) {
-		Optional<NodeReference> result = get(nodeModelService, cacheKey, ifNotInCache);
+	public NodeRef get(NodeModelRepositoryService nodeModelService, String cacheKey, 
+			Supplier<Optional<NodeRef>> ifNotInCache,
+			Supplier<NodeRef> ifNotExist) {
+		Optional<NodeRef> result = get(nodeModelService, cacheKey, ifNotInCache);
 		if (result.isPresent()) {
 			return result.get();
 		} else {
-			NodeReference nodeReference = ifNotExist.get();
-			put(cacheKey, nodeReference);
-			return nodeReference;
+			NodeRef nodeRef = ifNotExist.get();
+			put(cacheKey, nodeRef);
+			return nodeRef;
 		}
 	}
 
-	public void put(String key, NodeReference nodeReference) {
+	public void put(String key, NodeRef nodeRef) {
 		if (maxSize > 0) {
-			cache.put(key, nodeReference);
+			cache.put(key, nodeRef);
 		}
 	}
 	

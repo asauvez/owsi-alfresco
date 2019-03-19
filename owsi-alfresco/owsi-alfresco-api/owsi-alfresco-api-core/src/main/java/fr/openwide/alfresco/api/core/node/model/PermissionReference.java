@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/** http://docs.alfresco.com/5.2/references/permissions_share_components.html */
+/** http://docs.alfresco.com/6.0/references/permissions_share_components.html */
 public class PermissionReference implements Serializable {
 
 	 /** Lecture seule */

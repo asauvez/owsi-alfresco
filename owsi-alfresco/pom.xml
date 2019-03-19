@@ -20,15 +20,14 @@
         <owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
     </properties>
 
-    <modules>
-        <module>owsi-alfresco-api</module>
-        <module>owsi-alfresco-parent</module>
-        <module>owsi-alfresco-package</module>
-        <module>owsi-alfresco-app</module>
-        <module>owsi-alfresco-repo</module>
-        <module>owsi-alfresco-component</module>
-        <module>owsi-alfresco-demo</module>
-    </modules>
+	<modules>
+		<module>owsi-alfresco-api</module>
+		<module>owsi-alfresco-parent</module>
+		<module>owsi-alfresco-app</module>
+		<module>owsi-alfresco-repo</module>
+		<module>owsi-alfresco-component</module>
+		<module>owsi-alfresco-demo</module>
+	</modules>
 
     <scm>
         <developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>

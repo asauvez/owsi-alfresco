@@ -15,8 +15,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-package-alfresco</artifactId>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-enterprise</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -24,8 +24,7 @@
 		<!-- On tire également ce war pour que MigrationMojo puisse l'examiner -->
 		<dependency>
 			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco</artifactId>
-			<version>${owsi-alfresco.repo.alfresco.version}</version>
+			<artifactId>alfresco-enterprise</artifactId>
 			<type>war</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -72,8 +71,8 @@
 				<configuration>
 					<overlays>
 						<overlay>
-							<groupId>fr.openwide.alfresco</groupId>
-							<artifactId>owsi-alfresco-package-alfresco</artifactId>
+							<groupId>org.alfresco</groupId>
+							<artifactId>alfresco-enterprise</artifactId>
 							<type>war</type>
 						</overlay>
 					</overlays>
@@ -122,8 +121,8 @@
 							<failOnMissingWebXml>false</failOnMissingWebXml>
 							<overlays>
 								<overlay>
-									<groupId>fr.openwide.alfresco</groupId>
-									<artifactId>owsi-alfresco-package-alfresco</artifactId>
+									<groupId>org.alfresco</groupId>
+									<artifactId>alfresco-enterprise</artifactId>
 									<type>war</type>
 								</overlay>
 								<overlay>
@@ -133,53 +132,6 @@
 								</overlay>
 							</overlays>
 						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<profile>
-			<id>h2</id>
-			<dependencies>
-				<dependency>
-					<groupId>com.h2database</groupId>
-					<artifactId>h2</artifactId>
-					<version>${owsi-alfresco.repo.h2.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.alfresco</groupId>
-					<artifactId>alfresco-repository</artifactId>
-					<version>${owsi-alfresco.repo.alfresco.version}</version>
-					<classifier>h2scripts</classifier>
-					<exclusions>
-						<exclusion>
-							<groupId>*</groupId>
-							<artifactId>*</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>add-h2-resources</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>add-resource</goal>
-								</goals>
-								<configuration>
-									<resources>
-										<resource>
-											<directory>src/main/h2-resources</directory>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
