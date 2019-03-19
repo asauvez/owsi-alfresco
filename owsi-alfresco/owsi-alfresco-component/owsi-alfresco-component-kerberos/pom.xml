@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-app</artifactId>
-		<version>0.8.0-SNAPSHOT</version>
+		<version>0.8.0</version>
 		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-app/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-component-kerberos</artifactId>
