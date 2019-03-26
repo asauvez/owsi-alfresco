@@ -25,7 +25,6 @@
 		<module>owsi-alfresco-app</module>
 		<module>owsi-alfresco-repo</module>
 		<module>owsi-alfresco-component</module>
-		<module>owsi-alfresco-demo</module>
 	</modules>
 
     <scm>
