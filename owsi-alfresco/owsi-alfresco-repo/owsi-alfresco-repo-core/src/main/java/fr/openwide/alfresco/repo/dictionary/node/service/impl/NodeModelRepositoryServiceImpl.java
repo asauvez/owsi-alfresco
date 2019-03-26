@@ -2,8 +2,11 @@ package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -174,6 +177,17 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		deleteNode(nodeRef);
 	}
 
+	@Override
+	public Map<NameReference, Serializable> getProperties(NodeRef nodeRef) {
+		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+		Map<NameReference, Serializable> res = new LinkedHashMap<>();
+		for (Entry<QName, Serializable> entry : properties.entrySet()) {
+			res.put(conversionService.get(entry.getKey()), entry.getValue());
+		}
+		return res;
+	}
+	
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public <C extends Serializable> C getProperty(NodeRef nodeRef, NameReference property) {

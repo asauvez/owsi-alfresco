@@ -24,6 +24,9 @@ Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà l
 Nouveautés
 ==========
 
+## depuis 0.8.1
+* owsi.classification.freemarker.models pour classifier les cas simple
+
 ## depuis 0.8.0
 * Migration ACS 6.0
 * Supression des packages : 

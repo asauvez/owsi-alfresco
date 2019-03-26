@@ -9,7 +9,7 @@ import fr.openwide.alfresco.component.model.node.model.association.AssociationMo
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
-public abstract class ContainerModel extends Model {
+public class ContainerModel extends Model {
 
 	private Map<NameReference, PropertyModel<?>> properties = new HashMap<>();
 

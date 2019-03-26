@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.dictionary.node.service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -61,6 +62,7 @@ public interface NodeModelRepositoryService {
 	void deleteNode(NodeRef nodeRef);
 	void deleteNodePermanently(NodeRef nodeRef);
 	
+	Map<NameReference, Serializable> getProperties(NodeRef nodeRef);
 	<C extends Serializable> C getProperty(NodeRef nodeRef, NameReference property);
 	<C extends Serializable> C getProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
 	NodeRef getProperty(NodeRef nodeRef, NodeReferencePropertyModel property);

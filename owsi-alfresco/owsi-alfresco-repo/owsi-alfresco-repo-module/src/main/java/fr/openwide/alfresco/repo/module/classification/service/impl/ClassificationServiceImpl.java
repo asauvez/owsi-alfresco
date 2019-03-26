@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
@@ -63,6 +65,7 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
+import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
@@ -79,6 +82,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		));
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
+	
+	@Autowired @Qualifier("global-properties")
+	private Properties globalProperties;
 	
 	@Autowired private NodeModelService nodeModelService;
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
@@ -105,6 +111,14 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
+		
+		for (String nameReference : globalProperties.getProperty("owsi.classification.freemarker.models", "").split(",")) {
+			if (! nameReference.trim().isEmpty()) {
+				ContainerModel containerModel = new ContainerModel(NameReference.create(nameReference.trim()));
+				addClassification(containerModel, new FreeMarkerClassificationPolicy(globalProperties, containerModel));
+				policyRepositoryService.onAddAspect(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
+			}
+		}
 	}
 	
 	@Override
