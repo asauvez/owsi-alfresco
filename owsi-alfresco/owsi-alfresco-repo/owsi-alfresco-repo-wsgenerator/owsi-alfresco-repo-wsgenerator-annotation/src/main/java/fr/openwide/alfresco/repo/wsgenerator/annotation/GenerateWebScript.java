@@ -42,5 +42,6 @@ public @interface GenerateWebScript {
 	
 	String beanParent() default "webscript";
 	
+	/** Mettre à true s'il le WS implémente DeclarativeWebScript */
 	boolean useViewFile() default false;
 }
