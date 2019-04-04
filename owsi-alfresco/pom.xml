@@ -54,7 +54,7 @@
                         <pullMaster>true</pullMaster>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowSnapshots>true</allowSnapshots>
-                        <scmCommentPrefix>[release]</scmCommentPrefix>
+                        <scmCommentPrefix>[release] </scmCommentPrefix>
                     </configuration>
                 </plugin>
             </plugins>
