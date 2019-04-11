@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="dlauthority:datalistauthorityModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+    <description>TL Data List Content model</description>
+    <version>1.0</version>
+
+    <imports>
+        <!-- Import Alfresco Dictionary Definitions -->
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <!-- Import Alfresco Content Domain Model Definitions -->
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+        <!-- Import Alfresco Data List Model Definitions -->
+        <import uri="http://www.alfresco.org/model/datalist/1.0"   prefix="dl" />
+    </imports>
+
+    <namespaces>
+        <namespace uri="http://openwide.fr/modele/dlauthority" prefix="dlauthority"/>
+    </namespaces>
+
+    <types>
+        <type name="dlauthority:ListItem">
+            <title>Groupe liste</title>
+            <parent>dl:dataListItem</parent>
+            <associations>
+                <association name="dlauthority:autorityMember">
+                	<title>Member</title>
+                    <source>
+                        <mandatory>false</mandatory>
+                        <many>false</many>
+                    </source>
+                    <target>
+                        <class>cm:authority</class>
+                        <mandatory>true</mandatory>
+                        <many>false</many>
+                    </target>
+                </association>
+            </associations>
+        </type>
+    </types>
+
+</model>

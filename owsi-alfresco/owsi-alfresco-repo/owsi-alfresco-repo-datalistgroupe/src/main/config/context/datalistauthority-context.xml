@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="owsi-alfresco.dlauthority-service" class="org.owsi.alfresco.repo.datalistgroupe.service.impl.DatalistAuthorityServiceImpl" depends-on="dlauthority.dictionaryBootstrap" >
+	<!--TODO wakas -->
+
+	</bean>
+	
+	<!-- Registration of new models -->
+	<bean id="dlauthority.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+		<property name="models">
+			<list>
+				<value>alfresco/module/${alfresco.module.name}/model/datalistauthorityModel.xml</value>
+			</list>
+		</property>
+		 <property name="labels">
+            <list>
+                <!-- Bootstrap Resource Bundles for data list type and properties -->
+                <value>alfresco/module/${project.artifactId}/messages/datalistauthority-model</value>
+            </list>
+        </property>
+	</bean>	
+</beans>

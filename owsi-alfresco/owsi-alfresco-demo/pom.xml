@@ -23,7 +23,7 @@
 		<module>owsi-alfresco-demo-core</module>
 		<module>owsi-alfresco-demo-webapp</module>
 	</modules>
-
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
