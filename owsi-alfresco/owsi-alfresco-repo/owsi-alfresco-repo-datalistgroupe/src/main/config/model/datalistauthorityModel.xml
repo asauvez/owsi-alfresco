@@ -16,13 +16,18 @@
     <namespaces>
         <namespace uri="http://openwide.fr/modele/dlauthority" prefix="dlauthority"/>
     </namespaces>
-
     <types>
-        <type name="dlauthority:ListItem">
+        <type name="dlauthority:item">
             <title>Groupe liste</title>
             <parent>dl:dataListItem</parent>
+            <properties>
+            	<property name = "dlauthority:name">
+            	<title>nom</title>
+            	<type>d:text</type>
+            	</property>
+            </properties>
             <associations>
-                <association name="dlauthority:autorityMember">
+                <association name="dlauthority:authorityMember">
                 	<title>Member</title>
                     <source>
                         <mandatory>false</mandatory>
@@ -37,5 +42,18 @@
             </associations>
         </type>
     </types>
+    
+    <aspects>
+    	<aspect name = "dlauthority:group">
+    		<title>le groupe associé</title>
+    		<properties>
+    			<property name = "dlauthority:groupName">
+    				<title>Nom du groupe</title>
+    				<type>d:text</type>
+    				<mandatory>true</mandatory>
+    			</property>
+    		</properties>
+    	</aspect>
+    </aspects>
 
 </model>

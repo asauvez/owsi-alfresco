@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alfresco-config>
-    <config evaluator="model-type" condition="dlauthority:ListItem">
+    <config evaluator="model-type" condition="dlauthority:item">
         <forms>
             <!-- Create item form -->
             <form>
                 <field-visibility>
-                    <show id="dlauthority:autorityMember" />
+                    <show id="dlauthority:authorityMember" />
+                    <show id="dlauthority:name"></show>
                 </field-visibility>
                 <create-form template="../data-lists/forms/dataitem.ftl" />
                 <appearance>
@@ -14,12 +15,12 @@
         </forms>
     </config>
 
-    <config evaluator="node-type" condition="dlauthority:ListItem">
+    <config evaluator="node-type" condition="dlauthority:item">
         <forms>
         	<!--Edit item form-->
             <form>
                 <field-visibility>
-                    <show id="dlauthority:autorityMember" />
+                    <hide id="dlauthority:authorityMember" />
                 </field-visibility>
                 <edit-form template="../data-lists/forms/dataitem.ftl" />
                 <appearance>

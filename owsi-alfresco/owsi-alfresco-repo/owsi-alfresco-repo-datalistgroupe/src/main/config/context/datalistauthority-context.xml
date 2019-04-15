@@ -3,9 +3,39 @@
    "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-	<bean id="owsi-alfresco.dlauthority-service" class="org.owsi.alfresco.repo.datalistgroupe.service.impl.DatalistAuthorityServiceImpl" depends-on="dlauthority.dictionaryBootstrap" >
-	<!--TODO wakas -->
-
+	<bean id="DatalistAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.DatalistAuthorityListener" init-method="init" depends-on="dlauthority.dictionaryBootstrap" >
+		<property name="nodeService">
+			<ref bean="NodeService" />
+		</property>
+		<property name="policyComponent">
+			<ref bean="policyComponent" />
+		</property>
+		<property name="authorityService">
+			<ref bean="AuthorityService" />
+		</property>
+		<property name="siteService">
+			<ref bean="SiteService" />
+		</property>
+		
+		<property name="namespaceService">
+			<ref bean="NamespaceService" />
+		</property>
+		
+		
+		<property name="prefix" value="${datalistegroupe.nom_groupe.prefix}"/>
+		<property name="suffix" value="${datalistegroupe.nom_groupe.suffix}"/>	
+	</bean>
+	
+		<bean id="ItemsAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.ItemAuthorityListener" init-method="init" depends-on="dlauthority.dictionaryBootstrap" >
+		<property name="nodeService">
+			<ref bean="NodeService" />
+		</property>
+		<property name="policyComponent">
+			<ref bean="policyComponent" />
+		</property>
+		<property name="authorityService">
+			<ref bean="AuthorityService" />
+		</property>
 	</bean>
 	
 	<!-- Registration of new models -->
