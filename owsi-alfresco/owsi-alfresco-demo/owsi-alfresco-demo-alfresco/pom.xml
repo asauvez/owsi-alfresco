@@ -13,18 +13,17 @@
 	<name>OWSI Alfresco - Demo repo</name>
 	<description>Serveur Alfresco de démonstration et de test</description>
 
-	<dependencies>
-		<!-- wakas Tests-->
-		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
-			<version>${project.version}</version>
-		</dependency>		
+	<dependencies>	
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
+			<version>${project.version}</version>
+		</dependency>	
 	</dependencies>
 
 </project>

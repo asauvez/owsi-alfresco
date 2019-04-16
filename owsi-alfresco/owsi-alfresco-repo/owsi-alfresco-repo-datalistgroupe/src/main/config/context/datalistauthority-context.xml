@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
-   "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-	<bean id="DatalistAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.DatalistAuthorityListener" init-method="init" depends-on="dlauthority.dictionaryBootstrap" >
+<beans>
+	<bean id="owsi.datalistgroupe.DatalistAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.DatalistAuthorityListener" 
+			init-method="init" depends-on="owsi.datalistgroupe.dictionaryBootstrap" >
 		<property name="nodeService">
 			<ref bean="NodeService" />
 		</property>
@@ -16,17 +16,15 @@
 		<property name="siteService">
 			<ref bean="SiteService" />
 		</property>
-		
 		<property name="namespaceService">
 			<ref bean="NamespaceService" />
 		</property>
-		
-		
 		<property name="prefix" value="${datalistegroupe.nom_groupe.prefix}"/>
 		<property name="suffix" value="${datalistegroupe.nom_groupe.suffix}"/>	
 	</bean>
 	
-		<bean id="ItemsAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.ItemAuthorityListener" init-method="init" depends-on="dlauthority.dictionaryBootstrap" >
+	<bean id="owsi.datalistgroupe.ItemsAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.ItemAuthorityListener" 
+			init-method="init" depends-on="owsi.datalistgroupe.dictionaryBootstrap" >
 		<property name="nodeService">
 			<ref bean="NodeService" />
 		</property>
@@ -39,16 +37,16 @@
 	</bean>
 	
 	<!-- Registration of new models -->
-	<bean id="dlauthority.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+	<bean id="owsi.datalistgroupe.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
 		<property name="models">
 			<list>
 				<value>alfresco/module/${alfresco.module.name}/model/datalistauthorityModel.xml</value>
 			</list>
 		</property>
-		 <property name="labels">
+		<property name="labels">
             <list>
                 <!-- Bootstrap Resource Bundles for data list type and properties -->
-                <value>alfresco/module/${project.artifactId}/messages/datalistauthority-model</value>
+                <value>alfresco/module/${alfresco.module.name}/messages/datalistauthority-model</value>
             </list>
         </property>
 	</bean>	

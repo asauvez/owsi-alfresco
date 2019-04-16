@@ -14,12 +14,11 @@
 	<description>Serveur Share de démonstration et de test</description>
 
 	<dependencies>
-		<!-- wakas Tests-->
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
+			<artifactId>owsi-alfresco-demo-share-component</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-share-datalistgroupe</artifactId>

@@ -38,6 +38,9 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 	private NamespaceService namespaceService;
 	private String prefix, suffix; 
 	
+	
+	private static final String SITE_NAME_REPLACEMENT_STRING = "[NOM_DU_SITE]";
+	
 	public void setNodeService(NodeService nodeService) {
 		this.nodeService = nodeService;
 	}
@@ -175,46 +178,14 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 	}
 	
 	private boolean isAuthorityDatalist(NodeRef nodeRef) {
-		
-			String TYPE_DATALISTAUTHORITY_ITEM = qnameToString(DatalistAuthorityModel.TYPE_DATALISTAUTHORITY_ITEM, true);
-			if((nodeService.getProperty(nodeRef, DataListModel.PROP_DATALIST_ITEM_TYPE)!= null) && 
-					TYPE_DATALISTAUTHORITY_ITEM.equals(nodeService.getProperty(nodeRef, DataListModel.PROP_DATALIST_ITEM_TYPE))) {
-				return true;
-			}
-		return false;
+		String datalistType = (String) nodeService.getProperty(nodeRef, DataListModel.PROP_DATALIST_ITEM_TYPE);
+		return datalistType != null && datalistType.equals(DatalistAuthorityModel.TYPE_DATALISTAUTHORITY_ITEM.toPrefixString(namespaceService));
 	}
 	
 	private String getGroupName(NodeRef nodeRef) {
-		final SiteInfo siteInfo = siteService.getSite(nodeRef);
-		String name = prefix + (String)nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE) + suffix;
-		return name.replaceAll("NOM_DU_SITE", siteInfo.getShortName());
-	}
-	
-	// Thread local cache of namespace prefixes for long QName to short prefix name conversions
-	protected static ThreadLocal<Map<String, String>> namespacePrefixCache = new ThreadLocal<Map<String, String>>() {
-		@Override
-		protected Map<String, String> initialValue()
-		{
-			return new HashMap<String, String>(8);
-		}
-	};
-
-	private String qnameToString(final QName qname, final boolean isShortName) {
-	String result;
-		if (isShortName) {
-			final Map<String, String> cache = namespacePrefixCache.get();
-			String prefix = cache.get(qname.getNamespaceURI());
-			if (prefix == null) {
-				// first request for this namespace prefix, get and cache result
-				Collection<String> prefixes = this.namespaceService.getPrefixes(qname.getNamespaceURI());
-				prefix = prefixes.size() != 0 ? prefixes.iterator().next() : "";
-				cache.put(qname.getNamespaceURI(), prefix);
-			}
-			result = prefix + QName.NAMESPACE_PREFIX + qname.getLocalName();
-		}
-		else {
-			result = qname.toString();
-		}
-		return result;
+		SiteInfo siteInfo = siteService.getSite(nodeRef);
+		String name = prefix + nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE) + suffix;
+		// On remplace la constante des préfixes/suffixes correspondant au nom du site
+		return name.replaceAll(SITE_NAME_REPLACEMENT_STRING, siteInfo.getShortName());
 	}
 }

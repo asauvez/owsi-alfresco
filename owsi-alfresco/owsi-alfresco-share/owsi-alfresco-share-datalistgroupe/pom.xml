@@ -7,13 +7,8 @@
     <artifactId>owsi-alfresco-share</artifactId>
     <version>0.8.1-SNAPSHOT</version>
   </parent>
-  <groupId>fr.openwide.alfresco</groupId>
+  
   <artifactId>owsi-alfresco-share-datalistgroupe</artifactId>
-  <version>0.8.1-SNAPSHOT</version>
-  <name>owsi-alfresco-share-datalistgroupe</name>
+  <name>OWSI Alfresco - Share - Gestion des groupes sous forme DataList</name>
  
- 
-  <dependencies>
- 
-  </dependencies>
 </project>
