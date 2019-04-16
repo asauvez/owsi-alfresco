@@ -81,6 +81,10 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	@Override
 	public void init(Container container, Description description) {
+		if (tempDirectoryName == null) {
+			throw new IllegalStateException(this.getClass() + " : Vous devez déclarer votre WS avec @GenerateWebScript(..., beanParent=\"webscript.owsi.remote\").");
+		}
+		
 		super.init(container, description);
 		// Retrieve transaction parameters
 		if (description instanceof DescriptionImpl) {
