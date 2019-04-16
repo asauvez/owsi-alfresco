@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.DataListModel;
@@ -186,6 +187,6 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 		SiteInfo siteInfo = siteService.getSite(nodeRef);
 		String name = prefix + nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE) + suffix;
 		// On remplace la constante des préfixes/suffixes correspondant au nom du site
-		return name.replaceAll(SITE_NAME_REPLACEMENT_STRING, siteInfo.getShortName());
+		return name.replaceAll(Pattern.quote(SITE_NAME_REPLACEMENT_STRING), siteInfo.getShortName());
 	}
 }
