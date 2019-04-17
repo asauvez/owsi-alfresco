@@ -22,7 +22,7 @@
             <parent>dl:dataListItem</parent>
             <properties>
             	<property name = "dlauthority:name">
-            	<title>nom</title>
+            	<title>Nom de l'autorité</title>
             	<type>d:text</type>
             	</property>
             </properties>
