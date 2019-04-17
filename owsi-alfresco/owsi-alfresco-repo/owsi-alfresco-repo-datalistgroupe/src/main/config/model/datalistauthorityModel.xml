@@ -18,7 +18,7 @@
     </namespaces>
     <types>
         <type name="dlauthority:item">
-            <title>Groupe liste</title>
+            <title>Groupe dataliste</title>
             <parent>dl:dataListItem</parent>
             <properties>
             	<property name = "dlauthority:name">
@@ -31,11 +31,11 @@
                 	<title>Member</title>
                     <source>
                         <mandatory>false</mandatory>
-                        <many>false</many>
+                        <many>true</many>
                     </source>
                     <target>
                         <class>cm:authority</class>
-                        <mandatory>true</mandatory>
+                        <mandatory>false</mandatory>
                         <many>false</many>
                     </target>
                 </association>

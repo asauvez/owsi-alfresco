@@ -2,28 +2,31 @@
 <alfresco-config>
     <config evaluator="model-type" condition="dlauthority:item">
         <forms>
-            <!-- Create item form -->
             <form>
-                <field-visibility>
-                    <show id="dlauthority:authorityMember" />
-                    <show id="dlauthority:name"></show>
-                </field-visibility>
+                <view-form template="../data-lists/forms/dataitem.ftl" />
                 <create-form template="../data-lists/forms/dataitem.ftl" />
+                <field-visibility>
+                    <show id="dlauthority:authorityMember" for-mode='create' force='true' />
+                    <hide id="dlauthority:authorityMember" for-mode='view' />
+                    <show id="dlauthority:name" for-mode='view' force='true' />
+                    <hide id="dlauthority:name" for-mode='create' />
+                </field-visibility>
                 <appearance>
                 </appearance>
             </form>
         </forms>
     </config>
-
     <config evaluator="node-type" condition="dlauthority:item">
         <forms>
-        	<!--Edit item form-->
+            <!--Edit item form-->
             <form>
                 <field-visibility>
-                    <hide id="dlauthority:authorityMember" />
+                    <show id="dlauthority:authorityMember"/>
                 </field-visibility>
-                <edit-form template="../data-lists/forms/dataitem.ftl" />
+                <edit-form template="../data-lists/forms/dataitem.ftl"/>
                 <appearance>
+                    <field id="dlauthority:authorityMember" read-only="true">
+                    </field>
                 </appearance>
             </form>
         </forms>

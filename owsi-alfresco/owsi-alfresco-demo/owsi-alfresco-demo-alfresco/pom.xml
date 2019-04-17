@@ -13,7 +13,7 @@
 	<name>OWSI Alfresco - Demo repo</name>
 	<description>Serveur Alfresco de démonstration et de test</description>
 
-	<dependencies>	
+	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>

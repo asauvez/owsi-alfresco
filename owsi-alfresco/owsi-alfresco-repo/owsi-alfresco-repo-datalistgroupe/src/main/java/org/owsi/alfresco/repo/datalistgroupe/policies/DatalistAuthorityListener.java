@@ -1,8 +1,6 @@
 package org.owsi.alfresco.repo.datalistgroupe.policies;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
