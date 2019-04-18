@@ -46,7 +46,8 @@
 		<property name="labels">
             <list>
                 <!-- Bootstrap Resource Bundles for data list type and properties -->
-                <value>alfresco/module/${alfresco.module.name}/messages/datalistauthority-model</value>
+                <value>alfresco/module/${alfresco.module.name}/messages/datalistauthority</value>
+
             </list>
         </property>
 	</bean>	

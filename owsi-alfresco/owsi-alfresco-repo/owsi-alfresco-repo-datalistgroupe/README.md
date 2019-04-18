@@ -22,7 +22,7 @@ Pour intégrer la fonctionnalité proposé par le module :
 
 ```XML
 <dependency>
-	<groupId>'fr.openwide.alfresco</groupId>
+	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
 	<version>0.8.1</version>
 </dependency> 
@@ -32,7 +32,7 @@ Pour intégrer la fonctionnalité proposé par le module :
 ```XML
 <dependency>
 	<groupId>fr.openwide.alfresco</groupId>
-	<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
+	<artifactId>owsi-alfresco-share-datalistgroupe</artifactId>
 	<version>0.8.1</version>
 </dependency>
 ```
