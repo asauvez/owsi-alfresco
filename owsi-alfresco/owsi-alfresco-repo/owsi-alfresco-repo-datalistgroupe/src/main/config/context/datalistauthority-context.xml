@@ -4,38 +4,12 @@
 <beans>
 	<bean id="owsi.datalistgroupe.DatalistAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.DatalistAuthorityListener" 
 			init-method="init" depends-on="owsi.datalistgroupe.dictionaryBootstrap" >
-		<property name="nodeService">
-			<ref bean="NodeService" />
-		</property>
-		<property name="policyComponent">
-			<ref bean="policyComponent" />
-		</property>
-		<property name="authorityService">
-			<ref bean="AuthorityService" />
-		</property>
-		<property name="siteService">
-			<ref bean="SiteService" />
-		</property>
-		<property name="namespaceService">
-			<ref bean="NamespaceService" />
-		</property>
-		<property name="prefix" value="${datalistegroupe.nom_groupe.prefix}"/>
-		<property name="suffix" value="${datalistegroupe.nom_groupe.suffix}"/>	
 	</bean>
-	
+
 	<bean id="owsi.datalistgroupe.ItemsAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.ItemAuthorityListener" 
 			init-method="init" depends-on="owsi.datalistgroupe.dictionaryBootstrap" >
-		<property name="nodeService">
-			<ref bean="NodeService" />
-		</property>
-		<property name="policyComponent">
-			<ref bean="policyComponent" />
-		</property>
-		<property name="authorityService">
-			<ref bean="AuthorityService" />
-		</property>
 	</bean>
-	
+
 	<!-- Registration of new models -->
 	<bean id="owsi.datalistgroupe.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
 		<property name="models">
@@ -47,7 +21,6 @@
             <list>
                 <!-- Bootstrap Resource Bundles for data list type and properties -->
                 <value>alfresco/module/${alfresco.module.name}/messages/datalistauthority</value>
-
             </list>
         </property>
 	</bean>	

@@ -17,6 +17,7 @@ import org.alfresco.service.cmr.security.AuthorityService;
 import org.owsi.alfresco.repo.datalistgroupe.model.DatalistAuthorityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ItemAuthorityListener implements NodeServicePolicies.OnCreateNodePolicy, NodeServicePolicies.BeforeDeleteNodePolicy,
 																NodeServicePolicies.OnDeleteAssociationPolicy {
@@ -24,30 +25,16 @@ public class ItemAuthorityListener implements NodeServicePolicies.OnCreateNodePo
 	private final Logger LOGGER = LoggerFactory.getLogger(DatalistAuthorityListener.class);
 
 	// Dependencies
-	private NodeService nodeService;
-	private PolicyComponent policyComponent;
-	private AuthorityService authorityService;
-	
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
-	}
-
-	public void setPolicyComponent(PolicyComponent policyComponent) {
-		this.policyComponent = policyComponent;
-	}
-
-	public void setAuthorityService(AuthorityService authorityService) {
-		this.authorityService = authorityService;
-	}
+	@Autowired private NodeService nodeService;
+	@Autowired private PolicyComponent policyComponent;
+	@Autowired private AuthorityService authorityService;
 
 	// Behaviours
 	private Behaviour onCreateNode;
 	private Behaviour beforeDeleteNode;
 	private Behaviour onDeleteAssociation;
 
-	
 	public void init() {
-
 		// Create behaviours
 		this.onCreateNode = new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT);
 		this.beforeDeleteNode = new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT);

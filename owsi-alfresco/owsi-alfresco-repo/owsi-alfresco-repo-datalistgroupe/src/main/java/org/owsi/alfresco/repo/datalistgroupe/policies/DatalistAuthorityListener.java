@@ -1,8 +1,8 @@
 package org.owsi.alfresco.repo.datalistgroupe.policies;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.DataListModel;
@@ -17,57 +17,29 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
-import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.owsi.alfresco.repo.datalistgroupe.model.DatalistAuthorityModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNodePolicy, NodeServicePolicies.BeforeDeleteNodePolicy, 
 													NodeServicePolicies.OnUpdatePropertiesPolicy {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(DatalistAuthorityListener.class);
+	
 	// Dependencies
-	private NodeService nodeService;
-	private PolicyComponent policyComponent;
-	private AuthorityService authorityService;
-	private SiteService siteService;
-	private NamespaceService namespaceService;
-	private String prefix, suffix; 
-	
-	
-	private static final String SITE_NAME_REPLACEMENT_STRING = "[NOM_DU_SITE]";
-	
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
-	}
+	@Autowired private NodeService nodeService;
+	@Autowired private PolicyComponent policyComponent;
+	@Autowired private AuthorityService authorityService;
+	@Autowired private SiteService siteService;
+	@Autowired private NamespaceService namespaceService;
 
-	public void setPolicyComponent(PolicyComponent policyComponent) {
-		this.policyComponent = policyComponent;
-	}
-	
-	public void setAuthorityService(AuthorityService authorityService) {
-		this.authorityService = authorityService;
-		}
-
-	public void setSiteService(SiteService siteService) {
-		this.siteService = siteService;
-	}
-	
-
-	public void setNamespaceService(NamespaceService namespaceService) {
-		this.namespaceService = namespaceService;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
-	}
+	@Value("${datalistegroupe.nom_groupe.pattern}")
+	private  String pattern;
 
 	// Behaviours
 	private Behaviour onCreateNode;
@@ -182,9 +154,6 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 	}
 	
 	private String getGroupName(NodeRef nodeRef) {
-		SiteInfo siteInfo = siteService.getSite(nodeRef);
-		String name = prefix + nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE) + suffix;
-		// On remplace la constante des préfixes/suffixes correspondant au nom du site
-		return name.replaceAll(Pattern.quote(SITE_NAME_REPLACEMENT_STRING), siteInfo.getShortName());
+		return MessageFormat.format(pattern, siteService.getSite(nodeRef).getShortName(), (String) nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE));
 	}
 }
