@@ -11,5 +11,8 @@ public class NoSuchNodeRemoteException extends RepositoryRemoteException {
 	public NoSuchNodeRemoteException(String msg) {
 		super(msg);
 	}
+	public NoSuchNodeRemoteException(Exception e) {
+		super(e);
+	}
 	
 }
