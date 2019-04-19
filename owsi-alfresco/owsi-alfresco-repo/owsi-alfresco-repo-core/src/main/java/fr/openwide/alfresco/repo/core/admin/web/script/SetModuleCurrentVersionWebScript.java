@@ -22,6 +22,7 @@ import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
+import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 
 /**
@@ -34,7 +35,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
 		description="Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.",
 		formatDefault="html",
-		family="OWSI",
+		family=OwsiSwaggerWebScript.WS_FAMILY,
 		useViewFile=true)
 public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 	

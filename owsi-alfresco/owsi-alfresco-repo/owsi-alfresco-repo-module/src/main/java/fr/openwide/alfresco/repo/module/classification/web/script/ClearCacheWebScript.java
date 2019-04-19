@@ -9,6 +9,7 @@ import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
+import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 
@@ -19,7 +20,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 		url="/owsi/classification/clearcache",
 		description="Vide les caches de classification.",
 		formatDefault="html",
-		family="OWSI",
+		family=OwsiSwaggerWebScript.WS_FAMILY,
 		useViewFile=true)
 public class ClearCacheWebScript extends DeclarativeWebScript {
 	

@@ -27,6 +27,7 @@ Nouveautés
 ## depuis 0.8.1
 * owsi.classification.freemarker.models pour classifier les cas simple
 * /owsi/classification/clearcache Pour vider les caches de classification
+* /owsi/swagger.yaml
 
 ## depuis 0.8.0
 * Migration ACS 6.0

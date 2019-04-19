@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface GenerateWebScript {
 	
 	@SuppressWarnings("rawtypes")
@@ -44,4 +44,8 @@ public @interface GenerateWebScript {
 	
 	/** Mettre à true s'il le WS implémente DeclarativeWebScript */
 	boolean useViewFile() default false;
+	
+	boolean visibleInSwagger() default true;
+	SwaggerParameter[] swaggerParameters() default {};
+	SwaggerResponse[] swaggerResponses() default {};
 }

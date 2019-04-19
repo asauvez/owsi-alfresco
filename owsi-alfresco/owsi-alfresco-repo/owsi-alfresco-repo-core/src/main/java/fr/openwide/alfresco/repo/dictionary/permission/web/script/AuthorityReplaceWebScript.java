@@ -17,6 +17,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractMessageRemoteWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
@@ -52,7 +53,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		shortName="Replace une authority par une autre",
 		transactionAllow=GenerateWebScriptTransactionAllow.READWRITE,
-		family="OWSI",
+		family=OwsiSwaggerWebScript.WS_FAMILY,
 		beanParent="webscript.owsi.remote")
 public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<List<String>, WebScriptRequest> {
 
