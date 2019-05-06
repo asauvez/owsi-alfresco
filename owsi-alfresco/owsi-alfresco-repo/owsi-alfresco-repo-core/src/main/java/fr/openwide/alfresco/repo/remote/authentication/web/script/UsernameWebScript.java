@@ -8,6 +8,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService.AUTHENTICATED_USERNAME_SERVICE;
+import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractRemoteWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
@@ -18,7 +19,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		description="Retrieve current username",
 		formatDefault="html",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
-		family="OWSI",
+		family=OwsiSwaggerWebScript.WS_FAMILY,
 		beanParent="webscript.owsi.remote")
 public class UsernameWebScript extends AbstractRemoteWebScript<String, Void> {
 

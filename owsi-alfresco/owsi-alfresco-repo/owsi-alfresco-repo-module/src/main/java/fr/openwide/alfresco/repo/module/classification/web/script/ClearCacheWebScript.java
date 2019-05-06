@@ -9,41 +9,28 @@ import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 
+/**
+ * http://localhost:8080/alfresco/service/owsi/classification/clearcache
+ */
 @GenerateWebScript(
-		url={
-			"/owsi/classification/reclassify",
-			"/owsi/classification/reclassify?model=demo:document&batchSize=100"
-		},
-		description="Reclasse les documents dans le plan de classement.",
+		url="/owsi/classification/clearcache",
+		description="Vide les caches de classification.",
 		formatDefault="html",
 		family=OwsiSwaggerWebScript.WS_FAMILY,
 		useViewFile=true)
-public class ReclassifyWebScript extends DeclarativeWebScript {
+public class ClearCacheWebScript extends DeclarativeWebScript {
 	
 	@Autowired
 	private ClassificationService classificationService;
 	
 	@Override
 	protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
-		String batchSizeS = req.getParameter("batchSize");
-		int batchSize = (batchSizeS != null) ? Integer.parseInt(batchSizeS) : ClassificationService.DEFAULT_RECLASSIFY_BATCH_SIZE;
-
-		String modelNameS = req.getParameter("model");
-		int total;
-		if (modelNameS != null) {
-			NameReference modelName = NameReference.create(modelNameS);
-			total = classificationService.reclassify(modelName, batchSize);
-		} else {
-			total = classificationService.reclassifyAll(batchSize);
-		}
-		Map<String, Object> model = new HashMap<>();
-		model.put("total", total);
-		return model;
+		classificationService.clearCaches();
+		return new HashMap<>();
 	}
 
 }

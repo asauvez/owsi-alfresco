@@ -13,6 +13,7 @@ import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.TempFileProvider;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
 import fr.openwide.alfresco.api.core.node.exception.NodeExistsRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
@@ -81,6 +83,10 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	@Override
 	public void init(Container container, Description description) {
+		if (tempDirectoryName == null) {
+			throw new IllegalStateException(this.getClass() + " : Vous devez déclarer votre WS avec @GenerateWebScript(..., beanParent=\"webscript.owsi.remote\").");
+		}
+		
 		super.init(container, description);
 		// Retrieve transaction parameters
 		if (description instanceof DescriptionImpl) {
@@ -126,6 +132,10 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		try {
 			resValue = transactionedExecute(payload, bufferedRequest);
 			statusCode = (resValue != null) ? Status.STATUS_OK : Status.STATUS_NO_CONTENT;
+		} catch (InvalidNodeRefException e) {
+			LOGGER.warn("Node does not exist", e);
+			resException = new NoSuchNodeRemoteException(e);
+			statusCode = Status.STATUS_NOT_FOUND;
 		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
 			LOGGER.warn("Could not get access", e);
 			resException = e;
