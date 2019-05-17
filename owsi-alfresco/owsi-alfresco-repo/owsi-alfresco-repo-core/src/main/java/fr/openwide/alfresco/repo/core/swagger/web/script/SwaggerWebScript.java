@@ -56,9 +56,9 @@ public class SwaggerWebScript extends AbstractWebScript {
 		root.basePath = "/" + sysAdminParams.getAlfrescoContext() + "/s";
 		root.schemes = new String[] { sysAdminParams.getAlfrescoProtocol() };
 		
-		root.title = getRootTitle();
-		root.description = getRootDescription();
-		root.version = getRootVersion();
+		root.info.title = getRootTitle();
+		root.info.description = getRootDescription();
+		root.info.version = getRootVersion();
 		
 		for (WebScript webscript : webscripts.values()) {
 			GenerateWebScript annotation = webscript.getClass().getAnnotation(GenerateWebScript.class);
@@ -71,7 +71,7 @@ public class SwaggerWebScript extends AbstractWebScript {
 					SwaggerWS ws = new SwaggerWS();
 					ws.summary = annotation.shortName();
 					ws.description = annotation.description();
-					//ws.operationId = webscript.getClass().getName();
+					ws.operationId = annotation.wsName();
 					ws.tags = new String[] { annotation.family() };
 					
 					switch (annotation.formatDefault()) {
@@ -86,7 +86,7 @@ public class SwaggerWebScript extends AbstractWebScript {
 						model.description = param.description();
 						model.in = param.in().name().toLowerCase();
 						model.required = param.required();
-						model.type = param.type();
+						//model.type = param.type();
 						if (param.schema() != Void.class) {
 							model.type = "object";
 							model.schema = new SwaggerSchema(schemaGen.generateSchema(param.schema()));

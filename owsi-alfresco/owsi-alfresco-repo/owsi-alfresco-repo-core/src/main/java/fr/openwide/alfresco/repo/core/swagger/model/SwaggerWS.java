@@ -14,7 +14,7 @@ public class SwaggerWS {
 
 	@JsonProperty public String summary;
 	@JsonProperty public String description;
-	//@JsonProperty public String operationId;
+	@JsonProperty public String operationId;
 	@JsonProperty public String[] tags;
 	
 	@JsonProperty public List<String> produces = new ArrayList<>();
