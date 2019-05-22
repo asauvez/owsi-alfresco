@@ -194,6 +194,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	@Override
 	public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
+		if (! nodeModelRepositoryService.exists(nodeRef)) {
+			logger.debug("onAddAspect() sur une node qui n'existe plus " + nodeRef);
+			return;
+		}
+		
 		if (OwsiModel.classifiable.getNameReference().equals(conversionService.get(aspectTypeQName))) {
 			classify(nodeRef, ClassificationMode.CREATE);
 		} else {
@@ -202,6 +207,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	@Override
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
+		if (! nodeModelRepositoryService.exists(nodeRef)) {
+			logger.debug("onUpdateProperties() sur une node qui n'existe plus " + nodeRef);
+			return;
+		}
+		
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
 			Set<QName> newFields = new TreeSet<>(after.keySet());
