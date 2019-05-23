@@ -90,10 +90,11 @@ public class SwaggerWebScript extends AbstractWebScript {
 						model.description = param.description();
 						model.in = param.in().name().toLowerCase();
 						model.required = param.required();
-						model.type = param.type();
+						
 						if (param.schema() != Void.class) {
-							model.type = "object";
 							model.schema = new SwaggerSchema(schemaGen.generateSchema(param.schema()));
+						}else {
+							model.type = param.type();
 						}
 						
 						ws.parameters.add(model);
