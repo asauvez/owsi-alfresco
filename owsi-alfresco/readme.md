@@ -26,6 +26,7 @@ Nouveautés
 
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps 
+* Swagger : modification de rednu généré
 
 ## depuis 0.8.1
 * owsi.classification.freemarker.models pour classifier les cas simple
