@@ -32,6 +32,12 @@
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.alfresco.aos-module</groupId>
+			<artifactId>alfresco-aos-module</artifactId>
+			<version>1.2.2</version>
+			<type>amp</type>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -145,7 +151,29 @@
 					<value>true</value>
 				</property>
 			</activation>
-			<!-- Nothing to do -->
+			<build>
+				<plugins>
+					<plugin>
+	 					<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<failOnMissingWebXml>false</failOnMissingWebXml>
+							<overlays>
+								<overlay>
+									<groupId>org.alfresco</groupId>
+									<artifactId>alfresco-enterprise</artifactId>
+									<type>war</type>
+								</overlay>
+								<overlay>
+									<groupId>org.alfresco.aos-module</groupId>
+									<artifactId>alfresco-aos-module</artifactId>
+									<type>amp</type>
+								</overlay>
+							</overlays>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 
