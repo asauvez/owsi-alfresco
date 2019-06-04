@@ -25,7 +25,8 @@ Nouveautés
 ==========
 
 ## depuis 0.8.2
-* Classification gère si noeud supprimé entre temps 
+* Classification gère si noeud supprimé entre temps
+* Classification désactive cm:version, cm:auditable et owsi:classifiable policies 
 * Swagger : modification de rednu généré
 * Intégre AMP AOS
 

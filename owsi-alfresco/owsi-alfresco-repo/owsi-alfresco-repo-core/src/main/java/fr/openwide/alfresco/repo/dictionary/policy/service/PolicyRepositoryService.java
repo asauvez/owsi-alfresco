@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repo.dictionary.policy.service;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
@@ -49,6 +50,8 @@ public interface PolicyRepositoryService {
 
 	<T> T disableBehaviour(ContainerModel type, Callable<T> callable);
 	void disableBehaviour(ContainerModel type, Runnable runnable);
+	<T> T disableBehaviours(Collection<? extends ContainerModel> types, Callable<T> callable);
+	void disableBehaviours(Collection<? extends ContainerModel> types, Runnable runnable);
 	
 //    public interface BeforeUpdateNodePolicy extends ClassPolicy
 //    public interface BeforeArchiveNodePolicy extends ClassPolicy

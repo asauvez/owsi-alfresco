@@ -328,11 +328,15 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		ClassificationEvent event = new ClassificationEvent(nodeRef, mode, model);
 		ClassificationBuilder builder = new ClassificationBuilder(this, event);
 		try {
-			policy.classify(builder, model, event);
-			
-			policyRepositoryService.disableBehaviour(OwsiModel.classifiable, 
-				() -> nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date())
-			);
+			policyRepositoryService.disableBehaviours(Arrays.asList(
+						OwsiModel.classifiable,
+						CmModel.versionable,
+						CmModel.auditable), 
+					() -> { 
+				policy.classify(builder, model, event);
+				
+				nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date()); 
+			});
 			
 		} catch (RuntimeException ex) {
 			// On log en debug uniquement, car cela peut être une erreur retryable, qui provoque en relance de la transaction.
