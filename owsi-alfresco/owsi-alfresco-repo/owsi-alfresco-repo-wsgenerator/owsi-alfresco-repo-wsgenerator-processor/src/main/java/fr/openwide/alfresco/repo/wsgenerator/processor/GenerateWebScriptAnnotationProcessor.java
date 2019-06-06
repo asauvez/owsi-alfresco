@@ -99,6 +99,9 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 				family = (firstUrl.split("/").length > 1) ? firstUrl.split("/")[1] : "root";
 			}
 			String formatDefault = generateWebScript.formatDefault();
+			if (formatDefault.isEmpty()) {
+				formatDefault = generateWebScript.formatDefaultEnum().name().toLowerCase();
+			}
 
 			Filer filer = processingEnv.getFiler();
 			try {

@@ -13,6 +13,8 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 
 @GenerateWebScript(
 		url={
@@ -20,8 +22,9 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 			"/owsi/classification/reclassify?model=demo:document&batchSize=100"
 		},
 		description="Reclasse les documents dans le plan de classement.",
-		formatDefault="html",
+		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
+		authentication=GenerateWebScriptAuthentication.ADMIN,
 		useViewFile=true)
 public class ReclassifyWebScript extends DeclarativeWebScript {
 	

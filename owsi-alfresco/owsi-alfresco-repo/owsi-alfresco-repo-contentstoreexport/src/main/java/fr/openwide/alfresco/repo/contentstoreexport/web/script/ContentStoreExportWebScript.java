@@ -13,6 +13,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 @GenerateWebScript(
@@ -20,6 +21,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		shortName="Content store export",
 		description="Export necessary files",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
+		authentication=GenerateWebScriptAuthentication.ADMIN,
 		family="OWSI")
 public class ContentStoreExportWebScript extends AbstractWebScript implements ApplicationContextAware {
 

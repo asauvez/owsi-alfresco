@@ -11,13 +11,14 @@ import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractMessageRemoteWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 @GenerateWebScript(
 		paramClass=LOGIN_REQUEST_SERVICE.class,
 		shortName="login",
 		description="Login using username and password",
-		formatDefault="json",
+		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
 		authentication=GenerateWebScriptAuthentication.NONE,
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family=OwsiSwaggerWebScript.WS_FAMILY,

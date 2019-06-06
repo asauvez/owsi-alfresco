@@ -11,13 +11,14 @@ import fr.openwide.alfresco.api.core.search.service.NodeSearchRemoteService.SEAR
 import fr.openwide.alfresco.repo.core.node.web.script.AbstractNodeListWebScript;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 @GenerateWebScript(
 		paramClass=SEARCH_NODE_SERVICE.class,
 		shortName="search",
 		description="Search nodes with a Lucene query",
-		formatDefault="json",
+		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
 		beanParent="webscript.owsi.remote")

@@ -12,6 +12,8 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 
 /**
  * http://localhost:8080/alfresco/service/owsi/classification/clearcache
@@ -19,8 +21,9 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 @GenerateWebScript(
 		url="/owsi/classification/clearcache",
 		description="Vide les caches de classification.",
-		formatDefault="html",
+		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
+		authentication=GenerateWebScriptAuthentication.ADMIN,
 		useViewFile=true)
 public class ClearCacheWebScript extends DeclarativeWebScript {
 	
