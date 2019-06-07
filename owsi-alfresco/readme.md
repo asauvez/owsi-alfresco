@@ -30,6 +30,7 @@ Nouveautés
 * Swagger : modification de rednu généré
 * Intégre AMP AOS
 * /owsi/admin/configuration Renvoi configuration loggué au démarrage
+* Log git.properties au démarrage.
 
 ## depuis 0.8.1
 * owsi.classification.freemarker.models pour classifier les cas simple

@@ -1,12 +1,17 @@
 package fr.openwide.alfresco.api.core.log;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.function.Function;
 
 import javax.xml.bind.DatatypeConverter;
@@ -73,6 +78,31 @@ public abstract  class AbstractConfigurationLogger {
 				throw new IllegalStateException("Property not found " + propertyName);
 			}
 		}
+		
+		try {
+			Enumeration<URL> gitPropertiesUrl = Thread.currentThread().getContextClassLoader().getResources("/git.properties");
+			while (gitPropertiesUrl.hasMoreElements()) {
+				URL gitPropertyUrl = gitPropertiesUrl.nextElement();
+				try (InputStream in = gitPropertyUrl.openStream()) {
+					Properties gitProperty = new Properties();
+					gitProperty.load(in);
+					
+					String[] split = gitPropertyUrl.getPath().split("/");
+					String lib = split[Math.max(split.length-4, 0)];
+					
+					String branch = gitProperty.getProperty("git.branch");
+					String buildTime = gitProperty.getProperty("git.build.time");
+					String version = gitProperty.getProperty("git.build.version");
+					String msg = gitProperty.getProperty("git.commit.message.full");
+					String commitId = gitProperty.getProperty("git.commit.id.abbrev");
+					logPropertyAsInfo(lib, branch + ":" + version + ":" + commitId + ":" + buildTime + ":" + msg);
+				}
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+		
+		
 		logInfo("Configuration logging end");
 	}
 	
