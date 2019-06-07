@@ -245,6 +245,10 @@
 				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
 				<filtering>true</filtering>
 			</resource>
+			<resource>
+				<directory>src/main/webapp</directory>
+				<targetPath>META-INF/resources</targetPath>
+			</resource>
 		</resources>
 
 		<pluginManagement>
