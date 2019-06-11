@@ -9,7 +9,7 @@ pipeline {
    stages {
       stage('Build and Test') {
          steps {
-            sh 'mvn -B clean package -Damf -Dlivraison'
+            sh 'mvn -B -U clean package -Damf -Dlivraison'
          }
       }
    }
