@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 
-import javax.xml.bind.DatatypeConverter;
-
 public abstract  class AbstractConfigurationLogger {
 
 	private static final String MD5_PREFIX = "MD5:";
@@ -111,7 +109,16 @@ public abstract  class AbstractConfigurationLogger {
 	}
 
 	private String md5(String value) {
-		return DatatypeConverter.printHexBinary(md5MessageDigest.digest(value.getBytes(StandardCharsets.UTF_8))).toUpperCase();
+		return bytesToHex2(md5MessageDigest.digest(value.getBytes(StandardCharsets.UTF_8))).toUpperCase();
+	}
+	private static String bytesToHex2(byte[] hashInBytes) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < hashInBytes.length; i++) {
+			String hex = Integer.toHexString(0xff & hashInBytes[i]);
+			if (hex.length() == 1) sb.append('0');
+			sb.append(hex);
+		}
+		return sb.toString();
 	}
 	
 	protected String getInMo(long n) {
