@@ -4,7 +4,7 @@ pipeline {
    }
    tools {
       maven 'Maven 3.3.9'
-      jdk 'jdk8'
+      jdk 'OpenJDK 11.0.2'
    }
    stages {
       stage('Build and Test') {
