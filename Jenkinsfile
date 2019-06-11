@@ -9,7 +9,9 @@ pipeline {
    stages {
       stage('Build and Test') {
          steps {
-            sh 'mvn -B -U clean package -Damf -Dlivraison'
+	    dir("owsi-alfresco") {
+	            sh 'mvn -B -U clean package -Damf -Dlivraison'
+	    }
          }
       }
    }
