@@ -65,7 +65,7 @@
 			<scope>compile</scope>
 		</dependency>
 		
-		<!-- javax.xml.bind va disparaitre en Java 11 -->
+		<!-- javax.xml.bind va disparaitre en Java 11. Il faudra alors rajouter ces libs :
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -81,6 +81,7 @@
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.3.0</version>
 		</dependency>
+		-->
 	</dependencies>
 
 	<build>
