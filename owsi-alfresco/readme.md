@@ -3,6 +3,10 @@ Description
 Owsi-Alfresco est un ensemble d'outils destinés à rendre plus rapide et maintenable les développements autour 
 d'Alfresco 6.0.0.
 
+Liens
+=====
+https://ci-jenkins.vitry.intranet/job/owsi-alfresco/job/owsi-alfresco/
+
 FAQ
 ===
 * Au moment du login, l'application indique qu'Alfresco a répondu 404 : 

@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -63,12 +66,23 @@ public class MigrationMojo extends AbstractMigrationMojo {
 
 	private Map<String, File> resourceInJarByPath = new HashMap<String, File>();
 	private Map<String, File> resourceInWarByPath = new HashMap<String, File>();
+	private Set<String> customizationFoldersToIgnore = new HashSet<String>();
 	
 	private StringBuilder errors = new StringBuilder();
 	
 	private Unmarshaller unmarshaller = JAXBContext.newInstance(Extension.class).createUnmarshaller();
 	
 	public MigrationMojo() throws Exception {}
+	
+	private class MigrationStat {
+		public int nbIgnored = 0;
+		public int nbPatch = 0;
+		public int nbModule = 0;
+		@Override
+		public String toString() {
+			return "nbIgnored=" + nbIgnored + " nbPatch=" + nbPatch + " nbModule=" + nbModule;
+		}
+	}
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -80,8 +94,13 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			initAlfrescoJars();
 			
 			// parcours src/main/java/org/alfresco/
-			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco");
-			visitResources(new File(getBaseDir(), "src/main/webapp"), "");
+			MigrationStat stat = new MigrationStat();
+			visitResources(new File(getBaseDir(), "src/main/resources/alfresco/web-extension/site-data/extensions/"), "/alfresco/web-extension/site-data/extensions/", stat);
+			customizationFoldersToIgnore.add("/alfresco/web-extension");
+			
+			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco", stat);
+			visitResources(new File(getBaseDir(), "src/main/webapp"), "", stat);
+			getLog().info("Main stat " + stat.toString());
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.toString(), e);
 		}
@@ -116,32 +135,39 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				for (File module : alfrescoRepo.listFiles()) {
 					File version = new File(module, alfrescoVersion);
 					if (version.exists()) {
-						File jar = new File(version, module.getName() + "-" + version.getName() + ".jar");
-						if (jar.exists()) {
-							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar)));
-							try {
-								ZipEntry entry;
-								while ((entry = zip.getNextEntry()) != null) {
-									if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
-										put(resourceInJarByPath, "/" + entry.getName(), jar);
+						if ("alfresco".equals(targetWar) || "alfresco-enterprise".equals(targetWar)) {
+							File jar = new File(version, module.getName() + "-" + version.getName() + ".jar");
+							if (jar.exists()) {
+								ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar)));
+								try {
+									ZipEntry entry;
+									while ((entry = zip.getNextEntry()) != null) {
+										if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
+											put(resourceInJarByPath, "/" + entry.getName(), jar);
+										}
 									}
+								} finally {
+									zip.close();
 								}
-							} finally {
-								zip.close();
 							}
-						}
-						File jarClasses = new File(version, module.getName() + "-" + version.getName() + "-classes.jar");
-						if (jarClasses.exists() && module.getName().equals(targetWar)) {
-							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarClasses)));
-							try {
-								ZipEntry entry;
-								while ((entry = zip.getNextEntry()) != null) {
-									if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
-										put(resourceInJarByPath, "/" + entry.getName(), jarClasses);
+							
+							List<String> modulesToSearch = ("alfresco".equals(targetWar) || "alfresco-enterprise".equals(targetWar)) 
+									? Arrays.asList("alfresco", "alfresco-share-services")
+									: Arrays.asList(targetWar);
+							
+							File jarClasses = new File(version, module.getName() + "-" + version.getName() + "-classes.jar");
+							if (jarClasses.exists() && modulesToSearch.contains(module.getName())) {
+								ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarClasses)));
+								try {
+									ZipEntry entry;
+									while ((entry = zip.getNextEntry()) != null) {
+										if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
+											put(resourceInJarByPath, "/" + entry.getName(), jarClasses);
+										}
 									}
+								} finally {
+									zip.close();
 								}
-							} finally {
-								zip.close();
 							}
 						}
 						
@@ -184,20 +210,41 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		}
 	}
 	
-	private void visitResources(File folder, String path) throws Exception {
-		if (folder.exists()) {
-			for (File child : folder.listFiles()) {
-				String childPath = path + "/" + child.getName();
-				if (child.isDirectory()) {
-					visitResources(child, childPath);
-				} else {
-					analyzeResource(child, childPath);
-				}
+	private void visitResources(File folder, String path, MigrationStat stat) throws Exception {
+		if (! folder.exists()) {
+			getLog().warn(folder + " does not exist");
+			return;
+		}
+		
+		File ignoreFolderFile = new File(folder.getParentFile(), folder.getName() + ignoreFileExtension);
+		if (ignoreFolderFile.exists()) {
+			getLog().debug("Ignore folder " + folder);
+			stat.nbIgnored ++;
+			return;
+		}
+		if (customizationFoldersToIgnore.contains(path)) {
+			getLog().debug(folder + " already scanned as a custom package");
+			return;
+		}
+		
+		File[] children = folder.listFiles();
+		
+		// Fichiers avant folders
+		for (File child : children) {
+			String childPath = path + "/" + child.getName();
+			if (! child.isDirectory()) {
+				analyzeResource(child, childPath, stat);
+			}
+		}
+		for (File child : children) {
+			String childPath = path + "/" + child.getName();
+			if (child.isDirectory()) {
+				visitResources(child, childPath, stat);
 			}
 		}
 	}
 
-	private void analyzeResource(File file, String path) throws Exception {
+	private void analyzeResource(File file, String path, MigrationStat stat) throws Exception {
 		if (path.startsWith("/extension")) {
 			return;
 		}
@@ -207,11 +254,20 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			Extension extension = (Extension) unmarshaller.unmarshal(file);
 			for (Module module : extension.modules.modules) {
 				for (Customization customization : module.customizations.customizations) {
-					File customPackage = new File("src/main/resources/alfresco/web-extension/site-webscripts/" + customization.sourcePackageRoot.replace('.', '/'));
+					customizationFoldersToIgnore.add("/alfresco/site-webscripts/" + customization.sourcePackageRoot.replace('.', '/'));
+
+					File customPackage = new File(getBaseDir(), "src/main/resources/alfresco/web-extension/site-webscripts/" + customization.sourcePackageRoot.replace('.', '/'));
 					String customPath = "/alfresco/site-webscripts/" + customization.targetPackageRoot.replace('.', '/');
-					visitResources(customPackage, customPath);
+					
+					getLog().info("Custom package " + customPath + " in " + customPackage);
+					
+					MigrationStat statModule = new MigrationStat();
+					visitResources(customPackage, customPath, statModule);
+					getLog().info("Custom package " + customPath + " stat: " + statModule.toString());
 				}
 			}
+			stat.nbModule ++;
+			return;
 		}
 
 		String versionExtension = "." + alfrescoVersion + originalFileExtension;
@@ -221,6 +277,10 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				if (! patch.exists()) {
 					error(".ignore.ori file without corresponding patch file: " + file.getAbsolutePath());
 				}
+				if (file.length() > 0) {
+					error(".ignore.ori file should be empty: " + file.getAbsolutePath());
+				}
+				stat.nbIgnored ++;
 			} else if (path.endsWith(versionExtension)) {
 				File patch = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - versionExtension.length()));
 				if (! patch.exists()) {
@@ -228,6 +288,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				} else if (Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(patch))) {
 					error("Patch identical to original. You may delete it : " + patch.getAbsolutePath());
 				}
+				stat.nbPatch ++;
 			} else {
 				File currentVersionOriginalFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - versionExtension.length()) + versionExtension);
 				if (   deleteIdenticalResources
@@ -238,6 +299,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				} else {
 					error("You should migrate this original file to " + alfrescoVersion + " then delete it: " + file.getAbsolutePath());
 				}
+				stat.nbPatch ++;
 			}
 			return;
 		}
@@ -245,20 +307,10 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		getLog().debug("Analyse " + path);
 		String originalContent = findContentByPath(path);
 		
-		boolean customizedResource = 
-				   (path.startsWith("/alfresco/extension/templates/webscripts/") && ! path.startsWith("/alfresco/extension/templates/webscripts/org/alfresco/"))
-				|| path.startsWith("/alfresco/web-extension/");
-		if (customizedResource) {
-			if (originalContent != null) {
-				error("Customization path shoud contains patched file : " + file.getAbsolutePath());
-			}
-			return;
-		}
-		
 		if (originalContent == null) {
 			File ignore = new File(file.getParentFile(), file.getName() + ignoreFileExtension);
 			if (ignore.exists()) {
-				getLog().warn("Ignore resource " + file.getAbsolutePath());
+				getLog().debug("Ignore resource " + file.getAbsolutePath());
 				return;
 			} else if (file.getName().toUpperCase().startsWith("README.")) {
 				return;
@@ -332,9 +384,12 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		System.out.println(new File(".").getAbsolutePath());
+		
 		MigrationMojo mojo = new MigrationMojo();
 		mojo.alfrescoVersion = "6.0.0";
 		mojo.targetWar = "alfresco";
+		//mojo.targetWar = "share";
 		mojo.execute();
 	}
 }
