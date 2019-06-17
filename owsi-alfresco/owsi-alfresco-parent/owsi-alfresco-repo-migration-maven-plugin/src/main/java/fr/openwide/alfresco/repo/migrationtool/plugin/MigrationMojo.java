@@ -212,7 +212,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	private void visitResources(File folder, String path, MigrationStat stat) throws Exception {
 		if (! folder.exists()) {
-			getLog().warn(folder + " does not exist");
+			getLog().debug(folder + " does not exist");
 			return;
 		}
 		
@@ -259,11 +259,14 @@ public class MigrationMojo extends AbstractMigrationMojo {
 					File customPackage = new File(getBaseDir(), "src/main/resources/alfresco/web-extension/site-webscripts/" + customization.sourcePackageRoot.replace('.', '/'));
 					String customPath = "/alfresco/site-webscripts/" + customization.targetPackageRoot.replace('.', '/');
 					
-					getLog().info("Custom package " + customPath + " in " + customPackage);
-					
-					MigrationStat statModule = new MigrationStat();
-					visitResources(customPackage, customPath, statModule);
-					getLog().info("Custom package " + customPath + " stat: " + statModule.toString());
+					getLog().info("Custom package " + customization.targetPackageRoot);
+					if (customPackage.exists()) {
+						MigrationStat statModule = new MigrationStat();
+						visitResources(customPackage, customPath, statModule);
+						getLog().info("Custom package " + customization.targetPackageRoot + " stat: " + statModule.toString());
+					} else {
+						getLog().error(customPackage + " does not exist");
+					}
 				}
 			}
 			stat.nbModule ++;
