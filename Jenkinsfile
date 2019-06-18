@@ -10,7 +10,7 @@ pipeline {
       stage('Build and Test') {
          steps {
 	    dir("owsi-alfresco") {
-	            sh 'mvn -B -X clean package -Dlivraison'
+	            sh 'mvn -B clean source:jar deploy -Ddistribution=owsi-alfresco-release'
 	    }
          }
       }
