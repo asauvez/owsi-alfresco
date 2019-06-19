@@ -1,9 +1,12 @@
 package fr.openwide.alfresco.repo.contentstoreexport.web.script;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.output.TeeOutputStream;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -29,6 +32,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 			@SwaggerParameter(name="queries", description="Liste de queries à exporter séparées par des virgules (défaut vide)"),
 			@SwaggerParameter(name="nodeRefs", description="Liste de nodeRef racines à exporter séparés par des virgules (défaut vide)"),
 			@SwaggerParameter(name="exportContent", description="S'il faut exporter ou non le contenu (défaut true)"),
+			@SwaggerParameter(name="writeTo", description="Emplacement où écrire sur disque le Zip (défaut renvoie juste le Zip)"),
 		})
 public class ContentStoreExportWebScript extends AbstractWebScript implements ApplicationContextAware {
 
@@ -40,11 +44,20 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 		resp.setHeader("Content-Disposition", "attachment; filename=\"contentstoreexport-" 
 				+ new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip\"");
 		String exportContent = req.getParameter("exportContent");
-		contentStoreExportService.export(resp.getOutputStream(), 
+		
+		OutputStream outputStream = resp.getOutputStream();
+		if (req.getParameter("writeTo") != null) {
+			 outputStream = new TeeOutputStream(outputStream, new FileOutputStream(req.getParameter("writeTo")));
+		}
+		
+		contentStoreExportService.export(outputStream, 
 				req.getParameter("paths"), 
 				req.getParameter("queries"), 
 				req.getParameter("nodeRefs"),
 				(exportContent != null) ? Boolean.parseBoolean(exportContent) : true);
+		
+		outputStream.flush();
+		outputStream.close();
 	}
 	
 	@Override
