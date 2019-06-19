@@ -104,6 +104,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		try {
 			zipOutPutStream = new ZipOutputStream(outPutStream);
 			for (NodeRef root : rootNodesToExport) {
+				LOGGER.info("Export node : " + root);
 				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, exportContent);
 			}
 			LOGGER.info("Nombre de fichiers exportés: " + nbFiles);
@@ -275,6 +276,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private void recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
 			AtomicInteger nbFiles, AtomicLong totalVolume, boolean exportContent)
 			throws IOException {
+		LOGGER.debug("Export node : " + nodeRef);
+		
 		//recupération des properties du node courant
 		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
 		for (Entry<QName, Serializable> property : properties.entrySet()) {
