@@ -15,6 +15,7 @@ import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportSe
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 @GenerateWebScript(
 		url={"/owsi/contentstoreexport", "/owsi/contentstoreexport.zip"},
@@ -22,7 +23,13 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		description="Export necessary files",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		authentication=GenerateWebScriptAuthentication.ADMIN,
-		family="OWSI")
+		family="OWSI",
+		swaggerParameters={
+			@SwaggerParameter(name="paths", description="Liste de chemins à exporter séparés par des virgules (défaut vide)"),
+			@SwaggerParameter(name="queries", description="Liste de queries à exporter séparées par des virgules (défaut vide)"),
+			@SwaggerParameter(name="nodeRefs", description="Liste de nodeRef racines à exporter séparés par des virgules (défaut vide)"),
+			@SwaggerParameter(name="exportContent", description="S'il faut exporter ou non le contenu (défaut true)"),
+		})
 public class ContentStoreExportWebScript extends AbstractWebScript implements ApplicationContextAware {
 
 	private ContentStoreExportService contentStoreExportService;
@@ -32,10 +39,12 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 		resp.setContentType("application/zip");
 		resp.setHeader("Content-Disposition", "attachment; filename=\"contentstoreexport-" 
 				+ new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip\"");
+		String exportContent = req.getParameter("exportContent");
 		contentStoreExportService.export(resp.getOutputStream(), 
 				req.getParameter("paths"), 
 				req.getParameter("queries"), 
-				req.getParameter("nodeRefs"));
+				req.getParameter("nodeRefs"),
+				(exportContent != null) ? Boolean.parseBoolean(exportContent) : true);
 	}
 	
 	@Override

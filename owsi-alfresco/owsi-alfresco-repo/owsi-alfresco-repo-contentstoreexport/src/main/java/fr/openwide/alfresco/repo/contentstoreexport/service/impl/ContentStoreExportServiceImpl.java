@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -35,6 +37,7 @@ import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.ISO9075;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,24 +87,28 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private String contentstoreexportVersion;
 
 	@Override
-	public void export(OutputStream outPutStream, String paths, String queries, String noderefs) throws IOException {
+	public void export(OutputStream outPutStream, String paths, String queries, String noderefs,
+			boolean exportContent) throws IOException {
 		ZipOutputStream zipOutPutStream = null;
 		long startTime = System.currentTimeMillis();
 		Set<String> processedNodes = new HashSet<String>();
-		int count = 0;
 		LOGGER.info("lancement de l'export.");
 		Properties properties = new Properties();
 		properties.setProperty("contentstoreexport.version", contentstoreexportVersion);
 		properties.setProperty("alfresco.version", descriptorService.getCurrentRepositoryDescriptor().getVersion());
 		Set<NodeRef> rootNodesToExport = getRootNodesToExport(paths, queries, noderefs, properties);
 		// debut du stockage des fichiers dans le zip
+		
+		AtomicInteger nbFiles = new AtomicInteger(0);
+		AtomicLong totalVolume = new AtomicLong(0L);
 		try {
 			zipOutPutStream = new ZipOutputStream(outPutStream);
 			for (NodeRef root : rootNodesToExport) {
-				count += recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes);
+				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, exportContent);
 			}
-			LOGGER.info("Nombre de fichiers exportés: " + count);
-			properties.setProperty("nbr.fichiers.exportes", "" + count);
+			LOGGER.info("Nombre de fichiers exportés: " + nbFiles);
+			properties.setProperty("fichiers.exportes.nb", "" + nbFiles);
+			properties.setProperty("fichiers.exportes.size", "" + totalVolume);
 			LOGGER.info("Fin de l'export.");
 
 			exportLocalFiles(zipOutPutStream, new File(TOMCAT_HOME + "/shared/classes"));
@@ -250,8 +257,10 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 
 	private NodeRef getByPath(String path) {
 		NodeRef nodeRef = nodeService.getRootNode(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+		
 		for (String childName : path.split("/")) {
 			if (!childName.trim().isEmpty()) {
+				childName = ISO9075.decode(childName);
 				List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL,
 						QName.createQName(childName, namespacePrefixResolver), true);
 				if (assocs.size() != 1) {
@@ -263,43 +272,46 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		return nodeRef;
 	}
 
-	private int recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes)
+	private void recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
+			AtomicInteger nbFiles, AtomicLong totalVolume, boolean exportContent)
 			throws IOException {
-		int count = 0;
 		//recupération des properties du node courant
 		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
 		for (Entry<QName, Serializable> property : properties.entrySet()) {
 			//seul un content data nous interesse
 			if (property.getValue() instanceof ContentData) {
 				ContentData contentData = (ContentData) property.getValue();
-				ContentReader reader = contentService.getReader(nodeRef, property.getKey());
-				InputStream inputStream = reader.getContentInputStream();
-				try {
-					String contentUrl = contentData.getContentUrl();
-					if (processedNodes.add(contentUrl)) {
-						//on remplace "/store://" par "/contentstore"
-						if (contentUrl.startsWith(STORE_PREFIX)) {
-							contentUrl = contentUrl.substring(STORE_PREFIX.length());
-							contentUrl = "/contentstore" + contentUrl;
+				nbFiles.incrementAndGet();
+				totalVolume.addAndGet(contentData.getSize());
+				
+				if (exportContent) {
+					ContentReader reader = contentService.getReader(nodeRef, property.getKey());
+					InputStream inputStream = reader.getContentInputStream();
+					try {
+						String contentUrl = contentData.getContentUrl();
+						if (processedNodes.add(contentUrl)) {
+							//on remplace "/store://" par "/contentstore"
+							if (contentUrl.startsWith(STORE_PREFIX)) {
+								contentUrl = contentUrl.substring(STORE_PREFIX.length());
+								contentUrl = "/contentstore" + contentUrl;
+							}
+							//ajout de l'entrée au zip
+							zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
+							IOUtils.copy(inputStream, zipOutPutStream);
 						}
-						//ajout de l'entrée au zip
-						zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
-						IOUtils.copy(inputStream, zipOutPutStream);
-						count++;
+					} finally {
+						IOUtils.closeQuietly(inputStream);
+						zipOutPutStream.closeEntry();
 					}
-				} finally {
-					IOUtils.closeQuietly(inputStream);
 				}
-				zipOutPutStream.closeEntry();
 			}
 		}
 		//recursion dans les fils
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
 		for (ChildAssociationRef childAssoc : children) {
 			NodeRef childNodeRef = childAssoc.getChildRef();
-			count += recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes);
+			recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, exportContent);
 		}
-		return count;
 	}
 
 	private String secondToTimeConverter (long milliseconds) {
