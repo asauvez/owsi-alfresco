@@ -18,7 +18,7 @@ pipeline {
 				always {
 					junit '**/target/surefire-reports/*.xml'
 				}
-				always [
+				always {
 				//changed {
 					emailext (
 						subject: "[Jenkins]: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' status changed",
