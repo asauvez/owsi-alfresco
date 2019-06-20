@@ -23,7 +23,7 @@ pipeline {
 		stage('Metrics sonar') {
 			steps {
 				// sh 'mvn -gs $MAVEN_SETTINGS -Dsonar.organization="default-organization" -Dsonar.host.url=http://ged-lyon-nuxeo.vitry.intranet/sonar sonar:sonar'
-				sh 'mvn -Dsonar.organization="default-organization" -Dsonar.host.url=$SONAR_HOST_URL $SONAR_MAVEN_GOAL'
+				sh 'mvn -Dsonar.organization="default-organization" -Dsonar.host.url=${SONAR_HOST_URL} ${SONAR_MAVEN_GOAL}'
 			}
 		}
 	}
