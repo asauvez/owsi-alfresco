@@ -22,7 +22,9 @@ pipeline {
 		}
 		stage('Metrics sonar') {
 			steps {
-				sh 'mvn -Dsonar.organization="default-organization" -Dsonar.host.url=http://sonar.vitry.intranet:9000 sonar:sonar'
+				dir("owsi-alfresco") {
+					sh 'mvn -Dsonar.organization="default-organization" -Dsonar.host.url=http://sonar.vitry.intranet:9000 sonar:sonar'
+				}
 			}
 		}
 	}
