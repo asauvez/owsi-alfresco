@@ -15,16 +15,16 @@ public interface SiteService {
 
 	public void deleteSite(SiteReference siteReference);
 
-	void addCollaborator(SiteReference siteReference, AuthorityReference AuthorityReference);
-	void removeCollaborator(SiteReference siteReference, AuthorityReference AuthorityReference);
+	void addCollaborator(SiteReference siteReference, AuthorityReference authorityReference);
+	void removeCollaborator(SiteReference siteReference, AuthorityReference authorityReference);
 
-	void addConsumer(SiteReference siteReference, AuthorityReference AuthorityReference);
-	void removeConsumer(SiteReference siteReference, AuthorityReference AuthorityReference);
+	void addConsumer(SiteReference siteReference, AuthorityReference authorityReference);
+	void removeConsumer(SiteReference siteReference, AuthorityReference authorityReference);
 
-	void addContributor(SiteReference siteReference, AuthorityReference AuthorityReference);
-	void removeContributor(SiteReference siteReference, AuthorityReference AuthorityReference);
+	void addContributor(SiteReference siteReference, AuthorityReference authorityReference);
+	void removeContributor(SiteReference siteReference, AuthorityReference authorityReference);
 
-	void addManager(SiteReference siteReference, AuthorityReference AuthorityReference);
-	void removeManager(SiteReference siteReference, AuthorityReference AuthorityReference);
+	void addManager(SiteReference siteReference, AuthorityReference authorityReference);
+	void removeManager(SiteReference siteReference, AuthorityReference authorityReference);
 
 }
