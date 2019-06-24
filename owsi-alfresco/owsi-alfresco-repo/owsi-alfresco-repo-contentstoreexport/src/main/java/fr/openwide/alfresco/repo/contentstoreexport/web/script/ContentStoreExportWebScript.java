@@ -59,8 +59,8 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 				+ new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip\"");
 		
 		OutputStream outputStream = resp.getOutputStream();
-		if (req.getParameter("writeTo") != null) {
-			 outputStream = new TeeOutputStream(outputStream, new FileOutputStream(req.getParameter("writeTo")));
+		if (params.writeTo != null) {
+			 outputStream = new TeeOutputStream(outputStream, new FileOutputStream(params.writeTo));
 		}
 		
 		contentStoreExportService.export(outputStream, params);

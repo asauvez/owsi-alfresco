@@ -17,6 +17,9 @@ public class ContentStoreExportParams {
 	// Si false, n'export pas le contenu. Permet de savoir la taille.
 	public String exportContent = "true";
 	
+	// Emplacement où écrire sur disque le Zip (défaut renvoie juste le Zip)
+	public String writeTo;
+	
 	// Exporter sous forme de /contentStore/2019/12/31/....bin ou sous forme /Espace racine/...
 	public String pathType = PathType.CONTENTSTORE.name();
 	
