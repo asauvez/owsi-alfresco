@@ -22,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.management.MBeanServerConnection;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.management.JmxDumpUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -33,6 +34,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -42,6 +44,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.openwide.alfresco.repo.contentstoreexport.model.ContentStoreExportParams;
 import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportService;
 
 /**
@@ -79,6 +82,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private NodeService nodeService;
 	private SearchService searchService;
 	private ContentService contentService;
+	private PermissionService permissionService;
 	private NamespacePrefixResolver namespacePrefixResolver;
 	private MBeanServerConnection mbeanServer;
 
@@ -87,25 +91,25 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private String contentstoreexportVersion;
 
 	@Override
-	public void export(OutputStream outPutStream, String paths, String queries, String noderefs,
-			boolean exportContent) throws IOException {
-		ZipOutputStream zipOutPutStream = null;
+	public void export(OutputStream outputStream, ContentStoreExportParams params) throws IOException {
 		long startTime = System.currentTimeMillis();
 		Set<String> processedNodes = new HashSet<String>();
 		LOGGER.info("lancement de l'export.");
 		Properties properties = new Properties();
 		properties.setProperty("contentstoreexport.version", contentstoreexportVersion);
 		properties.setProperty("alfresco.version", descriptorService.getCurrentRepositoryDescriptor().getVersion());
-		Set<NodeRef> rootNodesToExport = getRootNodesToExport(paths, queries, noderefs, properties);
+		Set<NodeRef> rootNodesToExport = getRootNodesToExport(params, properties);
 		// debut du stockage des fichiers dans le zip
 		
 		AtomicInteger nbFiles = new AtomicInteger(0);
 		AtomicLong totalVolume = new AtomicLong(0L);
+		
+		ZipOutputStream zipOutPutStream = null;
 		try {
-			zipOutPutStream = new ZipOutputStream(outPutStream);
+			zipOutPutStream = new ZipOutputStream(outputStream);
 			for (NodeRef root : rootNodesToExport) {
 				LOGGER.info("Export node : " + root);
-				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, exportContent);
+				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, params);
 			}
 			LOGGER.info("Nombre de fichiers exportés: " + nbFiles);
 			properties.setProperty("fichiers.exportes.nb", "" + nbFiles);
@@ -203,12 +207,18 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		}
 	}
 	
-	private Set<NodeRef> getRootNodesToExport(String paths, String queries, String nodeRefs, Properties properties) {
+	private Set<NodeRef> getRootNodesToExport(ContentStoreExportParams params, Properties properties) {
 		Set<NodeRef> rootNodesToExport = new HashSet<NodeRef>();
+		
+		// All
+		if (params.isExportAll()) {
+			rootNodesToExport.addAll(nodeService.getAllRootNodes(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE));
+		}
+		
 		// Paths
-		if (paths != null) {
-			properties.setProperty("paths.parametres.req", paths);
-			for (String path : paths.split(",")) {
+		if (params.paths != null) {
+			properties.setProperty("paths.parametres.req", params.paths);
+			for (String path : params.paths.split(",")) {
 				if (!path.trim().isEmpty()) {
 					rootNodesToExport.add(getByPath(path));
 				}
@@ -221,9 +231,9 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			}
 		}
 		// Queries
-		if (queries != null) {
-			properties.setProperty("queries.parametres.req", queries);
-			for (String query : queries.split(",")) {
+		if (params.queries != null) {
+			properties.setProperty("queries.parametres.req", params.queries);
+			for (String query : params.queries.split(",")) {
 				if (!query.trim().isEmpty()) {
 					ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
 							SearchService.LANGUAGE_FTS_ALFRESCO, query);
@@ -242,9 +252,9 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			}
 		}
 		// NodeRefs
-		if (nodeRefs != null) {
-			properties.setProperty("noderefs.parametres.req", nodeRefs);
-			for (String nodeRef : nodeRefs.split(",")) {
+		if (params.nodeRefs != null) {
+			properties.setProperty("noderefs.parametres.req", params.nodeRefs);
+			for (String nodeRef : params.nodeRefs.split(",")) {
 				if (!nodeRef.trim().isEmpty()) {
 					rootNodesToExport.add(new NodeRef(nodeRef));
 				}
@@ -274,7 +284,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	}
 
 	private void recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
-			AtomicInteger nbFiles, AtomicLong totalVolume, boolean exportContent)
+			AtomicInteger nbFiles, AtomicLong totalVolume, ContentStoreExportParams params)
 			throws IOException {
 		LOGGER.debug("Export node : " + nodeRef);
 		
@@ -287,17 +297,12 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				nbFiles.incrementAndGet();
 				totalVolume.addAndGet(contentData.getSize());
 				
-				if (exportContent) {
+				if (params.isExportContent()) {
 					ContentReader reader = contentService.getReader(nodeRef, property.getKey());
 					InputStream inputStream = reader.getContentInputStream();
 					try {
-						String contentUrl = contentData.getContentUrl();
+						String contentUrl = getContentUrl(nodeRef, property.getKey(), contentData, params);
 						if (processedNodes.add(contentUrl)) {
-							//on remplace "/store://" par "/contentstore"
-							if (contentUrl.startsWith(STORE_PREFIX)) {
-								contentUrl = contentUrl.substring(STORE_PREFIX.length());
-								contentUrl = "/contentstore" + contentUrl;
-							}
 							//ajout de l'entrée au zip
 							zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
 							IOUtils.copy(inputStream, zipOutPutStream);
@@ -313,10 +318,29 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
 		for (ChildAssociationRef childAssoc : children) {
 			NodeRef childNodeRef = childAssoc.getChildRef();
-			recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, exportContent);
+			recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params);
 		}
 	}
 
+	private String getContentUrl(NodeRef nodeRef, QName property, ContentData contentData, ContentStoreExportParams params) {
+		switch (params.getPathType()) {
+		case CONTENTSTORE: 
+			String contentUrl = contentData.getContentUrl(); 
+			//on remplace "/store://" par "/contentstore"
+			if (contentUrl.startsWith(STORE_PREFIX)) {
+				contentUrl = contentUrl.substring(STORE_PREFIX.length());
+				contentUrl = "/contentstore" + contentUrl;
+			}
+			return contentUrl;
+		case ALFRESCO: 
+			return contentUrl = nodeService.getPath(nodeRef).toDisplayPath(nodeService, permissionService)
+				+ ((property.equals(ContentModel.PROP_CONTENT)) ? "" : "/" + property.getLocalName())
+				+ "/" + nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+		default: 
+			throw new IllegalStateException(params.getPathType().name());
+		}
+	}
+	
 	private String secondToTimeConverter (long milliseconds) {
 		long seconds = milliseconds / 1000;
 		long s = seconds % 60;
@@ -333,6 +357,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		this.nodeService = serviceRegistry.getNodeService();
 		this.searchService = serviceRegistry.getSearchService();
 		this.contentService = serviceRegistry.getContentService();
+		this.permissionService = serviceRegistry.getPermissionService();
 		this.namespacePrefixResolver = serviceRegistry.getNamespaceService();
 	}
 	

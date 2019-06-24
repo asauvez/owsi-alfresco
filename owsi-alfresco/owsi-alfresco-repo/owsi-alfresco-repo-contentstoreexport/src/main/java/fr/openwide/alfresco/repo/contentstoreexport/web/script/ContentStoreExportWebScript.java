@@ -14,12 +14,16 @@ import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
+import fr.openwide.alfresco.repo.contentstoreexport.model.ContentStoreExportParams;
 import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
+/**
+ * http://localhost:8080/alfresco/s/owsi/contentstoreexport.zip
+ */
 @GenerateWebScript(
 		url={"/owsi/contentstoreexport", "/owsi/contentstoreexport.zip"},
 		shortName="Content store export",
@@ -40,21 +44,26 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse resp) throws IOException {
+		ContentStoreExportParams params = new ContentStoreExportParams();
+		for (String paramName : req.getParameterNames()) {
+			String paramValue = req.getParameter(paramName);
+			try {
+				ContentStoreExportParams.class.getField(paramName).set(params, paramValue);
+			} catch (Exception e) {
+				throw new IllegalArgumentException(paramName, e);
+			}
+		}
+		
 		resp.setContentType("application/zip");
 		resp.setHeader("Content-Disposition", "attachment; filename=\"contentstoreexport-" 
 				+ new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip\"");
-		String exportContent = req.getParameter("exportContent");
 		
 		OutputStream outputStream = resp.getOutputStream();
 		if (req.getParameter("writeTo") != null) {
 			 outputStream = new TeeOutputStream(outputStream, new FileOutputStream(req.getParameter("writeTo")));
 		}
 		
-		contentStoreExportService.export(outputStream, 
-				req.getParameter("paths"), 
-				req.getParameter("queries"), 
-				req.getParameter("nodeRefs"),
-				(exportContent != null) ? Boolean.parseBoolean(exportContent) : true);
+		contentStoreExportService.export(outputStream, params);
 		
 		outputStream.flush();
 		outputStream.close();
