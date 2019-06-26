@@ -31,7 +31,7 @@ public class ContentStoreExportParams {
 		return Boolean.parseBoolean(exportContent);
 	}
 	
-	public enum PathType { CONTENTSTORE, ALFRESCO }
+	public enum PathType { CONTENTSTORE, ALFRESCO, BULK }
 	public PathType getPathType() {
 		return PathType.valueOf(pathType.toUpperCase());
 	}

@@ -9,6 +9,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,10 +45,12 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.ISO9075;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.openwide.alfresco.repo.contentstoreexport.model.ContentStoreExportParams;
+import fr.openwide.alfresco.repo.contentstoreexport.model.ContentStoreExportParams.PathType;
 import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportService;
 
 /**
@@ -70,10 +76,19 @@ import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportSe
  */
 public class ContentStoreExportServiceImpl implements ContentStoreExportService {
 
+	private DateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+	
 	private static final String STORE_PREFIX = "store:/";
 	private static final String SAMPLE_EXTENSION = ".sample";
 	private static final String TOMCAT_HOME = System.getProperty("catalina.base");
 
+	private static final Set<String> PROPERTIES_NOT_TO_EXPORT = new HashSet<String>(Arrays.asList(new String[] {
+		"sys:store-identifier",
+		"sys:store-protocol",
+		"sys:node-dbid",
+		"cm:lastThumbnailModification"
+	}));
+	
 	private final Logger LOGGER = LoggerFactory.getLogger(ContentStoreExportServiceImpl.class);
 
 	public static StringBuilder configurationLogger = new StringBuilder();
@@ -297,23 +312,68 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				nbFiles.incrementAndGet();
 				totalVolume.addAndGet(contentData.getSize());
 				
-				if (params.isExportContent()) {
-					ContentReader reader = contentService.getReader(nodeRef, property.getKey());
-					InputStream inputStream = reader.getContentInputStream();
-					try {
-						String contentUrl = getContentUrl(nodeRef, property.getKey(), contentData, params);
-						if (processedNodes.add(contentUrl)) {
-							//ajout de l'entrée au zip
-							zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
+				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
+				if (processedNodes.add(contentUrl)) {
+					if (params.isExportContent()) {
+						//ajout de l'entrée au zip
+						ContentReader reader = contentService.getReader(nodeRef, property.getKey());
+						InputStream inputStream = reader.getContentInputStream();
+						zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
+						try {
 							IOUtils.copy(inputStream, zipOutPutStream);
+						} finally {
+							IOUtils.closeQuietly(inputStream);
+							zipOutPutStream.closeEntry();
 						}
-					} finally {
-						IOUtils.closeQuietly(inputStream);
-						zipOutPutStream.closeEntry();
 					}
 				}
 			}
 		}
+		
+		if (params.getPathType() == PathType.BULK) {
+			String propertiesFile = "/export" 
+					+ nodeService.getPath(nodeRef).toDisplayPath(nodeService, permissionService)
+					+ "/" + nodeService.getProperty(nodeRef, ContentModel.PROP_NAME) + ".metadata.properties.xml";
+			zipOutPutStream.putNextEntry(new ZipEntry(propertiesFile));
+			PrintWriter propertiesWriter = new PrintWriter(zipOutPutStream);
+			try {
+				propertiesWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+				propertiesWriter.println("<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">");
+				propertiesWriter.println("<properties>");
+				propertiesWriter.println("    <entry key=\"type\">" + nodeService.getType(nodeRef).toPrefixString(namespacePrefixResolver) + "</entry>");
+				propertiesWriter.print  ("    <entry key=\"aspects\">");
+				boolean firstAspect = true;
+				for (QName aspect : nodeService.getAspects(nodeRef)) {
+					if (firstAspect) {
+						firstAspect = false;
+					} else {
+						propertiesWriter.print(",");
+					}
+					propertiesWriter.print(aspect.toPrefixString(namespacePrefixResolver));
+				}
+				propertiesWriter.println("</entry>");
+				for (Entry<QName, Serializable> property : properties.entrySet()) {
+					String propertyName = property.getKey().toPrefixString(namespacePrefixResolver);
+					if (! (property.getValue() instanceof ContentData) 
+						&& ! PROPERTIES_NOT_TO_EXPORT.contains(propertyName)) {
+						propertiesWriter.print  ("    <entry key=\"" + propertyName + "\">");
+						if (property.getValue() == null) {
+							// nop
+						} else if (property.getValue() instanceof Date) {
+							propertiesWriter.print(iso8601.format((Date) property.getValue()));
+						} else {
+							propertiesWriter.print(StringEscapeUtils.escapeXml10(property.getValue().toString()));
+						}
+						propertiesWriter.println("</entry>");
+					}
+				}
+				propertiesWriter.println("</properties>");
+				propertiesWriter.flush();
+			} finally {
+				zipOutPutStream.closeEntry();
+			}
+		}
+		
 		//recursion dans les fils
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
 		for (ChildAssociationRef childAssoc : children) {
@@ -322,7 +382,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		}
 	}
 
-	private String getContentUrl(NodeRef nodeRef, QName property, ContentData contentData, ContentStoreExportParams params) {
+	private String getContentPath(NodeRef nodeRef, QName property, ContentData contentData, ContentStoreExportParams params) {
 		switch (params.getPathType()) {
 		case CONTENTSTORE: 
 			String contentUrl = contentData.getContentUrl(); 
@@ -333,7 +393,9 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			}
 			return contentUrl;
 		case ALFRESCO: 
-			return contentUrl = nodeService.getPath(nodeRef).toDisplayPath(nodeService, permissionService)
+		case BULK:
+			return contentUrl = "/export" 
+				+ nodeService.getPath(nodeRef).toDisplayPath(nodeService, permissionService)
 				+ ((property.equals(ContentModel.PROP_CONTENT)) ? "" : "/" + property.getLocalName())
 				+ "/" + nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 		default: 

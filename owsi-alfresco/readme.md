@@ -37,6 +37,7 @@ Nouveautés
 * Intégre AMP AOS
 * /owsi/admin/configuration Renvoi configuration loggué au démarrage
 * Log git.properties au démarrage.
+* Amélioration du plugin contentstoreexport
 
 ## depuis 0.8.1
 * owsi.classification.freemarker.models pour classifier les cas simple
