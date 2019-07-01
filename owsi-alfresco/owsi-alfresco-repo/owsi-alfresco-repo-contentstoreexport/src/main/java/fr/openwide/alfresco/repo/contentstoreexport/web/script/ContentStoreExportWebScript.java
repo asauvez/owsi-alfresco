@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repo.contentstoreexport.web.script;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,6 +11,8 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
@@ -32,23 +35,35 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 		authentication=GenerateWebScriptAuthentication.ADMIN,
 		family="OWSI",
 		swaggerParameters={
-			@SwaggerParameter(name="paths", description="Liste de chemins à exporter séparés par des virgules (défaut vide)"),
-			@SwaggerParameter(name="queries", description="Liste de queries à exporter séparées par des virgules (défaut vide)"),
-			@SwaggerParameter(name="nodeRefs", description="Liste de nodeRef racines à exporter séparés par des virgules (défaut vide)"),
+			@SwaggerParameter(name="paths", description="Liste de chemins à exporter (défaut vide)"),
+			@SwaggerParameter(name="queries", description="Liste de queries à exporter (défaut vide)"),
+			@SwaggerParameter(name="nodeRefs", description="Liste de nodeRef racines à exporter (défaut vide)"),
+			@SwaggerParameter(name="exportBase", description="Export tout les noeuds minimums nécessaires à lancer Alfresco (défaut true)"),
+			@SwaggerParameter(name="exportAll", description="Export tout les noeuds (défaut false)"),
 			@SwaggerParameter(name="exportContent", description="S'il faut exporter ou non le contenu (défaut true)"),
 			@SwaggerParameter(name="writeTo", description="Emplacement où écrire sur disque le Zip (défaut renvoie juste le Zip)"),
+			@SwaggerParameter(name="pathType", description="Type d'export contentstore, alfresco ou bulk (défaut contentstore)"),
 		})
 public class ContentStoreExportWebScript extends AbstractWebScript implements ApplicationContextAware {
 
 	private ContentStoreExportService contentStoreExportService;
 	
+	private ConversionService conversionService = DefaultConversionService.getSharedInstance();
+	
+	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse resp) throws IOException {
 		ContentStoreExportParams params = new ContentStoreExportParams();
 		for (String paramName : req.getParameterNames()) {
-			String paramValue = req.getParameter(paramName);
+			String[] paramValues = req.getParameterValues(paramName);
 			try {
-				ContentStoreExportParams.class.getField(paramName).set(params, paramValue);
+				Field field = ContentStoreExportParams.class.getField(paramName);
+				Class<?> type = field.getType();
+				if (! type.isArray() && paramValues.length != 1) {
+					throw new IllegalStateException("You can not specify the param " + paramName + " more than once.");
+				}
+				Object convertValue = conversionService.convert(paramValues, type);
+				field.set(params, convertValue);
 			} catch (Exception e) {
 				throw new IllegalArgumentException(paramName, e);
 			}

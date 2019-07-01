@@ -225,30 +225,19 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private Set<NodeRef> getRootNodesToExport(ContentStoreExportParams params, Properties properties) {
 		Set<NodeRef> rootNodesToExport = new HashSet<NodeRef>();
 		
-		// All
-		if (params.isExportAll()) {
-			rootNodesToExport.addAll(nodeService.getAllRootNodes(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE));
-		}
-		
-		// Paths
-		if (params.paths != null) {
-			properties.setProperty("paths.parametres.req", params.paths);
-			for (String path : params.paths.split(",")) {
+		// Base
+		if (params.exportBase) {
+			//la racine system://syteme est ajoutée en dur via un noderef
+			rootNodesToExport.add(nodeService.getRootNode(new StoreRef("system://system")));
+
+			properties.setProperty("paths.parametres.config", contentstoreexportPaths);
+			for (String path : contentstoreexportPaths.split(",")) {
 				if (!path.trim().isEmpty()) {
 					rootNodesToExport.add(getByPath(path));
 				}
 			}
-		}
-		properties.setProperty("paths.parametres.config", contentstoreexportPaths);
-		for (String path : contentstoreexportPaths.split(",")) {
-			if (!path.trim().isEmpty()) {
-				rootNodesToExport.add(getByPath(path));
-			}
-		}
-		// Queries
-		if (params.queries != null) {
-			properties.setProperty("queries.parametres.req", params.queries);
-			for (String query : params.queries.split(",")) {
+			properties.setProperty("queries.parametres.config", contentstoreexportQueries);
+			for (String query : contentstoreexportQueries.split(",")) {
 				if (!query.trim().isEmpty()) {
 					ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
 							SearchService.LANGUAGE_FTS_ALFRESCO, query);
@@ -257,26 +246,45 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				}
 			}
 		}
-		properties.setProperty("queries.parametres.config", contentstoreexportQueries);
-		for (String query : contentstoreexportQueries.split(",")) {
-			if (!query.trim().isEmpty()) {
-				ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
-						SearchService.LANGUAGE_FTS_ALFRESCO, query);
-				rootNodesToExport.addAll(resultSet.getNodeRefs());
-				resultSet.close();
+		
+		// All
+		if (params.exportAll) {
+			properties.setProperty("all.parametres.req", "true");
+			rootNodesToExport.addAll(nodeService.getAllRootNodes(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE));
+		}
+		
+		// Paths
+		if (params.paths != null) {
+			properties.setProperty("paths.parametres.req", Arrays.asList(params.paths).toString());
+			for (String path : params.paths) {
+				if (!path.trim().isEmpty()) {
+					rootNodesToExport.add(getByPath(path));
+				}
+			}
+		}
+
+		// Queries
+		if (params.queries != null) {
+			properties.setProperty("queries.parametres.req", Arrays.asList(params.queries).toString());
+			for (String query : params.queries) {
+				if (!query.trim().isEmpty()) {
+					ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
+							SearchService.LANGUAGE_FTS_ALFRESCO, query);
+					rootNodesToExport.addAll(resultSet.getNodeRefs());
+					resultSet.close();
+				}
 			}
 		}
 		// NodeRefs
 		if (params.nodeRefs != null) {
-			properties.setProperty("noderefs.parametres.req", params.nodeRefs);
-			for (String nodeRef : params.nodeRefs.split(",")) {
+			properties.setProperty("noderefs.parametres.req", Arrays.asList(params.nodeRefs).toString());
+			for (String nodeRef : params.nodeRefs) {
 				if (!nodeRef.trim().isEmpty()) {
 					rootNodesToExport.add(new NodeRef(nodeRef));
 				}
 			}
 		}
-		//la racine system://syteme est ajoutée en dur via un noderef
-		rootNodesToExport.add(nodeService.getRootNode(new StoreRef("system://system")));
+		
 		LOGGER.info("Nombre de racines trouvées: " + rootNodesToExport.size());
 		return rootNodesToExport;
 	}
@@ -314,7 +322,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				
 				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
 				if (processedNodes.add(contentUrl)) {
-					if (params.isExportContent()) {
+					if (params.exportContent) {
 						//ajout de l'entrée au zip
 						ContentReader reader = contentService.getReader(nodeRef, property.getKey());
 						InputStream inputStream = reader.getContentInputStream();
