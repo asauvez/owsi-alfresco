@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -42,6 +43,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Convertis les emails reçus en fichier .eml, visible par le plugin Outlook.
@@ -129,10 +133,14 @@ public class Emailed2EmlServiceImpl implements InitializingBean, OnAddAspectPoli
 	private NodeService nodeService;
 	private ContentService contentService;
 	private TransactionService transactionService;
+	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
 	
 	private boolean convertToEml = true;
 	private boolean useHtmlAsBody = true;
 	private long deleteWaitMs = 5000;
+	
+	@Value("${owsi.emailed2eml.fieldsToCopy}")
+	private String fieldsToCopy;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -274,6 +282,12 @@ public class Emailed2EmlServiceImpl implements InitializingBean, OnAddAspectPoli
 		
 		Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
 		properties.put(ContentModel.PROP_NAME, fileName);
+		
+		for (String field : fieldsToCopy.split(",")) {
+			QName property = QName.createQName(field, prefixResolver);
+			properties.put(ContentModel.PROP_NAME, nodeService.getProperty(emailNodeRef, property));
+		}
+		
 		QName assocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(fileName));
 		NodeRef newNode = nodeService.createNode(parentRef, ContentModel.ASSOC_CONTAINS, assocQName, ContentModel.TYPE_CONTENT, properties).getChildRef();
 		

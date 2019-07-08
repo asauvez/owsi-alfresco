@@ -21,6 +21,7 @@ public interface PermissionRepositoryService {
 	void deletePermission(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission);
 	void deletePermissions(NodeRef nodeRef);
 	
+	List<RepositoryAccessControl> searchACL(NodeRef nodeRef, boolean inherited);
 	List<RepositoryAccessControl> searchACL(AuthorityReference authorityReference);
 	List<RepositoryAccessControl> searchACLwithParentAuthorities(AuthorityReference authorityReference);
 	List<RepositoryAccessControl> searchACL(Collection<AuthorityReference> authorityReferences);

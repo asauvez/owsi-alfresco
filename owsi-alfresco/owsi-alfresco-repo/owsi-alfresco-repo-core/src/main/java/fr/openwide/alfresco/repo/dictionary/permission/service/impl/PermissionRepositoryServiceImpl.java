@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 import org.alfresco.enterprise.repo.authorization.AuthorizationService;
 import org.alfresco.service.cmr.preference.PreferenceService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
@@ -86,6 +87,24 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	@Override
 	public void deletePermissions(NodeRef nodeRef) {
 		permissionService.deletePermissions(nodeRef);
+	}
+	
+	@Override
+	public List<RepositoryAccessControl> searchACL(NodeRef nodeRef, boolean inherited) {
+		Set<AccessPermission> permissions = inherited
+				? permissionService.getPermissions(nodeRef)
+				: permissionService.getAllSetPermissions(nodeRef);
+				
+		List<RepositoryAccessControl> res = new ArrayList<>(permissions.size());
+		for (AccessPermission permission : permissions) {
+			NodeReference nodeReference = conversionService.get(nodeRef);
+			AuthorityReference authority = AuthorityReference.authority(permission.getAuthority());
+			PermissionReference permissionRef = PermissionReference.create(permission.getPermission());
+			boolean allowed = permission.getAccessStatus() == AccessStatus.ALLOWED;
+			
+			res.add(new RepositoryAccessControl(nodeReference, authority, permissionRef, allowed));
+		}
+		return res;
 	}
 	
 	@Override
