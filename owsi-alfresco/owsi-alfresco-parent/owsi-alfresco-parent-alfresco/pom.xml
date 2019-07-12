@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
-		<version>0.8.1</version>
+		<version>0.8.2</version>
 		<relativePath>../owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-alfresco</artifactId>
@@ -21,16 +21,15 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- On tire également ce war pour que MigrationMojo puisse l'examiner -->
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>alfresco-enterprise</artifactId>
-			<type>war</type>
-			<scope>runtime</scope>
-		</dependency>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco.aos-module</groupId>
+			<artifactId>alfresco-aos-module</artifactId>
+			<version>1.2.2</version>
+			<type>amp</type>
 		</dependency>
 	</dependencies>
 
@@ -145,7 +144,29 @@
 					<value>true</value>
 				</property>
 			</activation>
-			<!-- Nothing to do -->
+			<build>
+				<plugins>
+					<plugin>
+	 					<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<configuration>
+							<failOnMissingWebXml>false</failOnMissingWebXml>
+							<overlays>
+								<overlay>
+									<groupId>org.alfresco</groupId>
+									<artifactId>alfresco-enterprise</artifactId>
+									<type>war</type>
+								</overlay>
+								<overlay>
+									<groupId>org.alfresco.aos-module</groupId>
+									<artifactId>alfresco-aos-module</artifactId>
+									<type>amp</type>
+								</overlay>
+							</overlays>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 

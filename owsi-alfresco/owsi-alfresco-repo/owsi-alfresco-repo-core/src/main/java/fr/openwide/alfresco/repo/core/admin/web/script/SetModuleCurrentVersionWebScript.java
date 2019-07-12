@@ -1,9 +1,10 @@
 package fr.openwide.alfresco.repo.core.admin.web.script;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.io.Writer;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -17,13 +18,14 @@ import org.alfresco.util.VersionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.extensions.webscripts.Cache;
-import org.springframework.extensions.webscripts.DeclarativeWebScript;
-import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 
 /**
  * http://localhost:8080/alfresco/service/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}
@@ -34,10 +36,10 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 @GenerateWebScript(
 		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
 		description="Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.",
-		formatDefault="html",
+		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		useViewFile=true)
-public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
+		authentication=GenerateWebScriptAuthentication.ADMIN)
+public class SetModuleCurrentVersionWebScript extends AbstractWebScript {
 	
 	private static final String MODULE_PARAM = "module";
 	private static final String VERSION_PARAM = "version";
@@ -47,8 +49,11 @@ public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 	@Autowired
 	private NodeService nodeService;
 	
+	
 	@Override
-	protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
+	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
+		res.setContentType("text/plain");
+
 		String _module = req.getParameter(MODULE_PARAM);
 		String _version = req.getParameter(VERSION_PARAM);
 		logger.info("ATTENTION, changement de la version courante du module "+_module);
@@ -60,8 +65,8 @@ public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 		nodeRef = getSystemChild(nodeRef, "{http://www.alfresco.org/system/modules/1.0}"+_module);
 		
 		if(nodeRef == null){
-			setStatusForBadRequest(status, 404, "Pas de registre pour le module "+_module, null);
-			return null;
+			setStatusForBadRequest(res, 404, "Pas de registre pour le module "+_module, null);
+			return;
 		}
 		QName propName = QName.createQName(ModuleComponentHelper.URI_MODULES_1_0, "currentVersion");
 		Serializable oldVersion = nodeService.getProperty(nodeRef, propName);
@@ -73,15 +78,16 @@ public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 		try{
 			versionNumber = new VersionNumber(_version);
 		} catch(AlfrescoRuntimeException e) {
-			setStatusForBadRequest(status, 400, "Numéro de version incorrect "+_version, e);
-			return null;
+			setStatusForBadRequest(res, 400, "Numéro de version incorrect "+_version, e);
+			return;
 		}
 		nodeService.setProperty(nodeRef, propName, versionNumber);
 		String msg = "La version courante enregistrée pour le module "+_module+" a été changée en "+_version+" (ancienne valeur : "+oldVersion+")";
 		logger.info(msg);
-		Map<String, Object> model = new HashMap<>();
-		model.put("_message", msg);
-		return model;
+		
+		try (Writer writer = res.getWriter()) {
+			writer.write(msg);
+		}
 	}
 	
 	private NodeRef getSystemChild(NodeRef nodeRef, String childName) {
@@ -89,11 +95,12 @@ public class SetModuleCurrentVersionWebScript extends DeclarativeWebScript {
 		return (! childAssocs.isEmpty()) ? childAssocs.get(0).getChildRef() : null;
 	}
 
-	private void setStatusForBadRequest(Status status, int code, String message, Throwable e) {
-		status.setCode(code);
-		status.setMessage(message);
-		status.setException(e);
-		status.setRedirect(true);
+	private void setStatusForBadRequest(WebScriptResponse res, int status, String message, Throwable e) throws IOException {
+		res.setStatus(status);
+		try (PrintWriter writer = new PrintWriter(res.getWriter())) {
+			writer.println(message);
+			e.printStackTrace(writer);
+		}
 	}
 
 }

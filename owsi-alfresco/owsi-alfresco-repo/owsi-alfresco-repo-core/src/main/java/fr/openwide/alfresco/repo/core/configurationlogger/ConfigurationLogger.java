@@ -36,6 +36,7 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 
 	private ApplicationContext applicationContext;
 	private Properties globalProperties;
+	private StringBuilder messagesGenerated = new StringBuilder();
 
 	@Autowired private BasicDataSource dataSource;
 
@@ -68,9 +69,14 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 		}
 	}
 
+	public String getMessagesGenerated() {
+		return messagesGenerated.toString();
+	}
+	
 	@Override
 	protected void logInfo(String msg) {
 		LOGGER.info(msg);
+		messagesGenerated.append(msg).append("\n");
 		ContentStoreExportServiceImpl.configurationLogger.append(msg).append("\n");
 	}
 

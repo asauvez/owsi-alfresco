@@ -79,10 +79,10 @@ public class RestrictionBuilderTest {
 				"AND cm_titled.cm:title='toto'\n" +
 				"AND o.cmis:name='toto'\n" +
 				"AND NOT o.cmis:name='tata'\n" +
-				"AND o.cmis:lastModificationDate > TIMESTAMP '2009-02-14T00:31:30.123+01:00'\n" +
-				"AND o.cmis:lastModificationDate <= TIMESTAMP '2009-02-14T00:31:30.123+01:00'\n" +
-				"AND o.cmis:lastModificationDate >= TIMESTAMP '2009-02-14T00:31:30.123+01:00'\n" +
-				"	AND o.cmis:lastModificationDate < TIMESTAMP '2009-02-14T00:31:30.999+01:00'\n" +
+				"AND o.cmis:lastModificationDate > TIMESTAMP '2009-02-13T23:31:30.123Z'\n" +
+				"AND o.cmis:lastModificationDate <= TIMESTAMP '2009-02-13T23:31:30.123Z'\n" +
+				"AND o.cmis:lastModificationDate >= TIMESTAMP '2009-02-13T23:31:30.123Z'\n" +
+				"	AND o.cmis:lastModificationDate < TIMESTAMP '2009-02-13T23:31:30.999Z'\n" +
 				"AND o.cmis:name > 'abc'\n" +
 				"AND o.cmis:name <= 'def'\n" +
 				"AND (o.cmis:name='titi'\n" +

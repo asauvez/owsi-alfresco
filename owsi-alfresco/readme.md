@@ -3,6 +3,12 @@ Description
 Owsi-Alfresco est un ensemble d'outils destinés à rendre plus rapide et maintenable les développements autour 
 d'Alfresco 6.0.0.
 
+
+Liens
+=====
+https://ci-jenkins.vitry.intranet/job/owsi-alfresco/job/owsi-alfresco/
+https://sonar.vitry.intranet/dashboard?id=fr.openwide.alfresco%3Aowsi-alfresco
+
 FAQ
 ===
 * Au moment du login, l'application indique qu'Alfresco a répondu 404 : 
@@ -23,6 +29,15 @@ Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà l
 
 Nouveautés
 ==========
+
+## depuis 0.8.2
+* Classification gère si noeud supprimé entre temps
+* Classification désactive cm:version, cm:auditable et owsi:classifiable policies 
+* Swagger : modification de rednu généré
+* Intégre AMP AOS
+* /owsi/admin/configuration Renvoi configuration loggué au démarrage
+* Log git.properties au démarrage.
+* Amélioration du plugin contentstoreexport
 
 ## depuis 0.8.1
 * owsi.classification.freemarker.models pour classifier les cas simple

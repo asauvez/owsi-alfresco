@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -11,8 +10,6 @@ import java.util.TimeZone;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.time.FastDateFormat;
-
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
@@ -47,6 +44,7 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 	}
 
 	private static final FastDateFormat dateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
+	private static final FastDateFormat isoDateformat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", TimeZone.getTimeZone("GMT")); 
 
 	private final RestrictionBuilder parent;
 	private boolean not = false;
@@ -153,8 +151,7 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 	}
 	protected static <C extends Serializable> String toFtsLuceneValue(PropertyModel<C> propertyModel, C value) {
 		if (propertyModel instanceof DateTimePropertyModel || propertyModel instanceof MultiDateTimePropertyModel) {
-			return ISO8601Utils.format((Date) value, true, TimeZone.getTimeZone(ZoneOffset.UTC));
-			//return ISO8601Utils.format((Date) value, true, TimeZone.getDefault()).replace(":", "\\:");
+			return isoDateformat.format((Date) value);
 		} else if (propertyModel instanceof DatePropertyModel || propertyModel instanceof MultiDatePropertyModel) {
 			return dateFormat.format((Date) value);
 		} else if (propertyModel instanceof AbstractNumberPropertyModel || propertyModel instanceof AbstractMultiNumberPropertyModel) {
@@ -171,7 +168,7 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 	}
 	protected static <C extends Serializable> String toCmisLuceneValue(PropertyModel<C> propertyModel, C value) {
 		if (propertyModel instanceof DateTimePropertyModel || propertyModel instanceof MultiDateTimePropertyModel) {
-			return "TIMESTAMP '" + ISO8601Utils.format((Date) value, true, TimeZone.getDefault()) + "'";
+			return "TIMESTAMP '" + isoDateformat.format((Date) value) + "'";
 		} else if (propertyModel instanceof DatePropertyModel || propertyModel instanceof MultiDatePropertyModel) {
 			return "TIMESTAMP '" + dateFormat.format((Date) value) + "'";
 		} else if (propertyModel instanceof AbstractNumberPropertyModel || propertyModel instanceof AbstractMultiNumberPropertyModel) {

@@ -8,13 +8,14 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService.GET_NODE_SERVICE;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
 @GenerateWebScript(
 	paramClass=GET_NODE_SERVICE.class,
 	shortName="get",
 	description="Get a node by reference",
-	formatDefault="json",
+	formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
 	transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 	family=OwsiSwaggerWebScript.WS_FAMILY,
 	beanParent="webscript.owsi.node")

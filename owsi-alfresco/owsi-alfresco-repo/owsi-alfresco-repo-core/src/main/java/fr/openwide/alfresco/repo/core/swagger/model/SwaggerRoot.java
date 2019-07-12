@@ -12,9 +12,7 @@ public class SwaggerRoot {
 	@JsonProperty public String basePath;
 	@JsonProperty public String[] schemes;
 	
-	@JsonProperty public String title;
-	@JsonProperty public String description;
-	@JsonProperty public String version;
+	@JsonProperty public SwaggerInfo info;
 	
 	@JsonProperty public Map<String, Map<String, SwaggerWS>> paths = new TreeMap<>();
 }

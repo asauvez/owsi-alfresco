@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.policy.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 
 import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
@@ -118,19 +120,32 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	
 	@Override
 	public <T> T disableBehaviour(ContainerModel type, Callable<T> callable) {
-		QName typeQName = conversionService.getRequired(type.getNameReference());
-		policyFilter.disableBehaviour(typeQName);
+		return disableBehaviours(Collections.singleton(type), callable);
+	}
+	@Override
+	public <T> T disableBehaviours(Collection<? extends ContainerModel> types, Callable<T> callable) {
+		for (ContainerModel type : types) {
+			QName typeQName = conversionService.getRequired(type.getNameReference());
+			policyFilter.disableBehaviour(typeQName);
+		}
 		try {
 			return callable.call();
 		} catch (Exception e) {
 			throw (e instanceof RuntimeException) ? (RuntimeException) e : new IllegalStateException(e);
 		} finally {
-			policyFilter.enableBehaviour(typeQName);
+			for (ContainerModel type : types) {
+				QName typeQName = conversionService.getRequired(type.getNameReference());
+				policyFilter.enableBehaviour(typeQName);
+			}
 		}
 	}
 	@Override
 	public void disableBehaviour(ContainerModel type, Runnable runnable) {
-		disableBehaviour(type, () -> {
+		disableBehaviours(Collections.singleton(type), runnable);
+	}
+	@Override
+	public void disableBehaviours(Collection<? extends ContainerModel> types, Runnable runnable) {
+		disableBehaviours(types, () -> {
 			runnable.run();
 			return null; 
 		});

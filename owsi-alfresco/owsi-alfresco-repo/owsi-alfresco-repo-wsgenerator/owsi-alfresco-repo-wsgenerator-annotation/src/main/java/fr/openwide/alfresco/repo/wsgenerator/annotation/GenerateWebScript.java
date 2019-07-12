@@ -29,7 +29,10 @@ public @interface GenerateWebScript {
 	
 	enum GenerateWebScriptFormat { ARGUMENT, EXTENSION, ANY }
 	GenerateWebScriptFormat format() default GenerateWebScriptFormat.ANY;
-	String formatDefault() default "text";
+	String formatDefault() default "";
+	
+	enum GenerateWebScriptFormatDefault { TEXT, HTML, JSON }
+	GenerateWebScriptFormatDefault formatDefaultEnum() default GenerateWebScriptFormatDefault.TEXT;
 	
 	enum GenerateWebScriptAuthentication { NONE, GUEST, USER, ADMIN }
 	GenerateWebScriptAuthentication authentication() default GenerateWebScriptAuthentication.USER;

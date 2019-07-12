@@ -18,6 +18,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import com.fasterxml.jackson.module.jsonSchema.customProperties.ValidationSchemaFactoryWrapper;
 
+import fr.openwide.alfresco.repo.core.swagger.model.SwaggerInfo;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerParameterModel;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerResponseModel;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerRoot;
@@ -56,9 +57,12 @@ public class SwaggerWebScript extends AbstractWebScript {
 		root.basePath = "/" + sysAdminParams.getAlfrescoContext() + "/s";
 		root.schemes = new String[] { sysAdminParams.getAlfrescoProtocol() };
 		
-		root.title = getRootTitle();
-		root.description = getRootDescription();
-		root.version = getRootVersion();
+		SwaggerInfo infos = new SwaggerInfo();
+		infos.title = getRootTitle();
+		infos.description = getRootDescription();
+		infos.version = getRootVersion();
+		root.info = infos;
+
 		
 		for (WebScript webscript : webscripts.values()) {
 			GenerateWebScript annotation = webscript.getClass().getAnnotation(GenerateWebScript.class);
@@ -71,7 +75,7 @@ public class SwaggerWebScript extends AbstractWebScript {
 					SwaggerWS ws = new SwaggerWS();
 					ws.summary = annotation.shortName();
 					ws.description = annotation.description();
-					//ws.operationId = webscript.getClass().getName();
+					ws.operationId = annotation.wsName();
 					ws.tags = new String[] { annotation.family() };
 					
 					switch (annotation.formatDefault()) {
@@ -86,10 +90,11 @@ public class SwaggerWebScript extends AbstractWebScript {
 						model.description = param.description();
 						model.in = param.in().name().toLowerCase();
 						model.required = param.required();
-						model.type = param.type();
+						
 						if (param.schema() != Void.class) {
-							model.type = "object";
 							model.schema = new SwaggerSchema(schemaGen.generateSchema(param.schema()));
+						}else {
+							model.type = param.type();
 						}
 						
 						ws.parameters.add(model);

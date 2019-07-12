@@ -187,6 +187,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 			service.copyNode(getNodeRef(), destinationFolder, Optional.<String>empty()))
 				.collect(Collectors.toList());
 	}
+	public void delete() {
+		service.getNodeModelService().deleteNode(getNodeRef());
+	}
 	
 	public ClassificationWithRootBuilder deletePrevious() {
 		String currentName = service.getNodeModelService().getProperty(getNodeRef(), CmModel.object.name);

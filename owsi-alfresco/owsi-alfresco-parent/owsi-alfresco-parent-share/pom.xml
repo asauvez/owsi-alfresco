@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-share-component</artifactId>
-		<version>0.8.1</version>
+		<version>0.8.2</version>
 		<relativePath>../owsi-alfresco-parent-share-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share</artifactId>
@@ -21,17 +21,10 @@
 			<groupId>org.alfresco</groupId>
 			<artifactId>share</artifactId>
 			<type>war</type>
+			<version>${owsi-alfresco.share.alfresco.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- On tire également ce war pour que MigrationMojo puisse l'examiner -->
-		<dependency>
-			<groupId>org.alfresco</groupId>
-			<artifactId>share</artifactId>
-			<version>${owsi-alfresco.share.alfresco.version}</version>
-			<type>war</type>
-			<scope>runtime</scope>
-		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>

@@ -194,6 +194,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	@Override
 	public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
+		if (! nodeModelRepositoryService.exists(nodeRef)) {
+			logger.debug("onAddAspect() sur une node qui n'existe plus " + nodeRef);
+			return;
+		}
+		
 		if (OwsiModel.classifiable.getNameReference().equals(conversionService.get(aspectTypeQName))) {
 			classify(nodeRef, ClassificationMode.CREATE);
 		} else {
@@ -202,6 +207,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	@Override
 	public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
+		if (! nodeModelRepositoryService.exists(nodeRef)) {
+			logger.debug("onUpdateProperties() sur une node qui n'existe plus " + nodeRef);
+			return;
+		}
+		
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
 			Set<QName> newFields = new TreeSet<>(after.keySet());
@@ -318,11 +328,15 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		ClassificationEvent event = new ClassificationEvent(nodeRef, mode, model);
 		ClassificationBuilder builder = new ClassificationBuilder(this, event);
 		try {
-			policy.classify(builder, model, event);
-			
-			policyRepositoryService.disableBehaviour(OwsiModel.classifiable, 
-				() -> nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date())
-			);
+			policyRepositoryService.disableBehaviours(Arrays.asList(
+						OwsiModel.classifiable,
+						CmModel.versionable,
+						CmModel.auditable), 
+					() -> { 
+				policy.classify(builder, model, event);
+				
+				nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date()); 
+			});
 			
 		} catch (RuntimeException ex) {
 			// On log en debug uniquement, car cela peut être une erreur retryable, qui provoque en relance de la transaction.
