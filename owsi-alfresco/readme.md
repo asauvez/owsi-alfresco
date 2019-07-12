@@ -30,12 +30,14 @@ Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà l
 Nouveautés
 ==========
 
+## depuis 0.8.3
+
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps
 * Classification désactive cm:version, cm:auditable et owsi:classifiable policies 
-* Swagger : modification de rednu généré
+* Swagger : modification de rendu généré
 * Intégre AMP AOS
-* /owsi/admin/configuration Renvoi configuration loggué au démarrage
+* WS /owsi/admin/configuration Renvoi configuration loggué au démarrage
 * Log git.properties au démarrage.
 * Amélioration du plugin contentstoreexport
 
