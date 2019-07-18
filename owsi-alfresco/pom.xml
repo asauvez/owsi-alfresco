@@ -15,10 +15,6 @@
     <name>OWSI Alfresco</name>
     <description>Capitalisation des développements utilisés sur les projets Alfresco</description>
 
-    <properties>
-        <owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
-    </properties>
-
 	<modules>
 		<module>owsi-alfresco-api</module>
 		<module>owsi-alfresco-parent</module>
@@ -37,25 +33,9 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>external.atlassian.jgitflow</groupId>
-                    <artifactId>jgitflow-maven-plugin</artifactId>
-                    <version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
-                    <configuration>
-                        <flowInitContext>
-                            <masterBranchName>master</masterBranchName>
-                            <developBranchName>dev</developBranchName>
-                            <featureBranchPrefix>ft-</featureBranchPrefix>
-                            <releaseBranchPrefix>rl-</releaseBranchPrefix>
-                            <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-                            <versionTagPrefix>v</versionTagPrefix>
-                        </flowInitContext>
-                        <noDeploy>true</noDeploy>
-                        <pullDevelop>true</pullDevelop>
-                        <pullMaster>true</pullMaster>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <allowSnapshots>true</allowSnapshots>
-                        <scmCommentPrefix>[release] </scmCommentPrefix>
-                    </configuration>
+                    <groupId>com.amashchenko.maven.plugin</groupId>
+		            <artifactId>gitflow-maven-plugin</artifactId>
+		            <version>1.12.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -97,8 +77,6 @@
             <id>nexus.mirror.alfresco.release.repo</id>
             <url>http://nexus.vitry.intranet/repository/alfresco-artifacts-repository/</url>
         </repository>
-
-
     </repositories>
 
 

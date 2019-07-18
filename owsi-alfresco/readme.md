@@ -27,6 +27,9 @@ mvn clean source:jar deploy -DargLine="" -Ddistribution=owsi-alfresco-release
 
 Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà le fichier owsi-m2/settings.xml permet d'utiliser OWSI-alfresco
 
+* Pour livrer une nouvelle version
+mvn gitflow:release
+
 Nouveautés
 ==========
 
