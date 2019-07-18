@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>fr.openwide.alfresco</groupId>
+    <artifactId>owsi-alfresco-root</artifactId>
+    <version>0.8.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>OWSI Alfresco root</name>
+
+    <properties>
+        <owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
+    </properties>
+
+	<modules>
+		<module>owsi-alfresco</module>
+		<module>owsi-alfresco-demo</module>
+	</modules>
+
+    <scm>
+        <developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
+        <url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>external.atlassian.jgitflow</groupId>
+                    <artifactId>jgitflow-maven-plugin</artifactId>
+                    <version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
+                    <configuration>
+                        <flowInitContext>
+                            <masterBranchName>master</masterBranchName>
+                            <developBranchName>dev</developBranchName>
+                            <featureBranchPrefix>ft-</featureBranchPrefix>
+                            <releaseBranchPrefix>rl-</releaseBranchPrefix>
+                            <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+                            <versionTagPrefix>v</versionTagPrefix>
+                        </flowInitContext>
+                        <noDeploy>true</noDeploy>
+                        <pullDevelop>true</pullDevelop>
+                        <pullMaster>true</pullMaster>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <allowSnapshots>true</allowSnapshots>
+                        <scmCommentPrefix>[release] </scmCommentPrefix>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <organization>
+        <name>Smile</name>
+        <url>http://www.smile.fr/</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <repositories>
+        <repository>
+            <id>nexus.internal.releases</id>
+            <url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>nexus.internal.snapshots</id>
+            <url>https://nexus.vitry.intranet/content/repositories/InternalSmileSnapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+
+        <repository>
+            <id>nexus.internal.third-party</id>
+            <url>https://nexus.vitry.intranet/content/repositories/nonCentralArtifacts/</url>
+        </repository>
+        <repository>
+            <id>nexus.mirror.alfresco.release.repo</id>
+            <url>http://nexus.vitry.intranet/repository/alfresco-artifacts-repository/</url>
+        </repository>
+    </repositories>
+
+
+</project>
