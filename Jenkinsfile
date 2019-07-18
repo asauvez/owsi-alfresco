@@ -10,9 +10,7 @@ pipeline {
 	stages {
 		stage('Build and Test') {
 			steps {
-				dir("owsi-alfresco") {
-					sh 'mvn -B clean source:jar deploy -Ddistribution=owsi-alfresco-release'
-				}
+				sh 'mvn -B clean source:jar deploy -Ddistribution=owsi-alfresco-release'
 			}
 			post {
 				always {
@@ -30,9 +28,7 @@ pipeline {
 		}
 		stage('Metrics sonar') {
 			steps {
-				dir("owsi-alfresco") {
-					sh 'mvn -Dsonar.organization="default-organization" -Dsonar.host.url=http://sonar.vitry.intranet:9000 sonar:sonar'
-				}
+				sh 'mvn -Dsonar.organization="default-organization" -Dsonar.host.url=http://sonar.vitry.intranet:9000 sonar:sonar'
 			}
 		}
 	}
