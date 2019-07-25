@@ -34,6 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.3
+* MigrationMojo se base sur dependencies et plus sur le contenu du .m2. 
 
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps

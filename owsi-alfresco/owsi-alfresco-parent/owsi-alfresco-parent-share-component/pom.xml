@@ -288,7 +288,6 @@
 							<createMissingFile>${owsi.migration.createMissingFile}</createMissingFile>
 							<createMissingIgnoreFile>${owsi.migration.createMissingIgnoreFile}</createMissingIgnoreFile>
 							<deleteIdenticalResources>${owsi.migration.deleteIdenticalResources}</deleteIdenticalResources>
-							<targetWar>share</targetWar>
 						</configuration>
 					</execution>
 				</executions>

@@ -1,0 +1,4 @@
+<search>
+   <default-operator>AND</default-operator>
+   <default-query-template>%(demo:id demo:reference demo:secondaryId cm:name cm:title cm:description ia:whatEvent ia:descriptionEvent lnk:title lnk:description sapIncomingInvoice:documentNumFI sapIncomingInvoice:documentNumMM sapIncomingInvoice:legalCommitmentNum sapIncomingInvoice:shortMarketNum sapIncomingInvoice:vendorNum TEXT TAG)</default-query-template>
+</search>

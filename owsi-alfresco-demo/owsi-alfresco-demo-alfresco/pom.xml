@@ -19,6 +19,20 @@
 			<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-data-model</artifactId>
+			<version>${dependency.alfresco-data-model.version}</version>
+			<classifier>sources</classifier>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 </project>

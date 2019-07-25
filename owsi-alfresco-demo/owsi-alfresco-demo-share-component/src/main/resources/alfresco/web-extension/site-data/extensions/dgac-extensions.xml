@@ -1,0 +1,16 @@
+<extension>
+	<modules>
+		<module>
+			<id>Demo extensions</id>
+			<auto-deploy>true</auto-deploy>
+			
+			<customizations>
+				<customization>
+					<targetPackageRoot>org.alfresco.components.search</targetPackageRoot>
+					<sourcePackageRoot>fr.demo.components.search</sourcePackageRoot>
+				</customization>
+			</customizations>
+			
+		</module>
+	</modules>
+</extension>

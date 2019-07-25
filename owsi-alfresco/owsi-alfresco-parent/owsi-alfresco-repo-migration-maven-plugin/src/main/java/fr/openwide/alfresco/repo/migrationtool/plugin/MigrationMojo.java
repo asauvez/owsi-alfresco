@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -17,6 +16,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -41,7 +41,7 @@ import fr.openwide.alfresco.repo.migrationtool.plugin.model.Module;
  * 
  * @author asauvez
  */
-@Mojo(name="migration", defaultPhase=LifecyclePhase.PACKAGE)
+@Mojo(name="migration", defaultPhase=LifecyclePhase.COMPILE)
 public class MigrationMojo extends AbstractMigrationMojo {
 
 	private static final String WEB_INF_CLASSES = "WEB-INF/classes";
@@ -57,9 +57,6 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	@Parameter(defaultValue="true")
 	private boolean deleteIdenticalResources = true;
-
-	@Parameter(property="targetWar")
-	private String targetWar;
 
 	@Parameter(property="alfresco.version", defaultValue="6.0.0")
 	private String alfrescoVersion;
@@ -91,7 +88,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			return;
 		}
 		try {
-			initAlfrescoJars();
+			initDependencyJars();
 			
 			// parcours src/main/java/org/alfresco/
 			MigrationStat stat = new MigrationStat();
@@ -100,6 +97,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco", stat);
 			visitResources(new File(getBaseDir(), "src/main/webapp"), "", stat);
+			visitResources(new File(getBaseDir(), "src/main/java/org/alfresco"), "/org/alfresco", stat);
 			getLog().info("Main stat " + stat.toString());
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.toString(), e);
@@ -114,99 +112,69 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		errors.append(msg).append("\n");
 	}
 	
-	private void initAlfrescoJars() throws Exception {
-		if (project != null && alfrescoVersion == null) {
-			alfrescoVersion = project.getProperties().getProperty("owsi-alfresco.repo.alfresco.version");
-			if (alfrescoVersion == null) {
-				alfrescoVersion = project.getProperties().getProperty("alfresco.version");
-			}
-		}
+	private void initDependencyJars() throws Exception {
+		@SuppressWarnings("unchecked")
+		Set<Artifact> dependencyArtifacts = project.getDependencyArtifacts();
 		
-		File userHome = new File(System.getProperty("user.home"));
-		File m2Repository = new File(userHome, ".m2/repository/");
-		if (! m2Repository.exists()) {
-			throw new MojoExecutionException("Maven Repository not found " + m2Repository.getAbsolutePath());
-		}
-		for (File alfrescoRepo : new File[] {
-				new File(m2Repository, "org/alfresco/"),
-				new File(m2Repository, "org/alfresco-entreprise/")
-		}) {
-			if (alfrescoRepo.exists()) {
-				for (File module : alfrescoRepo.listFiles()) {
-					File version = new File(module, alfrescoVersion);
-					if (version.exists()) {
-						if ("alfresco".equals(targetWar) || "alfresco-enterprise".equals(targetWar)) {
-							File jar = new File(version, module.getName() + "-" + version.getName() + ".jar");
-							if (jar.exists()) {
-								ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar)));
-								try {
-									ZipEntry entry;
-									while ((entry = zip.getNextEntry()) != null) {
-										if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
-											put(resourceInJarByPath, "/" + entry.getName(), jar);
-										}
-									}
-								} finally {
-									zip.close();
-								}
-							}
-							
-							List<String> modulesToSearch = ("alfresco".equals(targetWar) || "alfresco-enterprise".equals(targetWar)) 
-									? Arrays.asList("alfresco", "alfresco-share-services")
-									: Arrays.asList(targetWar);
-							
-							File jarClasses = new File(version, module.getName() + "-" + version.getName() + "-classes.jar");
-							if (jarClasses.exists() && modulesToSearch.contains(module.getName())) {
-								ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jarClasses)));
-								try {
-									ZipEntry entry;
-									while ((entry = zip.getNextEntry()) != null) {
-										if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
-											put(resourceInJarByPath, "/" + entry.getName(), jarClasses);
-										}
-									}
-								} finally {
-									zip.close();
-								}
-							}
-						}
-						
-						File war = new File(version, module.getName() + "-" + version.getName() + ".war");
-						if (war.exists() && module.getName().equals(targetWar)) {
-							ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(war)));
-							try {
-								ZipEntry entry;
-								while ((entry = zip.getNextEntry()) != null) {
-									if (! entry.isDirectory()) {
-										if (entry.getName().startsWith(WEB_INF_CLASSES)) {
-											if (! entry.getName().endsWith(".class")) {
-												put(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), war);
-											}
-										} else if (entry.getName().startsWith("WEB-INF/lib")) {
-											// Ignore librairie externe pour le moment
-										} else {
-											put(resourceInJarByPath, "/" + entry.getName(), war);
-										}
-									}
-								}
-							} finally {
-								zip.close();
+		getLog().debug("Artifacts : " + project.getDependencyArtifacts());
+		
+		for (Artifact artifact : dependencyArtifacts) {
+			File file = artifact.getFile();
+
+			if (file.exists()) {
+				ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
+				try {
+					ZipEntry entry;
+					while ((entry = zip.getNextEntry()) != null) {
+						if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
+							if (entry.getName().startsWith(WEB_INF_CLASSES)) {
+								put(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), file);
+							} else if (entry.getName().startsWith("WEB-INF/lib")) {
+								// Ignore librairie externe pour le moment
+							} else {
+								put(resourceInJarByPath, "/" + entry.getName(), file);
 							}
 						}
 					}
+				} finally {
+					zip.close();
 				}
 			}
+			
+//			File source = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf('.')) + "-sources.jar");
+//			if (source.exists()) {
+//				ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(source)));
+//				try {
+//					ZipEntry entry;
+//					while ((entry = zip.getNextEntry()) != null) {
+//						if (entry.getName().endsWith(".java")) {
+//							put(resourceInJarByPath, "/" + entry.getName(), source);
+//						}
+//					}
+//				} finally {
+//					zip.close();
+//				}
+//			}
 		}
 	}
 	
-	private void put(Map<String, File> map, String key, File value) {
-		if (key.startsWith("/META-INF/")) {
+	private Set<String> resourcesToIgnore = new HashSet<String>(Arrays.asList(
+			"/git.properties",
+			"/module.properties",
+			"/log4j.properties",
+			"/overview.html"
+		));
+
+	private void put(Map<String, File> map, String key, File jarFile) {
+		if (key.startsWith("/META-INF/") || key.endsWith(".class") || resourcesToIgnore.contains(key)) {
 			return;
 		}
 		
-		File oldValue = map.put(key, value);
+		File oldValue = map.put(key, jarFile);
 		if (oldValue != null) {
-			throw new IllegalStateException("Duplicate key " + key + " in " + value + " and " + oldValue);
+			if (! oldValue.getAbsolutePath().replace("-sources.", ".").equals(jarFile.getAbsolutePath().replace("-sources.", "."))) {
+				throw new IllegalStateException("Duplicate key " + key + " in " + jarFile + " and " + oldValue);
+			}
 		}
 	}
 	
@@ -391,8 +359,6 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		
 		MigrationMojo mojo = new MigrationMojo();
 		mojo.alfrescoVersion = "6.0.0";
-		mojo.targetWar = "alfresco";
-		//mojo.targetWar = "share";
 		mojo.execute();
 	}
 }

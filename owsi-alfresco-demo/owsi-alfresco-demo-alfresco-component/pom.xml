@@ -32,6 +32,15 @@
 			<artifactId>owsi-alfresco-demo-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Pour overrider search.get.config.xml -->
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-share-services</artifactId>
+			<version>6.0</version>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 </project>

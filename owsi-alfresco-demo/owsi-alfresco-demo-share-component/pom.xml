@@ -16,4 +16,14 @@
 		<alfresco.module.name>owsi-alfresco-demo-share-component</alfresco.module.name>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>share</artifactId>
+			<version>6.0</version>
+			<type>war</type>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
 </project>

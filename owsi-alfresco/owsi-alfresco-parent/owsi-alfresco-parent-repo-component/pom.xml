@@ -400,7 +400,7 @@
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>
-						<phase>process-resources</phase>
+						<phase>compile</phase>
 						<goals>
 							<goal>migration</goal>
 						</goals>
@@ -409,7 +409,6 @@
 							<createMissingFile>${owsi.migration.createMissingFile}</createMissingFile>
 							<createMissingIgnoreFile>${owsi.migration.createMissingIgnoreFile}</createMissingIgnoreFile>
 							<deleteIdenticalResources>${owsi.migration.deleteIdenticalResources}</deleteIdenticalResources>
-							<targetWar>alfresco-enterprise</targetWar>
 						</configuration>
 					</execution>
 				</executions>
