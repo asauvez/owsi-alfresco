@@ -189,7 +189,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 					}
 					// on ignore les fichiers *.sample
 					if (!file.isDirectory() && !path.endsWith(SAMPLE_EXTENSION)) {
-						zipOutPutStream.putNextEntry(new ZipEntry(path));
+						zipOutPutStream.putNextEntry(new ZipEntry(path.replace('\\', '/')));
 						FileInputStream fileIn = new FileInputStream(file);
 						try {
 							IOUtils.copy(fileIn, zipOutPutStream);
