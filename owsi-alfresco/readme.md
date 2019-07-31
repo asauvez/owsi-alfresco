@@ -35,6 +35,7 @@ Nouveautés
 
 ## depuis 0.8.3
 * MigrationMojo se base sur dependencies et plus sur le contenu du .m2. 
+* Remplace jgitflow par gitflow
 
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps
@@ -87,6 +88,9 @@ Nouveautés
 
 Migration
 =========
+
+## depuis 0.8.3
+* Les fichiers toto.xml.5.2.ori doivent être renomé en toto.xml--5.2.ori.
 
 ## vers 0.8.0
 * NodeModelRepositoryService utilise des NodeRef au lieu de NodeReference

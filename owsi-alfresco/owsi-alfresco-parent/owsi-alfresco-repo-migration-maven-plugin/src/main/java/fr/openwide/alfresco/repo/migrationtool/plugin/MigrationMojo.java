@@ -58,11 +58,8 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	@Parameter(defaultValue="true")
 	private boolean deleteIdenticalResources = true;
 
-	@Parameter(property="alfresco.version", defaultValue="6.0.0")
-	private String alfrescoVersion;
-
-	private Map<String, File> resourceInJarByPath = new HashMap<String, File>();
-	private Map<String, File> resourceInWarByPath = new HashMap<String, File>();
+	private Map<String, Artifact> resourceInJarByPath = new HashMap<String, Artifact>();
+	private Map<String, Artifact> resourceInWarByPath = new HashMap<String, Artifact>();
 	private Set<String> customizationFoldersToIgnore = new HashSet<String>();
 	
 	private StringBuilder errors = new StringBuilder();
@@ -88,7 +85,14 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			return;
 		}
 		try {
-			initDependencyJars();
+			@SuppressWarnings("unchecked")
+			Set<Artifact> dependencyArtifacts = project.getDependencyArtifacts();
+			
+			getLog().debug("Artifacts : " + project.getDependencyArtifacts());
+			
+			for (Artifact artifact : dependencyArtifacts) {
+				initDependency(artifact);
+			}
 			
 			// parcours src/main/java/org/alfresco/
 			MigrationStat stat = new MigrationStat();
@@ -112,49 +116,26 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		errors.append(msg).append("\n");
 	}
 	
-	private void initDependencyJars() throws Exception {
-		@SuppressWarnings("unchecked")
-		Set<Artifact> dependencyArtifacts = project.getDependencyArtifacts();
-		
-		getLog().debug("Artifacts : " + project.getDependencyArtifacts());
-		
-		for (Artifact artifact : dependencyArtifacts) {
-			File file = artifact.getFile();
-
-			if (file.exists()) {
-				ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
-				try {
-					ZipEntry entry;
-					while ((entry = zip.getNextEntry()) != null) {
-						if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
-							if (entry.getName().startsWith(WEB_INF_CLASSES)) {
-								put(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), file);
-							} else if (entry.getName().startsWith("WEB-INF/lib")) {
-								// Ignore librairie externe pour le moment
-							} else {
-								put(resourceInJarByPath, "/" + entry.getName(), file);
-							}
+	private void initDependency(Artifact artifact) throws Exception {
+		File file = artifact.getFile();
+		if (file != null) {
+			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
+			try {
+				ZipEntry entry;
+				while ((entry = zip.getNextEntry()) != null) {
+					if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
+						if (entry.getName().startsWith(WEB_INF_CLASSES)) {
+							putDependency(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), artifact);
+						} else if (entry.getName().startsWith("WEB-INF/lib")) {
+							// Ignore librairie externe pour le moment
+						} else {
+							putDependency(resourceInJarByPath, "/" + entry.getName(), artifact);
 						}
 					}
-				} finally {
-					zip.close();
 				}
+			} finally {
+				zip.close();
 			}
-			
-//			File source = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf('.')) + "-sources.jar");
-//			if (source.exists()) {
-//				ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(source)));
-//				try {
-//					ZipEntry entry;
-//					while ((entry = zip.getNextEntry()) != null) {
-//						if (entry.getName().endsWith(".java")) {
-//							put(resourceInJarByPath, "/" + entry.getName(), source);
-//						}
-//					}
-//				} finally {
-//					zip.close();
-//				}
-//			}
 		}
 	}
 	
@@ -165,15 +146,15 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			"/overview.html"
 		));
 
-	private void put(Map<String, File> map, String key, File jarFile) {
+	private void putDependency(Map<String, Artifact> map, String key, Artifact artifact) {
 		if (key.startsWith("/META-INF/") || key.endsWith(".class") || resourcesToIgnore.contains(key)) {
 			return;
 		}
 		
-		File oldValue = map.put(key, jarFile);
+		Artifact oldValue = map.put(key, artifact);
 		if (oldValue != null) {
-			if (! oldValue.getAbsolutePath().replace("-sources.", ".").equals(jarFile.getAbsolutePath().replace("-sources.", "."))) {
-				throw new IllegalStateException("Duplicate key " + key + " in " + jarFile + " and " + oldValue);
+			if (! oldValue.getFile().getAbsolutePath().replace("-sources.", ".").equals(artifact.getFile().getAbsolutePath().replace("-sources.", "."))) {
+				throw new IllegalStateException("Duplicate key " + key + " in " + artifact.getFile() + " and " + oldValue);
 			}
 		}
 	}
@@ -241,8 +222,11 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			return;
 		}
 
-		String versionExtension = "." + alfrescoVersion + originalFileExtension;
+		// Si fini par .ori
 		if (path.endsWith(originalFileExtension)) {
+			//String versionExtension = "." + alfrescoVersion + originalFileExtension;
+			
+			// Si fini par .ignore.ori
 			if (path.endsWith(ignoreFileExtension)) {
 				File patch = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - ignoreFileExtension.length()));
 				if (! patch.exists()) {
@@ -252,104 +236,137 @@ public class MigrationMojo extends AbstractMigrationMojo {
 					error(".ignore.ori file should be empty: " + file.getAbsolutePath());
 				}
 				stat.nbIgnored ++;
-			} else if (path.endsWith(versionExtension)) {
-				File patch = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - versionExtension.length()));
-				if (! patch.exists()) {
-					error("Original file without corresponding patch file: " + file.getAbsolutePath());
-				} else if (Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(patch))) {
-					error("Patch identical to original. You may delete it : " + patch.getAbsolutePath());
+			} else if (path.contains(versionSeparator)) {
+				String fileVersion = path.substring(path.lastIndexOf(versionSeparator) + versionSeparator.length(), path.length() - originalFileExtension.length());
+				File patchFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf(versionSeparator)));
+				
+				String currentVersion = findVersionByPath(path.substring(0, path.lastIndexOf(versionSeparator)));
+				byte[] originalContent = findContentByPath(path.substring(0, path.lastIndexOf(versionSeparator)));
+				if (originalContent == null) {
+					error("Can not find original content for " + file.getAbsolutePath());
+					return;
 				}
-				stat.nbPatch ++;
-			} else {
-				File currentVersionOriginalFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().length() - versionExtension.length()) + versionExtension);
-				if (   deleteIdenticalResources
-					&& currentVersionOriginalFile.exists() 
-					&& Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(currentVersionOriginalFile))) {
-					getLog().info("Old resource identical to new resource, delete it : " + file.getAbsolutePath());
-					file.delete();
+				
+				if (currentVersion.equals(fileVersion)) {
+					if (! Arrays.equals(originalContent, FileUtils.readFileToByteArray(file))) {
+						error("Copy different from original " + file.getAbsolutePath());
+						return;
+					}
+					
+					if (! patchFile.exists()) {
+						error("Original file without corresponding patch file: " + file.getAbsolutePath());
+					} else if (Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(patchFile))) {
+						error("Patch identical to original. You may delete it : " + patchFile.getAbsolutePath());
+					}
 				} else {
-					error("You should migrate this original file to " + alfrescoVersion + " then delete it: " + file.getAbsolutePath());
+					File currentVersionOriginalFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf(versionSeparator))
+							+ versionSeparator + currentVersion + originalFileExtension);
+					if (   deleteIdenticalResources
+						&& currentVersionOriginalFile.exists() 
+						&& Arrays.equals(FileUtils.readFileToByteArray(file), FileUtils.readFileToByteArray(currentVersionOriginalFile))) {
+						getLog().info("Old resource identical to new resource, delete it : " + file.getAbsolutePath());
+						file.delete();
+					} else {
+						error("You should migrate this original file to the current version then delete it: " + file.getAbsolutePath());
+					}
 				}
 				stat.nbPatch ++;
-			}
-			return;
-		}
-		
-		getLog().debug("Analyse " + path);
-		String originalContent = findContentByPath(path);
-		
-		if (originalContent == null) {
-			File ignore = new File(file.getParentFile(), file.getName() + ignoreFileExtension);
-			if (ignore.exists()) {
-				getLog().debug("Ignore resource " + file.getAbsolutePath());
-				return;
-			} else if (file.getName().toUpperCase().startsWith("README.")) {
-				return;
-			} else if (createMissingIgnoreFile) {
-				getLog().warn("Create missing file " + ignore);
-				FileUtils.write(ignore, "");
-				return;
-			} else {
-				error("Original resource not found for " + file.getAbsolutePath() + ". Create a file with .ignore.ori suffix if it is not a Alfresco patch.");
-				return;
-			}
-		}
-		File original = new File(file.getParentFile(), file.getName() + versionExtension);
-		if (original.exists()) {
-			String copyContent = FileUtils.readFileToString(original);
-			if (! originalContent.equals(copyContent)) {
-				error("Copy file different from original " + original.getAbsolutePath());
-			}
-			
-			String patchedContent = FileUtils.readFileToString(file);
-			if (originalContent.equals(patchedContent)) {
-				error("unecessary patch file. Identical resource:" + file.getAbsolutePath());
 			}
 		} else {
-			if (createMissingFile) {
-				getLog().warn("Create missing file " + original.getAbsolutePath());
-				FileUtils.write(original, originalContent);
+			getLog().debug("Analyse " + path);
+			byte[] originalContent = findContentByPath(path);
+			String version = findVersionByPath(path);
+			
+			if (originalContent == null) {
+				File ignore = new File(file.getParentFile(), file.getName() + ignoreFileExtension);
+				if (ignore.exists()) {
+					getLog().debug("Ignore resource " + file.getAbsolutePath());
+					return;
+				} else if (file.getName().toUpperCase().startsWith("README.")) {
+					return;
+				} else if (createMissingIgnoreFile) {
+					getLog().warn("Create missing file " + ignore);
+					FileUtils.write(ignore, "");
+					return;
+				} else {
+					error("Original resource not found for " + file.getAbsolutePath() + ". Create a file with .ignore.ori suffix if it is not a Alfresco patch.");
+					return;
+				}
+			}
+			File original = new File(file.getParentFile(), file.getName() + versionSeparator + version + originalFileExtension);
+			if (original.exists()) {
+				byte[] copyContent = FileUtils.readFileToByteArray(original);
+				if (! Arrays.equals(originalContent, copyContent)) {
+					error("Copy file different from original " + original.getAbsolutePath());
+				}
+				
+				byte[] patchedContent = FileUtils.readFileToByteArray(file);
+				if (Arrays.equals(originalContent, patchedContent)) {
+					error("unecessary patch file. Identical resource:" + file.getAbsolutePath());
+				}
 			} else {
-				error("Copy file not found and createMissingFile=false: " + original.getAbsolutePath());
+				if (createMissingFile) {
+					getLog().warn("Create missing file " + original.getAbsolutePath());
+					FileUtils.writeByteArrayToFile(original, originalContent);
+				} else {
+					error("Copy file not found and createMissingFile=false: " + original.getAbsolutePath());
+				}
 			}
 		}
 	}
 	
-	private String findContentByPath(String path) throws Exception {
+	private String findVersionByPath(String path) throws Exception {
 		if (path.startsWith("/alfresco/extension/templates/")) {
 			path = path.replace("/alfresco/extension/templates/", "/alfresco/templates/");
 		}
 		
-		File war = resourceInWarByPath.get(path);
+		Artifact war = resourceInWarByPath.get(path);
 		if (war != null) {
-			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(war)));
+			return war.getVersion();
+		}
+		
+		Artifact jar = resourceInJarByPath.get(path);
+		if (jar != null) {
+			return jar.getVersion();
+		}
+		return null;
+	}
+	
+	private byte[] findContentByPath(String path) throws Exception {
+		if (path.startsWith("/alfresco/extension/templates/")) {
+			path = path.replace("/alfresco/extension/templates/", "/alfresco/templates/");
+		}
+		
+		Artifact war = resourceInWarByPath.get(path);
+		if (war != null) {
+			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(war.getFile())));
 			try {
 				ZipEntry entry;
 				while ((entry = zip.getNextEntry()) != null) {
 					if (entry.getName().equals(WEB_INF_CLASSES + path)) {
-						return IOUtils.toString(zip);
+						return IOUtils.toByteArray(zip);
 					}
 				}
 			} finally {
 				zip.close();
 			}
-			throw new IllegalStateException(path + " - " + war.getAbsolutePath());
+			throw new IllegalStateException(path + " - " + war.getFile().getAbsolutePath());
 		}
 		
-		File jar = resourceInJarByPath.get(path);
+		Artifact jar = resourceInJarByPath.get(path);
 		if (jar != null) {
-			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar)));
+			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(jar.getFile())));
 			try {
 				ZipEntry entry;
 				while ((entry = zip.getNextEntry()) != null) {
 					if (entry.getName().equals(path.substring("/".length()))) {
-						return IOUtils.toString(zip);
+						return IOUtils.toByteArray(zip);
 					}
 				}
 			} finally {
 				zip.close();
 			}
-			throw new IllegalStateException(path + " - " + jar.getAbsolutePath());
+			throw new IllegalStateException(path + " - " + jar.getFile().getAbsolutePath());
 		}
 		return null;
 	}
@@ -358,7 +375,6 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		System.out.println(new File(".").getAbsolutePath());
 		
 		MigrationMojo mojo = new MigrationMojo();
-		mojo.alfrescoVersion = "6.0.0";
 		mojo.execute();
 	}
 }
