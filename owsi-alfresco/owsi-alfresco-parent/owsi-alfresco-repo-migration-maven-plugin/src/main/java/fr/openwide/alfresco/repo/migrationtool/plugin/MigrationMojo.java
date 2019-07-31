@@ -277,7 +277,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				String fileVersion = path.substring(path.lastIndexOf(versionSeparator) + versionSeparator.length(), path.length() - originalFileExtension.length());
 				File patchFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf(versionSeparator)));
 				
-				String currentVersion = findArtifactByPath(path.substring(0, path.lastIndexOf(versionSeparator))).getVersion();
+				String currentVersion = findVersionByPath(path.substring(0, path.lastIndexOf(versionSeparator)));
 				byte[] originalContent = findContentByPath(path.substring(0, path.lastIndexOf(versionSeparator)));
 				if (originalContent == null) {
 					error("Can not find original content for " + file.getAbsolutePath());
@@ -312,7 +312,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		} else {
 			getLog().debug("Analyse " + path);
 			byte[] originalContent = findContentByPath(path);
-			String version = findArtifactByPath(path).getVersion();
+			String version = findVersionByPath(path);
 			
 			if (originalContent == null) {
 				File ignore = new File(file.getParentFile(), file.getName() + ignoreFileExtension);
@@ -352,19 +352,19 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		}
 	}
 	
-	private Artifact findArtifactByPath(String path) throws Exception {
+	private String findVersionByPath(String path) throws Exception {
 		if (path.startsWith("/alfresco/extension/templates/")) {
 			path = path.replace("/alfresco/extension/templates/", "/alfresco/templates/");
 		}
 		
 		Artifact war = resourceInWarByPath.get(path);
 		if (war != null) {
-			return war;
+			return war.getVersion();
 		}
 		
 		Artifact jar = resourceInJarByPath.get(path);
 		if (jar != null) {
-			return jar;
+			return jar.getVersion();
 		}
 		return null;
 	}
