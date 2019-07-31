@@ -34,7 +34,10 @@ Nouveautés
 ==========
 
 ## depuis 0.8.3
-* MigrationMojo se base sur dependencies et plus sur le contenu du .m2. 
+* MigrationMojo se base sur dependencies et plus sur le contenu du .m2.
+* Pour surcharger un fichier présent dans une dépendance:
+   * mvn package -Dowsi.migration.overrideFile=index.jsp
+   * mvn package -Dowsi.migration.overrideContent=".alf-fullwindow .sticky-footer"s
 * Remplace jgitflow par gitflow
 
 ## depuis 0.8.2

@@ -3,6 +3,9 @@ package fr.openwide.alfresco.repo.migrationtool.plugin;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +60,11 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	@Parameter(defaultValue="true")
 	private boolean deleteIdenticalResources = true;
+
+	@Parameter(property="owsi.migration.overrideFile", defaultValue="")
+	private String overrideFile;
+	@Parameter(property="owsi.migration.overrideContent", defaultValue="")
+	private String overrideContent;
 
 	private Map<String, Artifact> resourceInJarByPath = new HashMap<String, Artifact>();
 	private Map<String, Artifact> resourceInWarByPath = new HashMap<String, Artifact>();
@@ -125,11 +133,11 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				while ((entry = zip.getNextEntry()) != null) {
 					if (! entry.isDirectory() && ! entry.getName().endsWith(".class")) {
 						if (entry.getName().startsWith(WEB_INF_CLASSES)) {
-							putDependency(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), artifact);
+							putDependency(resourceInWarByPath, entry.getName().substring(WEB_INF_CLASSES.length()), artifact, true, zip);
 						} else if (entry.getName().startsWith("WEB-INF/lib")) {
-							// Ignore librairie externe pour le moment
+							// TODO Ignore librairie externe pour le moment
 						} else {
-							putDependency(resourceInJarByPath, "/" + entry.getName(), artifact);
+							putDependency(resourceInJarByPath, "/" + entry.getName(), artifact, false, zip);
 						}
 					}
 				}
@@ -146,7 +154,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			"/overview.html"
 		));
 
-	private void putDependency(Map<String, Artifact> map, String key, Artifact artifact) {
+	private void putDependency(Map<String, Artifact> map, String key, Artifact artifact, boolean inWebInfClasses, InputStream in) throws IOException {
 		if (key.startsWith("/META-INF/") || key.endsWith(".class") || resourcesToIgnore.contains(key)) {
 			return;
 		}
@@ -157,6 +165,35 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				throw new IllegalStateException("Duplicate key " + key + " in " + artifact.getFile() + " and " + oldValue);
 			}
 		}
+		
+		if (overrideFile != null && overrideFile.length() > 0 && key.contains(overrideFile)) {
+			File destinationFile = createOverrideFile(key, artifact, inWebInfClasses);
+			OutputStream output = FileUtils.openOutputStream(destinationFile);
+			try {
+				IOUtils.copy(in, output);
+			} finally {
+				IOUtils.closeQuietly(output);
+			}
+		}
+
+		if (overrideContent != null && overrideContent.length() > 0) {
+			String fileContent = IOUtils.toString(in);
+			if (fileContent.contains(overrideContent)) {
+				File destinationFile = createOverrideFile(key, artifact, inWebInfClasses);
+				FileUtils.write(destinationFile, fileContent);
+			}
+		}
+	}
+	
+	private File createOverrideFile(String key, Artifact artifact, boolean inWebInfClasses) {
+		File destinationRoot = new File(getBaseDir(),
+			("war".equals(artifact.getType()) && ! inWebInfClasses) 
+				? "src/main/webapp"
+				: key.endsWith(".java") ? "src/main/java" : "src/main/resources");
+		File destinationFile = new File(destinationRoot, key);
+		destinationFile.getParentFile().mkdirs();
+		getLog().info("File " + destinationFile + " created");
+		return destinationFile;
 	}
 	
 	private void visitResources(File folder, String path, MigrationStat stat) throws Exception {
@@ -240,7 +277,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 				String fileVersion = path.substring(path.lastIndexOf(versionSeparator) + versionSeparator.length(), path.length() - originalFileExtension.length());
 				File patchFile = new File(file.getParentFile(), file.getName().substring(0, file.getName().lastIndexOf(versionSeparator)));
 				
-				String currentVersion = findVersionByPath(path.substring(0, path.lastIndexOf(versionSeparator)));
+				String currentVersion = findArtifactByPath(path.substring(0, path.lastIndexOf(versionSeparator))).getVersion();
 				byte[] originalContent = findContentByPath(path.substring(0, path.lastIndexOf(versionSeparator)));
 				if (originalContent == null) {
 					error("Can not find original content for " + file.getAbsolutePath());
@@ -275,7 +312,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		} else {
 			getLog().debug("Analyse " + path);
 			byte[] originalContent = findContentByPath(path);
-			String version = findVersionByPath(path);
+			String version = findArtifactByPath(path).getVersion();
 			
 			if (originalContent == null) {
 				File ignore = new File(file.getParentFile(), file.getName() + ignoreFileExtension);
@@ -315,19 +352,19 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		}
 	}
 	
-	private String findVersionByPath(String path) throws Exception {
+	private Artifact findArtifactByPath(String path) throws Exception {
 		if (path.startsWith("/alfresco/extension/templates/")) {
 			path = path.replace("/alfresco/extension/templates/", "/alfresco/templates/");
 		}
 		
 		Artifact war = resourceInWarByPath.get(path);
 		if (war != null) {
-			return war.getVersion();
+			return war;
 		}
 		
 		Artifact jar = resourceInJarByPath.get(path);
 		if (jar != null) {
-			return jar.getVersion();
+			return jar;
 		}
 		return null;
 	}
