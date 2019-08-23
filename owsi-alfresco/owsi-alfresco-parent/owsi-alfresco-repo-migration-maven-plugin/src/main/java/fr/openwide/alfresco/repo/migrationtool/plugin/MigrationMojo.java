@@ -109,6 +109,8 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco", stat);
 			visitResources(new File(getBaseDir(), "src/main/webapp"), "", stat);
+			visitResources(new File(getBaseDir(), "src/main/assembly/web"), "", stat);
+			visitResources(new File(getBaseDir(), "src/main/assembly/config/alfresco/"), "/alfresco", stat);
 			visitResources(new File(getBaseDir(), "src/main/java/org/alfresco"), "/org/alfresco", stat);
 			getLog().info("Main stat " + stat.toString());
 		} catch (Exception e) {
@@ -330,6 +332,17 @@ public class MigrationMojo extends AbstractMigrationMojo {
 					return;
 				}
 			}
+			
+			if (path.endsWith(".js") && ! path.endsWith("-min.js")) {
+				String pathMin = path.substring(path.lastIndexOf(".js")) + "-min.js";
+				if (findContentByPath(pathMin) != null) {
+					// TODO compress avec https://search.maven.org/artifact/com.yahoo.platform.yui/yuicompressor/2.4.8/jar
+					// http://yui.github.io/yuicompressor/
+					File fileMin = new File(file.getParentFile(), file.getName().substring(file.getName().lastIndexOf(".js")) + "-min.js");
+					FileUtils.copyFile(file, fileMin);
+				}
+			}
+			
 			File original = new File(file.getParentFile(), file.getName() + versionSeparator + version + originalFileExtension);
 			if (original.exists()) {
 				byte[] copyContent = FileUtils.readFileToByteArray(original);
