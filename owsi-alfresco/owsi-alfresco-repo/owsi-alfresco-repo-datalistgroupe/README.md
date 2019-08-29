@@ -24,7 +24,7 @@ Pour intégrer la fonctionnalité proposé par le module :
 <dependency>
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
-	<version>0.8.1</version>
+	<version>0.8.3</version>
 </dependency> 
 ```
   * Dans `Share` :
@@ -33,6 +33,6 @@ Pour intégrer la fonctionnalité proposé par le module :
 <dependency>
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-share-datalistgroupe</artifactId>
-	<version>0.8.1</version>
+	<version>0.8.3</version>
 </dependency>
 ```
