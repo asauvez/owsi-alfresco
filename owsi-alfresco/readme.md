@@ -39,6 +39,7 @@ Nouveautés
    * mvn package -Dowsi.migration.overrideFile=index.jsp
    * mvn package -Dowsi.migration.overrideContent=".alf-fullwindow .sticky-footer"s
 * Remplace jgitflow par gitflow
+* Module gestion des groupes de site par DataList
 
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps

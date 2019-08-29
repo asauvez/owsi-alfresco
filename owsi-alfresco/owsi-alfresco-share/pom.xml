@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>fr.openwide.alfresco</groupId>
+    <artifactId>owsi-alfresco-parent-share-component</artifactId>
+    <version>0.8.1-SNAPSHOT</version>
+	<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-share-component/pom.xml</relativePath>
+    
+  </parent>
+  <artifactId>owsi-alfresco-share</artifactId>
+  <packaging>pom</packaging>
+  
+  	<name>OWSI Alfresco - Share</name>
+	<description>Composants pour le développement d'extensions dans le Share</description>
+  
+	<!-- modules>
+		<module>owsi-alfresco-repo-wsgenerator</module>	
+	</modules-->
+	<modules>
+		<module>owsi-alfresco-share-datalistgroupe</module>
+	</modules>
+</project>
