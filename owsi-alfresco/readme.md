@@ -40,6 +40,7 @@ Nouveautés
    * mvn package -Dowsi.migration.overrideContent=".alf-fullwindow .sticky-footer"s
 * Remplace jgitflow par gitflow
 * Module gestion des groupes de site par DataList
+* /alfresco/s/owsi/permissions.csv?authority=admin Renvoi liste permissions pour une authorité
 
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps
