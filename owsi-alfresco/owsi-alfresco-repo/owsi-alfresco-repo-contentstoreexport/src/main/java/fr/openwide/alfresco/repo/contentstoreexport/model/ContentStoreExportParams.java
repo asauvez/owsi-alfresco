@@ -11,6 +11,9 @@ public class ContentStoreExportParams {
 	// Liste de noeuds à exporter
 	public String[] nodeRefs;
 
+	// Liste de sites à exporter
+	public String[] sites;
+
 	// Export tout les noeuds minimums nécessaires à lancer Alfresco
 	public boolean exportBase = true;
 

@@ -38,6 +38,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 			@SwaggerParameter(name="paths", description="Liste de chemins à exporter (défaut vide)"),
 			@SwaggerParameter(name="queries", description="Liste de queries à exporter (défaut vide)"),
 			@SwaggerParameter(name="nodeRefs", description="Liste de nodeRef racines à exporter (défaut vide)"),
+			@SwaggerParameter(name="sites", description="Liste de sites à exporter (défaut vide)"),
 			@SwaggerParameter(name="exportBase", description="Export tout les noeuds minimums nécessaires à lancer Alfresco (défaut true)"),
 			@SwaggerParameter(name="exportAll", description="Export tout les noeuds (défaut false)"),
 			@SwaggerParameter(name="exportContent", description="S'il faut exporter ou non le contenu (défaut true)"),
