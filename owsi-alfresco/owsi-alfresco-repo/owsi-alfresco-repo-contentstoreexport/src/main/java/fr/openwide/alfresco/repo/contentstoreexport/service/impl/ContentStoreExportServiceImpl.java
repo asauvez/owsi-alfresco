@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -309,6 +311,16 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private void recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
 			AtomicInteger nbFiles, AtomicLong totalVolume, ContentStoreExportParams params)
 			throws IOException {
+		
+		if (params.since != null) {
+			Date modified = (Date) nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED);
+			Duration duration = Duration.parse(params.since);
+			Date limit = Date.from(Instant.from(duration.subtractFrom(Instant.now())));
+			if (limit.after(modified)) {
+				return;
+			}
+		}
+		
 		LOGGER.debug("Export node : " + nodeRef);
 		
 		//recupération des properties du node courant

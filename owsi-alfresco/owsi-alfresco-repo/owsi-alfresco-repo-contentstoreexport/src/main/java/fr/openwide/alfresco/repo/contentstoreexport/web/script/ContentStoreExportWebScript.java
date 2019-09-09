@@ -43,6 +43,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 			@SwaggerParameter(name="exportContent", description="S'il faut exporter ou non le contenu (défaut true)"),
 			@SwaggerParameter(name="writeTo", description="Emplacement où écrire sur disque le Zip (défaut renvoie juste le Zip)"),
 			@SwaggerParameter(name="pathType", description="Type d'export contentstore, alfresco ou bulk (défaut contentstore)"),
+			@SwaggerParameter(name="since", description="N'exporte que les données modifiées depuis cette période (ex: P1D)"),
 		})
 public class ContentStoreExportWebScript extends AbstractWebScript implements ApplicationContextAware {
 
