@@ -19,13 +19,13 @@ public class AuthorizationServiceHelper {
 	protected void init(ApplicationContext applicationContext) {
 		try {
 			Class<?> clazz = Class.forName(AuthorizationServiceHelper.class.getName() + "Impl");
-			realAuthorizationServiceHelper = (AuthorizationServiceHelper) clazz.newInstance();
-			
-			realAuthorizationServiceHelper.init(applicationContext);
-		} catch (ClassNotFoundException e) {
+			AuthorizationServiceHelper authorizationServiceHelper = (AuthorizationServiceHelper) clazz.newInstance();
+			authorizationServiceHelper.init(applicationContext);
+			this.realAuthorizationServiceHelper = authorizationServiceHelper; 
+		} catch (NoClassDefFoundError e) {
 			LOGGER.info("Version community");
 			this.realAuthorizationServiceHelper = this;
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			throw new IllegalStateException(e);
 		}
 	}
