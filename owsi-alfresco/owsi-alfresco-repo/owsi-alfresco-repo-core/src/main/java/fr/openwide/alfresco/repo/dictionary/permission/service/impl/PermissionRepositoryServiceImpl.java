@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
-import org.alfresco.enterprise.repo.authorization.AuthorizationService;
 import org.alfresco.service.cmr.preference.PreferenceService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessPermission;
@@ -30,6 +29,7 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
@@ -58,7 +58,8 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	private PolicyRepositoryService policyRepositoryService;
 	private PreferenceService preferenceService;
 	private PersonService personService;
-	private AuthorizationService authorizationService;
+	
+	@Autowired private ApplicationContext applicationContext;
     
     private DataSource dataSource;
 	
@@ -201,6 +202,8 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			}
 		}
 
+		AuthorizationServiceHelper authorizationServiceHelper = new AuthorizationServiceHelper(applicationContext);
+		
 		// Remplace l'authority dans les ACL
 		int cpt = 0;
 		List<RepositoryAccessControl> listAcl = searchACL(oldAuthority);
@@ -228,7 +231,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			if ( deactivateOldUser ) {
 				LOGGER.info(String.format("Deauthorize old user before moving home : %s", oldAuthorityName));
 				if (authorityService.authorityExists(oldAuthorityName)){
-					deauthorizeUser(oldAuthorityName);
+					authorizationServiceHelper.deauthorizeUser(oldAuthorityName);
 				}
 			}
 			
@@ -240,15 +243,6 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		}
 		
 		return cpt;
-	}
-
-	private void deauthorizeUser(String oldAuthorityName) {
-		if (authorizationService.isAuthorized(oldAuthorityName)) {
-			authorizationService.deauthorize(oldAuthorityName);
-			LOGGER.warn(String.format("%s has been deauthorized", oldAuthorityName));
-		} else {
-			LOGGER.warn(String.format("failed to deauthorize: user %s was never authorized", oldAuthorityName));
-		}
 	}
 
 	private NodeRef copyHomeFilesAndPreferences(String sourceUserName, String targetUserName) {
@@ -347,9 +341,4 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	public void setPersonService(PersonService personService) {
 		this.personService = personService;
 	}
-	
-	public void setAuthorizationService(AuthorizationService authorizationService) {
-		this.authorizationService = authorizationService;
-	}
-	
 }
