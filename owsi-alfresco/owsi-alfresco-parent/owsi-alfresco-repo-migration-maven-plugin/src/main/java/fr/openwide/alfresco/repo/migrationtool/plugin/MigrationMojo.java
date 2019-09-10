@@ -153,7 +153,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	private void initDependency(Artifact artifact) throws Exception {
 		File file = artifact.getFile();
-		if (file != null) {
+		if (file != null && ! file.isDirectory()) {
 			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
 			try {
 				ZipEntry entry;
