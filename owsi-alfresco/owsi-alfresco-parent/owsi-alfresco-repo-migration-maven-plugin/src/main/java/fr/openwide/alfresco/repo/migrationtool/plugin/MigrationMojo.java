@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,7 +52,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	private static final String WEB_INF_CLASSES = "WEB-INF/classes";
 
 	@Parameter(defaultValue="true")
-	private boolean enabled = true;
+	private String enabled = "true";
 
 	@Parameter(defaultValue="true")
 	private boolean createMissingFile = true;
@@ -88,7 +90,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		if (! enabled) {
+		if (! isEnabled()) {
 			getLog().warn("Migration tools disabled.");
 			return;
 		}
@@ -118,6 +120,25 @@ public class MigrationMojo extends AbstractMigrationMojo {
 		}
 		if (errors.length() > 0) {
 			throw new MojoFailureException(errors.toString().substring(0, errors.length()-1));
+		}
+	}
+	
+	public boolean isEnabled() {
+		String fileName = null;
+		switch (enabled) {
+		case "true" : return true;
+		case "false" : return false;
+		case "once_an_day" :  fileName = "yyyy.MM.dd"; break;
+		case "once_an_hour" : fileName = "yyyy.MM.dd-hh"; break;
+		default: fileName = enabled; break;
+		}
+		File folder = new File("/tmp/owsi.migration/" + project.getGroupId() + "/" + project.getArtifactId() + "/" + project.getVersion());
+		folder.mkdirs();
+		File file = new File(folder, new SimpleDateFormat(fileName).format(new Date()));
+		try {
+			return file.createNewFile();
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 	
