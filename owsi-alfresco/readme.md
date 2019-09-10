@@ -33,6 +33,8 @@ mvn gitflow:release
 Nouveautés
 ==========
 
+## depuis 0.8.4
+
 ## depuis 0.8.3
 * MigrationMojo se base sur dependencies et plus sur le contenu du .m2.
 * Pour surcharger un fichier présent dans une dépendance:
