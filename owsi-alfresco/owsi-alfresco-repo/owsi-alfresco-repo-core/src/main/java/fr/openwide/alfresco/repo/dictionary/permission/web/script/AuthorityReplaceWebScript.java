@@ -82,7 +82,7 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		AuthorityReference newAuthority = AuthorityReference.authority(req.getParameter("new"));
 		String maxItem = req.getParameter("maxItem");
 		boolean removeOldInSite = getBooleanParameter(req, PARAM_REMOVE_OLD_IN_SITE, true);
-		boolean deactivateOldUser = getBooleanParameter(req, PARAM_DEACTIVATE_OLD_USER, true);
+		boolean deactivateOldUser = getBooleanParameter(req, PARAM_DEACTIVATE_OLD_USER, false);
 		return permissionRepositoryService.replaceAuthority(oldAuthority, newAuthority, 
 				Optional.ofNullable(maxItem).map(Integer::parseInt), removeOldInSite, deactivateOldUser);
 	}
@@ -93,7 +93,7 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 		String parameter = req.getParameter(PARAM_FOR_LIST_EXECUTION);
 		
 		boolean removeOldInSite = getBooleanParameter(req, PARAM_REMOVE_OLD_IN_SITE, true);
-		boolean deactivateOldUser = getBooleanParameter(req, PARAM_DEACTIVATE_OLD_USER, true);
+		boolean deactivateOldUser = getBooleanParameter(req, PARAM_DEACTIVATE_OLD_USER, false);
 		LOGGER.info(String.format("--> UserDuplicateWebScript execute with inputFile: %s ; removeOldInSite:%s ; deactivateOldUser: %s", parameter, removeOldInSite, deactivateOldUser));
 		if (parameter == null) {
 			results.add("The webscript should be called with an argument inputFile, with inputFile a file in the classpath");

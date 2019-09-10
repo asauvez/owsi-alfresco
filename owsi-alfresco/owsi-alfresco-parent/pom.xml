@@ -10,14 +10,13 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.8.2</version>
+	<version>0.8.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
 	<description>Définition des dépendances et plugins partagées par les autres projets et modules</description>
 
 	<properties>
-		<owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
 		<owsi-alfresco.maven-failsafe-plugin.version>2.19.1</owsi-alfresco.maven-failsafe-plugin.version>
 		<owsi-alfresco.git-commit-id-plugin.version>2.2.4</owsi-alfresco.git-commit-id-plugin.version>
 	</properties>
@@ -74,24 +73,17 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>external.atlassian.jgitflow</groupId>
-					<artifactId>jgitflow-maven-plugin</artifactId>
-					<version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
-					<configuration>
-						<flowInitContext>
-							<masterBranchName>master</masterBranchName>
-							<developBranchName>dev</developBranchName>
-							<featureBranchPrefix>ft-</featureBranchPrefix>
-							<releaseBranchPrefix>rl-</releaseBranchPrefix>
-							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-							<versionTagPrefix>v</versionTagPrefix>
-						</flowInitContext>
-						<noDeploy>true</noDeploy>
-						<pullDevelop>true</pullDevelop>
-						<pullMaster>true</pullMaster>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-						<scmCommentPrefix>[release] </scmCommentPrefix>
-					</configuration>
+					<groupId>com.amashchenko.maven.plugin</groupId>
+		            <artifactId>gitflow-maven-plugin</artifactId>
+		            <version>1.13.0</version>
+		            <configuration>
+		            	<gitFlowConfig>
+			            	<developmentBranch>dev</developmentBranch>
+					        <featureBranchPrefix>ft-</featureBranchPrefix>
+					        <releaseBranchPrefix>rl-</releaseBranchPrefix>
+					        <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+				        </gitFlowConfig>
+		            </configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

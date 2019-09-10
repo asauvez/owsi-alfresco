@@ -27,15 +27,27 @@ mvn clean source:jar deploy -DargLine="" -Ddistribution=owsi-alfresco-release
 
 Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà le fichier owsi-m2/settings.xml permet d'utiliser OWSI-alfresco
 
+* Pour livrer une nouvelle version
+mvn gitflow:release
+
 Nouveautés
 ==========
+
+## depuis 0.8.3
+* MigrationMojo se base sur dependencies et plus sur le contenu du .m2.
+* Pour surcharger un fichier présent dans une dépendance:
+   * mvn package -Dowsi.migration.overrideFile=index.jsp
+   * mvn package -Dowsi.migration.overrideContent=".alf-fullwindow .sticky-footer"s
+* Remplace jgitflow par gitflow
+* Module gestion des groupes de site par DataList
+* /alfresco/s/owsi/permissions.csv?authority=admin Renvoi liste permissions pour une authorité
 
 ## depuis 0.8.2
 * Classification gère si noeud supprimé entre temps
 * Classification désactive cm:version, cm:auditable et owsi:classifiable policies 
-* Swagger : modification de rednu généré
+* Swagger : modification de rendu généré
 * Intégre AMP AOS
-* /owsi/admin/configuration Renvoi configuration loggué au démarrage
+* WS /owsi/admin/configuration Renvoi configuration loggué au démarrage
 * Log git.properties au démarrage.
 * Amélioration du plugin contentstoreexport
 
@@ -81,6 +93,9 @@ Nouveautés
 
 Migration
 =========
+
+## depuis 0.8.3
+* Les fichiers toto.xml.5.2.ori doivent être renomé en toto.xml--5.2.ori.
 
 ## vers 0.8.0
 * NodeModelRepositoryService utilise des NodeRef au lieu de NodeReference

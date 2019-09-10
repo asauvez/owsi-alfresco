@@ -17,6 +17,9 @@ public abstract class AbstractMigrationMojo extends AbstractMojo {
 	@Parameter(defaultValue=".ignore.ori")
 	protected String ignoreFileExtension = ".ignore.ori";
 
+	@Parameter(defaultValue="--")
+	protected String versionSeparator = "--";
+
 	protected File getBaseDir() {
 		return (project != null) ? project.getBasedir() : new File(".");
 	}

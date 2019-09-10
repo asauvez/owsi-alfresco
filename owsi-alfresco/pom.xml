@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -9,15 +10,11 @@
 
     <groupId>fr.openwide.alfresco</groupId>
     <artifactId>owsi-alfresco</artifactId>
-    <version>0.8.2</version>
+    <version>0.8.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OWSI Alfresco</name>
     <description>Capitalisation des développements utilisés sur les projets Alfresco</description>
-
-    <properties>
-        <owsi-alfresco.jgitflow-maven-plugin.version>1.0-m5.1</owsi-alfresco.jgitflow-maven-plugin.version>
-    </properties>
 
 	<modules>
 		<module>owsi-alfresco-api</module>
@@ -25,7 +22,8 @@
 		<module>owsi-alfresco-app</module>
 		<module>owsi-alfresco-repo</module>
 		<module>owsi-alfresco-component</module>
-	</modules>
+		<module>owsi-alfresco-share</module>
+  </modules>
 
     <scm>
         <developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
@@ -37,25 +35,17 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>external.atlassian.jgitflow</groupId>
-                    <artifactId>jgitflow-maven-plugin</artifactId>
-                    <version>${owsi-alfresco.jgitflow-maven-plugin.version}</version>
-                    <configuration>
-                        <flowInitContext>
-                            <masterBranchName>master</masterBranchName>
-                            <developBranchName>dev</developBranchName>
-                            <featureBranchPrefix>ft-</featureBranchPrefix>
-                            <releaseBranchPrefix>rl-</releaseBranchPrefix>
-                            <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-                            <versionTagPrefix>v</versionTagPrefix>
-                        </flowInitContext>
-                        <noDeploy>true</noDeploy>
-                        <pullDevelop>true</pullDevelop>
-                        <pullMaster>true</pullMaster>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <allowSnapshots>true</allowSnapshots>
-                        <scmCommentPrefix>[release] </scmCommentPrefix>
-                    </configuration>
+                    <groupId>com.amashchenko.maven.plugin</groupId>
+		            <artifactId>gitflow-maven-plugin</artifactId>
+		            <version>1.12.0</version>
+		            <configuration>
+		            	<gitFlowConfig>
+			            	<developmentBranch>dev</developmentBranch>
+					        <featureBranchPrefix>ft-</featureBranchPrefix>
+					        <releaseBranchPrefix>rl-</releaseBranchPrefix>
+					        <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+				        </gitFlowConfig>
+		            </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -97,8 +87,6 @@
             <id>nexus.mirror.alfresco.release.repo</id>
             <url>http://nexus.vitry.intranet/repository/alfresco-artifacts-repository/</url>
         </repository>
-
-
     </repositories>
 
 

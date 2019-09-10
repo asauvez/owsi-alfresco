@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
+
 public abstract  class AbstractConfigurationLogger {
 
 	private static final String MD5_PREFIX = "MD5:";
@@ -85,8 +87,8 @@ public abstract  class AbstractConfigurationLogger {
 					Properties gitProperty = new Properties();
 					gitProperty.load(in);
 					
-					String[] split = gitPropertyUrl.getPath().split("/");
-					String lib = split[Math.max(split.length-4, 0)];
+					// file:/data/(...)/alfresco/WEB-INF/lib/rome-utils-1.5.1.jar!/.gitignore
+					String lib = StringUtils.substringAfterLast(StringUtils.substringBefore(gitPropertyUrl.getPath(), "!"), "/");
 					
 					String branch = gitProperty.getProperty("git.branch");
 					String buildTime = gitProperty.getProperty("git.build.time");

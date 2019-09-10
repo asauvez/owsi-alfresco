@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
-		<version>0.8.2</version>
+		<version>0.8.3-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-repo</artifactId>
@@ -19,6 +19,7 @@
 		<module>owsi-alfresco-repo-module</module>
 		<module>owsi-alfresco-repo-contentstoreexport</module>
 		<module>owsi-alfresco-repo-emailed2eml</module>
+		<module>owsi-alfresco-repo-datalistgroupe</module>
 	</modules>
 
 </project>

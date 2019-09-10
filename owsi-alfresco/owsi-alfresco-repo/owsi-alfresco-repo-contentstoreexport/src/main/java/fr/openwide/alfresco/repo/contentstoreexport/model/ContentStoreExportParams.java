@@ -11,6 +11,9 @@ public class ContentStoreExportParams {
 	// Liste de noeuds à exporter
 	public String[] nodeRefs;
 
+	// Liste de sites à exporter
+	public String[] sites;
+
 	// Export tout les noeuds minimums nécessaires à lancer Alfresco
 	public boolean exportBase = true;
 
@@ -25,6 +28,9 @@ public class ContentStoreExportParams {
 	
 	// Exporter sous forme de /contentStore/2019/12/31/....bin ou sous forme /Espace racine/...
 	public String pathType = PathType.CONTENTSTORE.name();
+	
+	// N'exporte que les données modifiées depuis cette période (ex: P1D)
+	public String since;
 	
 	public enum PathType { CONTENTSTORE, ALFRESCO, BULK }
 	public PathType getPathType() {

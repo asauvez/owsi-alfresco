@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ 	<modelVersion>4.0.0</modelVersion>
+  
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-repo</artifactId>
+		<version>0.8.3-SNAPSHOT</version>
+	</parent>
+	<artifactId>owsi-alfresco-repo-datalistgroupe</artifactId>
+	
+	<name>OWSI Alfresco - Repository - Gestion des groupes sous forme DataList </name>
+
+	<properties>
+		<alfresco.module.name>owsi-alfresco-repo-datalistgroupe</alfresco.module.name>		
+		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.6 -->
+		<jdk.version>1.6</jdk.version>  
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="owsi.datalistgroupe.DatalistAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.DatalistAuthorityListener" 
+			init-method="init" depends-on="owsi.datalistgroupe.dictionaryBootstrap" >
+	</bean>
+
+	<bean id="owsi.datalistgroupe.ItemsAuthoritypolicy" class="org.owsi.alfresco.repo.datalistgroupe.policies.ItemAuthorityListener" 
+			init-method="init" depends-on="owsi.datalistgroupe.dictionaryBootstrap" >
+	</bean>
+
+	<!-- Registration of new models -->
+	<bean id="owsi.datalistgroupe.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+		<property name="models">
+			<list>
+				<value>alfresco/module/${alfresco.module.name}/model/datalistauthorityModel.xml</value>
+			</list>
+		</property>
+		<property name="labels">
+            <list>
+                <!-- Bootstrap Resource Bundles for data list type and properties -->
+                <value>alfresco/module/${alfresco.module.name}/messages/datalistauthority</value>
+            </list>
+        </property>
+	</bean>	
+</beans>
