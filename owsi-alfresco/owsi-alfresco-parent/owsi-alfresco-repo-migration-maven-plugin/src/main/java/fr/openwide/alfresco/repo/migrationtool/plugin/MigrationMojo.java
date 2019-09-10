@@ -125,12 +125,16 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	public boolean isEnabled() {
 		String fileName = null;
-		switch (enabled) {
-		case "true" : return true;
-		case "false" : return false;
-		case "once_an_day" :  fileName = "yyyy.MM.dd"; break;
-		case "once_an_hour" : fileName = "yyyy.MM.dd-hh"; break;
-		default: fileName = enabled; break;
+		if ("true".equals(enabled)) {
+			return true;
+		} else if ("false".equals(enabled)) {
+			return false;
+		} else if ("once_an_day".equals(enabled)) {
+			fileName = "yyyy.MM.dd";
+		} else if ("once_an_hour".equals(enabled)) {
+			fileName = "yyyy.MM.dd-hh";
+		} else {
+			fileName = enabled;
 		}
 		File folder = new File("/tmp/owsi.migration/" + project.getGroupId() + "/" + project.getArtifactId() + "/" + project.getVersion());
 		folder.mkdirs();
