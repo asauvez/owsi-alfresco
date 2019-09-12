@@ -73,7 +73,8 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 		
 		resp.setContentType("application/zip");
 		resp.setHeader("Content-Disposition", "attachment; filename=\"contentstoreexport-" 
-				+ new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip\"");
+				+ new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) 
+				+ ".zip\"");
 		
 		OutputStream outputStream = resp.getOutputStream();
 		try {
