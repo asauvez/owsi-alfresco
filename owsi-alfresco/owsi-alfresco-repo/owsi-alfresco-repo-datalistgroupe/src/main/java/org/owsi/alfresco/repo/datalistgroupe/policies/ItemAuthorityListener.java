@@ -4,10 +4,9 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies;
-import org.alfresco.repo.policy.Behaviour;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -29,33 +28,21 @@ public class ItemAuthorityListener implements NodeServicePolicies.OnCreateNodePo
 	@Autowired private PolicyComponent policyComponent;
 	@Autowired private AuthorityService authorityService;
 
-	// Behaviours
-	private Behaviour onCreateNode;
-	private Behaviour beforeDeleteNode;
-	private Behaviour onDeleteAssociation;
-
 	public void init() {
-		// Create behaviours
-		this.onCreateNode = new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT);
-		this.beforeDeleteNode = new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT);
-		this.onDeleteAssociation = new JavaBehaviour(this, "onDeleteAssociation", NotificationFrequency.TRANSACTION_COMMIT);
-		
 		// Bind behaviours to node policies
 		this.policyComponent.bindClassBehaviour(
 				NodeServicePolicies.OnCreateNodePolicy.QNAME,
 				DatalistAuthorityModel.TYPE_DATALISTAUTHORITY_ITEM,
-				this.onCreateNode
-				);
+				new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
 		
 		this.policyComponent.bindClassBehaviour(
 				NodeServicePolicies.BeforeDeleteNodePolicy.QNAME,
 				DatalistAuthorityModel.TYPE_DATALISTAUTHORITY_ITEM,
-				this.beforeDeleteNode
-				);
+				new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT));
 		
 		this.policyComponent.bindAssociationBehaviour(NodeServicePolicies.OnDeleteAssociationPolicy.QNAME,
 				DatalistAuthorityModel.TYPE_DATALISTAUTHORITY_ITEM, DatalistAuthorityModel.ASSOC_DATALISTAUTHORITY,
-				this.onDeleteAssociation);
+				new JavaBehaviour(this, "onDeleteAssociation", NotificationFrequency.TRANSACTION_COMMIT));
 	}
 
 	@Override

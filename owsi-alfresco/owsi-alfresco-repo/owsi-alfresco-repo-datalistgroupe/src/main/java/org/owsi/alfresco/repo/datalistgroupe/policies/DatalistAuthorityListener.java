@@ -7,7 +7,6 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.DataListModel;
 import org.alfresco.repo.node.NodeServicePolicies;
-import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -17,6 +16,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -40,58 +40,54 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 
 	@Value("${datalistegroupe.nom_groupe.pattern}")
 	private  String pattern;
-
-	// Behaviours
-	private Behaviour onCreateNode;
-	private Behaviour beforeDeleteNode;
-	private Behaviour onUpdateProperties;
 	
 	public void init() {
-
-		// Create behaviours
-		this.onCreateNode = new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT);
-		this.beforeDeleteNode = new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT);
-		this.onUpdateProperties = new JavaBehaviour(this, "onUpdateProperties", NotificationFrequency.TRANSACTION_COMMIT);
 		
 		// Bind behaviours to node policies
 		this.policyComponent.bindClassBehaviour(
 				NodeServicePolicies.OnCreateNodePolicy.QNAME,
 				DataListModel.TYPE_DATALIST,
-				this.onCreateNode
-				);
+				new JavaBehaviour(this, "onCreateNode", NotificationFrequency.TRANSACTION_COMMIT));
 		
 		this.policyComponent.bindClassBehaviour(
 				NodeServicePolicies.BeforeDeleteNodePolicy.QNAME,
 				DataListModel.TYPE_DATALIST,
-				this.beforeDeleteNode
-				);
+				new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.FIRST_EVENT));
 		
 		this.policyComponent.bindClassBehaviour(
 				NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME,
 				DataListModel.TYPE_DATALIST,
-				this.onUpdateProperties
-				);
+				new JavaBehaviour(this, "onUpdateProperties", NotificationFrequency.TRANSACTION_COMMIT));
 	}
 	
 	@Override
 	public void onCreateNode(ChildAssociationRef childAssocRef) {
 		
-		final NodeRef finalNodeRef = childAssocRef.getChildRef();
+		final NodeRef groupNodeRef = childAssocRef.getChildRef();
 		AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>() {
 			@Override
 			public Object doWork() throws Exception {
-				if(nodeService.exists(finalNodeRef)) {
-					if(isAuthorityDatalist(finalNodeRef)) {
+				if(nodeService.exists(groupNodeRef)) {
+					if(isAuthorityDatalist(groupNodeRef)) {
 						// create the group
-						String authorityShortName = getGroupName(finalNodeRef);
+						
+						String groupName = (String) nodeService.getProperty(groupNodeRef, ContentModel.PROP_TITLE);
+						SiteInfo siteInfo = siteService.getSite(groupNodeRef);
+						String authorityShortName = MessageFormat.format(pattern, siteInfo.getShortName(), groupName);
+
 						String authorityName = authorityService.getName(AuthorityType.GROUP, authorityShortName);
 						if (authorityService.authorityExists(authorityName)) {
 							throw new IllegalArgumentException(authorityShortName + " existe déjà !");
 						} else {
 							authorityService.createAuthority(AuthorityType.GROUP, authorityShortName);
+							
+							// Les membres de ce site font automatiquement parti du site
+							String siteGroup = siteService.getSiteGroup(siteInfo.getShortName());
+							authorityService.addAuthority(siteGroup, authorityShortName);
+							
 							//Add aspect "dlauthority:group"
-							nodeService.addAspect(finalNodeRef, DatalistAuthorityModel.ASPECT_DATALISTAUTHORITY_GROUP, null);
-							nodeService.setProperty(finalNodeRef, DatalistAuthorityModel.PROP_DATALISTAUTHORITY_GROUP_NAME,
+							nodeService.addAspect(groupNodeRef, DatalistAuthorityModel.ASPECT_DATALISTAUTHORITY_GROUP, null);
+							nodeService.setProperty(groupNodeRef, DatalistAuthorityModel.PROP_DATALISTAUTHORITY_GROUP_NAME,
 									authorityName);
 						}
 					}
@@ -151,9 +147,5 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 	private boolean isAuthorityDatalist(NodeRef nodeRef) {
 		String datalistType = (String) nodeService.getProperty(nodeRef, DataListModel.PROP_DATALIST_ITEM_TYPE);
 		return datalistType != null && datalistType.equals(DatalistAuthorityModel.TYPE_DATALISTAUTHORITY_ITEM.toPrefixString(namespaceService));
-	}
-	
-	private String getGroupName(NodeRef nodeRef) {
-		return MessageFormat.format(pattern, siteService.getSite(nodeRef).getShortName(), (String) nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE));
 	}
 }
