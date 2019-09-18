@@ -129,6 +129,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		Properties properties = new Properties();
 		properties.setProperty("contentstoreexport.version", contentstoreexportVersion);
 		properties.setProperty("alfresco.version", descriptorService.getCurrentRepositoryDescriptor().getVersion());
+		properties.setProperty("export.date", new SimpleDateFormat("yyyy.MM.dd-hh.mm.ss").format(new Date()));
 		Set<NodeRef> rootNodesToExport = getRootNodesToExport(params, properties);
 		// debut du stockage des fichiers dans le zip
 		
