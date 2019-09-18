@@ -83,7 +83,7 @@ public class DatalistAuthorityListener implements NodeServicePolicies.OnCreateNo
 							
 							// Les membres de ce site font automatiquement parti du site
 							String siteGroup = siteService.getSiteGroup(siteInfo.getShortName());
-							authorityService.addAuthority(siteGroup, authorityShortName);
+							authorityService.addAuthority(siteGroup, authorityName);
 							
 							//Add aspect "dlauthority:group"
 							nodeService.addAspect(groupNodeRef, DatalistAuthorityModel.ASPECT_DATALISTAUTHORITY_GROUP, null);
