@@ -104,6 +104,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private ClassificationCache subFolderCache;
 	
 	private boolean addDeleteIfEmptyAspect;
+	private boolean createSubFolderInInnerTransaction;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -467,17 +468,21 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			
 			folderNode.assocs().primaryParent(associationType).nodeReference(conversionService.get(destinationFolder));
 			
-			try {
-				// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
-				return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
-					@Override
-					public NodeRef execute() {
-						return conversionService.getRequired(nodeModelService.create(folderNode));
-					}
-				}, false, true);
-			} catch (DuplicateChildNodeNameException ex) {
-				// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-				return nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
+			if (createSubFolderInInnerTransaction) {
+				try {
+					// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
+					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+						@Override
+						public NodeRef execute() {
+							return conversionService.getRequired(nodeModelService.create(folderNode));
+						}
+					}, false, true);
+				} catch (DuplicateChildNodeNameException ex) {
+					// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
+					return nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
+				}
+			} else {
+				return conversionService.getRequired(nodeModelService.create(folderNode));
 			}
 		});
 	} 
@@ -551,6 +556,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setAddDeleteIfEmptyAspect(boolean addDeleteIfEmptyAspect) {
 		this.addDeleteIfEmptyAspect = addDeleteIfEmptyAspect;
 	}
+	public void setCreateSubFolderInInnerTransaction(boolean createSubFolderInInnerTransaction) {
+		this.createSubFolderInInnerTransaction = createSubFolderInInnerTransaction;
+	}
+	
 
 	public void deletePrevious(NodeRef destinationFolder, String childName) {
 		Optional<NodeRef> child = nodeModelRepositoryService.getChildByName(destinationFolder, childName);
