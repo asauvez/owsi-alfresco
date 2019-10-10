@@ -35,6 +35,7 @@ Nouveautés
 
 ## depuis 0.8.4
  * owsi.classification.createSubFolderInInnerTransaction
+ * owsi.classification.addClassificationDate
 
 ## depuis 0.8.3
 * MigrationMojo se base sur dependencies et plus sur le contenu du .m2.

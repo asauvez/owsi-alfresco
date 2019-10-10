@@ -104,6 +104,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private ClassificationCache subFolderCache;
 	
 	private boolean addDeleteIfEmptyAspect;
+	private boolean addClassificationDate;
 	private boolean createSubFolderInInnerTransaction;
 
 	@Override
@@ -335,8 +336,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 						CmModel.auditable), 
 					() -> { 
 				policy.classify(builder, model, event);
-				
-				nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date()); 
+
+				if (addClassificationDate) {
+					nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date());
+				}
 			});
 			
 		} catch (RuntimeException ex) {
@@ -555,6 +558,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public void setAddDeleteIfEmptyAspect(boolean addDeleteIfEmptyAspect) {
 		this.addDeleteIfEmptyAspect = addDeleteIfEmptyAspect;
+	}
+	public void setAddClassificationDate(boolean addClassificationDate) {
+		this.addClassificationDate = addClassificationDate;
 	}
 	public void setCreateSubFolderInInnerTransaction(boolean createSubFolderInInnerTransaction) {
 		this.createSubFolderInInnerTransaction = createSubFolderInInnerTransaction;
