@@ -32,7 +32,12 @@
 			<artifactId>owsi-alfresco-demo-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+        <dependency>
+            <groupId>fr.openwide.alfresco</groupId>
+            <artifactId>owsi-alfresco-repo-treeaspect</artifactId>
+			<version>${project.version}</version>
+        </dependency>
+
 		<!-- Pour overrider search.get.config.xml -->
 		<dependency>
 			<groupId>org.alfresco</groupId>

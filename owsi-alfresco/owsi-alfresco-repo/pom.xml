@@ -20,6 +20,7 @@
 		<module>owsi-alfresco-repo-contentstoreexport</module>
 		<module>owsi-alfresco-repo-emailed2eml</module>
 		<module>owsi-alfresco-repo-datalistgroupe</module>
+		<module>owsi-alfresco-repo-treeaspect</module>
 	</modules>
 
 </project>

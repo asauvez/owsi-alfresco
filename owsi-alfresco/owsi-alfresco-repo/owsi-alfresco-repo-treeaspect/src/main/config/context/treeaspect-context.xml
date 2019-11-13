@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="owsi.service.treeaspect" class="fr.openwide.alfresco.repo.treeaspect.service.impl.TreeAspectServiceImpl" >
+		<property name="policyComponent" ref="policyComponent" />
+		<property name="nodeService" ref="NodeService"/>
+		<property name="dictionaryService" ref="dictionaryService"/>
+		<property name="properties">
+			<value>classpath:alfresco/web-extension/alfresco-global.properties</value>
+		</property>
+
+	</bean>
+
+	<bean id="owsi.service.registerRootPropertyName" class="fr.openwide.alfresco.repo.treeaspect.service.impl.RegisterRootPropertyNameImpl" >
+		<property name="policyComponent" ref="policyComponent" />
+		<property name="nodeService" ref="NodeService"/>
+	</bean>
+
+</beans>
