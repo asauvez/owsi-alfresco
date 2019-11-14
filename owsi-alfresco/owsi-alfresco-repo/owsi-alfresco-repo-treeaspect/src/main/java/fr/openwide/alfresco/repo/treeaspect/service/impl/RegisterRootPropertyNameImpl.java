@@ -16,6 +16,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Permet de copier une propriété dans une autre, si un aspect précit est présent.
+ *
+ * En appelant registerCopyPropertyName(QName aspectOfRootNode, QName propertyWhereCopy) copy le cm:name dans "propertyWhereCopy", quand
+ * un node a l'aspect "aspectOfRootNode"
+ * En appelant registerCopyPropertyName(QName aspectOfRootNode, QName propertyToCopy, QName propertyWhereCopy) copy la propiété
+ * "propertyToCopy" dans "propertyWhereCopy", quand un node a l'aspect "aspectOfRootNode"
+ *
+ * @author recol
+ */
+
 public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, OnUpdatePropertiesPolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegisterRootPropertyNameImpl.class);

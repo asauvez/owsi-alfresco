@@ -23,6 +23,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Permet de copier toutes les propriétés ainsi que les aspects dans les enfants d'un node.
+ *
+ * En appelant registerAspect(QName aspect) avec le QName de l'aspect, les policies permettant de mettre à jour les métadatas de cet aspect
+ * La fonction registerAspect(QName aspect, boolean breakInheritanceDuringMove), en mettant breakInheritanceDuringMove à false, permettera
+ * de ne pas supprimer les aspects quand on les bouge en dehors d'un dossier avec l'aspect.
+ *
+ * @author recol
+ */
+
 public class TreeAspectServiceImpl implements TreeAspectService, InitializingBean, OnCreateNodePolicy, OnUpdatePropertiesPolicy,
 		OnMoveNodePolicy, OnAddAspectPolicy, OnRemoveAspectPolicy {
 
@@ -33,10 +43,6 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	@Autowired private NodeService nodeService;
 	@Autowired private DictionaryService dictionaryService;
 	@Autowired @Qualifier("policyBehaviourFilter") private BehaviourFilter behaviourFilter;
-
-	@Autowired @Qualifier("global-properties")
-	private Properties properties;
-//	@Autowired private String aspectToRegister = (String) properties.get("aspect.to.copy");
 
 	private Map<QName, Boolean> aspectToCopy = new HashMap<>();
 
@@ -258,10 +264,6 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 
 	public void setDictionaryService(DictionaryService dictionaryService) {
 		this.dictionaryService = dictionaryService;
-	}
-
-	public void setProperties(Properties properties) {
-		this.properties = properties;
 	}
 
 	public void setAspectToCopy(Map<QName, Boolean> aspectToCopy) {
