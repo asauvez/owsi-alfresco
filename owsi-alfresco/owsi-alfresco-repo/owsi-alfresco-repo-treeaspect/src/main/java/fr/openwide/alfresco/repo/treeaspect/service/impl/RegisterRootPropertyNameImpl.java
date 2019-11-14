@@ -25,19 +25,19 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 	@Autowired private NodeService nodeService;
 
 
-	private static class TriptiqueToCopy {
+	private static class PropertiesForCopy {
 		public QName aspectForCopy;
 		public QName propertyToCopy;
 		public QName propertyWhereCopy;
 
-		public TriptiqueToCopy(QName aspectForCopy, QName propertyToCopy, QName propertyWhereCopy) {
+		public PropertiesForCopy(QName aspectForCopy, QName propertyToCopy, QName propertyWhereCopy) {
 			this.aspectForCopy = aspectForCopy;
 			this.propertyToCopy = propertyToCopy;
 			this.propertyWhereCopy = propertyWhereCopy;
 		}
 	}
 
-	private List<TriptiqueToCopy> registerRootPropertyName = new ArrayList<>();
+	private List<PropertiesForCopy> registerRootPropertyName = new ArrayList<>();
 
 	@Override public void registerCopyPropertyName(QName aspectOfRootNode, QName propertyWhereCopy) {
 		registerCopyPropertyName(aspectOfRootNode, ContentModel.PROP_NAME, propertyWhereCopy);
@@ -47,8 +47,8 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 		policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
 				aspectOfRootNode,
 				new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
-		TriptiqueToCopy triptiqueToCopy = new TriptiqueToCopy(aspectOfRootNode, propertyToCopy, propertyWhereCopy);
-		registerRootPropertyName.add(triptiqueToCopy);
+		PropertiesForCopy propertiesForCopy = new PropertiesForCopy(aspectOfRootNode, propertyToCopy, propertyWhereCopy);
+		registerRootPropertyName.add(propertiesForCopy);
 	}
 
 
@@ -57,9 +57,9 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 		if (! nodeService.exists(nodeRef)) return;
 		if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
 
-		for (TriptiqueToCopy triptique : registerRootPropertyName) {
-			if (nodeService.hasAspect(nodeRef, triptique.aspectForCopy)) {
-				nodeService.setProperty(nodeRef, triptique.propertyWhereCopy, nodeService.getProperty(nodeRef, triptique.propertyToCopy));
+		for (PropertiesForCopy properties : registerRootPropertyName) {
+			if (nodeService.hasAspect(nodeRef, properties.aspectForCopy)) {
+				nodeService.setProperty(nodeRef, properties.propertyWhereCopy, nodeService.getProperty(nodeRef, properties.propertyToCopy));
 			}
 		}
 		LOGGER.debug("End onUpdateProperties");

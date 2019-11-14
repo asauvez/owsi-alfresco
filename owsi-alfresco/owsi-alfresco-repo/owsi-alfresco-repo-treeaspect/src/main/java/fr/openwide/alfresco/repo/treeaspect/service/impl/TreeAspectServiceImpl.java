@@ -2,14 +2,12 @@ package fr.openwide.alfresco.repo.treeaspect.service.impl;
 
 import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
-import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
-import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.*;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -34,6 +32,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	@Autowired private PolicyComponent policyComponent;
 	@Autowired private NodeService nodeService;
 	@Autowired private DictionaryService dictionaryService;
+	@Autowired @Qualifier("policyBehaviourFilter") private BehaviourFilter behaviourFilter;
 
 	@Autowired @Qualifier("global-properties")
 	private Properties properties;
@@ -77,21 +76,29 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 
 		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
 
-		for (ChildAssociationRef child : children) {
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+			for (ChildAssociationRef child : children) {
 
-			if (nodeService.getType(child.getChildRef()).equals(ContentModel.TYPE_THUMBNAIL)) continue;
+				NodeRef childRef = child.getChildRef();
+				if (nodeService.getType(childRef).equals(ContentModel.TYPE_THUMBNAIL)) continue;
 
-			Map<QName, Serializable> properties = new HashMap<>();
+				Map<QName, Serializable> properties = new HashMap<>();
 
 
-			Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(newAspect).getProperties();
-			for (QName property : aspectProperty.keySet()) {
-				properties.put(property, nodeService.getProperty(nodeRef, property));
+				Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(newAspect).getProperties();
+				for (QName property : aspectProperty.keySet()) {
+					properties.put(property, nodeService.getProperty(nodeRef, property));
+				}
+				try {
+					behaviourFilter.disableBehaviour(childRef);
+					nodeService.addAspect(childRef, newAspect, properties);
+				} finally {
+					behaviourFilter.enableBehaviour(childRef);
+				}
 			}
-			nodeService.addAspect(child.getChildRef(), newAspect, properties);
-		}
+			return null;
+		}, AuthenticationUtil.getSystemUserName());
 
-//		copyToChild(nodeRef, nodeService.getProperties(nodeRef));
 		LOGGER.debug("End onAddAspect");
 	}
 	
@@ -103,7 +110,10 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 
 		NodeRef parentRef = childAssocRef.getParentRef();
 		NodeRef childRef = childAssocRef.getChildRef();
-		copyParentAspectToChild(parentRef, childRef);
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+			copyParentAspectToChild(parentRef, childRef);
+			return null;
+		}, AuthenticationUtil.getSystemUserName());
 
 		LOGGER.debug("End onCreateNode");
 	}
@@ -114,22 +124,39 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		if (!nodeService.exists(childRef)) return;
 		if (nodeService.getType(childRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
 
-		for (QName aspect : aspectToCopy.keySet()) {
-			if (nodeService.hasAspect(parentRef, aspect)) {
-				Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(aspect).getProperties();
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
 
-				for (QName property : aspectProperty.keySet()) {
-					nodeService.setProperty(childRef, property, nodeService.getProperty(parentRef, property));
+			for (QName aspect : aspectToCopy.keySet()) {
+				copyAspectToNode(parentRef, childRef, aspect);
+			}
+			List<ChildAssociationRef> children = nodeService.getChildAssocs(childRef);
+			if (children.size() > 0 ) {
+				for (ChildAssociationRef child : children) {
+					copyParentAspectToChild(childRef, child.getChildRef());
 				}
 			}
-		}
-		List<ChildAssociationRef> children = nodeService.getChildAssocs(childRef);
-		if (children.size() > 0 ) {
-			for (ChildAssociationRef child : children) {
-				copyParentAspectToChild(childRef, child.getChildRef());
+			return null;
+		}, AuthenticationUtil.getSystemUserName());
+
+		LOGGER.debug("End copyParentAspectToChild");
+	}
+
+	private void copyAspectToNode(NodeRef parentRef, NodeRef childRef, QName aspect) {
+		if (nodeService.hasAspect(parentRef, aspect)) {
+
+			Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(aspect).getProperties();
+
+			Map<QName, Serializable> aspectProperties = new HashMap<>();
+			for (QName property : aspectProperty.keySet()) {
+				aspectProperties.put(property, nodeService.getProperty(parentRef, property));
+			}
+			try {
+				behaviourFilter.disableBehaviour(childRef);
+				nodeService.addAspect(childRef, aspect, aspectProperties);
+			} finally {
+				behaviourFilter.enableBehaviour(childRef);
 			}
 		}
-		LOGGER.debug("End copyParentAspectToChild");
 	}
 
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
@@ -138,20 +165,32 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		if (! nodeService.exists(nodeRef)) return;
 		if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
 
-		for (QName aspect : aspectToCopy.keySet()) {
-			Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
 
-			for (QName property : aspectProperties.keySet()) {
-				Serializable beforeProperty = before.get(property);
-				Serializable afterProperty = after.get(property);
-				if (beforeProperty != null && !beforeProperty.equals(afterProperty)) {
-					for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null)) {
-						nodeService.setProperty(child.getChildRef(), property, afterProperty);
+			for (QName aspect : aspectToCopy.keySet()) {
+				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
+
+				for (QName property : aspectProperties.keySet()) {
+					Serializable beforeProperty = before.get(property);
+					Serializable afterProperty = after.get(property);
+					if (!Objects.equals(beforeProperty, afterProperty)) {
+
+						for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null)) {
+							NodeRef childRef = child.getChildRef();
+
+							try {
+								behaviourFilter.disableBehaviour(childRef);
+								nodeService.setProperty(childRef, property, afterProperty);
+							} finally {
+								behaviourFilter.enableBehaviour(childRef);
+							}
+						}
 					}
 				}
 			}
-		}
-		
+			return null;
+		}, AuthenticationUtil.getSystemUserName());
+
 		LOGGER.debug("End onUpdateProperties");
 	}
 
@@ -164,31 +203,26 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		if (!nodeService.exists(newChild)) return;
 		if (nodeService.getType(newChild).equals(ContentModel.TYPE_THUMBNAIL)) return;
 
-		for (QName aspect : aspectToCopy.keySet()) {
-			if (nodeService.hasAspect(newChild, aspect) && !nodeService.hasAspect(newParent, aspect)) {
-				// Si le parent n'a pas l'aspect, c'est que le node en question est le node root
-				if (!nodeService.hasAspect(oldChildAssocRef.getParentRef(), aspect)) {
-					LOGGER.debug("End onMoveNode nothing to do because is root aspect");
-					return;
-				}
 
-				if (aspectToCopy.get(aspect)) {
-					nodeService.removeAspect(newChild, aspect);
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+			for (QName aspect : aspectToCopy.keySet()) {
+				if (nodeService.hasAspect(newChild, aspect) && !nodeService.hasAspect(newParent, aspect)) {
+					// Si le parent n'a pas l'aspect, c'est que le node en question est le node root
+					if (!nodeService.hasAspect(oldChildAssocRef.getParentRef(), aspect)) {
+						LOGGER.debug("End onMoveNode nothing to do because is root aspect");
+						return null;
+					}
+
+					behaviourFilter.disableBehaviour(newChild);
+					if (aspectToCopy.get(aspect)) {
+						nodeService.removeAspect(newChild, aspect);
+					}
+					behaviourFilter.enableBehaviour(newChild);
 				}
+				copyAspectToNode(newParent, newChild, aspect);
 			}
-			if (nodeService.hasAspect(newParent, aspect)) {
-				if (nodeService.hasAspect(newChild, aspect)) {
-					nodeService.removeAspect(newChild, aspect);
-				}
-
-				Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(aspect).getProperties();
-
-				for (QName property : aspectProperty.keySet()) {
-					nodeService.setProperty(newChild, property, nodeService.getProperty(newParent, property));
-				}
-			}
-			Map<QName, Serializable> toto = nodeService.getProperties(newChild);
-		}
+			return null;
+		}, AuthenticationUtil.getSystemUserName());
 
 		LOGGER.debug("End onMoveNode");
 	}
@@ -197,10 +231,20 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		LOGGER.debug("Start onRemoveAspect");
 		if (! nodeService.exists(nodeRef)) return;
 
-		for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef)) {
-			nodeService.removeAspect(child.getChildRef(), aspectTypeQName);
-		}
-		
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+			HashMap<QName, Serializable> versionableProperties = new HashMap<>();
+			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef)) {
+				NodeRef childRef = child.getChildRef();
+				try {
+					behaviourFilter.disableBehaviour(childRef);
+					nodeService.removeAspect(childRef, aspectTypeQName);
+				} finally {
+					behaviourFilter.enableBehaviour(childRef);
+				}
+			}
+			return null;
+		}, AuthenticationUtil.getSystemUserName());
+
 		LOGGER.debug("Start onRemoveAspect");
 	}
 
