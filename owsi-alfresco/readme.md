@@ -38,6 +38,7 @@ Nouveautés
  * owsi.classification.addClassificationDate
  * /alfresco/s/owsi/request-debug pour connaitre les headers.
  * Treeaspect : module de copie d'aspect avec les métadata aux enfants
+ * owis-alfresco-test : Pour faire des tests d'appel distant.
 
 ## depuis 0.8.3
 * MigrationMojo se base sur dependencies et plus sur le contenu du .m2.
