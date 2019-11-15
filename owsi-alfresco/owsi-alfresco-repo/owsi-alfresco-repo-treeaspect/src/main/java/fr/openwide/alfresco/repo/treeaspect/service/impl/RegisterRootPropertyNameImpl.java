@@ -27,14 +27,13 @@ import java.util.*;
  * @author recol
  */
 
-public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, OnUpdatePropertiesPolicy {
+public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, OnUpdatePropertiesPolicy, OnAddAspectPolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegisterRootPropertyNameImpl.class);
 
 
 	@Autowired private PolicyComponent policyComponent;
 	@Autowired private NodeService nodeService;
-
 
 	private static class PropertiesForCopy {
 		public QName aspectForCopy;
@@ -58,13 +57,26 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 		policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
 				aspectOfRootNode,
 				new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+
+		policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME,
+				aspectOfRootNode,
+				new JavaBehaviour(this, OnAddAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+
 		PropertiesForCopy propertiesForCopy = new PropertiesForCopy(aspectOfRootNode, propertyToCopy, propertyWhereCopy);
 		registerRootPropertyName.add(propertiesForCopy);
 	}
 
 
+	@Override public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
+		copyProperties("onAddAspect", nodeRef);
+	}
+
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
-		LOGGER.debug("Start onUpdateProperties");
+		copyProperties("onUpdateProperties" , nodeRef);
+	}
+
+	private void copyProperties(String methodeName, NodeRef nodeRef) {
+		LOGGER.debug("Start " + methodeName +"() : " + nodeRef);
 		if (! nodeService.exists(nodeRef)) return;
 		if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
 
@@ -73,6 +85,6 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 				nodeService.setProperty(nodeRef, properties.propertyWhereCopy, nodeService.getProperty(nodeRef, properties.propertyToCopy));
 			}
 		}
-		LOGGER.debug("End onUpdateProperties");
+		LOGGER.debug("End " + methodeName +"()");
 	}
 }

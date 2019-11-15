@@ -1,10 +1,7 @@
 package fr.openwide.alfresco.repo.treeaspect.service.impl;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
@@ -52,14 +49,14 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	@Autowired private DictionaryService dictionaryService;
 	@Autowired @Qualifier("policyBehaviourFilter") private BehaviourFilter behaviourFilter;
 
-	private Map<QName, Boolean> aspectToCopy = new HashMap<>();
+	private Set<QName> aspectToCopy = new HashSet<>();
 
 	@Override public void registerAspect(QName aspect) {
 		registerAspect(aspect, true);
 	}
 
 	@Override public void registerAspect(QName aspect, boolean breakInheritanceDuringMove) {
-		aspectToCopy.put(aspect, breakInheritanceDuringMove);
+		aspectToCopy.add(aspect);
 
 		policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME,
 				aspect,
@@ -94,7 +91,9 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 				for (QName property : aspectProperties.keySet()) {
 					properties.put(property, nodeService.getProperty(nodeRef, property));
 				}
-				nodeService.addAspect(child.getChildRef(), newAspect, properties);
+				NodeRef childRef = child.getChildRef();
+				nodeService.addAspect(childRef, newAspect, properties);
+				onAddAspect(childRef, newAspect);
 			}
 		});
 	}
@@ -106,58 +105,57 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		if (! nodeService.exists(childAssocRef.getParentRef())) return;
 		
 		runAsSystem("onCreateNode", childRef, () -> {
-			copyParentAspectToChild(parentRef, childRef);
+			for (QName aspect : aspectToCopy) {
+				copyAspectToNode(parentRef, childRef, aspect);
+			}
 		});
 	}
 
-	private void copyParentAspectToChild(NodeRef parentRef, NodeRef childRef) {
-		for (QName aspect : aspectToCopy.keySet()) {
-			copyAspectToNode(parentRef, childRef, aspect);
-		}
-		List<ChildAssociationRef> children = nodeService.getChildAssocs(childRef, ContentModel.ASSOC_CONTAINS, null);
-		if (children.size() > 0 ) {
-			for (ChildAssociationRef child : children) {
-				
-				// TODO besoin recurisif ???
-				
-				copyParentAspectToChild(childRef, child.getChildRef());
-			}
-		}
-	}
-
 	private void copyAspectToNode(NodeRef parentRef, NodeRef childRef, QName aspect) {
-		if (nodeService.hasAspect(parentRef, aspect)) {
-			Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
+		runAsSystem("copyAspectToNode", childRef, () -> {
+			if (nodeService.hasAspect(parentRef, aspect)) {
+				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
 
-			Map<QName, Serializable> newProperties = new HashMap<>();
-			for (QName property : aspectProperties.keySet()) {
-				Serializable value = nodeService.getProperty(parentRef, property);
-				newProperties.put(property, value);
+				Map<QName, Serializable> newProperties = new HashMap<>();
+				for (QName property : aspectProperties.keySet()) {
+					Serializable value = nodeService.getProperty(parentRef, property);
+					newProperties.put(property, value);
+				}
+				nodeService.addAspect(childRef, aspect, newProperties);
+				for (ChildAssociationRef childAssociationRef : nodeService.getChildAssocs(childRef)) {
+					copyAspectToNode(childRef, childAssociationRef.getChildRef(), aspect);
+				}
 			}
-			nodeService.addAspect(childRef, aspect, newProperties);
-		}
+		});
 	}
 
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		runAsSystem("onUpdateProperties", nodeRef, () -> {
 			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null);
 			
-			for (QName aspect : aspectToCopy.keySet()) {
+			for (QName aspect : aspectToCopy) {
 				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
 
 				for (QName property : aspectProperties.keySet()) {
 					Serializable beforeProperty = before.get(property);
 					Serializable afterProperty = after.get(property);
 					if (!Objects.equals(beforeProperty, afterProperty)) {
-
-						for (ChildAssociationRef child : childAssocs) {
-							NodeRef childRef = child.getChildRef();
-							nodeService.setProperty(childRef, property, afterProperty);
-						}
+						updateChildProperties(childAssocs, property, afterProperty);
 					}
 				}
 			}
 		});
+	}
+
+	private void updateChildProperties(List<ChildAssociationRef> childAssocs, QName property, Serializable afterProperty) {
+		for (ChildAssociationRef child : childAssocs) {
+			NodeRef childRef = child.getChildRef();
+
+			runAsSystem("onRemoveAspect", childRef, () -> {
+				nodeService.setProperty(childRef, property, afterProperty);
+				updateChildProperties(nodeService.getChildAssocs(childRef), property, afterProperty);
+			});
+		}
 	}
 
 	@Override public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
@@ -167,16 +165,12 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		if (!nodeService.exists(newParent)) return;
 
 		runAsSystem("onMoveNode", newChild, () -> {
-			for (QName aspect : aspectToCopy.keySet()) {
+			for (QName aspect : aspectToCopy) {
 				if (nodeService.hasAspect(newChild, aspect) && !nodeService.hasAspect(newParent, aspect)) {
 					// Si le parent n'a pas l'aspect, c'est que le node en question est le node root
 					if (!nodeService.hasAspect(oldChildAssocRef.getParentRef(), aspect)) {
 						LOGGER.debug("End onMoveNode nothing to do because is root aspect");
 						continue;
-					}
-
-					if (aspectToCopy.get(aspect)) {
-						nodeService.removeAspect(newChild, aspect);
 					}
 				}
 				copyAspectToNode(newParent, newChild, aspect);
@@ -187,7 +181,9 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	@Override public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName) {
 		runAsSystem("onRemoveAspect", nodeRef, () -> {
 			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null)) {
-				nodeService.removeAspect(child.getChildRef(), aspectTypeQName);
+				NodeRef childRef = child.getChildRef();
+				nodeService.removeAspect(childRef, aspectTypeQName);
+				onRemoveAspect(childRef, aspectTypeQName);
 			}
 		});
 	}

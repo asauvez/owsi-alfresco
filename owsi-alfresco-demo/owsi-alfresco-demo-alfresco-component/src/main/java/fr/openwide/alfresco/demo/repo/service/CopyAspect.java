@@ -24,7 +24,7 @@ public class CopyAspect implements InitializingBean {
 
 	@Override public void afterPropertiesSet() throws Exception {
 		treeAspectService.registerAspect(conversionService.getRequired(DemoModel.demoAspect.getNameReference()), false);
-		registerRootPropertyName.registerCopyPropertyName(ContentModel.ASPECT_DUBLINCORE, QName.createQName("http://openwide.fr/modele/demo", "demoPropertyName"));
+		registerRootPropertyName.registerCopyPropertyCmName(ContentModel.ASPECT_DUBLINCORE, QName.createQName("http://openwide.fr/modele/demo", "demoPropertyName"));
 	}
 
 
