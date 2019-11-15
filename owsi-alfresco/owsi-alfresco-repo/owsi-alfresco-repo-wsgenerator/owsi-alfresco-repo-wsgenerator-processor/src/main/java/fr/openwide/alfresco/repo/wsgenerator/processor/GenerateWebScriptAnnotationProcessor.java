@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptLifecycle;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
 import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
@@ -157,6 +158,10 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 
 				xml.writeStartElement("family"); xml.writeCharacters(family); xml.writeEndElement();
 
+				if (generateWebScript.lifecycle() != GenerateWebScriptLifecycle.DEFAULT) {
+					xml.writeStartElement("lifecycle"); xml.writeCharacters(generateWebScript.lifecycle().name().toLowerCase()); xml.writeEndElement();
+				}
+				
 				xml.writeEndElement(); // webscript
 				
 				xml.writeEndDocument();
