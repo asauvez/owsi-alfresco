@@ -42,7 +42,10 @@ public @interface GenerateWebScript {
 
 	enum GenerateWebScriptTransactionAllow { READONLY, READWRITE }
 	GenerateWebScriptTransactionAllow transactionAllow() default GenerateWebScriptTransactionAllow.READWRITE;
-	
+
+	enum GenerateWebScriptLifecycle { DEFAULT, NONE, SAMPLE, DRAFT, PUBLIC_API, DRAFT_PUBLIC_API, DEPRECATED, INTERNAL }
+	GenerateWebScriptLifecycle lifecycle() default GenerateWebScriptLifecycle.DEFAULT;
+
 	String beanParent() default "webscript";
 	
 	/** Mettre à true s'il le WS implémente DeclarativeWebScript */

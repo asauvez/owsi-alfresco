@@ -25,5 +25,8 @@
 			</list>
 		</property>
 	</bean>
-	
+
+	<bean id="demo.service.copyAspect" class="fr.openwide.alfresco.demo.repo.service.CopyAspect" depends-on="demo.dictionaryBootstrap" >
+	</bean>
+
 </beans>

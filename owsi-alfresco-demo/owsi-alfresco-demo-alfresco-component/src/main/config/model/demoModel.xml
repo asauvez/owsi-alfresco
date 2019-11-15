@@ -16,6 +16,9 @@
 				<property name="demo:demoProperty">
 					<type>d:text</type>
 				</property>
+				<property name="demo:demoPropertyName">
+					<type>d:text</type>
+				</property>
 			</properties>
 		</aspect>
 	</aspects>

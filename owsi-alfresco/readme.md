@@ -36,6 +36,8 @@ Nouveautés
 ## depuis 0.8.4
  * owsi.classification.createSubFolderInInnerTransaction
  * owsi.classification.addClassificationDate
+ * /alfresco/s/owsi/request-debug pour connaitre les headers.
+ * Treeaspect : module de copie d'aspect avec les métadata aux enfants
 
 ## depuis 0.8.3
 * MigrationMojo se base sur dependencies et plus sur le contenu du .m2.
