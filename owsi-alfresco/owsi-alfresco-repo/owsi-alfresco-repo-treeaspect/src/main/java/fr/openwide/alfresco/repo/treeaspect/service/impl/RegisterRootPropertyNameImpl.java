@@ -50,11 +50,11 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 
 	private List<PropertiesForCopy> registerRootPropertyName = new ArrayList<>();
 
-	@Override public void registerCopyPropertyName(QName aspectOfRootNode, QName propertyWhereCopy) {
-		registerCopyPropertyName(aspectOfRootNode, ContentModel.PROP_NAME, propertyWhereCopy);
+	@Override public void registerCopyPropertyCmName(QName aspectOfRootNode, QName propertyWhereCopy) {
+		registerCopyProperty(aspectOfRootNode, ContentModel.PROP_NAME, propertyWhereCopy);
 	}
 
-	@Override public void registerCopyPropertyName(QName aspectOfRootNode, QName propertyToCopy, QName propertyWhereCopy) {
+	@Override public void registerCopyProperty(QName aspectOfRootNode, QName propertyToCopy, QName propertyWhereCopy) {
 		policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
 				aspectOfRootNode,
 				new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
@@ -75,13 +75,4 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 		}
 		LOGGER.debug("End onUpdateProperties");
 	}
-
-	public void setPolicyComponent(PolicyComponent policyComponent) {
-		this.policyComponent = policyComponent;
-	}
-
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
-	}
-
 }

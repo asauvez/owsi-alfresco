@@ -1,8 +1,17 @@
 package fr.openwide.alfresco.repo.treeaspect.service.impl;
 
-import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.node.NodeServicePolicies.*;
+import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
@@ -20,8 +29,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.Serializable;
-import java.util.*;
+import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 
 /**
  * Permet de copier toutes les propriétés ainsi que les aspects dans les enfants d'un node.
@@ -76,103 +84,64 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	
 	@Override
 	public void onAddAspect(final NodeRef nodeRef, QName newAspect) {
-		LOGGER.debug("Start onAddAspect");
-		if (! nodeService.exists(nodeRef)) return;
-		if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
+		runAsSystem("onAddAspect", nodeRef, () -> {
+			List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null);
 
-		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
-
-		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
 			for (ChildAssociationRef child : children) {
-
-				NodeRef childRef = child.getChildRef();
-				if (nodeService.getType(childRef).equals(ContentModel.TYPE_THUMBNAIL)) continue;
-
 				Map<QName, Serializable> properties = new HashMap<>();
-
-
-				Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(newAspect).getProperties();
-				for (QName property : aspectProperty.keySet()) {
+				
+				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(newAspect).getProperties();
+				for (QName property : aspectProperties.keySet()) {
 					properties.put(property, nodeService.getProperty(nodeRef, property));
 				}
-				try {
-					behaviourFilter.disableBehaviour(childRef);
-					nodeService.addAspect(childRef, newAspect, properties);
-				} finally {
-					behaviourFilter.enableBehaviour(childRef);
-				}
+				nodeService.addAspect(child.getChildRef(), newAspect, properties);
 			}
-			return null;
-		}, AuthenticationUtil.getSystemUserName());
-
-		LOGGER.debug("End onAddAspect");
+		});
 	}
 	
 	@Override public void onCreateNode(ChildAssociationRef childAssocRef) {
-		LOGGER.debug("Start onCreateNode");
-		if (! nodeService.exists(childAssocRef.getChildRef()) && ! nodeService.exists(childAssocRef.getParentRef())) return;
-		// TODO : ne rien faire si type = cm:thumbnail
-
-
 		NodeRef parentRef = childAssocRef.getParentRef();
 		NodeRef childRef = childAssocRef.getChildRef();
-		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+		
+		if (! nodeService.exists(childAssocRef.getParentRef())) return;
+		
+		runAsSystem("onCreateNode", childRef, () -> {
 			copyParentAspectToChild(parentRef, childRef);
-			return null;
-		}, AuthenticationUtil.getSystemUserName());
-
-		LOGGER.debug("End onCreateNode");
+		});
 	}
 
 	private void copyParentAspectToChild(NodeRef parentRef, NodeRef childRef) {
-		LOGGER.debug("Start copyParentAspectToChild");
-
-		if (!nodeService.exists(childRef)) return;
-		if (nodeService.getType(childRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
-
-		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
-
-			for (QName aspect : aspectToCopy.keySet()) {
-				copyAspectToNode(parentRef, childRef, aspect);
-			}
-			List<ChildAssociationRef> children = nodeService.getChildAssocs(childRef);
-			if (children.size() > 0 ) {
-				for (ChildAssociationRef child : children) {
-					copyParentAspectToChild(childRef, child.getChildRef());
-				}
-			}
-			return null;
-		}, AuthenticationUtil.getSystemUserName());
-
-		LOGGER.debug("End copyParentAspectToChild");
-	}
-
-	private void copyAspectToNode(NodeRef parentRef, NodeRef childRef, QName aspect) {
-		if (nodeService.hasAspect(parentRef, aspect)) {
-
-			Map<QName, PropertyDefinition> aspectProperty = dictionaryService.getAspect(aspect).getProperties();
-
-			Map<QName, Serializable> aspectProperties = new HashMap<>();
-			for (QName property : aspectProperty.keySet()) {
-				aspectProperties.put(property, nodeService.getProperty(parentRef, property));
-			}
-			try {
-				behaviourFilter.disableBehaviour(childRef);
-				nodeService.addAspect(childRef, aspect, aspectProperties);
-			} finally {
-				behaviourFilter.enableBehaviour(childRef);
+		for (QName aspect : aspectToCopy.keySet()) {
+			copyAspectToNode(parentRef, childRef, aspect);
+		}
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(childRef, ContentModel.ASSOC_CONTAINS, null);
+		if (children.size() > 0 ) {
+			for (ChildAssociationRef child : children) {
+				
+				// TODO besoin recurisif ???
+				
+				copyParentAspectToChild(childRef, child.getChildRef());
 			}
 		}
 	}
 
+	private void copyAspectToNode(NodeRef parentRef, NodeRef childRef, QName aspect) {
+		if (nodeService.hasAspect(parentRef, aspect)) {
+			Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
+
+			Map<QName, Serializable> newProperties = new HashMap<>();
+			for (QName property : aspectProperties.keySet()) {
+				Serializable value = nodeService.getProperty(parentRef, property);
+				newProperties.put(property, value);
+			}
+			nodeService.addAspect(childRef, aspect, newProperties);
+		}
+	}
+
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
-		// TODO ignore version + auditable policy
-		LOGGER.debug("Start onUpdateProperties");
-		if (! nodeService.exists(nodeRef)) return;
-		if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_THUMBNAIL)) return;
-
-		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
-
+		runAsSystem("onUpdateProperties", nodeRef, () -> {
+			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null);
+			
 			for (QName aspect : aspectToCopy.keySet()) {
 				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
 
@@ -181,92 +150,63 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 					Serializable afterProperty = after.get(property);
 					if (!Objects.equals(beforeProperty, afterProperty)) {
 
-						for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null)) {
+						for (ChildAssociationRef child : childAssocs) {
 							NodeRef childRef = child.getChildRef();
-
-							try {
-								behaviourFilter.disableBehaviour(childRef);
-								nodeService.setProperty(childRef, property, afterProperty);
-							} finally {
-								behaviourFilter.enableBehaviour(childRef);
-							}
+							nodeService.setProperty(childRef, property, afterProperty);
 						}
 					}
 				}
 			}
-			return null;
-		}, AuthenticationUtil.getSystemUserName());
-
-		LOGGER.debug("End onUpdateProperties");
+		});
 	}
 
 	@Override public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef) {
-		LOGGER.debug("Start onMoveNode");
-
 		NodeRef newChild = newChildAssocRef.getChildRef();
 		NodeRef newParent = newChildAssocRef.getParentRef();
 
-		if (!nodeService.exists(newChild)) return;
-		if (nodeService.getType(newChild).equals(ContentModel.TYPE_THUMBNAIL)) return;
+		if (!nodeService.exists(newParent)) return;
 
-
-		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+		runAsSystem("onMoveNode", newChild, () -> {
 			for (QName aspect : aspectToCopy.keySet()) {
 				if (nodeService.hasAspect(newChild, aspect) && !nodeService.hasAspect(newParent, aspect)) {
 					// Si le parent n'a pas l'aspect, c'est que le node en question est le node root
 					if (!nodeService.hasAspect(oldChildAssocRef.getParentRef(), aspect)) {
 						LOGGER.debug("End onMoveNode nothing to do because is root aspect");
-						return null;
+						continue;
 					}
 
-					behaviourFilter.disableBehaviour(newChild);
 					if (aspectToCopy.get(aspect)) {
 						nodeService.removeAspect(newChild, aspect);
 					}
-					behaviourFilter.enableBehaviour(newChild);
 				}
 				copyAspectToNode(newParent, newChild, aspect);
 			}
-			return null;
-		}, AuthenticationUtil.getSystemUserName());
-
-		LOGGER.debug("End onMoveNode");
+		});
 	}
 
 	@Override public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName) {
-		LOGGER.debug("Start onRemoveAspect");
-		if (! nodeService.exists(nodeRef)) return;
-
-		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
-			HashMap<QName, Serializable> versionableProperties = new HashMap<>();
-			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef)) {
-				NodeRef childRef = child.getChildRef();
-				try {
-					behaviourFilter.disableBehaviour(childRef);
-					nodeService.removeAspect(childRef, aspectTypeQName);
-				} finally {
-					behaviourFilter.enableBehaviour(childRef);
-				}
+		runAsSystem("onRemoveAspect", nodeRef, () -> {
+			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null)) {
+				nodeService.removeAspect(child.getChildRef(), aspectTypeQName);
 			}
-			return null;
+		});
+	}
+	
+	private void runAsSystem(String methodName, NodeRef nodeRef, Runnable runnable) {
+		AuthenticationUtil.runAs((AuthenticationUtil.RunAsWork<Void>) () -> {
+			if (! nodeService.exists(nodeRef)) return null;
+			
+			behaviourFilter.disableBehaviour(nodeRef);
+			try {
+				LOGGER.debug("Start " + methodName + "() : " + nodeRef);
+				
+				runnable.run();
+				
+				return null;
+			} finally {
+				behaviourFilter.enableBehaviour(nodeRef);
+				LOGGER.debug("End " + methodName + "()");
+			}
 		}, AuthenticationUtil.getSystemUserName());
-
-		LOGGER.debug("Start onRemoveAspect");
-	}
-
-	public void setPolicyComponent(PolicyComponent policyComponent) {
-		this.policyComponent = policyComponent;
-	}
-
-	public void setNodeService(NodeService nodeService) {
-		this.nodeService = nodeService;
-	}
-
-	public void setDictionaryService(DictionaryService dictionaryService) {
-		this.dictionaryService = dictionaryService;
-	}
-
-	public void setAspectToCopy(Map<QName, Boolean> aspectToCopy) {
-		this.aspectToCopy = aspectToCopy;
 	}
 }
