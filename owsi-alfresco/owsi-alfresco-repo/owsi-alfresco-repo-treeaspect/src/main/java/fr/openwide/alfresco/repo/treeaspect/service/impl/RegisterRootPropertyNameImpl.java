@@ -6,6 +6,7 @@ import org.alfresco.repo.node.NodeServicePolicies.*;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -27,7 +28,7 @@ import java.util.*;
  * @author recol
  */
 
-public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, OnUpdatePropertiesPolicy, OnAddAspectPolicy {
+public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, OnUpdatePropertiesPolicy, OnAddAspectPolicy, OnCreateNodePolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegisterRootPropertyNameImpl.class);
 
@@ -66,6 +67,10 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 		registerRootPropertyName.add(propertiesForCopy);
 	}
 
+
+	@Override public void onCreateNode(ChildAssociationRef childAssocRef) {
+		copyProperties("onCreateNode", childAssocRef.getChildRef());
+	}
 
 	@Override public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName) {
 		copyProperties("onAddAspect", nodeRef);
