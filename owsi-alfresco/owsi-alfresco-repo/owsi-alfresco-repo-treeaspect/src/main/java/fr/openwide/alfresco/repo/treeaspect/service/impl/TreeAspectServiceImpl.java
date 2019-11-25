@@ -113,13 +113,15 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 
 	private void copyAspectToNode(NodeRef parentRef, NodeRef childRef, QName aspect) {
 		runAsSystem("copyAspectToNode", childRef, () -> {
+			Map<QName, Serializable> nodeProperties = nodeService.getProperties(parentRef);
 			if (nodeService.hasAspect(parentRef, aspect)) {
 				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
 
 				Map<QName, Serializable> newProperties = new HashMap<>();
 				for (QName property : aspectProperties.keySet()) {
-					Serializable value = nodeService.getProperty(parentRef, property);
-					newProperties.put(property, value);
+					if (nodeProperties.containsKey(property)) {
+						newProperties.put(property, nodeProperties.get(property));
+					}
 				}
 				nodeService.addAspect(childRef, aspect, newProperties);
 				for (ChildAssociationRef childAssociationRef : nodeService.getChildAssocs(childRef)) {
