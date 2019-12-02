@@ -23,6 +23,7 @@
 		<module>owsi-alfresco-repo</module>
 		<module>owsi-alfresco-component</module>
 		<module>owsi-alfresco-share</module>
+		<module>owsi-alfresco-adf</module>
 		<module>owsi-alfresco-test</module>
   </modules>
 
