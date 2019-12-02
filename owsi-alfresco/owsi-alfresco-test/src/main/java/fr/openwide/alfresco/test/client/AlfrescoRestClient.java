@@ -65,11 +65,11 @@ public class AlfrescoRestClient {
 	}
 	
 	public String getTechnicalUser() {
-		return properties.getProperty("test.login");
+		return properties.getProperty("test.login", "admin");
 	}
 	
 	public String getBaseUrl() {
-		return properties.getProperty("test.host");
+		return properties.getProperty("test.host", "http://localhost:8080/alfresco");
 	}
 
 	public ObjectMapper getMapper() {
@@ -78,7 +78,7 @@ public class AlfrescoRestClient {
 	
 	private CloseableHttpResponse executeRequest(HttpUriRequest request) {
 		String login = getTechnicalUser();
-		String password = properties.getProperty("test.password");
+		String password = properties.getProperty("test.password", "admin");
 		
 		request.setHeader("Content-type", "application/json");
 		request.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((login + ":" + password).getBytes()));
@@ -86,7 +86,7 @@ public class AlfrescoRestClient {
 		try {
 			CloseableHttpResponse response = client.execute(request);
 			
-			long waitSeconds = Long.parseLong(properties.getProperty("test.wait.seconds"));
+			long waitSeconds = Long.parseLong(properties.getProperty("test.wait.seconds", "0"));
 			if (waitSeconds > 0L) {
 				System.out.println("Attente de " + waitSeconds + " secondes...");
 				try {

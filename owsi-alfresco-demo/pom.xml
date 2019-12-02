@@ -22,6 +22,7 @@
 		<module>owsi-alfresco-demo-application</module>
 		<module>owsi-alfresco-demo-core</module>
 		<module>owsi-alfresco-demo-webapp</module>
+		<module>owsi-alfresco-demo-test</module>
 	</modules>
 	
 	<dependencyManagement>

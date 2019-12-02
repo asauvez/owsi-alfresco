@@ -32,10 +32,4 @@ public class PathInfoModelIT {
 	public void setElements(List<PathElementModelIT> elements) {
 		this.elements = elements;
 	}
-	
-	
-	
-	
-	
-
 }
