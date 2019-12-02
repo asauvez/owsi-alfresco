@@ -63,8 +63,8 @@ public class NodeRestClient {
 		client.delete(urlDelete);
 	}
 
-	public void assertPathValue(NodeEntryModelIT<?> node, String path) {
-		Assert.assertEquals(path, node.getEntry().getPath().getName().replaceFirst("/Espace racine", "/Company Home"));
+	public void assertPathValue(NodeModelIT<?> node, String path) {
+		Assert.assertEquals(path, node.getPath().getName().replaceFirst("/Espace racine", "/Company Home"));
 	}
 	
 	private JavaType getNodeEntryModelITClass(Class<?> propertiesClass) {
