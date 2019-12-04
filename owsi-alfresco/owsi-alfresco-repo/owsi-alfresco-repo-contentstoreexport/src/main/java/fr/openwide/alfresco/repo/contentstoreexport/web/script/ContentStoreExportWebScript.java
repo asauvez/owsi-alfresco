@@ -11,8 +11,6 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
@@ -50,9 +48,6 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 
 	private ContentStoreExportService contentStoreExportService;
 	
-	private ConversionService conversionService = DefaultConversionService.getSharedInstance();
-	
-	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse resp) throws IOException {
 		ContentStoreExportParams params = new ContentStoreExportParams();
@@ -64,7 +59,7 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 				if (! type.isArray() && paramValues.length != 1) {
 					throw new IllegalStateException("You can not specify the param " + paramName + " more than once.");
 				}
-				Object convertValue = conversionService.convert(paramValues, type);
+				Object convertValue = convert(paramValues, type);
 				field.set(params, convertValue);
 			} catch (Exception e) {
 				throw new IllegalArgumentException(paramName, e);
@@ -86,6 +81,20 @@ public class ContentStoreExportWebScript extends AbstractWebScript implements Ap
 			outputStream.flush();
 		} finally {
 			outputStream.close();
+		}
+	}
+	
+	private Object convert(String[] paramValues, Class<?> type) {
+		if (type == String[].class) {
+			return paramValues;
+		} else if (type == String.class){
+			return paramValues[0];
+		} else if (type == boolean.class || type == Boolean.class){
+			return Boolean.valueOf(paramValues[0]);
+		} else if (type == int.class || type == Integer.class){
+			return Integer.valueOf(paramValues[0]);
+		} else {
+			throw new IllegalStateException(type.toString());
 		}
 	}
 	

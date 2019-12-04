@@ -15,6 +15,10 @@
 		
 		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.6 -->
 		<jdk.version>1.6</jdk.version>
+		
+		
+		<dependency.spring.version>3.0.5.RELEASE</dependency.spring.version>
+		<owsi-alfresco.api.spring.version>3.0.5.RELEASE</owsi-alfresco.api.spring.version>
 	</properties>
 	
 	<dependencies>
