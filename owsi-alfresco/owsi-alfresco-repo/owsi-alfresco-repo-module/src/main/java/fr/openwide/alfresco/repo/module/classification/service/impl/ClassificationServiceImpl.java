@@ -29,7 +29,6 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -39,6 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -480,9 +480,15 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 							return conversionService.getRequired(nodeModelService.create(folderNode));
 						}
 					}, false, true);
-				} catch (DuplicateChildNodeNameException ex) {
+				} catch (DuplicateChildNodeNameRemoteException ex) {
 					// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-					return nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
+					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+						@Override
+						public NodeRef execute() {
+							Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType);
+							return childByName.get();
+						}
+					}, true, true);
 				}
 			} else {
 				return conversionService.getRequired(nodeModelService.create(folderNode));

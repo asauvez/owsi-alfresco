@@ -11,7 +11,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer.Alphanumeric;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import fr.openwide.alfresco.test.client.AlfrescoRestClient;
 import fr.openwide.alfresco.test.client.NodeRestClient;
@@ -19,13 +21,14 @@ import fr.openwide.alfresco.test.model.ExifProperties;
 import fr.openwide.alfresco.test.model.NodeModelIT;
 import fr.openwide.alfresco.test.model.PropertiesModelIT;
 
+@TestMethodOrder(Alphanumeric.class)
 public class ClassificationTest {
 
 	private AlfrescoRestClient alfrescoRestClient = new AlfrescoRestClient("demo");
 	private NodeRestClient nodeRestClient = new NodeRestClient(alfrescoRestClient);
 	
 	@Test
-	public void testClassificationSimple() {
+	public void testClassification() {
 		ExifProperties properties = new ExifProperties();
 		properties.pixelXDimension = 640;
 		properties.pixelYDimension = 480;
@@ -41,17 +44,32 @@ public class ClassificationTest {
 	}
 	
 	@Test
-	public void testClassificationParallele() throws InterruptedException, ExecutionException {
-		ExecutorService executorService = new ThreadPoolExecutor(1, 1, 1000, TimeUnit.SECONDS,
+	public void testClassificationParallele10() throws InterruptedException, ExecutionException {
+		testClassificationParallele(2, 10);
+	}
+
+	@Test
+	public void testClassificationParallele100() throws InterruptedException, ExecutionException {
+		testClassificationParallele(100, 20);
+	}
+
+//	@Test
+//	public void testClassificationParallele1000() throws InterruptedException, ExecutionException {
+//		testClassificationParallele(1000);
+//	}
+
+	
+	private void testClassificationParallele(int nb, int diversity) throws InterruptedException, ExecutionException {
+		ExecutorService executorService = new ThreadPoolExecutor(100, 100, 1000, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>());
 
 		List<Callable<String>> tasks = new ArrayList<Callable<String>>();
-		for (int cpt = 0; cpt<1000; cpt++) {
+		for (int cpt = 0; cpt<nb; cpt++) {
 			int finalCpt = cpt;
 			tasks.add(new Callable<String>() {
 				@Override
 				public String call() throws Exception {
-					return createOne(finalCpt);
+					return createOne(finalCpt, diversity);
 				}
 			});
 		}
@@ -65,10 +83,10 @@ public class ClassificationTest {
 		executorService.shutdown();
 	}
 	
-	private String createOne(int cpt) {
+	private String createOne(int cpt, int diversity) {
 		ExifProperties properties = new ExifProperties();
-		properties.pixelXDimension = (int) (Math.random()*100);
-		properties.pixelYDimension = (int) (Math.random()*100);
+		properties.pixelXDimension = (int) (Math.random()*diversity);
+		properties.pixelYDimension = (int) (Math.random()*diversity);
 		NodeModelIT<ExifProperties> nodeToCreate = new NodeModelIT<ExifProperties>("toto_" + cpt, "cm:folder", properties);
 		nodeToCreate.getAspectNames().add("owsi:classifiable");
 		NodeModelIT<ExifProperties> createNode = nodeRestClient.createNode(nodeToCreate);
