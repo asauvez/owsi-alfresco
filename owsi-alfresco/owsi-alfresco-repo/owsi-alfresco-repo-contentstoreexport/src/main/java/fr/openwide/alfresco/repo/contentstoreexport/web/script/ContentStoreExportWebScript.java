@@ -40,6 +40,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 			@SwaggerParameter(name="exportBase", description="Export tout les noeuds minimums nécessaires à lancer Alfresco (défaut true)"),
 			@SwaggerParameter(name="exportAll", description="Export tout les noeuds (défaut false)"),
 			@SwaggerParameter(name="exportContent", description="S'il faut exporter ou non le contenu (défaut true)"),
+			@SwaggerParameter(name="exportVersions", description="S'il faut exporter ou non les anciennes versions (défaut true)"),
 			@SwaggerParameter(name="writeTo", description="Emplacement où écrire sur disque le Zip (défaut renvoie juste le Zip)"),
 			@SwaggerParameter(name="pathType", description="Type d'export contentstore, alfresco ou bulk (défaut contentstore)"),
 			@SwaggerParameter(name="since", description="N'exporte que les données modifiées depuis cette période (ex: P1D)"),

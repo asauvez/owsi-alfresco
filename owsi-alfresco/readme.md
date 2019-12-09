@@ -34,6 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.4
+ * ContentStoreExport.exportVersions et newTransactionEveryDepth
  * owsi.classification.createSubFolderInInnerTransaction
  * owsi.classification.addClassificationDate
  * /alfresco/s/owsi/request-debug pour connaitre les headers.
