@@ -10,10 +10,6 @@
 
 	<name>OWSI Alfresco - Test API</name>
 
-	<properties>
-		<owsi-core.animal-sniffer-maven-plugin.version>1.18</owsi-core.animal-sniffer-maven-plugin.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>

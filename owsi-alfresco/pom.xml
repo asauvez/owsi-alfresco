@@ -16,6 +16,10 @@
     <name>OWSI Alfresco</name>
     <description>Capitalisation des développements utilisés sur les projets Alfresco</description>
 
+	<properties>
+		<owsi-core.animal-sniffer-maven-plugin.version>1.18</owsi-core.animal-sniffer-maven-plugin.version>
+	</properties>
+
 	<modules>
 		<module>owsi-alfresco-api</module>
 		<module>owsi-alfresco-parent</module>
