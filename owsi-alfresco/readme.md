@@ -33,6 +33,9 @@ mvn gitflow:release
 Nouveautés
 ==========
 
+## depuis 0.8.5
+ * webdavticketprovider pour authentifier automatiquement les utilisateurs lors de l'edit online.
+
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth
  * owsi.classification.createSubFolderInInnerTransaction

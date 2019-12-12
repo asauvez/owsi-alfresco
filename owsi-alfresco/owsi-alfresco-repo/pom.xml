@@ -21,6 +21,7 @@
 		<module>owsi-alfresco-repo-emailed2eml</module>
 		<module>owsi-alfresco-repo-datalistgroupe</module>
 		<module>owsi-alfresco-repo-treeaspect</module>
+		<module>owsi-alfresco-repo-webdavticketprovider</module>
 	</modules>
 
 </project>
