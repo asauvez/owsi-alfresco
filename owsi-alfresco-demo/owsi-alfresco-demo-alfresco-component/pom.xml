@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
-		<version>0.8.3</version>
+		<version>0.8.4-SNAPSHOT</version>
 		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-demo-alfresco-component</artifactId>
@@ -32,7 +32,12 @@
 			<artifactId>owsi-alfresco-demo-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+        <dependency>
+            <groupId>fr.openwide.alfresco</groupId>
+            <artifactId>owsi-alfresco-repo-treeaspect</artifactId>
+			<version>${project.version}</version>
+        </dependency>
+
 		<!-- Pour overrider search.get.config.xml -->
 		<dependency>
 			<groupId>org.alfresco</groupId>

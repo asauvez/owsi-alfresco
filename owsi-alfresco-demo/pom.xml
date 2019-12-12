@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.8.3</version>
+		<version>0.8.4-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco/owsi-alfresco-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-demo</artifactId>
@@ -22,6 +22,7 @@
 		<module>owsi-alfresco-demo-application</module>
 		<module>owsi-alfresco-demo-core</module>
 		<module>owsi-alfresco-demo-webapp</module>
+		<module>owsi-alfresco-demo-test</module>
 	</modules>
 	
 	<dependencyManagement>

@@ -8,14 +8,18 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,9 +31,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.management.MBeanServerConnection;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.management.JmxDumpUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -40,15 +50,19 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.ISO9075;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +93,9 @@ import fr.openwide.alfresco.repo.contentstoreexport.service.ContentStoreExportSe
  */
 public class ContentStoreExportServiceImpl implements ContentStoreExportService {
 
+	private static final String OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME = "owsi-contentstoreexport-view";
+	private static final String SPRING_BEAN_NAMESPACE = "http://www.springframework.org/schema/beans";
+
 	private DateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 	
 	private static final String STORE_PREFIX = "store:/";
@@ -102,6 +119,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private ContentService contentService;
 	private PermissionService permissionService;
 	private SiteService siteService;
+	private VersionService versionService;
+	private RetryingTransactionHelper retryingTransactionHelper;
 	private NamespacePrefixResolver namespacePrefixResolver;
 	private MBeanServerConnection mbeanServer;
 
@@ -117,6 +136,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		Properties properties = new Properties();
 		properties.setProperty("contentstoreexport.version", contentstoreexportVersion);
 		properties.setProperty("alfresco.version", descriptorService.getCurrentRepositoryDescriptor().getVersion());
+		properties.setProperty("export.date", new SimpleDateFormat("yyyy.MM.dd-hh.mm.ss").format(new Date()));
 		Set<NodeRef> rootNodesToExport = getRootNodesToExport(params, properties);
 		// debut du stockage des fichiers dans le zip
 		
@@ -128,42 +148,54 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			zipOutPutStream = new ZipOutputStream(outputStream);
 			for (NodeRef root : rootNodesToExport) {
 				LOGGER.info("Export node : " + root);
-				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, params);
+				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, 1);
 			}
+
 			LOGGER.info("Nombre de fichiers exportés: " + nbFiles);
 			properties.setProperty("fichiers.exportes.nb", "" + nbFiles);
 			properties.setProperty("fichiers.exportes.size", "" + totalVolume);
 			LOGGER.info("Fin de l'export.");
 
-			exportLocalFiles(zipOutPutStream, new File(TOMCAT_HOME + "/shared/classes"));
-
-			// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
-			zipOutPutStream.putNextEntry(new ZipEntry("jars.txt"));
-			PrintWriter writer = new PrintWriter(zipOutPutStream);
-			exportListJars(writer, new File(TOMCAT_HOME));
-			writer.flush();
-			zipOutPutStream.closeEntry();
-			
-			// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
-			zipOutPutStream.putNextEntry(new ZipEntry("jmxdump.txt"));
-			writer = new PrintWriter(zipOutPutStream);
-			try {
-				JmxDumpUtil.dumpConnection(mbeanServer, writer);
-			} catch (Throwable t) {
-				// Si dans une vielle version cela ne passe pas, on ignore
-				LOGGER.error("Ignore ", t);
-				t.printStackTrace(writer);
-			}
-			writer.flush();
-			zipOutPutStream.closeEntry();
-
-			// Ajout du ConfigurationLogger, s'il est disponible
-			if (configurationLogger.length() > 0) {
-				zipOutPutStream.putNextEntry(new ZipEntry("configurationlogger.txt"));
-				OutputStreamWriter out = new OutputStreamWriter(zipOutPutStream, StandardCharsets.UTF_8);
-				out.append(configurationLogger.toString());
-				out.flush();
-				zipOutPutStream.closeEntry();
+			if (params.acp) {
+				createView(params, rootNodesToExport, zipOutPutStream);
+			} else {
+				// Export tomcat/shared/classes/
+				exportLocalFiles(zipOutPutStream, new File(TOMCAT_HOME + "/shared/classes"));
+	
+				// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
+				zipOutPutStream.putNextEntry(new ZipEntry("jars.txt"));
+				try {
+					PrintWriter writer = new PrintWriter(zipOutPutStream);
+					exportListJars(writer, new File(TOMCAT_HOME));
+					writer.flush();
+				} finally {
+					zipOutPutStream.closeEntry();
+				}
+				
+				// Ajout du JMX dump, normalement accessible depuis /alfresco/service/api/admin/jmxdump
+				zipOutPutStream.putNextEntry(new ZipEntry("jmxdump.txt"));
+				try {
+					PrintWriter writer = new PrintWriter(zipOutPutStream);
+					try {
+						JmxDumpUtil.dumpConnection(mbeanServer, writer);
+					} catch (Throwable t) {
+						// Si dans une vielle version cela ne passe pas, on ignore
+						LOGGER.error("Ignore ", t);
+						t.printStackTrace(writer);
+					}
+					writer.flush();
+				} finally {
+					zipOutPutStream.closeEntry();
+				}
+	
+				// Ajout du ConfigurationLogger, s'il est disponible
+				if (configurationLogger.length() > 0) {
+					zipOutPutStream.putNextEntry(new ZipEntry("configurationlogger.txt"));
+					OutputStreamWriter out = new OutputStreamWriter(zipOutPutStream, StandardCharsets.UTF_8);
+					out.append(configurationLogger.toString());
+					out.flush();
+					zipOutPutStream.closeEntry();
+				}
 			}
 			
 			// fin des traitements (aucun traitement supplémentaire ne doit etre fait au dela de ce point)
@@ -173,11 +205,214 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			String elapsedTime = secondToTimeConverter(stopTime - startTime);
 			properties.setProperty("temps.execution", elapsedTime);
 			zipOutPutStream.putNextEntry(new ZipEntry("ContentStoreExport.properties"));
-			properties.store(zipOutPutStream, "Généré automatiquement par le service ContentStoreExport @SMILE");
-			zipOutPutStream.closeEntry();
+			try {
+				properties.store(zipOutPutStream, "Généré automatiquement par le service ContentStoreExport @SMILE");
+			} finally {
+				zipOutPutStream.closeEntry();
+			}
+		} catch (XMLStreamException e) {
+			throw new IllegalStateException(e);
 		} finally {
 			IOUtils.closeQuietly(zipOutPutStream);
 		}
+	}
+
+	/** @see org.alfresco.repo.importer.view.ViewParser */
+	private void createView(ContentStoreExportParams params, Set<NodeRef> rootNodesToExport,
+			ZipOutputStream zipOutPutStream)
+			throws IOException, XMLStreamException, FactoryConfigurationError, UnsupportedEncodingException {
+		
+		// View files
+		String exportKey = new SimpleDateFormat("yyyy.MM.dd-hh.mm.ss").format(new Date());
+		
+		for (NodeRef nodeRef : rootNodesToExport) {
+			String dataFile = "alfresco/module/"+ OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME + "/view-" + exportKey + "-" + nodeRef.getId() + "-data.xml";
+			zipOutPutStream.putNextEntry(new ZipEntry(dataFile));
+			try {
+				XMLStreamWriter xmlView = XMLOutputFactory.newFactory()
+						.createXMLStreamWriter(zipOutPutStream, "UTF-8");
+				xmlView.writeStartDocument();
+				xmlView.writeStartElement("view", "view", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+		
+				ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
+				createViewForNode(primaryParent, xmlView, params);
+		
+				xmlView.writeEndElement();
+				xmlView.writeEndDocument();
+				xmlView.flush();
+			} finally {
+				zipOutPutStream.closeEntry();
+			}
+		}
+
+		// module.properties
+		zipOutPutStream.putNextEntry(new ZipEntry("alfresco/module/"+ OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME + "/module.properties"));
+		try {
+			PrintWriter writer = new PrintWriter(new OutputStreamWriter(zipOutPutStream));
+			writer.println("module.id=" + OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME);
+			writer.println("module.version=1.0");
+			writer.flush();
+		} finally {
+			zipOutPutStream.closeEntry();
+		}
+		
+		// Spring context
+		zipOutPutStream.putNextEntry(new ZipEntry("alfresco/module/"+ OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME + "/view-" + exportKey + "-context.xml"));
+		try {
+			XMLStreamWriter xmlSpring = XMLOutputFactory.newFactory()
+					.createXMLStreamWriter(zipOutPutStream, "UTF-8");
+			xmlSpring.setDefaultNamespace(SPRING_BEAN_NAMESPACE);
+			xmlSpring.writeStartDocument();
+			xmlSpring.writeStartElement(SPRING_BEAN_NAMESPACE, "beans");
+			
+			xmlSpring.writeStartElement(SPRING_BEAN_NAMESPACE, "bean");
+			xmlSpring.writeAttribute("id", "owsi.contentstoreexport.bootstrap.view." + exportKey);
+			xmlSpring.writeAttribute("class", "org.alfresco.repo.module.ImporterModuleComponent");
+			xmlSpring.writeAttribute("parent", "module.baseComponent");
+			
+			writeProperty(xmlSpring,"moduleId", "owsi.contentstoreexport");
+			writeProperty(xmlSpring,"name", "owsi.contentstoreexport.bootstrap.view." + exportKey);
+			writeProperty(xmlSpring,"sinceVersion", "1.0");
+			writeProperty(xmlSpring,"appliesFromVersion", "1.0");
+			writeProperty(xmlSpring,"importer", "spacesBootstrap");
+			
+			xmlSpring.writeStartElement("property");
+			xmlSpring.writeAttribute("name", "bootstrapViews");
+			xmlSpring.writeStartElement("list");
+			
+			for (NodeRef nodeRef : rootNodesToExport) {
+				xmlSpring.writeStartElement("props");
+				
+				String path = nodeService.getPath(nodeRef).toPrefixString(namespacePrefixResolver);
+				xmlSpring.writeStartElement("prop");
+				xmlSpring.writeAttribute("key", "path");
+				xmlSpring.writeCharacters(path);
+				xmlSpring.writeEndElement();
+	
+				String dataFile = "alfresco/module/"+ OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME + "/view-" + exportKey + "-" + nodeRef.getId() + "-data.xml";
+				xmlSpring.writeStartElement("prop");
+				xmlSpring.writeAttribute("key", "location");
+				xmlSpring.writeCharacters(dataFile);
+				xmlSpring.writeEndElement();
+	
+				xmlSpring.writeEndElement(); // props
+			}
+			
+			xmlSpring.writeEndElement(); // list
+			xmlSpring.writeEndElement(); // property
+	
+			xmlSpring.writeEndElement(); // bean
+			xmlSpring.writeEndElement(); // beans
+			xmlSpring.writeEndDocument();
+			xmlSpring.flush();
+		} finally {
+			zipOutPutStream.closeEntry();
+		}
+	}
+
+	private void writeProperty(XMLStreamWriter xmlSpring, String name, String value) throws XMLStreamException {
+		xmlSpring.writeStartElement("property");
+		xmlSpring.writeAttribute("name", name);
+		xmlSpring.writeAttribute("value", value);
+		xmlSpring.writeEndElement();
+	}
+	
+	private void writeStartElement(XMLStreamWriter writer, QName qname) throws XMLStreamException {
+		writer.writeStartElement(QName.splitPrefixedQName(qname.toPrefixString(namespacePrefixResolver))[0], 
+				qname.getLocalName(), 
+				qname.getNamespaceURI());
+	}
+
+	private void createViewForNode(ChildAssociationRef parent, XMLStreamWriter writer, ContentStoreExportParams params) throws XMLStreamException {
+		NodeRef nodeRef = parent.getChildRef();
+		writeStartElement(writer, nodeService.getType(nodeRef));
+		
+		writer.writeAttribute("view", NamespaceService.REPOSITORY_VIEW_1_0_URI, "childName", parent.getQName().toPrefixString(namespacePrefixResolver));
+		
+		Set<QName> aspects = nodeService.getAspects(nodeRef);
+		if (! aspects.isEmpty()) {
+			writer.writeStartElement("view", "aspects", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+			for (QName aspect : aspects) {
+				writeStartElement(writer, aspect);
+				writer.writeEndElement();
+			}
+			writer.writeEndElement();
+		}
+		
+		writer.writeStartElement("view", "properties", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+		for (Entry<QName, Serializable> pv : properties.entrySet()) {
+			QName property = pv.getKey();
+			if (! PROPERTIES_NOT_TO_EXPORT.contains(property.toPrefixString(namespacePrefixResolver))) {
+				writeStartElement(writer, property);
+				
+				if (pv.getValue() == null) {
+					// nop
+				} else if (pv.getValue() instanceof Date) {
+					writer.writeCharacters(iso8601.format((Date) pv.getValue()));
+				} else if (pv.getValue() instanceof ContentData) {
+					ContentData originalContentData = (ContentData) pv.getValue();
+					ContentData contentData = new ContentData(
+							"classpath:" + getContentPath(nodeRef, property, originalContentData, params),
+							originalContentData.getMimetype(), 
+							originalContentData.getSize(), 
+							originalContentData.getEncoding(), 
+							originalContentData.getLocale());
+					writer.writeCharacters(contentData.getInfoUrl());
+				} else {
+					writer.writeCharacters(pv.getValue().toString());
+				}
+				writer.writeEndElement();
+			}
+		}
+		writer.writeEndElement();
+		
+		if (params.acpPermissions) {
+			Set<AccessPermission> acl = permissionService.getAllSetPermissions(nodeRef);
+			List<AccessPermission> aclFiltered = new ArrayList<AccessPermission>();
+			for (AccessPermission ace : acl) {
+				if (ace.isSetDirectly()) {
+					aclFiltered.add(ace);
+				}
+			}
+			if (! aclFiltered.isEmpty()) {
+				writer.writeStartElement("view", "acl", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+				for (AccessPermission ace : aclFiltered) {
+					writer.writeStartElement("view", "ace", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+					writer.writeAttribute("view", NamespaceService.REPOSITORY_VIEW_1_0_URI, "access", ace.getAccessStatus().name());
+					
+					writer.writeStartElement("view", "authority", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+					writer.writeCharacters(ace.getAuthority());
+					writer.writeEndElement();
+					
+					writer.writeStartElement("view", "permission", NamespaceService.REPOSITORY_VIEW_1_0_URI);
+					writer.writeCharacters(ace.getPermission());
+					writer.writeEndElement();
+					
+					writer.writeEndElement();
+				}
+				writer.writeEndElement();
+			}
+		}
+		
+		// Children
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
+		Map<QName, List<ChildAssociationRef>> mapChildren = new LinkedHashMap<QName, List<ChildAssociationRef>>();
+		for (ChildAssociationRef child : children) {
+			List<ChildAssociationRef> list = mapChildren.get(child.getTypeQName());
+			if (list == null) {
+				mapChildren.put(child.getTypeQName(), list = new ArrayList<ChildAssociationRef>());
+			}
+			list.add(child);
+		}
+		for (Entry<QName, List<ChildAssociationRef>> entry : mapChildren.entrySet()) {
+			writeStartElement(writer, entry.getKey());
+			for (ChildAssociationRef child : entry.getValue()) {
+				createViewForNode(child, writer, params);
+			}
+			writer.writeEndElement();
+		}		
+		writer.writeEndElement();
 	}
 
 	// parcours recursif du dossier shared/classes de Tomcat
@@ -231,35 +466,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	}
 	
 	private Set<NodeRef> getRootNodesToExport(ContentStoreExportParams params, Properties properties) {
-		Set<NodeRef> rootNodesToExport = new HashSet<NodeRef>();
-		
-		// Base
-		if (params.exportBase) {
-			//la racine system://syteme est ajoutée en dur via un noderef
-			rootNodesToExport.add(nodeService.getRootNode(new StoreRef("system://system")));
-
-			properties.setProperty("paths.parametres.config", contentstoreexportPaths);
-			for (String path : contentstoreexportPaths.split(",")) {
-				if (!path.trim().isEmpty()) {
-					rootNodesToExport.add(getByPath(path));
-				}
-			}
-			properties.setProperty("queries.parametres.config", contentstoreexportQueries);
-			for (String query : contentstoreexportQueries.split(",")) {
-				if (!query.trim().isEmpty()) {
-					ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
-							SearchService.LANGUAGE_FTS_ALFRESCO, query);
-					rootNodesToExport.addAll(resultSet.getNodeRefs());
-					resultSet.close();
-				}
-			}
-		}
-		
-		// All
-		if (params.exportAll) {
-			properties.setProperty("all.parametres.req", "true");
-			rootNodesToExport.addAll(nodeService.getAllRootNodes(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE));
-		}
+		Set<NodeRef> rootNodesToExport = new LinkedHashSet<NodeRef>();
 		
 		// Paths
 		if (params.paths != null) {
@@ -303,6 +510,33 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			}
 		}
 		
+		// Base
+		if (params.exportBase && ! params.acp) {
+			//la racine system://syteme est ajoutée en dur via un noderef
+			rootNodesToExport.add(nodeService.getRootNode(new StoreRef("system://system")));
+
+			properties.setProperty("paths.parametres.config", contentstoreexportPaths);
+			for (String path : contentstoreexportPaths.split(",")) {
+				if (!path.trim().isEmpty()) {
+					rootNodesToExport.add(getByPath(path));
+				}
+			}
+			properties.setProperty("queries.parametres.config", contentstoreexportQueries);
+			for (String query : contentstoreexportQueries.split(",")) {
+				if (!query.trim().isEmpty()) {
+					ResultSet resultSet = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
+							SearchService.LANGUAGE_FTS_ALFRESCO, query);
+					rootNodesToExport.addAll(resultSet.getNodeRefs());
+					resultSet.close();
+				}
+			}
+		}
+		
+		// All
+		if (params.exportAll) {
+			properties.setProperty("all.parametres.req", "true");
+			rootNodesToExport.addAll(nodeService.getAllRootNodes(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE));
+		}
 		
 		LOGGER.info("Nombre de racines trouvées: " + rootNodesToExport.size());
 		return rootNodesToExport;
@@ -325,9 +559,9 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		return nodeRef;
 	}
 
-	private void recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
-			AtomicInteger nbFiles, AtomicLong totalVolume, ContentStoreExportParams params)
-			throws IOException {
+	private void recurseThroughNodeRefChilds(NodeRef nodeRef, final ZipOutputStream zipOutPutStream, final Set<String> processedNodes,
+			final AtomicInteger nbFiles, final AtomicLong totalVolume, final ContentStoreExportParams params, final int depth)
+			throws IOException, XMLStreamException {
 		
 		if (params.since != null) {
 			Date modified = (Date) nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED);
@@ -342,6 +576,107 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		
 		//recupération des properties du node courant
 		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+		analyzeProperties(nodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, properties);
+		
+		if (       params.exportVersions 
+				&& params.getPathType() == PathType.CONTENTSTORE 
+				&& versionService.isVersioned(nodeRef)) {
+			VersionHistory versionHistory = versionService.getVersionHistory(nodeRef);
+			for (Version version : versionHistory.getAllVersions()) {
+				Map<String, Serializable> versionProperties = version.getVersionProperties();
+				Map<QName, Serializable> versionProperties2 = new LinkedHashMap<QName, Serializable>();
+				for (Entry<String, Serializable> entry : versionProperties.entrySet()) {
+					// On n'a que le local name. Le content devrait être un cm:content.
+					QName key = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, entry.getKey());
+					versionProperties2.put(key, entry.getValue());
+				}
+				analyzeProperties(nodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, versionProperties2);
+			}
+		}
+		
+		if (params.getPathType() == PathType.BULK) {
+			String propertiesFile = getContentPath(nodeRef, ContentModel.PROP_CONTENT, null, params)
+					+ ".metadata.properties.xml";
+			if (processedNodes.add(propertiesFile)) {
+				zipOutPutStream.putNextEntry(new ZipEntry(propertiesFile));
+				
+				try {
+					XMLStreamWriter xmlWriter = XMLOutputFactory.newFactory()
+							.createXMLStreamWriter(zipOutPutStream, "UTF-8");
+					xmlWriter.writeStartDocument();
+					xmlWriter.writeStartElement("properties");
+
+					xmlWriter.writeStartElement("entry");
+					xmlWriter.writeAttribute("key", "type");
+					xmlWriter.writeCharacters(nodeService.getType(nodeRef).toPrefixString(namespacePrefixResolver));
+					xmlWriter.writeEndElement();
+
+					xmlWriter.writeStartElement("entry");
+					xmlWriter.writeAttribute("key", "aspects");
+					
+					boolean firstAspect = true;
+					for (QName aspect : nodeService.getAspects(nodeRef)) {
+						if (firstAspect) {
+							firstAspect = false;
+						} else {
+							xmlWriter.writeCharacters(",");
+						}
+						xmlWriter.writeCharacters(aspect.toPrefixString(namespacePrefixResolver));
+					}
+					xmlWriter.writeEndElement();
+					
+					for (Entry<QName, Serializable> property : properties.entrySet()) {
+						String propertyName = property.getKey().toPrefixString(namespacePrefixResolver);
+						if (! (property.getValue() instanceof ContentData) 
+							&& ! PROPERTIES_NOT_TO_EXPORT.contains(propertyName)) {
+							xmlWriter.writeStartElement("entry");
+							xmlWriter.writeAttribute("key", propertyName);
+							
+							if (property.getValue() == null) {
+								// nop
+							} else if (property.getValue() instanceof Date) {
+								xmlWriter.writeCharacters(iso8601.format((Date) property.getValue()));
+							} else {
+								xmlWriter.writeCharacters(property.getValue().toString());
+							}
+							xmlWriter.writeEndElement();
+						}
+					}
+					
+					xmlWriter.writeEndElement();
+					xmlWriter.writeEndDocument();
+					xmlWriter.flush();
+				} finally {
+					zipOutPutStream.closeEntry();
+				}
+			}
+		}
+		
+		//recursion dans les fils
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
+		for (ChildAssociationRef childAssoc : children) {
+			if (   params.getPathType() == PathType.CONTENTSTORE
+				|| ContentModel.ASSOC_CONTAINS.equals(childAssoc.getTypeQName())) {
+				final NodeRef childNodeRef = childAssoc.getChildRef();
+				
+				if (depth % params.newTransactionEveryDepth == 1) {
+					retryingTransactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+						@Override
+						public Void execute() throws Throwable {
+							recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, depth+1);
+							return null;
+						}
+					}, true, true);
+				} else {
+					recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, depth+1);
+				}
+			}
+		}
+	}
+
+	private void analyzeProperties(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
+			AtomicInteger nbFiles, AtomicLong totalVolume, ContentStoreExportParams params,
+			Map<QName, Serializable> properties) throws IOException {
 		for (Entry<QName, Serializable> property : properties.entrySet()) {
 			//seul un content data nous interesse
 			if (property.getValue() instanceof ContentData) {
@@ -368,61 +703,6 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 						}
 					}
 				}
-			}
-		}
-		
-		if (params.getPathType() == PathType.BULK) {
-			String propertiesFile = getContentPath(nodeRef, ContentModel.PROP_CONTENT, null, params)
-					+ ".metadata.properties.xml";
-			if (processedNodes.add(propertiesFile)) {
-				zipOutPutStream.putNextEntry(new ZipEntry(propertiesFile));
-				PrintWriter propertiesWriter = new PrintWriter(zipOutPutStream);
-				try {
-					propertiesWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-					propertiesWriter.println("<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">");
-					propertiesWriter.println("<properties>");
-					propertiesWriter.println("    <entry key=\"type\">" + nodeService.getType(nodeRef).toPrefixString(namespacePrefixResolver) + "</entry>");
-					propertiesWriter.print  ("    <entry key=\"aspects\">");
-					boolean firstAspect = true;
-					for (QName aspect : nodeService.getAspects(nodeRef)) {
-						if (firstAspect) {
-							firstAspect = false;
-						} else {
-							propertiesWriter.print(",");
-						}
-						propertiesWriter.print(aspect.toPrefixString(namespacePrefixResolver));
-					}
-					propertiesWriter.println("</entry>");
-					for (Entry<QName, Serializable> property : properties.entrySet()) {
-						String propertyName = property.getKey().toPrefixString(namespacePrefixResolver);
-						if (! (property.getValue() instanceof ContentData) 
-							&& ! PROPERTIES_NOT_TO_EXPORT.contains(propertyName)) {
-							propertiesWriter.print  ("    <entry key=\"" + propertyName + "\">");
-							if (property.getValue() == null) {
-								// nop
-							} else if (property.getValue() instanceof Date) {
-								propertiesWriter.print(iso8601.format((Date) property.getValue()));
-							} else {
-								propertiesWriter.print(StringEscapeUtils.escapeXml10(property.getValue().toString()));
-							}
-							propertiesWriter.println("</entry>");
-						}
-					}
-					propertiesWriter.println("</properties>");
-					propertiesWriter.flush();
-				} finally {
-					zipOutPutStream.closeEntry();
-				}
-			}
-		}
-		
-		//recursion dans les fils
-		List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
-		for (ChildAssociationRef childAssoc : children) {
-			if (   params.getPathType() == PathType.CONTENTSTORE
-				|| ContentModel.ASSOC_CONTAINS.equals(childAssoc.getTypeQName())) {
-				NodeRef childNodeRef = childAssoc.getChildRef();
-				recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params);
 			}
 		}
 	}
@@ -467,6 +747,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		this.permissionService = serviceRegistry.getPermissionService();
 		this.namespacePrefixResolver = serviceRegistry.getNamespaceService();
 		this.siteService = serviceRegistry.getSiteService();
+		this.versionService = serviceRegistry.getVersionService();
+		this.retryingTransactionHelper = serviceRegistry.getRetryingTransactionHelper();
 	}
 	
 	public void setContentstoreexportVersion(String contentstoreexportVersion) {

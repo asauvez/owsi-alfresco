@@ -16,6 +16,8 @@
 		<property name="subFolderCacheMaxSize" value="${owsi.classification.subFolderCache.maxSize}" />
 		
 		<property name="addDeleteIfEmptyAspect" value="${owsi.classification.addDeleteIfEmptyAspect}" />
+		<property name="addClassificationDate" value="${owsi.classification.addClassificationDate}" />
+		<property name="createSubFolderInInnerTransaction" value="${owsi.classification.createSubFolderInInnerTransaction}" />
 	</bean>
 
 	<bean id="owsi.service.deleteIfEmptyService" class="fr.openwide.alfresco.repo.module.deleteifempty.service.impl.DeleteIfEmptyServiceImpl"

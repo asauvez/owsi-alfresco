@@ -29,7 +29,6 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -39,6 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -104,6 +104,8 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private ClassificationCache subFolderCache;
 	
 	private boolean addDeleteIfEmptyAspect;
+	private boolean addClassificationDate;
+	private boolean createSubFolderInInnerTransaction;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -334,8 +336,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 						CmModel.auditable), 
 					() -> { 
 				policy.classify(builder, model, event);
-				
-				nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date()); 
+
+				if (addClassificationDate) {
+					nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationDate, new Date());
+				}
 			});
 			
 		} catch (RuntimeException ex) {
@@ -467,17 +471,27 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			
 			folderNode.assocs().primaryParent(associationType).nodeReference(conversionService.get(destinationFolder));
 			
-			try {
-				// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
-				return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
-					@Override
-					public NodeRef execute() {
-						return conversionService.getRequired(nodeModelService.create(folderNode));
-					}
-				}, false, true);
-			} catch (DuplicateChildNodeNameException ex) {
-				// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-				return nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType).get();
+			if (createSubFolderInInnerTransaction) {
+				try {
+					// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
+					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+						@Override
+						public NodeRef execute() {
+							return conversionService.getRequired(nodeModelService.create(folderNode));
+						}
+					}, false, true);
+				} catch (DuplicateChildNodeNameRemoteException ex) {
+					// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
+					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+						@Override
+						public NodeRef execute() {
+							Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType);
+							return childByName.get();
+						}
+					}, true, true);
+				}
+			} else {
+				return conversionService.getRequired(nodeModelService.create(folderNode));
 			}
 		});
 	} 
@@ -551,6 +565,13 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void setAddDeleteIfEmptyAspect(boolean addDeleteIfEmptyAspect) {
 		this.addDeleteIfEmptyAspect = addDeleteIfEmptyAspect;
 	}
+	public void setAddClassificationDate(boolean addClassificationDate) {
+		this.addClassificationDate = addClassificationDate;
+	}
+	public void setCreateSubFolderInInnerTransaction(boolean createSubFolderInInnerTransaction) {
+		this.createSubFolderInInnerTransaction = createSubFolderInInnerTransaction;
+	}
+	
 
 	public void deletePrevious(NodeRef destinationFolder, String childName) {
 		Optional<NodeRef> child = nodeModelRepositoryService.getChildByName(destinationFolder, childName);
