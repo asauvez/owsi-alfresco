@@ -681,11 +681,12 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			//seul un content data nous interesse
 			if (property.getValue() instanceof ContentData) {
 				ContentData contentData = (ContentData) property.getValue();
-				nbFiles.incrementAndGet();
-				totalVolume.addAndGet(contentData.getSize());
-				
 				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
+				
 				if (processedNodes.add(contentUrl)) {
+					nbFiles.incrementAndGet();
+					totalVolume.addAndGet(contentData.getSize());
+					
 					if (params.exportContent) {
 						//ajout de l'entrée au zip
 						ContentReader reader = contentService.getReader(nodeRef, property.getKey());
