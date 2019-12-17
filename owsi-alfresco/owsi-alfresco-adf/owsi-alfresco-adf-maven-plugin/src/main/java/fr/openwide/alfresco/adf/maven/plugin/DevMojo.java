@@ -1,10 +1,15 @@
 package fr.openwide.alfresco.adf.maven.plugin;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -28,6 +33,8 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class DevMojo extends AbstractAdfMojo {
 
 
+	private static final String REFERENCES = "\"$references\": [";
+
 	private static final long ORIGINAL_TIMESPAMP = 0L;
 
 	@Parameter
@@ -42,17 +49,32 @@ public class DevMojo extends AbstractAdfMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			File targetAppFolder = getTargetAppFolder();
-			File srcAppFolder = getSrcAppFolder();
-			File rootAppFolder = getRootAppFolder();
+			File rootAppFolder = getRootSrcAppFolder();
+			initAppExtensionsFile();
 			
-			targetAppFolder.mkdirs();
-			srcAppFolder.mkdirs();
-			rootAppFolder.mkdirs();
-			
-			FileUtils.copyDirectory(srcAppFolder, new File(targetAppFolder, "src"));
-			FileUtils.copyDirectory(rootAppFolder, targetAppFolder);
+			createFileLinks(rootAppFolder, targetAppFolder);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
+		}
+	}
+	
+	private void createFileLinks(File src, File dest) throws IOException {
+		if (src.isDirectory()) {
+			dest.mkdir();
+			for (File file : src.listFiles()) {
+				createFileLinks(file, new File(dest, file.getName()));
+			}
+		} else {
+			getLog().info("Create link " + src);
+			
+			if (dest.exists() && ! dest.delete()) {
+				throw new IllegalStateException("Ne peut pas effacer " + dest);
+			}
+//			try {
+//				Files.createSymbolicLink(dest.toPath(), src.toPath());
+//			} catch (UnsupportedOperationException ex) {
+				Files.copy(src.toPath(), dest.toPath());
+//			}
 		}
 	}
 	
@@ -79,7 +101,13 @@ public class DevMojo extends AbstractAdfMojo {
 				}
 			}
 		}
-		return originalAppFolder;
+		
+		// Saute le premier niveau
+		File[] files = originalAppFolder.listFiles();
+		if (files.length != 1) {
+			throw new IllegalStateException(Arrays.asList(files).toString());
+		}
+		return files[0];
 	}
 	
 	private File getTargetAppFolder() throws IOException {
@@ -87,21 +115,53 @@ public class DevMojo extends AbstractAdfMojo {
 		if (! targetAppFolder.exists()) {
 			getLog().info("Création de " + targetAppFolder);
 			File originalAppFolder = getOriginalAppFolder();
-			// Saute le premier niveau
-			File[] files = originalAppFolder.listFiles();
-			if (files.length != 1) {
-				throw new IllegalStateException(Arrays.asList(files).toString());
-			}
-			FileUtils.copyDirectory(files[0], targetAppFolder);
+			FileUtils.copyDirectory(originalAppFolder, targetAppFolder);
 		}
 		return targetAppFolder;
 	}
 	
-	private File getSrcAppFolder() {
-		return new File(getBaseDir(), "src/app/src");
+	private File getRootSrcAppFolder() {
+		File folder = new File(getBaseDir(), "src/app");
+		folder.mkdirs();
+		return folder;
 	}
-	private File getRootAppFolder() {
-		return new File(getBaseDir(), "src/app/root");
+	
+	private File getCustomExtensionsSourceFile() throws IOException {
+		File customExtensionsSourceFile = new File(getRootSrcAppFolder(), "src/assets/plugins/" + project.getArtifactId() + ".json");
+		if (! customExtensionsSourceFile.exists()) {
+			customExtensionsSourceFile.getParentFile().mkdirs();
+			try (PrintWriter writer = new PrintWriter(new FileWriter(customExtensionsSourceFile))) {
+				writer.println("{");
+				writer.println("  \"$schema\": \"../../../extension.schema.json\",");
+				writer.println("  \"$id\": \"" + project.getArtifactId() + "\",");
+				writer.println("  \"$name\": \"" + project.getName() + "\",");
+				writer.println("  \"$version\": \"" + project.getVersion() + "\",");
+				writer.println("  \"$description\": \"Permet de surcharger les valeurs de app.extensions.json\"");
+				writer.println("}");
+				writer.flush();
+			}
+		}
+		return customExtensionsSourceFile;
+	}
+	
+	private void initAppExtensionsFile() throws IOException {
+		File originalAppExtensionsFile = new File(getOriginalAppFolder(), "src/assets/app.extensions.json");
+		try (BufferedReader reader = new BufferedReader(new FileReader(originalAppExtensionsFile))) {
+			
+			File appExtensionsFile = new File(getTargetAppFolder(), "src/assets/app.extensions.json");
+			try (PrintWriter writer = new PrintWriter(new FileWriter(appExtensionsFile))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					int pos = line.indexOf(REFERENCES);
+					if (pos != -1) {
+						line = line.substring(0, pos + REFERENCES.length())
+							+ "\"" + getCustomExtensionsSourceFile().getName() + "\", "
+							+ line.substring(pos + REFERENCES.length());
+					}
+					writer.println(line);
+				}
+			}
+		}
 	}
 	
 	public static void main(String[] args) throws Exception {
