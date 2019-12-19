@@ -380,10 +380,17 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	public void moveNode(NodeRef node, NodeRef destinationFolder) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Move node {} to {} : {}.", node, destinationFolder, getPath(destinationFolder));
+		NodeRef actualPrimaryParent = nodeModelRepositoryService.getPrimaryParent(node).get();
+		if (actualPrimaryParent.equals(destinationFolder)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Move node {} : Already in correct folder", node);
+			}
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Move node {} to {} : {}.", node, destinationFolder, getPath(destinationFolder));
+			}
+			nodeModelRepositoryService.moveNode(node, destinationFolder);
 		}
-		nodeModelRepositoryService.moveNode(node, destinationFolder);
 	}
 	public NodeRef copyNode(NodeRef node, NodeRef destinationFolder, Optional<String> newName) {
 		if (logger.isDebugEnabled()) {
@@ -519,7 +526,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	public Optional<NodeRef> getByNamedPath(String ... names) {
-		return nodeModelRepositoryService.getByNamedPath(names);
+		// Pas nécessaire d'avoir le droit de lecture sur les dossiers intermédiaires.
+		return AuthenticationUtil.runAsSystem(() -> 
+			nodeModelRepositoryService.getByNamedPath(names));
 	}
 	public Optional<NodeRef> getByNamedPathCached(String ... names) {
 		String cacheKey = Arrays.toString(names);

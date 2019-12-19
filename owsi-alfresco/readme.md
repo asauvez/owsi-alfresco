@@ -34,6 +34,8 @@ Nouveautés
 ==========
 
 ## depuis 0.8.5
+ * Classification : N'appelle pas moveNode() si le document est déjà dans le bon dossier.
+ * Classification.rootFolderNamedPath() : Plus besoin de devoir voir les dossiers intermédiaires.
  * webdavticketprovider pour authentifier automatiquement les utilisateurs lors de l'edit online.
 
 ## depuis 0.8.4
