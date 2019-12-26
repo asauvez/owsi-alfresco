@@ -34,7 +34,8 @@ public class TicketProvidedWebDavServiceImpl extends WebDavServiceImpl {
 		String url = super.getWebdavUrl(nodeRef);
 		
 		if (provideTicket) {
-			url += "?ticket=" + authenticationService.getCurrentTicket();
+			//url += "?ticket=" + authenticationService.getCurrentTicket();
+			url = "/webdav/owsi-aos/" + authenticationService.getCurrentTicket() + url;
 		}
 		
 		return url;
