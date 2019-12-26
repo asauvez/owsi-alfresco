@@ -10,11 +10,15 @@
 
     <groupId>fr.openwide.alfresco</groupId>
     <artifactId>owsi-alfresco</artifactId>
-    <version>0.8.4-SNAPSHOT</version>
+    <version>0.8.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OWSI Alfresco</name>
     <description>Capitalisation des développements utilisés sur les projets Alfresco</description>
+
+	<properties>
+		<owsi-core.animal-sniffer-maven-plugin.version>1.18</owsi-core.animal-sniffer-maven-plugin.version>
+	</properties>
 
 	<modules>
 		<module>owsi-alfresco-api</module>

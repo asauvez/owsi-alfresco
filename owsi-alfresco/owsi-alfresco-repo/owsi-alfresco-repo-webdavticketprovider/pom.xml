@@ -3,12 +3,18 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-repo-wsgenerator</artifactId>
+		<artifactId>owsi-alfresco-repo</artifactId>
 		<version>0.8.5-SNAPSHOT</version>
 	</parent>
-	<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
-	<packaging>jar</packaging>
-	
-	<name>OWSI Alfresco - Repository - Génération de Webscripts - Annotations</name>
+	<artifactId>owsi-alfresco-repo-webdavticketprovider</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
 </project>

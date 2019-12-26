@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
@@ -29,18 +30,21 @@ public class RequestDebugWebScript extends SwaggerWebScript {
 		
 		out.println("URL: " + req.getURL());
 		
-		out.println("Headers:");
+		out.println("\nHeaders:");
 		for (String headerName : req.getHeaderNames()) {
 			String[] headerValues = req.getHeaderValues(headerName);
 			out.append("  ").append(headerName).append(": ").append(Arrays.asList(headerValues).toString()).append("\n");
 		}
 		
-		out.println("Params:");
+		out.println("\nParams:");
 		for (String paramName : req.getParameterNames()) {
 			String[] paramValues = req.getParameterValues(paramName);
 			out.append("  ").append(paramName).append("=").append(Arrays.asList(paramValues).toString()).append("\n");
 		}
-		
+
+		out.println("\nAuthentication: " + AuthenticationUtil.getFullAuthentication().getName());
+		out.println("Authorities: " + Arrays.asList(AuthenticationUtil.getFullAuthentication().getAuthorities()));
+
 		out.flush();
 		out.close();
 	}

@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.repo.remote.authentication.service.impl;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -17,8 +16,8 @@ import org.springframework.beans.factory.InitializingBean;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.authentication.model.RepositoryUser;
+import fr.openwide.alfresco.api.core.authentication.model.TicketReference;
 import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.authentication.service.AuthenticationRemoteService;
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
@@ -39,11 +38,11 @@ public class AuthenticationRemoteServiceImpl implements AuthenticationRemoteServ
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		URL url = getClass().getResource("/alfresco/extension/templates/webscripts/owsi/authentication/request.post.desc.xml");
-		if (url == null) {
-			throw new IllegalStateException("Les Webscripts n'ont pas été générés automatiquement. "
-				+ "Vous devez lancer un mvn package sur le projet owsi-alfresco-repo-core, puis le raffraichir dans Eclipse.");
-		}
+//		URL url = getClass().getResource("/alfresco/extension/templates/webscripts/owsi/authentication/request.post.desc.xml");
+//		if (url == null) {
+//			throw new IllegalStateException("Les Webscripts n'ont pas été générés automatiquement. "
+//				+ "Vous devez lancer un mvn package sur le projet owsi-alfresco-repo-core, puis le raffraichir dans Eclipse.");
+//		}
 	}
 	
 	@Override

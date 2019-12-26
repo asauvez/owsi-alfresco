@@ -10,7 +10,7 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.8.4-SNAPSHOT</version>
+	<version>0.8.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
@@ -19,6 +19,7 @@
 	<properties>
 		<owsi-alfresco.maven-failsafe-plugin.version>2.19.1</owsi-alfresco.maven-failsafe-plugin.version>
 		<owsi-alfresco.git-commit-id-plugin.version>2.2.4</owsi-alfresco.git-commit-id-plugin.version>
+		<owsi-core.animal-sniffer-maven-plugin.version>1.18</owsi-core.animal-sniffer-maven-plugin.version>
 	</properties>
 
 	<modules>

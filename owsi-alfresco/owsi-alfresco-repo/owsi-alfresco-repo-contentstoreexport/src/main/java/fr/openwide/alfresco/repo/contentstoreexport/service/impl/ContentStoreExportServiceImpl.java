@@ -38,6 +38,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.management.JmxDumpUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -51,6 +53,9 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteService;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionHistory;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -114,6 +119,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private ContentService contentService;
 	private PermissionService permissionService;
 	private SiteService siteService;
+	private VersionService versionService;
+	private RetryingTransactionHelper retryingTransactionHelper;
 	private NamespacePrefixResolver namespacePrefixResolver;
 	private MBeanServerConnection mbeanServer;
 
@@ -141,7 +148,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			zipOutPutStream = new ZipOutputStream(outputStream);
 			for (NodeRef root : rootNodesToExport) {
 				LOGGER.info("Export node : " + root);
-				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, params);
+				recurseThroughNodeRefChilds(root, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, 1);
 			}
 
 			LOGGER.info("Nombre de fichiers exportés: " + nbFiles);
@@ -552,8 +559,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		return nodeRef;
 	}
 
-	private void recurseThroughNodeRefChilds(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
-			AtomicInteger nbFiles, AtomicLong totalVolume, ContentStoreExportParams params)
+	private void recurseThroughNodeRefChilds(NodeRef nodeRef, final ZipOutputStream zipOutPutStream, final Set<String> processedNodes,
+			final AtomicInteger nbFiles, final AtomicLong totalVolume, final ContentStoreExportParams params, final int depth)
 			throws IOException, XMLStreamException {
 		
 		if (params.since != null) {
@@ -569,32 +576,21 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		
 		//recupération des properties du node courant
 		Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-		for (Entry<QName, Serializable> property : properties.entrySet()) {
-			//seul un content data nous interesse
-			if (property.getValue() instanceof ContentData) {
-				ContentData contentData = (ContentData) property.getValue();
-				nbFiles.incrementAndGet();
-				totalVolume.addAndGet(contentData.getSize());
-				
-				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
-				if (processedNodes.add(contentUrl)) {
-					if (params.exportContent) {
-						//ajout de l'entrée au zip
-						ContentReader reader = contentService.getReader(nodeRef, property.getKey());
-						if (reader != null) {
-							InputStream inputStream = reader.getContentInputStream();
-							zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
-							try {
-								IOUtils.copy(inputStream, zipOutPutStream);
-							} finally {
-								IOUtils.closeQuietly(inputStream);
-								zipOutPutStream.closeEntry();
-							}
-						} else {
-							LOGGER.warn(nodeRef + " / " + property.getKey() + " has a null reader.");
-						}
-					}
+		analyzeProperties(nodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, properties);
+		
+		if (       params.exportVersions 
+				&& params.getPathType() == PathType.CONTENTSTORE 
+				&& versionService.isVersioned(nodeRef)) {
+			VersionHistory versionHistory = versionService.getVersionHistory(nodeRef);
+			for (Version version : versionHistory.getAllVersions()) {
+				Map<String, Serializable> versionProperties = version.getVersionProperties();
+				Map<QName, Serializable> versionProperties2 = new LinkedHashMap<QName, Serializable>();
+				for (Entry<String, Serializable> entry : versionProperties.entrySet()) {
+					// On n'a que le local name. Le content devrait être un cm:content.
+					QName key = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, entry.getKey());
+					versionProperties2.put(key, entry.getValue());
 				}
+				analyzeProperties(nodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, versionProperties2);
 			}
 		}
 		
@@ -661,8 +657,53 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		for (ChildAssociationRef childAssoc : children) {
 			if (   params.getPathType() == PathType.CONTENTSTORE
 				|| ContentModel.ASSOC_CONTAINS.equals(childAssoc.getTypeQName())) {
-				NodeRef childNodeRef = childAssoc.getChildRef();
-				recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params);
+				final NodeRef childNodeRef = childAssoc.getChildRef();
+				
+				if (depth % params.newTransactionEveryDepth == 1) {
+					retryingTransactionHelper.doInTransaction(new RetryingTransactionCallback<Void>() {
+						@Override
+						public Void execute() throws Throwable {
+							recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, depth+1);
+							return null;
+						}
+					}, true, true);
+				} else {
+					recurseThroughNodeRefChilds(childNodeRef, zipOutPutStream, processedNodes, nbFiles, totalVolume, params, depth+1);
+				}
+			}
+		}
+	}
+
+	private void analyzeProperties(NodeRef nodeRef, ZipOutputStream zipOutPutStream, Set<String> processedNodes,
+			AtomicInteger nbFiles, AtomicLong totalVolume, ContentStoreExportParams params,
+			Map<QName, Serializable> properties) throws IOException {
+		for (Entry<QName, Serializable> property : properties.entrySet()) {
+			//seul un content data nous interesse
+			if (property.getValue() instanceof ContentData) {
+				ContentData contentData = (ContentData) property.getValue();
+				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
+				
+				if (processedNodes.add(contentUrl)) {
+					nbFiles.incrementAndGet();
+					totalVolume.addAndGet(contentData.getSize());
+					
+					if (params.exportContent) {
+						//ajout de l'entrée au zip
+						ContentReader reader = contentService.getReader(nodeRef, property.getKey());
+						if (reader != null) {
+							InputStream inputStream = reader.getContentInputStream();
+							zipOutPutStream.putNextEntry(new ZipEntry(contentUrl));
+							try {
+								IOUtils.copy(inputStream, zipOutPutStream);
+							} finally {
+								IOUtils.closeQuietly(inputStream);
+								zipOutPutStream.closeEntry();
+							}
+						} else {
+							LOGGER.warn(nodeRef + " / " + property.getKey() + " has a null reader.");
+						}
+					}
+				}
 			}
 		}
 	}
@@ -707,6 +748,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		this.permissionService = serviceRegistry.getPermissionService();
 		this.namespacePrefixResolver = serviceRegistry.getNamespaceService();
 		this.siteService = serviceRegistry.getSiteService();
+		this.versionService = serviceRegistry.getVersionService();
+		this.retryingTransactionHelper = serviceRegistry.getRetryingTransactionHelper();
 	}
 	
 	public void setContentstoreexportVersion(String contentstoreexportVersion) {
