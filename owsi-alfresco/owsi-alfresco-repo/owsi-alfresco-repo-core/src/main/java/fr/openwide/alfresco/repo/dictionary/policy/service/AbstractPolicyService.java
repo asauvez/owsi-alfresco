@@ -1,0 +1,100 @@
+package fr.openwide.alfresco.repo.dictionary.policy.service;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.ClassPolicy;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
+import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
+
+/**
+ * Classe mère pour mettre en place des policy pour un type/aspect donnée.
+ * Il suffit d'implementer une interface (comme OnUpdatePropertiesPolicy) pour y être abonné.
+ */
+public abstract class AbstractPolicyService implements InitializingBean {
+	
+	@Autowired protected PolicyRepositoryService policyRepositoryService;
+	@Autowired protected NodeModelRepositoryService nodeRepositoryService;
+	@Autowired protected ConversionService conversionService;
+	
+	private ContainerModel model;
+
+	public AbstractPolicyService(ContainerModel model) {
+		this.model = model;
+	}
+	
+	public NotificationFrequency getNotificationFrequency() {
+		return NotificationFrequency.TRANSACTION_COMMIT;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends ClassPolicy> void bindClassBehaviour(Class<T> interface_) {
+		policyRepositoryService.bindClassBehaviour(model, getNotificationFrequency(), interface_, (T) this);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		for (Class<?> interface_ : this.getClass().getInterfaces()) {
+			if (ClassPolicy.class.isAssignableFrom(interface_)) {
+				bindClassBehaviour((Class) interface_);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean nodeExists(NodeRef nodeRef) {
+		return nodeRepositoryService.exists(nodeRef);
+	}
+	
+	/**
+	 * Methode utilitaire pour savoir s'il y a eut un changement de certaines propriétés.
+	 */
+	protected boolean hasPropertiesChanged(Map<QName, Serializable> before, Map<QName, Serializable> after, PropertyModel<?> ... properties) {
+		for (PropertyModel<?> property : properties) {
+			Serializable beforeValue = before.get(conversionService.getRequired(property.getNameReference()));
+			Serializable  afterValue =  after.get(conversionService.getRequired(property.getNameReference()));
+			if (! Objects.equals(beforeValue, afterValue)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	protected <C extends Serializable> C getProperty(Map<QName, Serializable> value, SinglePropertyModel<C> property) {
+		return conversionService.getProperty(value, property);
+	}
+	protected <C extends Serializable> List<C> getProperty(Map<QName, Serializable> value, MultiPropertyModel<C> property) {
+		return conversionService.getProperty(value, property);
+	}
+	protected <E extends Enum<E>> E getProperty(Map<QName, Serializable> value, EnumTextPropertyModel<E> property) {
+		return conversionService.getProperty(value, property);
+	}	
+	protected <C extends Serializable> List<C> getListNewItems(Map<QName, Serializable> before, Map<QName, Serializable> after, MultiPropertyModel<C> property) {
+		List<C> beforeList = getProperty(before, property);
+		List<C> afterList = getProperty(after, property);
+		
+		List<C> newItems = new ArrayList<>(afterList);
+		newItems.removeAll(beforeList);
+		return newItems;
+	}
+	protected <C extends Serializable> List<C> getListRemovedItems(Map<QName, Serializable> before, Map<QName, Serializable> after, MultiPropertyModel<C> property) {
+		return getListNewItems(after, before, property);
+	}
+	
+}
