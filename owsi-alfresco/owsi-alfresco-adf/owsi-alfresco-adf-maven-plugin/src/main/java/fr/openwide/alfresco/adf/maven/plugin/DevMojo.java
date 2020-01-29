@@ -111,7 +111,7 @@ public class DevMojo extends AbstractAdfMojo {
 	}
 	
 	private File getTargetAppFolder() throws IOException {
-		File targetAppFolder = new File(getBaseDir(), "target/orginal-app");
+		File targetAppFolder = new File(getBaseDir(), "target/original-app");
 		if (! targetAppFolder.exists()) {
 			getLog().info("Création de " + targetAppFolder);
 			File originalAppFolder = getOriginalAppFolder();
