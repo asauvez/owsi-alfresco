@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repo.module.classification.model.builder;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -133,7 +134,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		}
 		return destinationFolders.iterator().next();
 	}
-	public Collection<NodeRef> getDestinationFolders() {
+	public List<NodeRef> getDestinationFolders() {
 		return destinationFolders;
 	}
 	
@@ -187,6 +188,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 			service.copyNode(getNodeRef(), destinationFolder, Optional.<String>empty()))
 				.collect(Collectors.toList());
 	}
+	
 	public void delete() {
 		service.getNodeModelService().deleteNode(getNodeRef());
 	}
@@ -217,5 +219,14 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 			service.createFileLink(getNodeRef(), destinationFolder, Optional.empty());
 		}
 		return this;
+	}
+	
+	public ClassificationWithRootBuilder firstDestination() {
+		List<NodeRef> first = (destinationFolders.isEmpty()) ? Collections.emptyList() : destinationFolders.subList(0, 1);
+		return new ClassificationWithRootBuilder(service, getEvent(), first);
+	}
+	public ClassificationWithRootBuilder otherDestinations() {
+		List<NodeRef> others = (destinationFolders.isEmpty()) ? Collections.emptyList() : destinationFolders.subList(1, destinationFolders.size());
+		return new ClassificationWithRootBuilder(service, getEvent(), others);
 	}
 }
