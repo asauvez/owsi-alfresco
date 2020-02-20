@@ -300,6 +300,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return nodeModelRepositoryService.getCompanyHome();
 	}
 	
+	@Override
+	public void classify(NodeRef nodeRef) {
+		classify(nodeRef, ClassificationMode.MANUAL);
+	}
+	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
 		Set<NodeRef> classifiedNodes = getClassifiedNodes();
 		if (! classifiedNodes.add(nodeRef)) {

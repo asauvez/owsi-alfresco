@@ -5,6 +5,7 @@ public enum ClassificationMode {
 	
 	CREATE,
 	UPDATE,
-	RECLASSIFY
+	RECLASSIFY,
+	MANUAL
 	
 }
