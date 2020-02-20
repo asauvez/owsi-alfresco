@@ -9,10 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationWithRootBuilder;
@@ -30,19 +34,27 @@ import freemarker.template.TemplateException;
  */
 public class FreeMarkerClassificationPolicy implements ClassificationPolicy<ContainerModel> {
 	
-	private List<Template> templates = new ArrayList<>();
+	private Template ftsRootTemplate = null;
+	private List<Template> subfoldersTemplates = new ArrayList<>();
 
 	public FreeMarkerClassificationPolicy(Properties globalProperties, ContainerModel model) throws IOException {
-		String propertyKey = "owsi.classification." + model.getNameReference().getFullName().replace(':', '_') + ".subfolders";
-		String templatesAsString = globalProperties.getProperty(propertyKey);
-		if (templatesAsString == null) {
-			throw new IllegalStateException("Ne trouve pas la propriété " + propertyKey);
+		Configuration cfg = new Configuration();
+
+		String ftsRootPropertyKey = "owsi.classification." + model.getNameReference().getFullName().replace(':', '_') + ".root.fts";
+		String ftsRootTemplatesAsString = globalProperties.getProperty(ftsRootPropertyKey);
+		if (StringUtils.isNoneEmpty(ftsRootTemplatesAsString)) {
+			ftsRootTemplate = new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg);
+		}
+
+		String subfoldersPropertyKey = "owsi.classification." + model.getNameReference().getFullName().replace(':', '_') + ".subfolders";
+		String subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
+		if (subfoldersTemplatesAsString == null) {
+			throw new IllegalStateException("Ne trouve pas la propriété " + subfoldersPropertyKey);
 		}
 		
-		Configuration cfg = new Configuration();
-		for (String templateAsString : templatesAsString.split("/")) {
+		for (String templateAsString : subfoldersTemplatesAsString.split("/")) {
 			if (! templateAsString.isEmpty()) {
-				templates.add(new Template(templateAsString, new StringReader(templateAsString), cfg));
+				subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
 			}
 		}
 	}
@@ -56,18 +68,36 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			dataModel.put(entry.getKey().getFullName().replace(':', '_'), entry.getValue());
 		}
 		
-		ClassificationWithRootBuilder rootBuilder = builder.rootCompanyHome();
-		for (Template template : templates) {
-			StringWriter out = new StringWriter();
-			try {
-				template.process(dataModel, out);
-			} catch (TemplateException | IOException e) {
-				throw new IllegalStateException(model.getNameReference() + " " + template.getName(), e);
+		ClassificationWithRootBuilder rootBuilder;
+		if (ftsRootTemplate != null) {
+			String ftsRoot = processTemplate(ftsRootTemplate, dataModel);
+			Optional<ClassificationWithRootBuilder> optional = builder.rootFolder(new RestrictionBuilder()
+					.custom(ftsRoot).of());
+			if (optional.isPresent()) {
+				rootBuilder = optional.get();
+			} else {
+				throw new IllegalStateException(ftsRoot + " ne renvoie rien.");
 			}
-			String folderName = out.toString();
+		} else {
+			rootBuilder = builder.rootCompanyHome();
+		}
+		
+		
+		for (Template template : subfoldersTemplates) {
+			String folderName = processTemplate(template, dataModel);
 			rootBuilder.subFolder(folderName);
 		}
 		
 		rootBuilder.moveNode();
+	}
+	
+	private String processTemplate(Template template, Map<String, Object> dataModel) {
+		StringWriter out = new StringWriter();
+		try {
+			template.process(dataModel, out);
+		} catch (TemplateException | IOException e) {
+			throw new IllegalStateException(template.getName(), e);
+		}
+		return out.toString();
 	}
 }

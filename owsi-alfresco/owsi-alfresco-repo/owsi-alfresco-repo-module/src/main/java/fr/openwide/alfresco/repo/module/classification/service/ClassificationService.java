@@ -2,6 +2,8 @@ package fr.openwide.alfresco.repo.module.classification.service;
 
 import java.util.function.Consumer;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.Restriction;
@@ -24,6 +26,8 @@ public interface ClassificationService {
 	int reclassifyAll(Integer batchSize);
 	int reclassify(ContainerModel model, Integer batchSize, Restriction ...restrictions);
 	int reclassify(NameReference modelName, Integer batchSize);
+	
+	void classify(NodeRef nodeRef);
 	
 	void clearCaches();
 }
