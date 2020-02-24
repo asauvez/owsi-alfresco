@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.adf.maven.plugin;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -8,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.ProcessBuilder.Redirect;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -22,14 +24,16 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 /**
  * TODO
  * 
  * @author asauvez
  */
 @Mojo(name="dev", defaultPhase=LifecyclePhase.COMPILE)
+
 public class DevMojo extends AbstractAdfMojo {
 
 
@@ -51,30 +55,102 @@ public class DevMojo extends AbstractAdfMojo {
 			File targetAppFolder = getTargetAppFolder();
 			File rootAppFolder = getRootSrcAppFolder();
 			initAppExtensionsFile();
+			createFileLinks(rootAppFolder, targetAppFolder, true);
+			//createFileLinks(rootAppFolder, targetAppFolder);
+			getLog().info("Getting command...");
+			String serve = System.getProperty("serve");
+			getLog().info("Command is " + serve);
 			
-			createFileLinks(rootAppFolder, targetAppFolder);
+			
+			
+			if (serve != null) {
+				try {
+					Process process = new ProcessBuilder(serve.split(" "))
+						.redirectOutput(Redirect.INHERIT)
+						.redirectError(Redirect.INHERIT)
+						.start();
+					Runtime.getRuntime().addShutdownHook(new Thread() {
+				        public void run() {
+				            process.destroy();
+				        }
+				    });
+					while(true) {
+						//getLog().info("Running...");
+						createFileLinks(rootAppFolder, targetAppFolder, false);
+						createTargetLinks(targetAppFolder,rootAppFolder);
+						TimeUnit.SECONDS.sleep(4);
+						//if (!p.isAlive()) break;
+					}
+					//process.destroy();
+				}catch(Throwable t){
+					t.printStackTrace();
+				}
+				
+			}
+			
+
+
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
-		}
+		} 
 	}
 	
-	private void createFileLinks(File src, File dest) throws IOException {
+	// This function adds target files to the src folder, only if they have been recently modified
+	private void createTargetLinks(File src, File dest) throws IOException {
+		if (src.isDirectory()) {
+			//dest.mkdir();
+			for (File file : src.listFiles()) {
+				createTargetLinks(file, new File(dest, file.getName()));
+			}
+		} else {
+			Date date = new Date();
+			long time = date.getTime();
+			long lastModified = src.lastModified();
+			if(time - lastModified < 4500) {
+				if(dest.exists() && ! dest.delete()) {
+					throw new IllegalStateException("Ne peut pas effacer " + dest);
+				}
+				dest.getParentFile().mkdirs();
+				getLog().info("Create target link from " + src);
+				Files.copy(src.toPath(), dest.toPath());
+				dest.setLastModified(lastModified - 8000);
+				
+			}
+		}
+	}
+
+	private void createFileLinks(File src, File dest, boolean isFirstTime) throws IOException {
+
 		if (src.isDirectory()) {
 			dest.mkdir();
 			for (File file : src.listFiles()) {
-				createFileLinks(file, new File(dest, file.getName()));
+				createFileLinks(file, new File(dest, file.getName()), isFirstTime);
 			}
 		} else {
-			getLog().info("Create link " + src);
 			
-			if (dest.exists() && ! dest.delete()) {
-				throw new IllegalStateException("Ne peut pas effacer " + dest);
-			}
-//			try {
-//				Files.createSymbolicLink(dest.toPath(), src.toPath());
-//			} catch (UnsupportedOperationException ex) {
+			if(dest.exists() && !isFirstTime) {
+				Date date = new Date();
+				long time = date.getTime();
+				long lastModified = src.lastModified();
+				if(time - lastModified < 4500) {
+					if(! dest.delete()) {
+						throw new IllegalStateException("Ne peut pas effacer " + dest);
+					}
+					getLog().info("Update link " + src + " last modif: " + (time - lastModified) + " ms ago");
+					
+					Files.copy(src.toPath(), dest.toPath());
+					dest.setLastModified(lastModified - 8000);
+				}else {
+					//getLog().info("File " + src + " was changed too recently " +(lastModified - time) +" ms");
+				}
+			}else if(dest.exists() && isFirstTime) {
+				dest.delete();
+				getLog().info("Create new link " + src /**+ " to dest "+ dest +" dest exists:" + dest.getAbsoluteFile().exists()*/);
 				Files.copy(src.toPath(), dest.toPath());
-//			}
+			}else {
+				getLog().info("Create new link " + src /**+ " to dest "+ dest +" dest exists:" + dest.getAbsoluteFile().exists()*/);
+				Files.copy(src.toPath(), dest.toPath());
+			}
 		}
 	}
 	
