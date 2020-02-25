@@ -7,5 +7,6 @@ import fr.openwide.alfresco.repo.contentstoreexport.model.ContentStoreExportPara
 
 public interface ContentStoreExportService {
 
-	void export(OutputStream outputStream, ContentStoreExportParams params) throws IOException;
+	void export(OutputStream outputStream, String fileName, ContentStoreExportParams params) throws IOException;
+
 }
