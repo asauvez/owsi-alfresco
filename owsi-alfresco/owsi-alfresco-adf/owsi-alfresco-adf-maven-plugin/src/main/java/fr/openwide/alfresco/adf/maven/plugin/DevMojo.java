@@ -37,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 public class DevMojo extends AbstractAdfMojo {
 
 
+	private static final String ORI_EXTENSION = ".ori";
+
 	private static final String REFERENCES = "\"$references\": [";
 
 	private static final long ORIGINAL_TIMESPAMP = 0L;
@@ -45,7 +47,7 @@ public class DevMojo extends AbstractAdfMojo {
 	private String appUrl = "https://github.com/Alfresco/alfresco-content-app/archive/{0}.zip";
 	
 	@Parameter
-	private String appVersion = "v1.10.0";
+	private String appVersion = "v1.9.0";
 
 	public DevMojo() throws Exception {}
 	
@@ -127,8 +129,9 @@ public class DevMojo extends AbstractAdfMojo {
 				createFileLinks(file, new File(dest, file.getName()), isFirstTime);
 			}
 		} else {
-			
-			if(dest.exists() && !isFirstTime) {
+			if (src.getName().endsWith(ORI_EXTENSION)) {
+				// ignore
+			} else if(dest.exists() && !isFirstTime) {
 				Date date = new Date();
 				long time = date.getTime();
 				long lastModified = src.lastModified();
@@ -143,11 +146,13 @@ public class DevMojo extends AbstractAdfMojo {
 				}else {
 					//getLog().info("File " + src + " was changed too recently " +(lastModified - time) +" ms");
 				}
-			}else if(dest.exists() && isFirstTime) {
-				dest.delete();
+			} else if(dest.exists() && isFirstTime) {
+				File oriFile = new File(src.getAbsolutePath() + "." + appVersion + ORI_EXTENSION);
+				oriFile.delete();
+				dest.renameTo(oriFile);
 				getLog().info("Create new link " + src /**+ " to dest "+ dest +" dest exists:" + dest.getAbsoluteFile().exists()*/);
 				Files.copy(src.toPath(), dest.toPath());
-			}else {
+			} else {
 				getLog().info("Create new link " + src /**+ " to dest "+ dest +" dest exists:" + dest.getAbsoluteFile().exists()*/);
 				Files.copy(src.toPath(), dest.toPath());
 			}
