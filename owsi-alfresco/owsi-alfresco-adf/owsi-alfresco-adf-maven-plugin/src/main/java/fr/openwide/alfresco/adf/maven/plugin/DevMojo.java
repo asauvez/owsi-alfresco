@@ -39,8 +39,6 @@ public class DevMojo extends AbstractAdfMojo {
 
 	private static final String ORI_EXTENSION = ".ori";
 
-	private static final String REFERENCES = "\"$references\": [";
-
 	private static final long ORIGINAL_TIMESPAMP = 0L;
 
 	@Parameter
@@ -57,6 +55,7 @@ public class DevMojo extends AbstractAdfMojo {
 			File targetAppFolder = getTargetAppFolder();
 			File rootAppFolder = getRootSrcAppFolder();
 			initAppExtensionsFile();
+			initAppModuleFile();
 			createFileLinks(rootAppFolder, targetAppFolder, true);
 			//createFileLinks(rootAppFolder, targetAppFolder);
 			getLog().info("Getting command...");
@@ -210,6 +209,8 @@ public class DevMojo extends AbstractAdfMojo {
 	private File getCustomExtensionsSourceFile() throws IOException {
 		File customExtensionsSourceFile = new File(getRootSrcAppFolder(), "src/assets/plugins/" + project.getArtifactId() + ".json");
 		if (! customExtensionsSourceFile.exists()) {
+			getLog().info("Create" + customExtensionsSourceFile);
+
 			customExtensionsSourceFile.getParentFile().mkdirs();
 			try (PrintWriter writer = new PrintWriter(new FileWriter(customExtensionsSourceFile))) {
 				writer.println("{");
@@ -226,11 +227,15 @@ public class DevMojo extends AbstractAdfMojo {
 	}
 	
 	private void initAppExtensionsFile() throws IOException {
+		String REFERENCES = "\"$references\": [";
+		
 		File originalAppExtensionsFile = new File(getOriginalAppFolder(), "src/assets/app.extensions.json");
 		try (BufferedReader reader = new BufferedReader(new FileReader(originalAppExtensionsFile))) {
 			
 			File appExtensionsFile = new File(getTargetAppFolder(), "src/assets/app.extensions.json");
 			try (PrintWriter writer = new PrintWriter(new FileWriter(appExtensionsFile))) {
+				getLog().info("Patch " + appExtensionsFile);
+
 				String line;
 				while ((line = reader.readLine()) != null) {
 					int pos = line.indexOf(REFERENCES);
@@ -244,7 +249,52 @@ public class DevMojo extends AbstractAdfMojo {
 			}
 		}
 	}
+
+	private File getCustomModuleFile() throws IOException {
+		File customModuleFile = new File(getRootSrcAppFolder(), "src/app/" + project.getArtifactId() + ".module.ts");
+		if (! customModuleFile.exists()) {
+			getLog().info("Create" + customModuleFile);
+
+			customModuleFile.getParentFile().mkdirs();
+			try (PrintWriter writer = new PrintWriter(new FileWriter(customModuleFile))) {
+				writer.println("import { NgModule } from '@angular/core';");
+				writer.println("@NgModule({");
+				writer.println("  imports: [],");
+				writer.println("  exports: [],");
+				writer.println("  declarations: [],");
+				writer.println("  providers: [],");
+				writer.println("  entryComponents: []");
+				writer.println("})");
+				writer.println("export class " + getCustomModuleName() + " {}");
+			}
+		}
+		return customModuleFile;
+	}
+	private String getCustomModuleName() {
+		return project.getArtifactId().replace("-", "") + "Module";
+	}
 	
+	private void initAppModuleFile() throws IOException {
+		File originalAppModuleFile = new File(getOriginalAppFolder(), "src/app/app.module.ts");
+		try (BufferedReader reader = new BufferedReader(new FileReader(originalAppModuleFile))) {
+			File appModuleFile = new File(getTargetAppFolder(), "src/app/app.module.ts");
+			getLog().info("Patch " + appModuleFile);
+			try (PrintWriter writer = new PrintWriter(new FileWriter(appModuleFile))) {
+				String name = getCustomModuleFile().getName();
+				String nameWithoutExtension = name.substring(0, name.length() - ".ts".length());
+				writer.print("import { " + getCustomModuleName() + " } from './" + nameWithoutExtension + "';\n");
+				String line;
+				while ((line = reader.readLine()) != null) {
+					int pos = line.indexOf("  imports: [");
+					if (pos != -1) {
+						line = "  imports: [\n    " + getCustomModuleName() + ",\n";
+					}
+					writer.println(line);
+				}
+			}
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
 		System.out.println(new File(".").getAbsolutePath());
 		
