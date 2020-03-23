@@ -66,12 +66,12 @@ public class DevMojo extends AbstractAdfMojo {
 					"import { " + getCustomModuleName() + " } from './" + moduleFileName.substring(0, moduleFileName.length() - ".ts".length()) + "';\n",
 					"  imports: [", 
 					"  imports: [\n    " + getCustomModuleName() + ",\n");
-			replaceInFile("angular.json", "",
-					"      \"root\": \"\",", 
-					"      \"root\": \"" + project.getBuild().getFinalName() + "\",");
-			replaceInFile("src/index.html", "",
-					"<head>", 
-					"<head>\n    <base href=\"" + project.getBuild().getFinalName() + "\" />");
+//			replaceInFile("angular.json", "",
+//					"      \"root\": \"\",", 
+//					"      \"root\": \"" + project.getBuild().getFinalName() + "\",");
+//			replaceInFile("src/index.html", "",
+//					"<head>", 
+//					"<head>\n    <base href=\"" + project.getBuild().getFinalName() + "\" />");
 
 			createFileLinks(rootAppFolder, targetAppFolder, originalAppFolder, true);
 			//createFileLinks(rootAppFolder, targetAppFolder);
