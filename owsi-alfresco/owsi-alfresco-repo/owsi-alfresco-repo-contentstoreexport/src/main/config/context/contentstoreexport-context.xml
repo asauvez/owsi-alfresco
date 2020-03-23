@@ -11,6 +11,8 @@
 		<property name="serviceRegistry" ref="ServiceRegistry"/>
 		<property name="descriptorService" ref ="DescriptorService"/>
 		<property name="MBeanServer" ref="alfrescoMBeanServer" />
+		<property name="repositoryHelper" ref="repositoryHelper" />
+		<property name="fileFolderService" ref="FileFolderService"/>
 	</bean>
 	
 </beans>

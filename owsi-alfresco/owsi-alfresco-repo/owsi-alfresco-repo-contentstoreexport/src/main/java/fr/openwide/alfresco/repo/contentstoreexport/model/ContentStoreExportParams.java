@@ -27,8 +27,11 @@ public class ContentStoreExportParams {
 	public boolean exportVersions = true;
 
 	// Emplacement où écrire sur disque le Zip (défaut renvoie juste le Zip)
-	public String writeTo;
-	
+	public String writeToDisk;
+
+	// Emplacement où écrire sur Alfresco le Zip (défaut renvoie juste le Zip)
+	public String writeToAlfresco;
+
 	// Lance une nouvelle transaction au bout de n profondeur
 	public int newTransactionEveryDepth = Integer.MAX_VALUE;
 	
