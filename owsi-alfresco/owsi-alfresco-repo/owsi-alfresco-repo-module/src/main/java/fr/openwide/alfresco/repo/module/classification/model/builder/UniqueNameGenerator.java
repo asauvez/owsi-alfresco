@@ -7,7 +7,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class UniqueNameGenerator {
 	
-	protected int index = 1;
+	protected int index = 0;
 
 	public String generateNextName(String originalName) {
 		String baseName = FilenameUtils.removeExtension(originalName);
@@ -16,6 +16,12 @@ public class UniqueNameGenerator {
 			extension = "." + extension;
 		}
 		
-		return baseName + "-" + (index ++) + extension;
+		index ++;
+		return generateNextName(baseName, extension, index);
+	}
+	
+	protected String generateNextName(String baseName, String extension, int index) {
+		//return baseName + " (" + index + ")" + extension;
+		return baseName + "-" + index + extension;
 	}
 }
