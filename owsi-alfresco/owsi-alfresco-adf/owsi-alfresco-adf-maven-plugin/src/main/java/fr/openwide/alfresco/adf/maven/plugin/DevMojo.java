@@ -77,10 +77,12 @@ public class DevMojo extends AbstractAdfMojo {
 			//createFileLinks(rootAppFolder, targetAppFolder);
 			getLog().info("Getting command...");
 			String serve = System.getProperty("serve");
+			String serveDirectory = System.getProperty("serveDirectory", ".");
 			getLog().info("Command is " + serve);
 			
 			if (serve != null) {
 				Process process = new ProcessBuilder(serve.split(" "))
+					.directory(new File(serveDirectory))
 					.redirectOutput(Redirect.INHERIT)
 					.redirectError(Redirect.INHERIT)
 					.start();
@@ -225,7 +227,6 @@ public class DevMojo extends AbstractAdfMojo {
 	// src/assets/plugins/xxx.json
 	private File getSourceCustomExtensionsSourceFile() throws IOException {
 		File customExtensionsSourceFile = new File(getRootSrcAppFolder(), "src/assets/plugins/" + project.getArtifactId() + ".json");
-		filesToIgnore.add(customExtensionsSourceFile);
 		
 		if (! customExtensionsSourceFile.exists()) {
 			getLog().info("Create" + customExtensionsSourceFile);
@@ -278,7 +279,6 @@ public class DevMojo extends AbstractAdfMojo {
 	// ./src/app/src/app/xxx.module.ts
 	private File getSourceCustomModuleFile() throws IOException {
 		File customModuleFile = new File(getRootSrcAppFolder(), "src/app/" + project.getArtifactId() + ".module.ts");
-		filesToIgnore.add(customModuleFile);
 		if (! customModuleFile.exists()) {
 			getLog().info("Create" + customModuleFile);
 
