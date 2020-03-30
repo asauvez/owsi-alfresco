@@ -10,7 +10,6 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
-import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
 import fr.openwide.alfresco.component.model.repository.model.st.StSiteContainer.SiteContainerType;

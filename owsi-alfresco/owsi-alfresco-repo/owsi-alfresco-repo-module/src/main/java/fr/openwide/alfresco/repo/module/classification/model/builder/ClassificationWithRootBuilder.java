@@ -139,13 +139,11 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder uniqueName() {
-		if (destinationFolders.size() > 1) {
-			throw new UnsupportedOperationException(destinationFolders.toString());
-		}
-		for (NodeRef destinationFolder : destinationFolders) {
-			String newName = service.getNodeModelService().getUniqueChildName(destinationFolder, getNodeRef());
-			name(newName);
-		}
+		return uniqueName(new UniqueNameGenerator());
+	}
+	public ClassificationWithRootBuilder uniqueName(UniqueNameGenerator uniqueNameGenerator) {
+		String uniqueName = service.getUniqueName(getNodeRef(), getDestinationFolders(), uniqueNameGenerator);
+		service.setNewName(getNodeRef(), uniqueName);
 		return this;
 	}
 	
@@ -206,6 +204,18 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 */
 	public ClassificationWithRootBuilder createSecondaryParent() {
 		for (NodeRef destinationFolder : destinationFolders) {
+			service.createSecondaryParent(getNodeRef(), destinationFolder);
+		}
+		return this;
+	}
+
+	/**
+	 * Déplace le document dans la première destination et crée des parents secondaires pour les autres.
+	 */
+	public ClassificationWithRootBuilder moveFirstAndCreateSecondaryParents() {
+		service.moveNode(getNodeRef(), destinationFolders.get(0));
+		
+		for (NodeRef destinationFolder : destinationFolders.subList(1, destinationFolders.size())) {
 			service.createSecondaryParent(getNodeRef(), destinationFolder);
 		}
 		return this;

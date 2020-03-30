@@ -34,10 +34,13 @@ Nouveautés
 ==========
 
 ## depuis 0.8.5
- * Classification : N'appelle pas moveNode() si le document est déjà dans le bon dossier.
- * Classification.rootFolderNamedPath() : Plus besoin de devoir voir les dossiers intermédiaires.
+ * Classification :
+ 	* N'appelle pas moveNode() si le document est déjà dans le bon dossier.
+ 	* rootFolderNamedPath() : Plus besoin de devoir voir les dossiers intermédiaires.
+ 	* uniqueName() sur plusieurs destinations.
  * AbstractPolicyService pour simplifier la mise en place de policy.
- * webdavticketprovider pour authentifier automatiquement les utilisateurs lors de l'edit online.
+ * ADF : Plugin Maven pour démarrer projet
+ * ContentStoreExport : Fix totalVolume
 
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth
