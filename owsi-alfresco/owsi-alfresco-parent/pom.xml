@@ -93,7 +93,7 @@
 	<repositories>
 		<repository>
 			<id>alfresco-artifacts-repository</id>
-			<url>http://artifacts.alfresco.com/nexus/content/groups/private/</url>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/private/</url>
 		</repository>
 		<repository>
 			<id>nexus.internal.releases</id>
