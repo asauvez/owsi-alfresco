@@ -31,12 +31,6 @@
 		<module>owsi-alfresco-test</module>
   </modules>
 
-    <scm>
-        <developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
-        <url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi</url>
-        <tag>HEAD</tag>
-    </scm>
-
     <build>
         <pluginManagement>
             <plugins>

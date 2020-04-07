@@ -31,6 +31,8 @@
 		<module>owsi-alfresco-parent-alfresco</module>
 		<module>owsi-alfresco-parent-share-component</module>
 		<module>owsi-alfresco-parent-share</module>
+		<module>owsi-alfresco-parent-sdk4</module>
+		<module>owsi-alfresco-parent-sdk4-plus</module>
 	</modules>
 
 	<build>

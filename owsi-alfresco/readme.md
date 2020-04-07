@@ -41,6 +41,7 @@ Nouveautés
  * AbstractPolicyService pour simplifier la mise en place de policy.
  * ADF : Plugin Maven pour démarrer projet
  * ContentStoreExport : Fix totalVolume
+ * owsi-alfresco-parent-sdk4 et owsi-alfresco-parent-sdk4-plus : Parents pour les dév sur une base SDK4.
 
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth
