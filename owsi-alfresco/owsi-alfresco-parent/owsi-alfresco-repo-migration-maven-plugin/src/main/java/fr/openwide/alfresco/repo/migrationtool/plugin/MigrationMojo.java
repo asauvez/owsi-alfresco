@@ -108,6 +108,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			MigrationStat stat = new MigrationStat();
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco/web-extension/site-data/extensions/"), "/alfresco/web-extension/site-data/extensions/", stat);
 			customizationFoldersToIgnore.add("/alfresco/web-extension");
+			customizationFoldersToIgnore.add("/alfresco/module/" + project.getArtifactId());
 			
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco", stat);
 			visitResources(new File(getBaseDir(), "src/main/webapp"), "", stat);
