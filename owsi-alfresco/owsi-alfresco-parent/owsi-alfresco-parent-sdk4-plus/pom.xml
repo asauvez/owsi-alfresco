@@ -18,11 +18,31 @@
 
 	<properties>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
+		<owsi-alfresco.version>0.8.5-SNAPSHOT</owsi-alfresco.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-			
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-core</artifactId>
+				<version>${owsi-alfresco.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-module</artifactId>
+				<version>${owsi-alfresco.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-contentstoreexport</artifactId>
+				<version>${owsi-alfresco.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
+				<version>${owsi-alfresco.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
