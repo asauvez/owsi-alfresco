@@ -36,17 +36,20 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 	
 	private Template ftsRootTemplate = null;
 	private List<Template> subfoldersTemplates = new ArrayList<>();
+	private boolean uniqueName;
 
 	public FreeMarkerClassificationPolicy(Properties globalProperties, ContainerModel model) throws IOException {
 		Configuration cfg = new Configuration();
 
-		String ftsRootPropertyKey = "owsi.classification." + model.getNameReference().getFullName().replace(':', '_') + ".root.fts";
+		String policyKey = model.getNameReference().getFullName().replace(':', '_');
+		
+		String ftsRootPropertyKey = "owsi.classification." + policyKey + ".root.fts";
 		String ftsRootTemplatesAsString = globalProperties.getProperty(ftsRootPropertyKey);
 		if (StringUtils.isNoneEmpty(ftsRootTemplatesAsString)) {
 			ftsRootTemplate = new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg);
 		}
 
-		String subfoldersPropertyKey = "owsi.classification." + model.getNameReference().getFullName().replace(':', '_') + ".subfolders";
+		String subfoldersPropertyKey = "owsi.classification." + policyKey + ".subfolders";
 		String subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
 		if (subfoldersTemplatesAsString == null) {
 			throw new IllegalStateException("Ne trouve pas la propriété " + subfoldersPropertyKey);
@@ -57,6 +60,9 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 				subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
 			}
 		}
+		
+		String uniqueNamePropertyKey = "owsi.classification." + policyKey + ".uniquename";
+		uniqueName = Boolean.valueOf(globalProperties.getProperty(uniqueNamePropertyKey, "false"));
 	}
 	
 	@Override
@@ -88,6 +94,9 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			rootBuilder.subFolder(folderName);
 		}
 		
+		if (uniqueName) {
+			rootBuilder.uniqueName();
+		}
 		rootBuilder.moveNode();
 	}
 	
