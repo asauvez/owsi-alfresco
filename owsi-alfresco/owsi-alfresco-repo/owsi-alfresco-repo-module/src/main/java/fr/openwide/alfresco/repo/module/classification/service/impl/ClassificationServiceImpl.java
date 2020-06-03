@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repo.module.classification.service.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
@@ -77,7 +80,8 @@ import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
 		OnAddAspectPolicy, OnUpdatePropertiesPolicy, 
-		PreNodeCreationCallback {
+		PreNodeCreationCallback, 
+		ApplicationListener<ContextRefreshedEvent> {
 	
 	private static final String CLASSIFIED_NODE_TRANSACTION_KEY = ClassificationServiceImpl.class +  ".classifiedNodes";
 	private static final Set<QName> IGNORED_PROPERTIES = new HashSet<>(Arrays.asList(
@@ -119,11 +123,20 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
-		
+	}
+	
+	/** On fait dans ContextRefreshedEvent car les models peuvent ne pas avoir été initialisé */
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
 		for (String nameReference : globalProperties.getProperty("owsi.classification.freemarker.models", "").split(",")) {
 			if (! nameReference.trim().isEmpty()) {
 				ContainerModel containerModel = new ContainerModel(NameReference.create(nameReference.trim()));
-				addClassification(containerModel, new FreeMarkerClassificationPolicy(globalProperties, containerModel));
+				try {
+					addClassification(containerModel, new FreeMarkerClassificationPolicy(globalProperties, containerModel));
+				} catch (IOException e) {
+					logger.error(nameReference, e);
+					throw new IllegalStateException(nameReference, e);
+				}
 				policyRepositoryService.onAddAspect(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
 			}
 		}
@@ -513,6 +526,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			
 			folderNode.assocs().primaryParent(associationType).nodeReference(conversionService.get(destinationFolder));
 			
+			if (logger.isDebugEnabled()) {
+				logger.debug("Create subfolder {}", cleanFolderName);
+			}
+
 			if (createSubFolderInInnerTransaction) {
 				try {
 					// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.

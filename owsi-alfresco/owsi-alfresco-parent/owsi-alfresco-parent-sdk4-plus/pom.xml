@@ -92,6 +92,7 @@
 				<!-- Permet de générer des WS avec une annotation -->
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
+				<version>3.3.3</version>
 				<executions>
 					<execution>
 						<id>maven-processor-plugin-default</id>

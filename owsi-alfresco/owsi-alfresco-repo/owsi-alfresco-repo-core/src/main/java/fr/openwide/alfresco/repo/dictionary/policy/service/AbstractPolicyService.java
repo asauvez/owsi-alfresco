@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.ClassPolicy;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -13,11 +14,13 @@ import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
@@ -40,10 +43,17 @@ public abstract class AbstractPolicyService implements InitializingBean {
 	public NotificationFrequency getNotificationFrequency() {
 		return NotificationFrequency.TRANSACTION_COMMIT;
 	}
+	protected ChildAssociationModel getChildAssociationModel() {
+		return CmModel.folder.contains;
+	}
 	
 	@SuppressWarnings("unchecked")
 	private <T extends ClassPolicy> void bindClassBehaviour(Class<T> interface_) {
 		policyRepositoryService.bindClassBehaviour(model, getNotificationFrequency(), interface_, (T) this);
+	}
+	@SuppressWarnings("unchecked")
+	private <T extends AssociationPolicy> void bindAssociationBehaviour(Class<T> interface_) {
+		policyRepositoryService.bindAssociationBehaviour(model, getChildAssociationModel(), getNotificationFrequency(), interface_, (T) this);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -52,6 +62,8 @@ public abstract class AbstractPolicyService implements InitializingBean {
 		for (Class<?> interface_ : this.getClass().getInterfaces()) {
 			if (ClassPolicy.class.isAssignableFrom(interface_)) {
 				bindClassBehaviour((Class) interface_);
+			} else if (AssociationPolicy.class.isAssignableFrom(interface_)) {
+				bindAssociationBehaviour((Class) interface_);
 			}
 		}
 	}

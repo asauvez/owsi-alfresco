@@ -34,14 +34,18 @@ Nouveautés
 ==========
 
 ## depuis 0.8.5
+ * Alfresco 6.2.1
  * Classification :
  	* N'appelle pas moveNode() si le document est déjà dans le bon dossier.
  	* rootFolderNamedPath() : Plus besoin de devoir voir les dossiers intermédiaires.
  	* uniqueName() sur plusieurs destinations.
+	* Freemarker policies fait à la fin de l'initialisation pour avoir tous les modèles
  * AbstractPolicyService pour simplifier la mise en place de policy.
+ * bindAssociationBehaviour() pour écouter createChild
  * ADF : Plugin Maven pour démarrer projet
  * ContentStoreExport : Fix totalVolume
  * owsi-alfresco-parent-sdk4 et owsi-alfresco-parent-sdk4-plus : Parents pour les dév sur une base SDK4.
+ * Déplace alfresco-global du module dans repository.properties pour permettre à d'autres modules de surcharger des valeurs
 
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth
