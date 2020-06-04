@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -54,7 +55,7 @@ public class MatchRestriction<C extends Serializable> extends Restriction {
 		if (value == null || (value instanceof String && ((String) value).isEmpty())) {
 			return "";
 		}
-		String prefix = exact ? "=" : "@";
+		String prefix = (exact && ! (value instanceof Date)) ? "=" : "@";
 		String fuzzy = (this.fuzzy != null) ? "~" + this.fuzzy : "";
 		return prefix + property.toLucene() + ":" + toFtsLuceneValue(property, value) + fuzzy;
 	}

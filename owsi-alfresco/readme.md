@@ -46,6 +46,7 @@ Nouveautés
  * ContentStoreExport : Fix totalVolume
  * owsi-alfresco-parent-sdk4 et owsi-alfresco-parent-sdk4-plus : Parents pour les dév sur une base SDK4.
  * Déplace alfresco-global du module dans repository.properties pour permettre à d'autres modules de surcharger des valeurs
+ * Fix RestrictionBuilder.eq() pour les dates.
 
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth

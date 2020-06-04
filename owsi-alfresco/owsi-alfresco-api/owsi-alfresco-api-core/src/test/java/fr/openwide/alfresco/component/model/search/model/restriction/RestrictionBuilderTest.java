@@ -26,6 +26,7 @@ public class RestrictionBuilderTest {
 				"AND NOT ASPECT:cm\\:workingcopy\n" +
 				"AND ID:workspace\\://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c\n" +
 				"AND =cm\\:contentPropertyName:\"{http://www.alfresco.org/model/content/1.0}content\"\n" +
+				"AND @cm\\:modified:2009-02-13T23:31:30.123Z\n" +
 				"AND cm\\:modified:<2009-02-13T23:31:30.123Z TO MAX]\n" +
 				"AND cm\\:modified:[MIN TO 2009-02-13T23:31:30.123Z]\n" +
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
@@ -45,6 +46,7 @@ public class RestrictionBuilderTest {
 				.hasAspect(CmModel.workingCopy).not().of()
 				.id(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
 				.eq(RnModel.thumbnail.contentPropertyName, CmModel.content.content.getNameReference()).of()
+				.eq(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.gt(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.le(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.gt(CmModel.object.name, "abc").of()
