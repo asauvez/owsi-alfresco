@@ -84,6 +84,9 @@ public class RestrictionBuilder extends Restriction {
 	public ParentRestriction parent(NodeReference parentRef) {
 		return add(new ParentRestriction(this, parentRef));
 	}
+	public AncestorRestriction ancestor(NodeReference parentRef) {
+		return add(new AncestorRestriction(this, parentRef));
+	}
 
 	/**
 	 * Si la paramètre est null ou chaîne vide, on ne tient pas compte de la restriction.
