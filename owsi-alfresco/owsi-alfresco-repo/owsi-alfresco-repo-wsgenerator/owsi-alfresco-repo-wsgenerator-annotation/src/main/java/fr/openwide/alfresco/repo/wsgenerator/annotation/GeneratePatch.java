@@ -7,9 +7,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GenerateService {
+public @interface GeneratePatch {
 	
 	String value() default "";
-	
-	String[] dependsOn() default {};
+
+	String[] dependsOn() default { "dictionaryBootstrap" };
 }

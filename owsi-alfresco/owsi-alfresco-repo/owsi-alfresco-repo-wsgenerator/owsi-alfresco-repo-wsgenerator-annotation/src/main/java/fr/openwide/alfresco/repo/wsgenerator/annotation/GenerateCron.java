@@ -7,9 +7,17 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GenerateService {
+public @interface GenerateCron {
 	
-	String value() default "";
-	
+	String id() default "";
+
 	String[] dependsOn() default {};
+
+	String cronExpression();
+	String startDelay() default "0";
+	
+	String enable() default "true";
+	boolean readOnly() default true;
+	String runAs() default "System";
+	boolean logAsInfo() default false;
 }
