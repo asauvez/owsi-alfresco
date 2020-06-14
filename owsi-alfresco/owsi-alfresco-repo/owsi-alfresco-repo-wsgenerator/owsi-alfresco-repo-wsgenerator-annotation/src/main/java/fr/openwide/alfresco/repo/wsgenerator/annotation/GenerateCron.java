@@ -17,7 +17,7 @@ public @interface GenerateCron {
 	String startDelay() default "0";
 	
 	String enable() default "true";
-	boolean readOnly() default true;
+	boolean readOnly() default false;
 	String runAs() default "System";
 	boolean logAsInfo() default false;
 }

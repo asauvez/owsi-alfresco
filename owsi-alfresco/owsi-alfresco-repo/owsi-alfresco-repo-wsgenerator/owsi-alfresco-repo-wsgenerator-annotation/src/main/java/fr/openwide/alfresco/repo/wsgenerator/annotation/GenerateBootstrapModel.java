@@ -7,9 +7,12 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GenerateService {
-	
+public @interface GenerateBootstrapModel {
+
 	String id() default "";
 	
+	String[] importModels() default {};
+	String[] importLabels() default {};
+
 	String[] dependsOn() default {};
 }
