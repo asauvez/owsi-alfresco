@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GeneratePatch {
 	
-	String value() default "";
+	String id() default "";
 
 	String[] dependsOn() default { "dictionaryBootstrap" };
 }
