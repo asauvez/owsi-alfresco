@@ -47,6 +47,7 @@ Nouveautés
  * owsi-alfresco-parent-sdk4 et owsi-alfresco-parent-sdk4-plus : Parents pour les dév sur une base SDK4.
  * Déplace alfresco-global du module dans repository.properties pour permettre à d'autres modules de surcharger des valeurs
  * Fix RestrictionBuilder.eq() pour les dates.
+ * Ajout de RepositoryAccessControl.isInherited()
  * @GenerateService, @GeneratePatch, @GenerateBootstrapModel et @GenerateCron
 
 ## depuis 0.8.4
