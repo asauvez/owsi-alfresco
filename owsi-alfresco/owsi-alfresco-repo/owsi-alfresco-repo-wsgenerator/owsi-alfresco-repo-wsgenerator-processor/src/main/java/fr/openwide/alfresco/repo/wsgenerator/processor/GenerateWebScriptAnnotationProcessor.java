@@ -276,11 +276,13 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			xml.writeStartElement("bean");
 			xml.writeAttribute("id", "patch." + patchName);
 			xml.writeAttribute("class", className.toString());
+			xml.writeAttribute("parent", "basePatch");
 			if (generatePatch.dependsOn().length > 0) {
 				xml.writeAttribute("depends-on", String.join(", ", generatePatch.dependsOn()));
 			}
 
 			generateProperty(xml, "id", "patch." + patchName);
+			generateProperty(xml, "description", "OWSI auto generate patch patch." + patchName);
 			generateProperty(xml, "fixesFromSchema", "0");
 			generateProperty(xml, "fixesToSchema", "${version.schema}");
 			generateProperty(xml, "targetSchema", "10000000");
