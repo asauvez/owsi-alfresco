@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repo.core.swagger.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,15 +11,22 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.types.ArraySchema;
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
 
 @JsonInclude(Include.NON_EMPTY)
 public class SwaggerSchema {
 
 	@JsonProperty public String type;
+	@JsonProperty public String format;
 	@JsonProperty public List<String> required = new ArrayList<>();
 	@JsonProperty public Map<String, SwaggerSchema> properties = new TreeMap<>();
+	@JsonProperty public Map<String, String> items;
 	
+	public SwaggerSchema(String type, String format) {
+		this.type = type;
+		this.format = format;
+	}
 	public SwaggerSchema(JsonSchema schema) {
 		type = schema.getType().value();
 		
@@ -32,6 +40,9 @@ public class SwaggerSchema {
 					this.required.add(property.getKey());
 				}
 			}
+		} else if (schema instanceof ArraySchema) {
+			ArraySchema array = (ArraySchema) schema;
+			items = Collections.singletonMap("$ref", "#/definitions/" + array.getItems().asSingleItems().getSchema().getId());
 		}
 	}
 	

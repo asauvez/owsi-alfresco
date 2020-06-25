@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.core.swagger.web.script;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.alfresco.repo.admin.SysAdminParams;
@@ -12,11 +13,13 @@ import org.springframework.extensions.webscripts.WebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
-import com.fasterxml.jackson.module.jsonSchema.customProperties.ValidationSchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerInfo;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerParameterModel;
@@ -26,6 +29,7 @@ import fr.openwide.alfresco.repo.core.swagger.model.SwaggerSchema;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerWS;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter.SwaggerParameterIn;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerResponse;
 
 public class SwaggerWebScript extends AbstractWebScript {
@@ -34,14 +38,13 @@ public class SwaggerWebScript extends AbstractWebScript {
 	@Autowired private SysAdminParams sysAdminParams;
 
 	private ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-	private JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(objectMapper, new ValidationSchemaFactoryWrapper());
-	
 
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		res.setHeader("Access-Control-Allow-Origin", "*");
 
-		res.setContentType("application/x-yaml");
+		//res.setContentType("application/x-yaml");
+		res.setContentType("text/plain");
 		SwaggerRoot root = getRoot();
 		String yaml = objectMapper.writeValueAsString(root);
 		yaml = yaml.substring("---\n".length());
@@ -62,7 +65,19 @@ public class SwaggerWebScript extends AbstractWebScript {
 		infos.description = getRootDescription();
 		infos.version = getRootVersion();
 		root.info = infos;
-
+		
+		Map<String, JavaType> seenSchemas = new TreeMap<>();
+		SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
+		VisitorContext visitorContext = new VisitorContext() {
+			@Override
+			public String addSeenSchemaUri(JavaType aSeenSchema) {
+				String uri = super.addSeenSchemaUri(aSeenSchema);
+				seenSchemas.put(uri, aSeenSchema);
+				return uri;
+			}
+		};
+		visitor.setVisitorContext(visitorContext);
+		JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(objectMapper, visitor);
 		
 		for (WebScript webscript : webscripts.values()) {
 			GenerateWebScript annotation = webscript.getClass().getAnnotation(GenerateWebScript.class);
@@ -92,9 +107,13 @@ public class SwaggerWebScript extends AbstractWebScript {
 						model.required = param.required();
 						
 						if (param.schema() != Void.class) {
-							model.schema = new SwaggerSchema(schemaGen.generateSchema(param.schema()));
+							model.schema = new SwaggerSchema(schemaGenerator.generateSchema(param.schema()));
 						}else {
-							model.type = param.type();
+							if (param.in() == SwaggerParameterIn.BODY) {
+								model.schema = new SwaggerSchema(param.type(), "binary");
+							} else {
+								model.type = param.type();
+							}
 						}
 						
 						ws.parameters.add(model);
@@ -103,7 +122,7 @@ public class SwaggerWebScript extends AbstractWebScript {
 						SwaggerResponseModel model = new SwaggerResponseModel();
 						model.description = resp.description();
 						if (resp.schema() != Void.class) {
-							model.schema = new SwaggerSchema(schemaGen.generateSchema(resp.schema()));
+							model.schema = new SwaggerSchema(schemaGenerator.generateSchema(resp.schema()));
 						}
 						ws.responses.put(Integer.toString(resp.statusCode()), model);
 					}
@@ -112,6 +131,11 @@ public class SwaggerWebScript extends AbstractWebScript {
 				}
 			}
 		}
+		
+		for (Entry<String, JavaType> entry : seenSchemas.entrySet()) {
+			root.definitions.put(entry.getKey(), new SwaggerSchema(schemaGenerator.generateSchema(entry.getValue())));
+		}
+		
 		return root;
 	}
 

@@ -15,4 +15,6 @@ public class SwaggerRoot {
 	@JsonProperty public SwaggerInfo info;
 	
 	@JsonProperty public Map<String, Map<String, SwaggerWS>> paths = new TreeMap<>();
+
+	@JsonProperty public Map<String, SwaggerSchema> definitions = new TreeMap<>();
 }
