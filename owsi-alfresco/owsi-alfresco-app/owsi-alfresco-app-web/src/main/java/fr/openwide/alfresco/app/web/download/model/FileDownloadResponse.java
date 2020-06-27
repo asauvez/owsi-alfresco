@@ -1,59 +1,45 @@
 package fr.openwide.alfresco.app.web.download.model;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import fr.openwide.alfresco.api.core.util.ThresholdBuffer;
+
 public class FileDownloadResponse extends ContentDownloadResponse {
 
-	private File file;
-	private OutputStream outputStream;
-
-	private InputStream inputStream;
-
-	public FileDownloadResponse(HttpServletResponse httpServletResponse, File file, OutputStream outputStream) {
+	private ThresholdBuffer thresholdBuffer;
+	
+	public FileDownloadResponse(HttpServletResponse httpServletResponse, ThresholdBuffer thresholdBuffer) {
 		super(httpServletResponse);
 		
-		this.file = file;
-		this.outputStream = outputStream;
+		this.thresholdBuffer = thresholdBuffer;
 	}
 
 	@Override
 	public OutputStream getOutputStream() {
-		return outputStream;
+		return thresholdBuffer;
 	}
 
 	@Override
 	public void flush() throws IOException {
-		if (outputStream != null) {
-			outputStream.close();
-		}
-		inputStream = new BufferedInputStream(new FileInputStream(file));
+		thresholdBuffer.flush();
 	}
 
 	@Override
 	public long getContentLength() {
-		return file.length();
+		return thresholdBuffer.getSize();
 	}
 
 	@Override
 	public InputStream getWrittableStream() {
-		return inputStream;
+		return thresholdBuffer.newInputStream();
 	}
 
 	@Override
 	public void close() throws IOException {
-		if (inputStream != null) {
-			inputStream.close();
-		}
-		if (! file.delete()) {
-			throw new IOException("Could not delete file: " + file);
-		}
+		thresholdBuffer.close();
 	}
-
 }

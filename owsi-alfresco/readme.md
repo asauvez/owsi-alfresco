@@ -49,6 +49,7 @@ Nouveautés
  * Fix RestrictionBuilder.eq() pour les dates.
  * Ajout de RepositoryAccessControl.isInherited()
  * @GenerateService, @GeneratePatch, @GenerateBootstrapModel et @GenerateCron
+ * ThresholdBuffer pour stocker des fichiers temporaires
 
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth

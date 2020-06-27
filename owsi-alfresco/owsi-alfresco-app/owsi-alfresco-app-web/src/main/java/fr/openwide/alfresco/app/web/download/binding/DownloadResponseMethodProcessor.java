@@ -1,18 +1,15 @@
 package fr.openwide.alfresco.app.web.download.binding;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -29,6 +26,7 @@ import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserialize
 import fr.openwide.alfresco.api.core.node.model.RemoteCallParameters;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.api.core.util.ThresholdBufferFactory;
 import fr.openwide.alfresco.app.core.node.service.NodeService;
 import fr.openwide.alfresco.app.web.download.model.ByteArrayDownloadResponse;
 import fr.openwide.alfresco.app.web.download.model.ContentDownloadResponse;
@@ -42,11 +40,10 @@ import fr.openwide.core.spring.util.StringUtils;
 
 public class DownloadResponseMethodProcessor extends DownloadResponseHandler implements HandlerMethodReturnValueHandler, HandlerMethodArgumentResolver {
 
+	@Autowired
 	protected NodeService nodeService;
-
-	public DownloadResponseMethodProcessor(NodeService nodeService) {
-		this.nodeService = nodeService;
-	}
+	@Autowired
+	private ThresholdBufferFactory thresholdBufferFactory;
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -72,11 +69,7 @@ public class DownloadResponseMethodProcessor extends DownloadResponseHandler imp
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			downloadResponse = new ByteArrayDownloadResponse(response, baos);
 		} else if (FileDownloadResponse.class.equals(parameterType)) {
-			File tempFile = File.createTempFile("download", Long.toString(System.nanoTime()));
-			OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
-			// store outputStream if needed during the request lifecycle
-			request.setAttribute(getClass().getName(), outputStream);
-			downloadResponse = new FileDownloadResponse(response, tempFile, outputStream);
+			downloadResponse = new FileDownloadResponse(response, thresholdBufferFactory.newOutputStream());
 		} else if (NodeReferenceDownloadResponse.class.equals(parameterType)) {
 			downloadResponse = new NodeReferenceDownloadResponse(response);
 		} else {

@@ -42,10 +42,9 @@ import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteExceptio
 import fr.openwide.alfresco.api.core.remote.exception.IntegrityRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
+import fr.openwide.alfresco.api.core.util.ThresholdBufferFactory;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 import fr.openwide.alfresco.repo.remote.framework.model.InnerTransactionParameters;
-import fr.openwide.alfresco.repo.remote.framework.web.util.BufferedRequest;
-import fr.openwide.alfresco.repo.remote.framework.web.util.ThresholdOutputStreamFactory;
 
 /**
  * Base class which handle web-service returning one object of type R.
@@ -79,7 +78,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 	private String tempDirectoryName = null;
 	private int memoryThreshold = 4 * 1024 * 1024; // 4mb
 	private long maxContentSize = (long) 4 * 1024 * 1024 * 1024; // 4gb
-	private ThresholdOutputStreamFactory streamFactory = null;
+	private ThresholdBufferFactory streamFactory = null;
 
 	@Override
 	public void init(Container container, Description description) {
@@ -106,7 +105,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		}
 		
 		File tempDirectory = TempFileProvider.getTempDir(tempDirectoryName);
-		this.streamFactory = ThresholdOutputStreamFactory.newInstance(tempDirectory, memoryThreshold, maxContentSize, encryptTempFiles);
+		this.streamFactory = ThresholdBufferFactory.newInstance(tempDirectory, memoryThreshold, maxContentSize, encryptTempFiles);
 	}
 
 	@Override
