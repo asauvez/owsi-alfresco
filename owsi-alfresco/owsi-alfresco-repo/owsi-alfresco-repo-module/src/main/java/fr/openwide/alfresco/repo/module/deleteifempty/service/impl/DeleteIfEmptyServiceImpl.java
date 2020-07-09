@@ -4,6 +4,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,12 +46,16 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 	public void onDeleteChildAssociation(ChildAssociationRef childAssocRef) {
 		NodeRef parentRef = childAssocRef.getParentRef();
 		
-		// Si le noeud parent a encore d'autres enfants
-		if (   nodeModelService.exists(parentRef) 
-			&& nodeModelService.getChildrenAssocsContains(parentRef).isEmpty()) {
-			
-			nodeModelService.deleteNode(parentRef);
-		}
+		// runAsSystem pour voir les enfants que le user en cours n'a pas le droit de voir
+		AuthenticationUtil.runAsSystem(() -> {
+			// Si le noeud parent a encore d'autres enfants
+			if (   nodeModelService.exists(parentRef) 
+				&& nodeModelService.getChildrenAssocsContains(parentRef).isEmpty()) {
+				
+				nodeModelService.deleteNode(parentRef);
+			}
+			return null;
+		});
 	}
 	
 	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
