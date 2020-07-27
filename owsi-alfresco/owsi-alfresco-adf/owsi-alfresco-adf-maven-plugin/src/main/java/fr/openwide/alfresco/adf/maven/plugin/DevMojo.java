@@ -45,7 +45,7 @@ public class DevMojo extends AbstractAdfMojo {
 	private String appUrl = "https://github.com/Alfresco/alfresco-content-app/archive/{0}.zip";
 	
 	@Parameter
-	private String appVersion = "v1.9.0";
+	private String appVersion = "1.12.0";
 
 	private Set<File> filesToIgnore = new HashSet<>();
 
