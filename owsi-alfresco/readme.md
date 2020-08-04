@@ -40,6 +40,7 @@ Nouveautés
  	* rootFolderNamedPath() : Plus besoin de devoir voir les dossiers intermédiaires.
  	* uniqueName() sur plusieurs destinations.
 	* Freemarker policies fait à la fin de l'initialisation pour avoir tous les modèles
+	* owsi.classification.createSubFolderInInnerTransaction par défaut à false
  * AbstractPolicyService pour simplifier la mise en place de policy.
  * bindAssociationBehaviour() pour écouter createChild
  * ADF : Plugin Maven pour démarrer projet
@@ -50,6 +51,7 @@ Nouveautés
  * Ajout de RepositoryAccessControl.isInherited()
  * @GenerateService, @GeneratePatch, @GenerateBootstrapModel et @GenerateCron
  * ThresholdBuffer pour stocker des fichiers temporaires
+ * BootstrapService dans core au lieu de module
 
 ## depuis 0.8.4
  * ContentStoreExport.exportVersions et newTransactionEveryDepth
