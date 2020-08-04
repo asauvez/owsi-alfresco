@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
+import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
-import fr.openwide.alfresco.repo.module.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 /**

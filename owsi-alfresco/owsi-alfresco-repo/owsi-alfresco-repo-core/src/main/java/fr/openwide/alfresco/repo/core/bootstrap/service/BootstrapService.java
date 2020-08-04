@@ -1,6 +1,8 @@
-package fr.openwide.alfresco.repo.module.bootstrap.service;
+package fr.openwide.alfresco.repo.core.bootstrap.service;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.site.SiteInfo;
+import org.alfresco.service.cmr.site.SiteVisibility;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 
@@ -20,4 +22,5 @@ public interface BootstrapService {
 	NodeRef importFileFromClassPath(NodeRef parentRef, String fileName);
 	void importView(NodeRef parentRef, String viewFileName, String messageFileName);
 
+	SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
 }
