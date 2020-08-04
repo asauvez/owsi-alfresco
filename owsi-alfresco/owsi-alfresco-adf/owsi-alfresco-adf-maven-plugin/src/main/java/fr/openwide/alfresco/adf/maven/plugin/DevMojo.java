@@ -69,9 +69,9 @@ public class DevMojo extends AbstractAdfMojo {
 //			replaceInFile("angular.json", "",
 //					"      \"root\": \"\",", 
 //					"      \"root\": \"" + project.getBuild().getFinalName() + "\",");
-//			replaceInFile("src/index.html", "",
-//					"<head>", 
-//					"<head>\n    <base href=\"" + project.getBuild().getFinalName() + "\" />");
+			replaceInFile("src/index.html", "",
+					"<base href=\"/\" />", 
+					"<base href=\"/" + project.getBuild().getFinalName() + "/\" />");
 
 			createFileLinks(rootAppFolder, targetAppFolder, originalAppFolder, true);
 			//createFileLinks(rootAppFolder, targetAppFolder);
