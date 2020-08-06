@@ -49,6 +49,7 @@ import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch",
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron",
 })
 public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 
