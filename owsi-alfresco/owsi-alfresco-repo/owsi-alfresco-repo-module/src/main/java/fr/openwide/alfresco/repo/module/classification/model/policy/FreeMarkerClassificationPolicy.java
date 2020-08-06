@@ -5,12 +5,15 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +40,8 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 	private Template ftsRootTemplate = null;
 	private List<Template> subfoldersTemplates = new ArrayList<>();
 	private boolean uniqueName;
+	private String folderSeparator = "/";
+	private Optional<String> multiFolderSeparator;
 
 	public FreeMarkerClassificationPolicy(Properties globalProperties, ContainerModel model) throws IOException {
 		Configuration cfg = new Configuration();
@@ -49,13 +54,19 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			ftsRootTemplate = new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg);
 		}
 
+		String folderSeparatorKey = "owsi.classification." + policyKey + ".folderSeparator";
+		folderSeparator = globalProperties.getProperty(folderSeparatorKey, "/");
+
+		String multiFolderSeparatorKey = "owsi.classification." + policyKey + ".multiFolderSeparator";
+		multiFolderSeparator = Optional.ofNullable(globalProperties.getProperty(multiFolderSeparatorKey, null));
+
 		String subfoldersPropertyKey = "owsi.classification." + policyKey + ".subfolders";
 		String subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
 		if (subfoldersTemplatesAsString == null) {
 			throw new IllegalStateException("Ne trouve pas la propriété " + subfoldersPropertyKey);
 		}
 		
-		for (String templateAsString : subfoldersTemplatesAsString.split("/")) {
+		for (String templateAsString : subfoldersTemplatesAsString.split(folderSeparator)) {
 			if (! templateAsString.isEmpty()) {
 				subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
 			}
@@ -91,13 +102,19 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		
 		for (Template template : subfoldersTemplates) {
 			String folderName = processTemplate(template, dataModel);
-			rootBuilder.subFolder(folderName);
+			if (multiFolderSeparator.isPresent()) {
+				Set<String> folderNames = new TreeSet<String>(Arrays.asList(folderName.split(multiFolderSeparator.get())));
+				folderNames.remove("");
+				rootBuilder.subFolders(folderNames);
+			} else {
+				rootBuilder.subFolder(folderName);
+			}
 		}
 		
 		if (uniqueName) {
 			rootBuilder.uniqueName();
 		}
-		rootBuilder.moveNode();
+		rootBuilder.moveFirstAndCreateSecondaryParents();
 	}
 	
 	private String processTemplate(Template template, Map<String, Object> dataModel) {
