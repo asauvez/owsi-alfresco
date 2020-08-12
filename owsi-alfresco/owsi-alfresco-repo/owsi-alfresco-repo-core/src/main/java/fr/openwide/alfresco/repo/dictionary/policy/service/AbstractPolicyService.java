@@ -79,6 +79,8 @@ public abstract class AbstractPolicyService implements InitializingBean {
 	 * Methode utilitaire pour savoir s'il y a eut un changement de certaines propriétés.
 	 */
 	protected boolean hasPropertiesChanged(Map<QName, Serializable> before, Map<QName, Serializable> after, PropertyModel<?> ... properties) {
+		if (before == null || after == null) return true;
+		
 		for (PropertyModel<?> property : properties) {
 			Serializable beforeValue = before.get(conversionService.getRequired(property.getNameReference()));
 			Serializable  afterValue =  after.get(conversionService.getRequired(property.getNameReference()));
