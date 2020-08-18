@@ -7,6 +7,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import fr.openwide.alfresco.demo.business.model.DemoModel;
 import fr.openwide.alfresco.repo.module.bootstrap.patch.AbstractBootstrapPatch;
 
+//@GeneratePatch(dependsOn = {"owsi.service.bootstrapService"})
 public class DemoPatch extends AbstractBootstrapPatch {
 
 	private static final String DEMO_FOLDER_NAME = "Demo";
