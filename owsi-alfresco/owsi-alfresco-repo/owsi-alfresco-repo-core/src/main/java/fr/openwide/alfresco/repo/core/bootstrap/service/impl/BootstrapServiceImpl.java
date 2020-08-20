@@ -47,8 +47,7 @@ import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 
 @GenerateService(
-	id="owsi.service.bootstrapService", 
-	dependsOn = "owsi.dictionaryBootstrap")
+	id="owsi.service.bootstrapService")
 public class BootstrapServiceImpl implements BootstrapService {
 
 	private final Logger logger = LoggerFactory.getLogger(BootstrapServiceImpl.class);
