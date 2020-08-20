@@ -27,6 +27,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.SinglePro
 
 public interface NodeModelRepositoryService {
 
+	NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException;
 	NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
 	
 	boolean exists(NodeRef nodeRef);
