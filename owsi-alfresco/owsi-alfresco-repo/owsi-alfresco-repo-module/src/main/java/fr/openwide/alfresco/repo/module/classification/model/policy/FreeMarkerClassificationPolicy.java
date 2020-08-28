@@ -40,7 +40,6 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 	private Template ftsRootTemplate = null;
 	private List<Template> subfoldersTemplates = new ArrayList<>();
 	private boolean uniqueName;
-	private String folderSeparator = "/";
 	private Optional<String> multiFolderSeparator;
 
 	public FreeMarkerClassificationPolicy(Properties globalProperties, ContainerModel model) throws IOException {
@@ -54,9 +53,6 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			ftsRootTemplate = new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg);
 		}
 
-		String folderSeparatorKey = "owsi.classification." + policyKey + ".folderSeparator";
-		folderSeparator = globalProperties.getProperty(folderSeparatorKey, "/");
-
 		String multiFolderSeparatorKey = "owsi.classification." + policyKey + ".multiFolderSeparator";
 		multiFolderSeparator = Optional.ofNullable(globalProperties.getProperty(multiFolderSeparatorKey, null));
 
@@ -66,16 +62,46 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			throw new IllegalStateException("Ne trouve pas la propriété " + subfoldersPropertyKey);
 		}
 		
-		for (String templateAsString : subfoldersTemplatesAsString.split(folderSeparator)) {
+		for (String templateAsString : splitIgnoreBracket(subfoldersTemplatesAsString)) {
 			if (! templateAsString.isEmpty()) {
 				subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
 			}
 		}
-		
+
 		String uniqueNamePropertyKey = "owsi.classification." + policyKey + ".uniquename";
 		uniqueName = Boolean.valueOf(globalProperties.getProperty(uniqueNamePropertyKey, "false"));
 	}
 	
+	private static List<String> splitIgnoreBracket(String input) {
+		int nParens = 0;
+		int start = 0;
+		List<String> result = new ArrayList<>();
+		for (int i = 0; i < input.length(); i++) {
+			switch (input.charAt(i)) {
+			case '/':
+				if (nParens == 0) {
+					result.add(input.substring(start, i));
+					start = i + 1;
+				}
+				break;
+			case '{':
+			case '<':
+				nParens++;
+				break;
+			case '}':
+			case '>':
+				nParens--;
+				if (nParens < 0)
+					throw new IllegalArgumentException("Unbalanced bracket at offset #" + i);
+				break;
+			}
+		}
+		if (nParens > 0)
+			throw new IllegalArgumentException("Missing closing bracket");
+		result.add(input.substring(start));
+		return result;
+	}
+
 	@Override
 	public void classify(ClassificationBuilder builder, ContainerModel model, ClassificationEvent event) {
 		Map<NameReference, Serializable> properties = builder.getNodeModelService().getProperties(builder.getNodeRef());
