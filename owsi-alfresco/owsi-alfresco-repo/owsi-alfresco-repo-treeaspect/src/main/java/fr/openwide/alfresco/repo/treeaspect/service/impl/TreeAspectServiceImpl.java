@@ -154,7 +154,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		for (ChildAssociationRef child : childAssocs) {
 			NodeRef childRef = child.getChildRef();
 
-			runAsSystem("onRemoveAspect", childRef, () -> {
+			runAsSystem("updateChildProperties", childRef, () -> {
 				nodeService.setProperty(childRef, property, afterProperty);
 				updateChildProperties(nodeService.getChildAssocs(childRef), property, afterProperty);
 			});
