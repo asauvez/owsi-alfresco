@@ -5,6 +5,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
+/**
+ * Exemple :
+ * 
+ * @GenerateBootstrapModel(
+ *	importModels = "alfresco/module/xxx-ged-platform/xxx-model.xml",
+ *	dependsOn = "owsi.dictionaryBootstrap"
+ * )
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GenerateBootstrapModel {

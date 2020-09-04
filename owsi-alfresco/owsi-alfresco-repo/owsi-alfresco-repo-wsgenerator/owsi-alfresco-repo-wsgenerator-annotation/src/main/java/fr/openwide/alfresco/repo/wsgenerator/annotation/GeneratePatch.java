@@ -5,6 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * La classe doit hériter de AbstractPatch.
+ * 
+ * Il faut probablement mettre un dependsOn si on utilise un model custom.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GeneratePatch {
