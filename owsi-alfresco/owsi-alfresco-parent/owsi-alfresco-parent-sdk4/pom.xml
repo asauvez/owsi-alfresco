@@ -387,6 +387,16 @@
 		</profile>
 	</profiles>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus.internal.snapshots</id>
+			<url>http://nexus.vitry.intranet/repository/InternalSmileSnapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>nexus.internal.releases</id>
+			<url>http://nexus.vitry.intranet/repository/InternalSmileReleases/</url>
+		</repository>
+	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>alfresco-public</id>
