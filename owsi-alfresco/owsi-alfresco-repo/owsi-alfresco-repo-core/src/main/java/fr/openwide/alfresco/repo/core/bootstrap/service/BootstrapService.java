@@ -5,6 +5,7 @@ import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteVisibility;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
 
 
 public interface BootstrapService {
@@ -23,4 +24,6 @@ public interface BootstrapService {
 	void importView(NodeRef parentRef, String viewFileName, String messageFileName);
 
 	SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
+	NodeRef createDataListContainer(SiteInfo siteInfo);
+	NodeRef createDataList(NodeRef dataListContainer, String title, DlDataListItem dataListItemType);
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Properties;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.importer.ImporterBootstrap;
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -41,6 +43,8 @@ import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.component.model.repository.model.DlModel;
+import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
 import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
@@ -192,9 +196,20 @@ public class BootstrapServiceImpl implements BootstrapService {
 			siteInfo = siteService.createSite("site-dashboard", siteName, siteTitle, siteDescription, siteVisibility);
 			// TODO siteService.setMembership(siteInfo.getShortName(), "admin", SiteRole.SiteManager.toString());
 			createDefaultDashboard(siteInfo);
-			NodeRef documentLibraryNodeRef = siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
+			siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
 		}
 		return siteInfo;
+	}
+	@Override
+	public NodeRef createDataListContainer(SiteInfo siteInfo) {
+		return siteService.createContainer(siteInfo.getShortName(), "dataLists", null, 
+				Collections.singletonMap(SiteModel.PROP_COMPONENT_ID, "dataLists"));
+	}
+	@Override
+	public NodeRef createDataList(NodeRef dataListContainer, String name, DlDataListItem dataListItemType) {
+		NodeRef dataList = nodeModelRepositoryService.createNode(dataListContainer, DlModel.dataList, name);
+		nodeModelRepositoryService.setProperty(dataList, DlModel.dataList.dataListItemType, dataListItemType.getNameReference().getFullName());
+		return dataList;
 	}
 
 	private void createDefaultDashboard(SiteInfo siteInfo) {
