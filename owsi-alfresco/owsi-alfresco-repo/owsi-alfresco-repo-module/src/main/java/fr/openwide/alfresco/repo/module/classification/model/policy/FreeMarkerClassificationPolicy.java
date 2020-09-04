@@ -31,14 +31,20 @@ import freemarker.template.TemplateException;
 /**
  * Permet de faire une classification juste en définissant les propriétés suivantes :
  * 
- *  owsi.classification.freemarker.models=exif:exif
-*   owsi.classification.exif_exif.subfolders=/Demo/exif/${cm_created?string.yyyy}/${exif_pixelXDimension}/${exif_pixelYDimension}/
- *
+ * owsi.classification.freemarker.models=exif:exif
+ * owsi.classification.exif_exif.subfolders=/Sites/DAM/documentLibrary/photos/${cm_created?string.yyyy}/${exif_pixelXDimension!"inconnu"}/${exif_pixelYDimension!"inconnu"}/
+ * owsi.classification.exif_exif.name=product_image.${cm_name?keep_after_last(".")}
+ * owsi.classification.exif_exif.uniquename=true
+ * 
+ * Classement dans plusieurs dossiers
+ * owsi.classification.xxx_bonLivraison.subfolders=/Sites/XXX/documentLibrary/bdl/<#list xxx_codeFournisseur as code>@Fournisseur ${code}</#list>/
+ * owsi.classification.xxx_bonLivraison.multiFolderSeparator=@
  */
 public class FreeMarkerClassificationPolicy implements ClassificationPolicy<ContainerModel> {
 	
-	private Template ftsRootTemplate = null;
+	private Optional<Template> ftsRootTemplate = Optional.empty();
 	private List<Template> subfoldersTemplates = new ArrayList<>();
+	private Optional<Template> newNameTemplate = Optional.empty();
 	private boolean uniqueName;
 	private Optional<String> multiFolderSeparator;
 
@@ -50,7 +56,7 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		String ftsRootPropertyKey = "owsi.classification." + policyKey + ".root.fts";
 		String ftsRootTemplatesAsString = globalProperties.getProperty(ftsRootPropertyKey);
 		if (StringUtils.isNoneEmpty(ftsRootTemplatesAsString)) {
-			ftsRootTemplate = new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg);
+			ftsRootTemplate = Optional.of(new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg));
 		}
 
 		String multiFolderSeparatorKey = "owsi.classification." + policyKey + ".multiFolderSeparator";
@@ -58,16 +64,20 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 
 		String subfoldersPropertyKey = "owsi.classification." + policyKey + ".subfolders";
 		String subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
-		if (subfoldersTemplatesAsString == null) {
-			throw new IllegalStateException("Ne trouve pas la propriété " + subfoldersPropertyKey);
-		}
-		
-		for (String templateAsString : splitIgnoreBracket(subfoldersTemplatesAsString)) {
-			if (! templateAsString.isEmpty()) {
-				subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
+		if (subfoldersTemplatesAsString != null) {
+			for (String templateAsString : splitIgnoreBracket(subfoldersTemplatesAsString)) {
+				if (! templateAsString.isEmpty()) {
+					subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
+				}
 			}
 		}
 
+		String newNamePropertyKey = "owsi.classification." + policyKey + ".name";
+		String newNameAsString = globalProperties.getProperty(newNamePropertyKey);
+		if (newNameAsString != null) {
+			newNameTemplate = Optional.of(new Template(newNamePropertyKey, new StringReader(newNameAsString), cfg));
+		}
+		
 		String uniqueNamePropertyKey = "owsi.classification." + policyKey + ".uniquename";
 		uniqueName = Boolean.valueOf(globalProperties.getProperty(uniqueNamePropertyKey, "false"));
 	}
@@ -112,8 +122,8 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		}
 		
 		ClassificationWithRootBuilder rootBuilder;
-		if (ftsRootTemplate != null) {
-			String ftsRoot = processTemplate(ftsRootTemplate, dataModel);
+		if (ftsRootTemplate.isPresent()) {
+			String ftsRoot = processTemplate(ftsRootTemplate.get(), dataModel);
 			Optional<ClassificationWithRootBuilder> optional = builder.rootFolder(new RestrictionBuilder()
 					.custom(ftsRoot).of());
 			if (optional.isPresent()) {
@@ -135,6 +145,11 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			} else {
 				rootBuilder.subFolder(folderName);
 			}
+		}
+		
+		if (newNameTemplate.isPresent()) {
+			String newName = processTemplate(newNameTemplate.get(), dataModel);
+			rootBuilder.name(newName);
 		}
 		
 		if (uniqueName) {
