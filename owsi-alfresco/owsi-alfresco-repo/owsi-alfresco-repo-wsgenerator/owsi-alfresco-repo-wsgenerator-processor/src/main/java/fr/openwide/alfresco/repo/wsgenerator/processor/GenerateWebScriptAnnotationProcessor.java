@@ -208,7 +208,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			}
 			
 			xml.writeStartElement("bean");
-			xml.writeAttribute("id", "service." + serviceName);
+			xml.writeAttribute("id", serviceName);
 			xml.writeAttribute("class", className.toString());
 			if (generateService.dependsOn().length > 0) {
 				xml.writeAttribute("depends-on", String.join(", ", generateService.dependsOn()));
@@ -228,7 +228,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			}
 			
 			xml.writeStartElement("bean");
-			xml.writeAttribute("id", "service." + modelName);
+			xml.writeAttribute("id", modelName);
 			xml.writeAttribute("parent", "dictionaryModelBootstrap");
 			if (generateBootstrapModel.dependsOn().length > 0) {
 				xml.writeAttribute("depends-on", String.join(", ", generateBootstrapModel.dependsOn()));
