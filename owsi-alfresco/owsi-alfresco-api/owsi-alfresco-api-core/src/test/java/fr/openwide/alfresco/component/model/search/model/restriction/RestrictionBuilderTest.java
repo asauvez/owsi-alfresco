@@ -31,6 +31,7 @@ public class RestrictionBuilderTest {
 				"AND cm\\:modified:[MIN TO 2009-02-13T23:31:30.123Z]\n" +
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
 				"AND cm\\:name:[\\\\u0000 TO \"def\"]\n" +
+				"AND SITE:\"swsdp\"\n" +
 				"AND FINGERPRINT:aeb883c2-ad52-43f1-ab9f-1bf16137e79c_20_80\n" +
 				"AND (=cm\\:name:\"titi\"\n" +
 				"	OR =cm\\:name:\"tata\")\n" + 
@@ -51,6 +52,7 @@ public class RestrictionBuilderTest {
 				.le(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.gt(CmModel.object.name, "abc").of()
 				.le(CmModel.object.name, "def").of()
+				.site("swsdp").of()
 				.fingerPrint(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c"))
 					.overlap(20)
 					.confident(80).of()

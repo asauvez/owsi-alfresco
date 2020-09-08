@@ -160,6 +160,9 @@ public class RestrictionBuilder extends Restriction {
 		return add(new BetweenRelativeTimeRestriction(this, property, min, max, unit));
 	}
 	
+	public SiteRestriction site(String siteShortName) {
+		return add(new SiteRestriction(this, siteShortName));
+	}
 	public TagRestriction tag(String tag) {
 		return add(new TagRestriction(this, tag));
 	}
