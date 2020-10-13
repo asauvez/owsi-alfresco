@@ -36,7 +36,7 @@
 		<owsi-alfresco.share.json.version>20090211</owsi-alfresco.share.json.version>
 		<owsi-alfresco.share.json-simple.version>1.1.1</owsi-alfresco.share.json-simple.version>
 		<owsi-alfresco.share.myfaces.version>1.1.10</owsi-alfresco.share.myfaces.version>
-		<owsi-alfresco.share.spring-surf-core.version>6.2</owsi-alfresco.share.spring-surf-core.version>
+		<owsi-alfresco.share.spring-surf-core.version>6.18</owsi-alfresco.share.spring-surf-core.version>
 		<owsi-alfresco.share.freemarker.version>2.3.20-alfresco-patched</owsi-alfresco.share.freemarker.version>
 		
 		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
@@ -60,6 +60,38 @@
 		<dependency>
 			<groupId>org.alfresco.surf</groupId>
 			<artifactId>spring-surf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>share</artifactId>
+			<version>${owsi-alfresco.share.alfresco.version}</version>
+			<classifier>classes</classifier>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>jstl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>share</artifactId>
+			<version>${owsi-alfresco.share.alfresco.version}</version>
+			<type>war</type>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	
@@ -175,6 +207,18 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-core</artifactId>
+				<version>2.2.11</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-impl</artifactId>
+				<version>2.2.11</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.freemarker</groupId>
 				<artifactId>freemarker</artifactId>
 				<version>${owsi-alfresco.share.freemarker.version}</version>
@@ -190,6 +234,12 @@
 				<groupId>com.googlecode.json-simple</groupId>
 				<artifactId>json-simple</artifactId>
 				<version>${owsi-alfresco.share.json-simple.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.mozilla</groupId>
+				<artifactId>rhino</artifactId>
+				<version>1.7R4-alfresco-patched</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
@@ -223,10 +273,40 @@
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
-						<groupId>*</groupId>
-						<artifactId>*</artifactId>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.extensions.surf</groupId>
+				<artifactId>spring-surf-core-configservice</artifactId>
+				<version>${owsi-alfresco.share.spring-surf-core.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-surf-api</artifactId>
+				<version>6.11</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-webscripts</artifactId>
+				<version>6.18</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.alfresco.surf</groupId>
+				<artifactId>spring-webscripts-api</artifactId>
+				<version>6.18</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.chemistry.opencmis</groupId>
+				<artifactId>chemistry-opencmis-client-impl</artifactId>
+				<version>1.0.0</version>
+				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

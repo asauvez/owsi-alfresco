@@ -154,7 +154,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	private void initDependency(Artifact artifact) throws Exception {
 		File file = artifact.getFile();
-		if (file != null && ! file.isDirectory() && file.getName().endsWith(".jar")) {
+		if (file != null && ! file.isDirectory() && (file.getName().endsWith(".jar") || file.getName().endsWith(".war"))) {
 			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
 			try {
 				ZipEntry entry;

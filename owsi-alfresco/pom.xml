@@ -31,25 +31,25 @@
 		<module>owsi-alfresco-test</module>
   </modules>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.amashchenko.maven.plugin</groupId>
-		            <artifactId>gitflow-maven-plugin</artifactId>
-		            <version>1.14.0</version>
-		            <configuration>
-		            	<gitFlowConfig>
-			            	<developmentBranch>dev</developmentBranch>
-					        <featureBranchPrefix>ft-</featureBranchPrefix>
-					        <releaseBranchPrefix>rl-</releaseBranchPrefix>
-					        <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-				        </gitFlowConfig>
-		            </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.amashchenko.maven.plugin</groupId>
+					<artifactId>gitflow-maven-plugin</artifactId>
+					<version>1.14.0</version>
+					<configuration>
+						<gitFlowConfig>
+							<developmentBranch>dev</developmentBranch>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+						</gitFlowConfig>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
     <organization>
         <name>Smile</name>
