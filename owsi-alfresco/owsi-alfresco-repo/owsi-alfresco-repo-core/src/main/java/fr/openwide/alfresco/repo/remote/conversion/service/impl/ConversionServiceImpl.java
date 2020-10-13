@@ -18,6 +18,10 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
+import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 
@@ -141,6 +145,22 @@ public class ConversionServiceImpl implements ConversionService {
 		}
 		return map;
 	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <C extends Serializable> C getProperty(Map<QName, Serializable> value, SinglePropertyModel<C> property) {
+		return (C) value.get(get(property.getNameReference()));
+	}
+	@Override
+	@SuppressWarnings("unchecked")
+	public <C extends Serializable> List<C> getProperty(Map<QName, Serializable> value, MultiPropertyModel<C> property) {
+		return (List<C>) value.get(get(property.getNameReference()));
+	}
+	@Override
+	public <E extends Enum<E>> E getProperty(Map<QName, Serializable> value, EnumTextPropertyModel<E> property) {
+		return PropertiesNode.textToEnum(property, (String) value.get(get(property.getNameReference())));
+	}
+	
 	
 	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
 		this.namespacePrefixResolver = namespacePrefixResolver;

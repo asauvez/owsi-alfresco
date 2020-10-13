@@ -8,6 +8,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
@@ -86,6 +87,11 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	public ClassificationWithRootBuilder rootFoldersIdentifier(NameReference identifier) {
 		return rootFolders(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of());
+	}
+
+	public ClassificationWithRootBuilder rootFoldersWithAspect(AspectModel aspect) {
+		return rootFolders(new RestrictionBuilder()
+				.hasAspect(aspect).of());
 	}
 
 	/**

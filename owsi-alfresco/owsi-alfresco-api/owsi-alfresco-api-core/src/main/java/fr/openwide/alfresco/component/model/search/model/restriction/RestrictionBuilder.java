@@ -84,6 +84,9 @@ public class RestrictionBuilder extends Restriction {
 	public ParentRestriction parent(NodeReference parentRef) {
 		return add(new ParentRestriction(this, parentRef));
 	}
+	public AncestorRestriction ancestor(NodeReference parentRef) {
+		return add(new AncestorRestriction(this, parentRef));
+	}
 
 	/**
 	 * Si la paramètre est null ou chaîne vide, on ne tient pas compte de la restriction.
@@ -157,6 +160,9 @@ public class RestrictionBuilder extends Restriction {
 		return add(new BetweenRelativeTimeRestriction(this, property, min, max, unit));
 	}
 	
+	public SiteRestriction site(String siteShortName) {
+		return add(new SiteRestriction(this, siteShortName));
+	}
 	public TagRestriction tag(String tag) {
 		return add(new TagRestriction(this, tag));
 	}

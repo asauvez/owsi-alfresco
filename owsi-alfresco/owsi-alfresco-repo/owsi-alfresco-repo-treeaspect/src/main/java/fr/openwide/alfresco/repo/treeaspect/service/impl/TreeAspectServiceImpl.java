@@ -20,6 +20,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -82,7 +83,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	@Override
 	public void onAddAspect(final NodeRef nodeRef, QName newAspect) {
 		runAsSystem("onAddAspect", nodeRef, () -> {
-			List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null);
+			List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
 
 			for (ChildAssociationRef child : children) {
 				Map<QName, Serializable> properties = new HashMap<>();
@@ -133,7 +134,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		runAsSystem("onUpdateProperties", nodeRef, () -> {
-			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null);
+			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
 			
 			for (QName aspect : aspectToCopy) {
 				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
@@ -153,7 +154,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		for (ChildAssociationRef child : childAssocs) {
 			NodeRef childRef = child.getChildRef();
 
-			runAsSystem("onRemoveAspect", childRef, () -> {
+			runAsSystem("updateChildProperties", childRef, () -> {
 				nodeService.setProperty(childRef, property, afterProperty);
 				updateChildProperties(nodeService.getChildAssocs(childRef), property, afterProperty);
 			});
@@ -182,7 +183,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 
 	@Override public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName) {
 		runAsSystem("onRemoveAspect", nodeRef, () -> {
-			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, null)) {
+			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL)) {
 				NodeRef childRef = child.getChildRef();
 				nodeService.removeAspect(childRef, aspectTypeQName);
 				onRemoveAspect(childRef, aspectTypeQName);

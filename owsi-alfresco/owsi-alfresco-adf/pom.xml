@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco</artifactId>
+		<version>0.8.5-SNAPSHOT</version>
+	</parent>
+	<artifactId>owsi-alfresco-adf</artifactId>
+	<packaging>pom</packaging>
+
+	<name>OWSI Alfresco - ADF Application</name>
+	<description>Composants pour le développement d'une application spécifique en Angular/ADF sur Alfresco</description>
+
+	<modules>
+		<module>owsi-alfresco-adf-maven-plugin</module>
+	</modules>
+
+</project>

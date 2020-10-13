@@ -14,14 +14,16 @@ public class RepositoryAccessControl implements Serializable {
 	private AuthorityReference authority;
 	private PermissionReference permission;
 	private boolean allowed;
+	private boolean inherited;
 
 	public RepositoryAccessControl() {}
 
-	public RepositoryAccessControl(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed) {
+	public RepositoryAccessControl(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed, boolean inherited) {
 		this.nodeReference = nodeReference;
 		this.authority = authority;
 		this.permission = permission;
 		this.allowed = allowed;
+		this.inherited = inherited;
 	}
 
 	public NodeReference getNodeReference() {
@@ -52,6 +54,13 @@ public class RepositoryAccessControl implements Serializable {
 		this.allowed = allowed;
 	}
 
+	public boolean isInherited() {
+		return inherited;
+	}
+	public void setInherited(boolean inherited) {
+		this.inherited = inherited;
+	}
+	
 	@Override
 	public String toString() {
 		return Joiner.on(":").join(nodeReference, authority, permission, allowed);

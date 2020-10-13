@@ -108,6 +108,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			MigrationStat stat = new MigrationStat();
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco/web-extension/site-data/extensions/"), "/alfresco/web-extension/site-data/extensions/", stat);
 			customizationFoldersToIgnore.add("/alfresco/web-extension");
+			customizationFoldersToIgnore.add("/alfresco/module/" + project.getArtifactId());
 			
 			visitResources(new File(getBaseDir(), "src/main/resources/alfresco"), "/alfresco", stat);
 			visitResources(new File(getBaseDir(), "src/main/webapp"), "", stat);
@@ -153,7 +154,7 @@ public class MigrationMojo extends AbstractMigrationMojo {
 	
 	private void initDependency(Artifact artifact) throws Exception {
 		File file = artifact.getFile();
-		if (file != null && ! file.isDirectory()) {
+		if (file != null && ! file.isDirectory() && (file.getName().endsWith(".jar") || file.getName().endsWith(".war"))) {
 			ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));
 			try {
 				ZipEntry entry;

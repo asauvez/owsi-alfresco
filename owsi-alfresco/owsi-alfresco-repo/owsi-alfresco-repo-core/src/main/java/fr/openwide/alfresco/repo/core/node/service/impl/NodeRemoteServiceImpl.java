@@ -269,7 +269,8 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 						nodeReference,
 						AuthorityReference.authority(accessPermission.getAuthority()),
 						PermissionReference.create(accessPermission.getPermission()),
-						accessPermission.getAccessStatus() == AccessStatus.ALLOWED));
+						accessPermission.getAccessStatus() == AccessStatus.ALLOWED,
+						accessPermission.isInherited()));
 			}
 		}
 		return node;
@@ -561,21 +562,24 @@ public class NodeRemoteServiceImpl implements NodeRepositoryService {
 		
 		Set<RepositoryAccessControl> oldPermissions = new HashSet<RepositoryAccessControl>();
 		for (AccessPermission oldPermission : permissionService.getAllSetPermissions(nodeRef)) {
-			if (oldPermission.isSetDirectly()) {
+			if (! oldPermission.isInherited()) {
 				oldPermissions.add(new RepositoryAccessControl(
 					conversionService.get(nodeRef),
 					AuthorityReference.authority(oldPermission.getAuthority()),
 					PermissionReference.create(oldPermission.getPermission()),
-					oldPermission.getAccessStatus() == AccessStatus.ALLOWED));
+					oldPermission.getAccessStatus() == AccessStatus.ALLOWED,
+					oldPermission.isInherited()));
 			}
 		}
 		
 		for (RepositoryAccessControl newPermission : node.getAccessControlList()) {
-			if (! oldPermissions.remove(newPermission)) {
-				permissionService.setPermission(nodeRef, 
-						newPermission.getAuthority().getName(), 
-						newPermission.getPermission().getName(), 
-						newPermission.isAllowed());
+			if (! newPermission.isInherited()) {
+				if (! oldPermissions.remove(newPermission)) {
+					permissionService.setPermission(nodeRef, 
+							newPermission.getAuthority().getName(), 
+							newPermission.getPermission().getName(), 
+							newPermission.isAllowed());
+				}
 			}
 		}
 		

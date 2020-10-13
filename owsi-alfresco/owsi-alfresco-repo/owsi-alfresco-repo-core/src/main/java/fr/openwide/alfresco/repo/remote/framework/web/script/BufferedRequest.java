@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repo.remote.framework.web.util;
+package fr.openwide.alfresco.repo.remote.framework.web.script;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,27 +13,29 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WrappingWebScriptRequest;
 import org.springframework.util.FileCopyUtils;
 
-import fr.openwide.alfresco.repo.remote.framework.web.util.ThresholdOutputStream.ThresholdInputStream;
+import fr.openwide.alfresco.api.core.util.ThresholdBuffer;
+import fr.openwide.alfresco.api.core.util.ThresholdBuffer.ThresholdInputStream;
+import fr.openwide.alfresco.api.core.util.ThresholdBufferFactory;
 
 /**
- * Correction de {@link fr.openwide.alfresco.repo.remote.framework.web.util.web.scripts.BufferedRequest}.
+ * Correction de {@link fr.openwide.alfresco.repo.remote.framework.web.script.web.scripts.BufferedRequest}.
  * 
  * @author asauvez
  */
 public class BufferedRequest implements WrappingWebScriptRequest {
-	private ThresholdOutputStreamFactory streamFactory;
+	private ThresholdBufferFactory streamFactory;
 	private WebScriptRequest req;
 	private ThresholdInputStream thresholdInputStream;
 	private InputStream contentStream;
 	private BufferedReader contentReader;
 
-	public BufferedRequest(WebScriptRequest req, ThresholdOutputStreamFactory streamFactory) {
+	public BufferedRequest(WebScriptRequest req, ThresholdBufferFactory streamFactory) {
 		this.req = req;
 		this.streamFactory = streamFactory;
 	}
 
 	private InputStream bufferInputStream() throws IOException {
-		ThresholdOutputStream bufferStream = streamFactory.newOutputStream();
+		ThresholdBuffer bufferStream = streamFactory.newOutputStream();
 
 		try {
 			FileCopyUtils.copy(req.getContent().getInputStream(), bufferStream);
@@ -42,7 +44,7 @@ public class BufferedRequest implements WrappingWebScriptRequest {
 			throw e;
 		}
 
-		thresholdInputStream = (ThresholdInputStream) bufferStream.getInputStream();
+		thresholdInputStream = (ThresholdInputStream) bufferStream.newInputStream();
 		return thresholdInputStream;
 	}
 

@@ -4,8 +4,8 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-api</artifactId>
-		<version>0.8.4</version>
-		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-api/pom.xml</relativePath>
+		<version>0.8.5</version>
+		<relativePath>../../owsi-alfresco/owsi-alfresco-parent/owsi-alfresco-parent-api/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-demo-api</artifactId>
 

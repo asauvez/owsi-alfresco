@@ -10,7 +10,7 @@
 
     <groupId>fr.openwide.alfresco</groupId>
     <artifactId>owsi-alfresco</artifactId>
-    <version>0.8.4</version>
+    <version>0.8.5</version>
     <packaging>pom</packaging>
 
     <name>OWSI Alfresco</name>
@@ -27,34 +27,29 @@
 		<module>owsi-alfresco-repo</module>
 		<module>owsi-alfresco-component</module>
 		<module>owsi-alfresco-share</module>
+		<module>owsi-alfresco-adf</module>
 		<module>owsi-alfresco-test</module>
   </modules>
 
-    <scm>
-        <developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
-        <url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi</url>
-        <tag>HEAD</tag>
-    </scm>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.amashchenko.maven.plugin</groupId>
-		            <artifactId>gitflow-maven-plugin</artifactId>
-		            <version>1.12.0</version>
-		            <configuration>
-		            	<gitFlowConfig>
-			            	<developmentBranch>dev</developmentBranch>
-					        <featureBranchPrefix>ft-</featureBranchPrefix>
-					        <releaseBranchPrefix>rl-</releaseBranchPrefix>
-					        <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-				        </gitFlowConfig>
-		            </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.amashchenko.maven.plugin</groupId>
+					<artifactId>gitflow-maven-plugin</artifactId>
+					<version>1.14.0</version>
+					<configuration>
+						<gitFlowConfig>
+							<developmentBranch>dev</developmentBranch>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+						</gitFlowConfig>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
     <organization>
         <name>Smile</name>
@@ -68,6 +63,18 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus.internal.snapshots</id>
+            <url>http://nexus.vitry.intranet/repository/InternalSmileSnapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus.internal.releases</id>
+            <url>http://nexus.vitry.intranet/repository/InternalSmileReleases/</url>
+        </repository>
+    </distributionManagement>
+    
     <repositories>
         <repository>
             <id>nexus.internal.releases</id>

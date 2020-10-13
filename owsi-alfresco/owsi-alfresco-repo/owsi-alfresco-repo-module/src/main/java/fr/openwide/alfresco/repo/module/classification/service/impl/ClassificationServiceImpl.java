@@ -1,7 +1,9 @@
 package fr.openwide.alfresco.repo.module.classification.service.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -29,6 +31,9 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.model.FileExistsException;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -37,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
@@ -63,6 +70,7 @@ import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelReposi
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.builder.UniqueNameGenerator;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerClassificationPolicy;
@@ -72,7 +80,8 @@ import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
 		OnAddAspectPolicy, OnUpdatePropertiesPolicy, 
-		PreNodeCreationCallback {
+		PreNodeCreationCallback, 
+		ApplicationListener<ContextRefreshedEvent> {
 	
 	private static final String CLASSIFIED_NODE_TRANSACTION_KEY = ClassificationServiceImpl.class +  ".classifiedNodes";
 	private static final Set<QName> IGNORED_PROPERTIES = new HashSet<>(Arrays.asList(
@@ -91,6 +100,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private NodeRepositoryService nodeRepositoryService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
+	@Autowired private FileFolderService fileFolderService;
 	
 	private ConversionService conversionService;
 	private TransactionService transactionService;
@@ -113,11 +123,20 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		nodeRepositoryService.addPreNodeCreationCallback(this);
-		
+	}
+	
+	/** On fait dans ContextRefreshedEvent car les models peuvent ne pas avoir été initialisé */
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
 		for (String nameReference : globalProperties.getProperty("owsi.classification.freemarker.models", "").split(",")) {
 			if (! nameReference.trim().isEmpty()) {
 				ContainerModel containerModel = new ContainerModel(NameReference.create(nameReference.trim()));
-				addClassification(containerModel, new FreeMarkerClassificationPolicy(globalProperties, containerModel));
+				try {
+					addClassification(containerModel, new FreeMarkerClassificationPolicy(globalProperties, containerModel));
+				} catch (IOException e) {
+					logger.error(nameReference, e);
+					throw new IllegalStateException(nameReference, e);
+				}
 				policyRepositoryService.onAddAspect(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
 			}
 		}
@@ -300,6 +319,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return nodeModelRepositoryService.getCompanyHome();
 	}
 	
+	@Override
+	public void classify(NodeRef nodeRef) {
+		classify(nodeRef, ClassificationMode.MANUAL);
+	}
+	
 	private void classify(NodeRef nodeRef, ClassificationMode mode) {
 		Set<NodeRef> classifiedNodes = getClassifiedNodes();
 		if (! classifiedNodes.add(nodeRef)) {
@@ -367,8 +391,32 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public void setNewName(NodeRef node, String newName) {
-		nodeModelRepositoryService.setProperty(node, CmModel.object.name, newName);
+		try {
+			fileFolderService.rename(node, newName);
+		} catch (FileExistsException | FileNotFoundException e) {
+			throw new IllegalStateException(e);
+		}
 	}
+	
+	public String getUniqueName(NodeRef document, Collection<NodeRef> destinationFolders, UniqueNameGenerator uniqueNameGenerator) {
+		String originalName = nodeModelRepositoryService.getProperty(document, CmModel.object.name);
+		
+		String newName = originalName;
+		while (existsNewName(document, destinationFolders, newName)) {
+			newName = uniqueNameGenerator.generateNextName(originalName);
+		}
+		return newName;
+	}
+	private boolean existsNewName(NodeRef document, Collection<NodeRef> destinationFolders, String newName) {
+		for (NodeRef folder : destinationFolders) {
+			Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(folder, newName);
+			if (childByName.isPresent() && ! childByName.get().equals(document)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void setContentStore(NodeRef node, String storeName) {
 		nodeModelRepositoryService.setProperty(node, CmModel.storeSelector.storeName, storeName);
 	}
@@ -380,10 +428,17 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	public void moveNode(NodeRef node, NodeRef destinationFolder) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Move node {} to {} : {}.", node, destinationFolder, getPath(destinationFolder));
+		NodeRef actualPrimaryParent = nodeModelRepositoryService.getPrimaryParent(node).get();
+		if (actualPrimaryParent.equals(destinationFolder)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Move node {} : Already in correct folder", node);
+			}
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Move node {} to {} : {}.", node, destinationFolder, getPath(destinationFolder));
+			}
+			nodeModelRepositoryService.moveNode(node, destinationFolder);
 		}
-		nodeModelRepositoryService.moveNode(node, destinationFolder);
 	}
 	public NodeRef copyNode(NodeRef node, NodeRef destinationFolder, Optional<String> newName) {
 		if (logger.isDebugEnabled()) {
@@ -471,6 +526,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			
 			folderNode.assocs().primaryParent(associationType).nodeReference(conversionService.get(destinationFolder));
 			
+			if (logger.isDebugEnabled()) {
+				logger.debug("Create subfolder {}", cleanFolderName);
+			}
+
 			if (createSubFolderInInnerTransaction) {
 				try {
 					// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
@@ -519,7 +578,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	public Optional<NodeRef> getByNamedPath(String ... names) {
-		return nodeModelRepositoryService.getByNamedPath(names);
+		// Pas nécessaire d'avoir le droit de lecture sur les dossiers intermédiaires.
+		return AuthenticationUtil.runAsSystem(() -> 
+			nodeModelRepositoryService.getByNamedPath(names));
 	}
 	public Optional<NodeRef> getByNamedPathCached(String ... names) {
 		String cacheKey = Arrays.toString(names);

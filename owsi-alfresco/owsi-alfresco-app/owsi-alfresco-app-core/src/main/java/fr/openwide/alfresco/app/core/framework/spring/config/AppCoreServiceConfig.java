@@ -1,9 +1,11 @@
 package fr.openwide.alfresco.app.core.framework.spring.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import fr.openwide.alfresco.api.core.util.ThresholdBufferFactory;
 import fr.openwide.alfresco.app.core.authority.service.AuthorityService;
 import fr.openwide.alfresco.app.core.authority.service.impl.AuthorityServiceImpl;
 import fr.openwide.alfresco.app.core.licence.service.LicenseService;
@@ -65,4 +67,12 @@ public class AppCoreServiceConfig {
 				appCoreSecurityConfig.shareRemoteBinding());
 	}
 
+	@Bean
+	public ThresholdBufferFactory thresholdBufferFactory(
+			@Value("${owsi.thresholdTempFiles.memoryThreshold}") int memoryThreshold, 
+			@Value("${owsi.thresholdTempFiles.maxContentSize}") long maxContentSize, 
+			@Value("${owsi.thresholdTempFiles.encrypt}") boolean encrypt) {
+
+		return ThresholdBufferFactory.newInstance(null, memoryThreshold, maxContentSize, encrypt);
+	}
 }

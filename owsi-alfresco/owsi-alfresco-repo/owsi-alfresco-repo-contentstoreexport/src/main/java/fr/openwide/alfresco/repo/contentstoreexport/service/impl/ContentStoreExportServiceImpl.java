@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.contentstoreexport.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,13 +39,17 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.management.JmxDumpUtil;
+import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -63,6 +68,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.ISO9075;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.TeeOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,12 +130,15 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	private NamespacePrefixResolver namespacePrefixResolver;
 	private MBeanServerConnection mbeanServer;
 
+	private FileFolderService fileFolderService;
+	private Repository repositoryHelper;
+
 	private String contentstoreexportPaths;
 	private String contentstoreexportQueries;
 	private String contentstoreexportVersion;
 
 	@Override
-	public void export(OutputStream outputStream, ContentStoreExportParams params) throws IOException {
+	public void export(OutputStream outputStream, String fileName, ContentStoreExportParams params) throws IOException {
 		long startTime = System.currentTimeMillis();
 		Set<String> processedNodes = new HashSet<String>();
 		LOGGER.info("lancement de l'export.");
@@ -143,6 +152,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		AtomicInteger nbFiles = new AtomicInteger(0);
 		AtomicLong totalVolume = new AtomicLong(0L);
 		
+		outputStream = getOutputStream(outputStream, fileName, params);
 		ZipOutputStream zipOutPutStream = null;
 		try {
 			zipOutPutStream = new ZipOutputStream(outputStream);
@@ -681,11 +691,12 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			//seul un content data nous interesse
 			if (property.getValue() instanceof ContentData) {
 				ContentData contentData = (ContentData) property.getValue();
-				nbFiles.incrementAndGet();
-				totalVolume.addAndGet(contentData.getSize());
-				
 				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
+				
 				if (processedNodes.add(contentUrl)) {
+					nbFiles.incrementAndGet();
+					totalVolume.addAndGet(contentData.getSize());
+					
 					if (params.exportContent) {
 						//ajout de l'entrée au zip
 						ContentReader reader = contentService.getReader(nodeRef, property.getKey());
@@ -736,6 +747,25 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		return String.format("%dh %02dmn %02ds", h,m,s);
 	}
 	
+	private OutputStream getOutputStream(OutputStream outputStream, 
+			String fileName, 
+			ContentStoreExportParams params) throws IOException {
+		if (params.writeToDisk != null) {
+			File file = new File(params.writeToDisk, fileName);
+			outputStream = new TeeOutputStream(outputStream, new FileOutputStream(file));
+		}
+		if (params.writeToAlfresco != null) {
+			NodeRef parentNodeRef = (params.writeToAlfresco.trim().length() > 0)
+					? getByPath(params.writeToAlfresco)
+					: repositoryHelper.getUserHome(repositoryHelper.getFullyAuthenticatedPerson());
+			FileInfo fileInfo = fileFolderService.create(parentNodeRef, fileName, ContentModel.TYPE_CONTENT);
+			ContentWriter writer = contentService.getWriter(fileInfo.getNodeRef(), ContentModel.PROP_CONTENT, true);
+			outputStream = new TeeOutputStream(outputStream, writer.getContentOutputStream());
+		}
+		return outputStream;
+	}
+ 
+	
 	public void setDescriptorService(DescriptorService descriptorService) {
 		this.descriptorService = descriptorService;
 	}
@@ -764,5 +794,11 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 	}
 	public void setMBeanServer(MBeanServerConnection mbeanServer) {
 		this.mbeanServer = mbeanServer;
+	}
+	public void setRepositoryHelper(Repository repositoryHelper) {
+		this.repositoryHelper = repositoryHelper;
+	}
+	public void setFileFolderService(FileFolderService fileFolderService) {
+		this.fileFolderService = fileFolderService;
 	}
 }

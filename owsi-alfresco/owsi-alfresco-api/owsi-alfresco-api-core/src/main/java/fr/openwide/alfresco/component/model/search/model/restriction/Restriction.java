@@ -147,7 +147,7 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 	}
 	
 	protected static String toFtsLuceneValue(String value) {
-		return "\"" + value.toString().replace("\"", "\\\"") + "\"";
+		return "\"" + value.replace("\"", "\\\"") + "\"";
 	}
 	protected static <C extends Serializable> String toFtsLuceneValue(PropertyModel<C> propertyModel, C value) {
 		if (propertyModel instanceof DateTimePropertyModel || propertyModel instanceof MultiDateTimePropertyModel) {

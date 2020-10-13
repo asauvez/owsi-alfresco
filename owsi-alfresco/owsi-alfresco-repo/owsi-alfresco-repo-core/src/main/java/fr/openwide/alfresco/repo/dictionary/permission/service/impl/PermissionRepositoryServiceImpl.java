@@ -103,7 +103,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			PermissionReference permissionRef = PermissionReference.create(permission.getPermission());
 			boolean allowed = permission.getAccessStatus() == AccessStatus.ALLOWED;
 			
-			res.add(new RepositoryAccessControl(nodeReference, authority, permissionRef, allowed));
+			res.add(new RepositoryAccessControl(nodeReference, authority, permissionRef, allowed, permission.isInherited()));
 		}
 		return res;
 	}
@@ -160,7 +160,7 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 							PermissionReference permission = PermissionReference.create(res.getString(col ++));
 							boolean allowed = res.getBoolean(col ++);
 							
-							list.add(new RepositoryAccessControl(nodeReference, authority, permission, allowed));
+							list.add(new RepositoryAccessControl(nodeReference, authority, permission, allowed, false));
 						}
 					}
 				}

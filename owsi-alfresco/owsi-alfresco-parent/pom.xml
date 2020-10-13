@@ -10,7 +10,7 @@
 
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
-	<version>0.8.4</version>
+	<version>0.8.5</version>
 	<packaging>pom</packaging>
 
 	<name>OWSI Alfresco - Parent</name>
@@ -31,6 +31,8 @@
 		<module>owsi-alfresco-parent-alfresco</module>
 		<module>owsi-alfresco-parent-share-component</module>
 		<module>owsi-alfresco-parent-share</module>
+		<module>owsi-alfresco-parent-sdk4</module>
+		<module>owsi-alfresco-parent-sdk4-plus</module>
 	</modules>
 
 	<build>
@@ -75,16 +77,16 @@
 			<plugins>
 				<plugin>
 					<groupId>com.amashchenko.maven.plugin</groupId>
-		            <artifactId>gitflow-maven-plugin</artifactId>
-		            <version>1.13.0</version>
-		            <configuration>
-		            	<gitFlowConfig>
-			            	<developmentBranch>dev</developmentBranch>
-					        <featureBranchPrefix>ft-</featureBranchPrefix>
-					        <releaseBranchPrefix>rl-</releaseBranchPrefix>
-					        <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-				        </gitFlowConfig>
-		            </configuration>
+					<artifactId>gitflow-maven-plugin</artifactId>
+					<version>1.14.0</version>
+					<configuration>
+						<gitFlowConfig>
+							<developmentBranch>dev</developmentBranch>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+						</gitFlowConfig>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -93,7 +95,7 @@
 	<repositories>
 		<repository>
 			<id>alfresco-artifacts-repository</id>
-			<url>http://artifacts.alfresco.com/nexus/content/groups/private/</url>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/private/</url>
 		</repository>
 		<repository>
 			<id>nexus.internal.releases</id>

@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -31,6 +33,10 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptLifecycle;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
@@ -39,7 +45,11 @@ import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint",
-	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript"
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript",
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService",
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel",
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch",
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron",
 })
 public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 
@@ -51,14 +61,21 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(WebScriptEndPoint.class)) {
 			processWsEndPoint(annotatedClassElement);
 		}
-		
 		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateWebScript.class)) {
 			processWs(annotatedClassElement);
 		}
-		
-//		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateScheduledJob.class)) {
-//			processScheduledJob(annotatedClassElement);
-//		}
+		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateService.class)) {
+			processService(annotatedClassElement);
+		}
+		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateBootstrapModel.class)) {
+			processBootstrapModel(annotatedClassElement);
+		}
+		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GeneratePatch.class)) {
+			processPatch(annotatedClassElement);
+		}
+		for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateCron.class)) {
+			processScheduledJob(annotatedClassElement);
+		}
 		return true;
 	}
 
@@ -114,96 +131,280 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		String shortName = (! generateWebScript.shortName().isEmpty()) ? StringEscapeUtils.escapeXml10(generateWebScript.shortName()) : wsName;
 		CharSequence description = (! generateWebScript.description().isEmpty()) ? StringEscapeUtils.escapeXml10(generateWebScript.description()) : className;
 
-		String family = generateWebScript.family();
-		if (family.isEmpty()) {
-			family = (firstUrl.split("/").length > 1) ? firstUrl.split("/")[1] : "root";
-		}
-		String formatDefault = generateWebScript.formatDefault();
-		if (formatDefault.isEmpty()) {
-			formatDefault = generateWebScript.formatDefaultEnum().name().toLowerCase();
-		}
+		String family = generateWebScript.family().isEmpty() 
+				? ((firstUrl.split("/").length > 1) ? firstUrl.split("/")[1] : "root")
+				: generateWebScript.family();
+		String formatDefault = generateWebScript.formatDefault().isEmpty() 
+				? generateWebScript.formatDefaultEnum().name().toLowerCase() 
+				: generateWebScript.formatDefault();
 
+		String[] urlsFinal = urls;
+		generateXml(annotatedClassElement, 
+				"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
+				wsName + "." + method + ".desc.xml", (xml) -> {
+			xml.writeStartElement("webscript");
+			xml.writeStartElement("shortname"); xml.writeCharacters(shortName); xml.writeEndElement();
+			xml.writeStartElement("description"); xml.writeCharacters(description.toString()); xml.writeEndElement();
+
+			for (String url : urlsFinal) {
+				xml.writeStartElement("url"); xml.writeCharacters(url); xml.writeEndElement();
+			}
+			
+			xml.writeStartElement("format"); 
+			xml.writeAttribute("default", formatDefault);
+			xml.writeCharacters(generateWebScript.format().name().toLowerCase()); 
+			xml.writeEndElement();
+			
+			xml.writeStartElement("authentication"); xml.writeCharacters(generateWebScript.authentication().name().toLowerCase()); xml.writeEndElement();
+			
+			xml.writeStartElement("transaction"); 
+			xml.writeAttribute("allow", generateWebScript.transactionAllow().name().toLowerCase());
+			xml.writeCharacters(generateWebScript.transaction().name().toLowerCase()); 
+			xml.writeEndElement();
+
+			xml.writeStartElement("family"); xml.writeCharacters(family); xml.writeEndElement();
+
+			if (generateWebScript.lifecycle() != GenerateWebScriptLifecycle.DEFAULT) {
+				xml.writeStartElement("lifecycle"); xml.writeCharacters(generateWebScript.lifecycle().name().toLowerCase()); xml.writeEndElement();
+			}
+			
+			xml.writeEndElement(); // webscript
+		});
+		
+		if (generateWebScript.useViewFile()) {
+			try {
+				Filer filer = processingEnv.getFiler();
+				FileObject viewFile = filer.getResource(StandardLocation.CLASS_PATH, 
+						"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
+						wsName + "." + method + "." + formatDefault + ".ftl");
+				processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + viewFile.toUri() + " existe bien");
+			} catch (FileNotFoundException ex) {
+				throw new IllegalStateException("If you declare useViewFile=true, you must create a file "
+						+ "src/main/resources/alfresco/extension/templates/webscripts" + wsFolder + "/" 
+						+ wsName + "." + method + "." + formatDefault + ".ftl");
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+		
+		String methodFinal = method;
+		generateSpringContext(annotatedClassElement, (xml) -> {
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", "webscript" + wsFolder.replace("/", ".") + "." + wsName + "." + methodFinal);
+			xml.writeAttribute("parent", generateWebScript.beanParent());
+			xml.writeAttribute("class", className.toString());
+			xml.writeEndElement(); // bean
+		});
+	}
+
+	private void processService(Element annotatedClassElement) throws FactoryConfigurationError {
+		GenerateService generateService = annotatedClassElement.getAnnotation(GenerateService.class);
+		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+
+		generateSpringContext(annotatedClassElement, (xml) -> {
+			String serviceName = generateService.id();
+			if (serviceName.isEmpty()) {
+				serviceName = className.toString();
+			}
+			
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", serviceName);
+			xml.writeAttribute("class", className.toString());
+			if (generateService.dependsOn().length > 0) {
+				xml.writeAttribute("depends-on", String.join(", ", generateService.dependsOn()));
+			}
+			xml.writeEndElement(); // bean
+		});
+	}
+
+	private void processBootstrapModel(Element annotatedClassElement) throws FactoryConfigurationError {
+		GenerateBootstrapModel generateBootstrapModel = annotatedClassElement.getAnnotation(GenerateBootstrapModel.class);
+		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+
+		generateSpringContext(annotatedClassElement, (xml) -> {
+			String modelName = generateBootstrapModel.id();
+			if (modelName.isEmpty()) {
+				modelName = className.toString();
+			}
+			
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", modelName);
+			xml.writeAttribute("parent", "dictionaryModelBootstrap");
+			if (generateBootstrapModel.dependsOn().length > 0) {
+				xml.writeAttribute("depends-on", String.join(", ", generateBootstrapModel.dependsOn()));
+			}
+			if (generateBootstrapModel.importModels().length != 0) {
+				xml.writeStartElement("property");
+				xml.writeAttribute("name", "models");
+				xml.writeStartElement("list");
+				for (String model : generateBootstrapModel.importModels()) {
+					xml.writeStartElement("value");
+					xml.writeCharacters(model);
+					xml.writeEndElement(); // value
+				}
+				xml.writeEndElement(); // list
+				xml.writeEndElement(); // property
+			}
+			if (generateBootstrapModel.importLabels().length != 0) {
+				xml.writeStartElement("property");
+				xml.writeAttribute("name", "labels");
+				xml.writeStartElement("list");
+				for (String label : generateBootstrapModel.importLabels()) {
+					if (label.endsWith(".properties")) {
+						label = label.substring(0, label.length() - ".properties".length());
+					}
+					xml.writeStartElement("value");
+					xml.writeCharacters(label);
+					xml.writeEndElement(); // value
+				}
+				xml.writeEndElement(); // list
+				xml.writeEndElement(); // property
+			}
+			xml.writeEndElement(); // bean
+		});
+	}
+
+	private void processPatch(Element annotatedClassElement) throws FactoryConfigurationError {
+		GeneratePatch generatePatch = annotatedClassElement.getAnnotation(GeneratePatch.class);
+		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+
+		generateSpringContext(annotatedClassElement, (xml) -> {
+			String patchName = generatePatch.id();
+			if (patchName.isEmpty()) {
+				patchName = className.toString();
+			}
+
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", "patch." + patchName);
+			xml.writeAttribute("class", className.toString());
+			xml.writeAttribute("parent", "basePatch");
+			if (generatePatch.dependsOn().length > 0) {
+				xml.writeAttribute("depends-on", String.join(", ", generatePatch.dependsOn()));
+			}
+
+			generateProperty(xml, "id", "patch." + patchName);
+			generateProperty(xml, "description", "OWSI auto generate patch patch." + patchName);
+			generateProperty(xml, "fixesFromSchema", "0");
+			generateProperty(xml, "fixesToSchema", "${version.schema}");
+			generateProperty(xml, "targetSchema", "10000000");
+
+			xml.writeEndElement(); // bean
+		});
+	}
+	
+	private void processScheduledJob(Element annotatedClassElement) {
+		GenerateCron generateCron = annotatedClassElement.getAnnotation(GenerateCron.class);
+		String className = ((TypeElement) annotatedClassElement).getQualifiedName().toString();
+		String serviceId = (generateCron.id().isEmpty()) ? className : "cron." + className;
+		
+		generateSpringContext(annotatedClassElement, (xml) -> {
+			String startDelay = generateCron.startDelay();
+			if (startDelay.startsWith("P")) {
+				startDelay = Long.toString(Duration.parse(generateCron.startDelay()).get(ChronoUnit.SECONDS)*1000L);
+			}
+			
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", serviceId);
+			xml.writeAttribute("class", className.toString());
+			if (generateCron.dependsOn().length > 0) {
+				xml.writeAttribute("depends-on", String.join(", ", generateCron.dependsOn()));
+			}
+			xml.writeEndElement(); // bean
+			
+			String jobDetailId = serviceId + ".JobDetail";
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", jobDetailId);
+			xml.writeAttribute("class", "org.springframework.scheduling.quartz.JobDetailFactoryBean");
+			generateProperty(xml, "jobClass", "fr.openwide.alfresco.repo.core.cron.model.CronRunnableJob");
+			xml.writeStartElement("property");
+			xml.writeAttribute("name", "jobDataAsMap");
+			xml.writeStartElement("map");
+			
+			xml.writeStartElement("entry");
+			xml.writeAttribute("key", "runnable");
+			xml.writeAttribute("value-ref", serviceId);
+			xml.writeEndElement(); // entry
+			
+			xml.writeStartElement("entry");
+			xml.writeAttribute("key", "jobLockService");
+			xml.writeAttribute("value-ref", "jobLockService");
+			xml.writeEndElement(); // entry
+			
+			xml.writeStartElement("entry");
+			xml.writeAttribute("key", "transactionService");
+			xml.writeAttribute("value-ref", "transactionService");
+			xml.writeEndElement(); // entry
+			
+			generateMapEntry(xml, "logAsInfo", Boolean.toString(generateCron.logAsInfo()));
+			generateMapEntry(xml, "readOnly", Boolean.toString(generateCron.readOnly()));
+			generateMapEntry(xml, "enable", generateCron.enable());
+			generateMapEntry(xml, "runAs", generateCron.runAs());
+
+			xml.writeEndElement(); // map
+			xml.writeEndElement(); // property
+			xml.writeEndElement(); // bean
+			
+			String cronTriggerFactoryBeanId = serviceId + ".CronTriggerFactoryBean";
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", cronTriggerFactoryBeanId);
+			xml.writeAttribute("class", "org.springframework.scheduling.quartz.CronTriggerFactoryBean");
+			xml.writeStartElement("property");
+			xml.writeAttribute("name", "jobDetail");
+			xml.writeAttribute("ref", jobDetailId);
+			xml.writeEndElement(); // property
+			generateProperty(xml, "cronExpression", generateCron.cronExpression());
+			generateProperty(xml, "startDelay", startDelay);
+			xml.writeEndElement(); // bean
+			
+			xml.writeStartElement("bean");
+			xml.writeAttribute("id", serviceId + ".customTriggersList");
+			xml.writeAttribute("class", "org.springframework.scheduling.quartz.SchedulerFactoryBean");
+
+			xml.writeStartElement("property");
+			xml.writeAttribute("name", "triggers");
+			xml.writeStartElement("list");
+			xml.writeStartElement("ref");
+			xml.writeAttribute("bean", cronTriggerFactoryBeanId);
+			xml.writeEndElement(); // ref
+			xml.writeEndElement(); // list
+			xml.writeEndElement(); // property
+
+			xml.writeEndElement(); // bean
+		});
+	}
+
+	@FunctionalInterface
+	private interface XmlGenerator {
+		void generate(XMLStreamWriter xml) throws XMLStreamException;
+	}
+	
+	private void generateSpringContext(Element annotatedClassElement, XmlGenerator generator) {
+		generateXml(annotatedClassElement, 
+				"org.springframework.extensions.webscripts", 
+				"wsgenerator-" + annotatedClassElement + "-context.xml", (xml) -> {
+			xml.writeStartElement("beans");
+			xml.writeDefaultNamespace("http://www.springframework.org/schema/beans");
+			xml.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+			xml.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", 
+					"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd");
+
+			generator.generate(xml);
+			
+			xml.writeEndElement(); // beans
+		});
+	}
+
+	private void generateXml(Element annotatedClassElement, String module, String name, XmlGenerator generator) {
 		Filer filer = processingEnv.getFiler();
 		try {
-			FileObject descXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
-					"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
-					wsName + "." + method + ".desc.xml",
-					annotatedClassElement);
-			try (Writer out = descXml.openWriter()) {
-				XMLStreamWriter xml = XMLOutputFactory.newFactory().createXMLStreamWriter(out);
-				xml.writeStartDocument();
-				xml.writeComment("Generated by " + getClass() + " for " + annotatedClassElement);
-				
-				xml.writeStartElement("webscript");
-				xml.writeDefaultNamespace("http://www.springframework.org/schema/beans");
-				
-				xml.writeStartElement("shortname"); xml.writeCharacters(shortName); xml.writeEndElement();
-				xml.writeStartElement("description"); xml.writeCharacters(description.toString()); xml.writeEndElement();
-
-				for (String url : urls) {
-					xml.writeStartElement("url"); xml.writeCharacters(url); xml.writeEndElement();
-				}
-				
-				xml.writeStartElement("format"); 
-				xml.writeAttribute("default", formatDefault);
-				xml.writeCharacters(generateWebScript.format().name().toLowerCase()); 
-				xml.writeEndElement();
-				
-				xml.writeStartElement("authentication"); xml.writeCharacters(generateWebScript.authentication().name().toLowerCase()); xml.writeEndElement();
-				
-				xml.writeStartElement("transaction"); 
-				xml.writeAttribute("allow", generateWebScript.transactionAllow().name().toLowerCase());
-				xml.writeCharacters(generateWebScript.transaction().name().toLowerCase()); 
-				xml.writeEndElement();
-
-				xml.writeStartElement("family"); xml.writeCharacters(family); xml.writeEndElement();
-
-				if (generateWebScript.lifecycle() != GenerateWebScriptLifecycle.DEFAULT) {
-					xml.writeStartElement("lifecycle"); xml.writeCharacters(generateWebScript.lifecycle().name().toLowerCase()); xml.writeEndElement();
-				}
-				
-				xml.writeEndElement(); // webscript
-				
-				xml.writeEndDocument();
-				xml.flush();
-			}
-			processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + descXml.toUri() + " a été généré");
-			
-			if (generateWebScript.useViewFile()) {
-				try {
-					FileObject viewFile = filer.getResource(StandardLocation.CLASS_PATH, 
-							"alfresco.extension.templates.webscripts" + wsFolder.replace("/", "."), 
-							wsName + "." + method + "." + formatDefault + ".ftl");
-					processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + viewFile.toUri() + " existe bien");
-				} catch (FileNotFoundException ex) {
-					throw new IllegalStateException("If you declare useViewFile=true, you must create a file "
-							+ "src/main/resources/alfresco/extension/templates/webscripts" + wsFolder + "/" 
-							+ wsName + "." + method + "." + formatDefault + ".ftl");
-				}
-			}
-			
 			FileObject springContextXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
-					"org.springframework.extensions.webscripts",
-					"wsgenerator" + wsFolder.replace("/", "-") + "-" + wsName + "-" + method + "-context.xml",
-					annotatedClassElement);
+					module, name, annotatedClassElement);
 			try (Writer out = springContextXml.openWriter()) {
-				XMLStreamWriter xml = XMLOutputFactory.newFactory().createXMLStreamWriter(out);
+				XMLStreamWriter xml = new IndentingXMLStreamWriter(XMLOutputFactory.newFactory().createXMLStreamWriter(out));
 				xml.writeStartDocument();
 				xml.writeComment("Generated by " + getClass() + " for " + annotatedClassElement);
 				
-				xml.writeStartElement("beans");
-				xml.writeDefaultNamespace("http://www.springframework.org/schema/beans");
-				xml.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-				xml.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "schemaLocation", 
-						"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd");
-
-				xml.writeStartElement("bean");
-				xml.writeAttribute("id", "webscript" + wsFolder.replace("/", ".") + "." + wsName + "." + method);
-				xml.writeAttribute("parent", generateWebScript.beanParent());
-				xml.writeAttribute("class", className.toString());
-				xml.writeEndElement(); // bean
-				
-				xml.writeEndElement(); // beans
+				generator.generate(xml);
 				
 				xml.writeEndDocument();
 				xml.flush();
@@ -216,72 +417,18 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		}
 	}
 
-//	private void processScheduledJob(Element annotatedClassElement) {
-//		GenerateScheduledJob scheduledJob = annotatedClassElement.getAnnotation(GenerateScheduledJob.class);
-//		String className = ((TypeElement) annotatedClassElement).getQualifiedName().toString();
-//
-//		Filer filer = processingEnv.getFiler();
-//		try {
-//			FileObject springContextXml = filer.createResource(StandardLocation.CLASS_OUTPUT, 
-//					"alfresco.extension",
-//					"scheduler-" + className + "-context.xml",
-//					annotatedClassElement);
-//			try (Writer out = springContextXml.openWriter()) {
-//				XMLStreamWriter xml = XMLOutputFactory.newFactory().createXMLStreamWriter(out);
-//				xml.writeDefaultNamespace("http://www.springframework.org/schema/beans");
-//				xml.writeStartDocument();
-//				xml.writeComment("Generated by " + getClass() + " for " + annotatedClassElement);
-//				
-//				xml.writeStartElement("beans");
-//
-//				xml.writeStartDocument("bean");
-//				xml.writeAttribute("id", "scheduler" + className);
-//				xml.writeAttribute("class", className.toString());
-//				if (scheduledJob.beanParent().length() != 0) {
-//					xml.writeAttribute("parent", scheduledJob.beanParent());
-//				}
-//				xml.writeEndElement(); // bean
-//				
-//				
-///* 
-// * 
-// * 	<bean id="sogelym.unshare.unshareJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
-//		<property name="jobClass" value="fr.openwide.sogelym.repo.unshare.service.impl.SogelymUnshareCron"/>
-//		<property name="jobDataAsMap">
-//			<map>
-//				<entry key="keepSharedDays" value="${sogelym.unshare.days}"/>
-//				<entry key="nodeModelService" value-ref="owsi.service.nodeModelService"/>
-//				<entry key="nodeSearchModelService" value-ref="owsi.service.nodeSearchModelService"/>
-//			</map>
-//		</property>
-//	</bean>
-//	<bean id="sogelym.unshareJobTrigger" class="org.alfresco.util.CronTriggerBean">
-//		<property name="jobDetail">
-//			<ref bean="sogelym.unshare.unshareJobDetail" />
-//		</property>
-//		<property name="scheduler">
-//			<ref bean="schedulerFactory" />
-//		</property>
-//		<property name="cronExpression">
-//			<value>${sogelym.unshare.cron}</value>
-//		</property>
-//	</bean>
-//
-// * */				
-//				
-//				
-//				xml.writeEndElement(); // beans
-//				
-//				xml.writeEndDocument();
-//				xml.flush();
-//			}
-//			processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Le fichier " + springContextXml.toUri() + " a été généré");
-//		} catch (IOException e) {
-//			throw new IllegalStateException(e);
-//		} catch (XMLStreamException e) {
-//			throw new IllegalStateException(e);
-//		}
-//	}
+	private void generateProperty(XMLStreamWriter xml, String propertyName, String propertyValue) throws XMLStreamException {
+		xml.writeStartElement("property");
+		xml.writeAttribute("name", propertyName);
+		xml.writeAttribute("value", propertyValue);
+		xml.writeEndElement(); // property
+	}
+	private void generateMapEntry(XMLStreamWriter xml, String key, String value) throws XMLStreamException {
+		xml.writeStartElement("entry");
+		xml.writeAttribute("key", key);
+		xml.writeAttribute("value", value);
+		xml.writeEndElement(); // entry
+	}
 
 	private String getFullName(Element element) {
 		Element parent = element.getEnclosingElement();

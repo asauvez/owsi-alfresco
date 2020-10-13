@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -64,6 +65,14 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	private SimpleCache<String, NodeRef> singletonCache; // eg. for dataDictionaryNodeRef
 	private final String KEY_DATADICTIONARY_NODEREF = "owsi.key.datadictionary.noderef";
 	
+	@Override
+	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException {
+		return nodeService.createNode(parentRef, 
+				ContentModel.ASSOC_CONTAINS, 
+				NodeRemoteServiceImpl.createAssociationName(name), 
+				conversionService.getRequired(type.getNameReference()),
+				Collections.singletonMap(ContentModel.PROP_NAME, name)).getChildRef();
+	}
 	@Override
 	public NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
 		return conversionService.getRequired(nodeModelService.createFolder(conversionService.get(parentRef), folderName));

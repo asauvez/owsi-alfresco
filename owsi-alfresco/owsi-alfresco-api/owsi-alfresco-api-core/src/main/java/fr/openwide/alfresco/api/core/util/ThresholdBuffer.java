@@ -1,22 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-package fr.openwide.alfresco.repo.remote.framework.web.util;
+package fr.openwide.alfresco.api.core.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -39,17 +23,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Basé sur https://chemistry.apache.org/java/0.11.0/maven/apidocs/org/apache/chemistry/opencmis/server/shared/ThresholdOutputStreamFactory.html
+ * 
  * An OutputStream that stores the data in main memory until it reaches a
  * threshold. If the threshold is passed the data is written to a temporary
  * file.
  * 
  * It it is important to close this OutputStream before
- * {@link #getInputStream()} is called or call {@link #destroy()} if the
+ * {@link #newInputStream()} is called or call {@link #destroy()} if the
  * InputStream isn't required!
  */
-public class ThresholdOutputStream extends OutputStream {
+public class ThresholdBuffer extends OutputStream {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ThresholdOutputStream.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ThresholdBuffer.class);
 
     private static final int MAX_GROW = 10 * 1024 * 1024; // 10 MiB
     private static final int DEFAULT_THRESHOLD = 4 * 1024 * 1024; // 4 MiB
@@ -68,10 +54,12 @@ public class ThresholdOutputStream extends OutputStream {
     private byte[] buf = null;
     private int bufSize = 0;
     private long size = 0;
-    private File tempFile;
+    /*private*/ File tempFile;
     private OutputStream tmpStream;
     private Key key;
     private byte[] iv;
+    
+    private Collection<InputStream> inputStreams = new ArrayList<>();
 
     /**
      * Constructor.
@@ -83,7 +71,7 @@ public class ThresholdOutputStream extends OutputStream {
      * @param maxContentSize
      *            max size of the content in bytes (-1 to disable the check)
      */
-    public ThresholdOutputStream(File tempDir, int memoryThreshold, long maxContentSize) {
+    public ThresholdBuffer(File tempDir, int memoryThreshold, long maxContentSize) {
         this(64 * 1024, tempDir, memoryThreshold, maxContentSize, false);
     }
 
@@ -97,7 +85,7 @@ public class ThresholdOutputStream extends OutputStream {
      * @param maxContentSize
      *            max size of the content in bytes (-1 to disable the check)
      */
-    public ThresholdOutputStream(File tempDir, int memoryThreshold, long maxContentSize, boolean encrypt) {
+    public ThresholdBuffer(File tempDir, int memoryThreshold, long maxContentSize, boolean encrypt) {
         this(64 * 1024, tempDir, memoryThreshold, maxContentSize, encrypt);
     }
 
@@ -115,7 +103,7 @@ public class ThresholdOutputStream extends OutputStream {
      * @param encrypt
      *            indicates if temporary files must be encrypted
      */
-    public ThresholdOutputStream(int initSize, File tempDir, int memoryThreshold, long maxContentSize, boolean encrypt) {
+    public ThresholdBuffer(int initSize, File tempDir, int memoryThreshold, long maxContentSize, boolean encrypt) {
         if (initSize < 0) {
             throw new IllegalArgumentException("Negative initial size: " + initSize);
         }
@@ -155,7 +143,7 @@ public class ThresholdOutputStream extends OutputStream {
     }
 
     private void openTempFile() throws IOException {
-        tempFile = File.createTempFile("opencmis", null, tempDir);
+        tempFile = File.createTempFile("ThresholdOutputStream", ".tmp", tempDir);
 
         if (encrypt) {
             Cipher cipher;
@@ -231,10 +219,6 @@ public class ThresholdOutputStream extends OutputStream {
 
     @Override
     public void flush() throws IOException {
-        if (tmpStream == null && memoryThreshold < bufSize) {
-            openTempFile();
-        }
-
         if (tmpStream != null) {
             try {
                 if (bufSize > 0) {
@@ -248,14 +232,19 @@ public class ThresholdOutputStream extends OutputStream {
             }
         }
     }
-
+    
     @Override
-    public void close() throws IOException {
-        flush();
+    public void close() {
+        try {
+			flush();
 
-        if (tmpStream != null) {
-            tmpStream.close();
-        }
+	        if (tmpStream != null) {
+	            tmpStream.close();
+	        }
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+        destroy();
     }
 
     /**
@@ -263,6 +252,10 @@ public class ThresholdOutputStream extends OutputStream {
      */
     public void destroy() {
         try {
+        	for (InputStream input : inputStreams) {
+        		input.close();
+        	}
+        	
             if (tmpStream != null) {
                 tmpStream.flush();
                 tmpStream.close();
@@ -284,16 +277,23 @@ public class ThresholdOutputStream extends OutputStream {
     /**
      * Returns the data as an InputStream.
      */
-    public InputStream getInputStream() throws IOException {
-        if (tmpStream != null) {
-            close();
-            buf = null;
-
-            return new InternalTempFileInputStream();
-        } else {
-            return new InternalBufferInputStream();
-        }
-    }
+	public InputStream newInputStream() {
+		InputStream inputStream;
+		if (tmpStream != null) {
+			try {
+				flush();
+				buf = null;
+				
+				inputStream = new InternalTempFileInputStream();
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		} else {
+			inputStream = new InternalBufferInputStream();
+		}
+		inputStreams.add(inputStream);
+		return inputStream;
+	}
 
     /**
      * Provides information about the input stream.
@@ -600,13 +600,6 @@ public class ThresholdOutputStream extends OutputStream {
 
         @Override
         public void close() throws IOException {
-            delete();
-        }
-
-        /**
-         * Closes the temp file stream and then deletes the temp file.
-         */
-        protected void delete() {
             if (!isClosed) {
                 try {
                     stream.close();
@@ -615,7 +608,12 @@ public class ThresholdOutputStream extends OutputStream {
                     // ignore
                 }
             }
+        }
 
+        /**
+         * Closes the temp file stream and then deletes the temp file.
+         */
+        protected void delete() {
             if (!isDeleted) {
                 isDeleted = tempFile.delete();
                 if (!isDeleted) {
