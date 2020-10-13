@@ -33,6 +33,8 @@ mvn gitflow:release
 Nouveautés
 ==========
 
+## depuis 0.8.6
+
 ## depuis 0.8.5
  * Alfresco 6.2.1
  * Classification :
