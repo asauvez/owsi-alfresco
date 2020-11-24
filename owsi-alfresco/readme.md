@@ -34,6 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.6
+ * Classification: fix si une valeur était à null et ne l'est plus.
 
 ## depuis 0.8.5
  * Alfresco 6.2.1

@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -236,21 +237,21 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		// Appeler à la création. Sera gérer par onAddAspect()
 		if (! before.isEmpty()) {
 			Set<QName> newFields = new TreeSet<>(after.keySet());
-			Set<QName> removedFields = new TreeSet<>();
-			Set<QName> changedFields = new TreeSet<>();
+			newFields.removeAll(before.keySet());
 			
+			Set<QName> removedFields = new TreeSet<>(before.keySet());
+			removedFields.removeAll(after.keySet());
+			
+			Set<QName> changedFields = new TreeSet<>();
 			for (Entry<QName, Serializable> entry : before.entrySet()) {
 				QName property = entry.getKey();
 				Serializable oldValue = entry.getValue();
 				Serializable newValue = after.get(property);
 				
-				newFields.remove(property);
-				if ((oldValue != null || newValue != null) && !oldValue.equals(newValue)) {
-					if (! IGNORED_PROPERTIES.contains(property)) {
+				if (	! newFields.contains(property) 
+						&& ! IGNORED_PROPERTIES.contains(property)
+						&& ! Objects.equals(oldValue, newValue)) {
 						changedFields.add(property);
-					}
-				} else if (oldValue != null && newValue == null) {
-					removedFields.add(property);
 				}
 			}
 			
