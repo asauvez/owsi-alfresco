@@ -1,6 +1,6 @@
 
 alfresco.version=6.0
-owsi-alfresco.version=0.8.6-SNAPSHOT
+owsi-alfresco.version=0.8.6
 
 # Autorise un client à spécifier avec quel un utilisateur le WS demandé sera exécuté.
 owsi-alfresco.run-as.enabled=true
