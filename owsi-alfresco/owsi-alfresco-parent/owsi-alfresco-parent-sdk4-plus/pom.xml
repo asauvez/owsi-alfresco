@@ -18,7 +18,7 @@
 
 	<properties>
 		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
-		<owsi-alfresco.version>0.8.5-SNAPSHOT</owsi-alfresco.version>
+		<owsi-alfresco.version>0.8.6-SNAPSHOT</owsi-alfresco.version>
 	</properties>
 
 	<dependencyManagement>
@@ -181,7 +181,7 @@
 											<pluginExecutionFilter>
 												<groupId>fr.openwide.alfresco</groupId>
 												<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-												<versionRange>[0.8.5-SNAPSHOT,)</versionRange>
+												<versionRange>[0.8.5,)</versionRange>
 												<goals>
 													<goal>migration</goal>
 												</goals>
