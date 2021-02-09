@@ -130,7 +130,10 @@ Release du 09/02/2021
 Migration
 =========
 
-## depuis 0.8.3
+## vers 0.8.7
+- Ajouter la propriété suivante dans le projet qu itire OWSI : `<owsi-alfresco.version>0.8.7</owsi-alfresco.version>`
+
+## vers 0.8.3
 * Les fichiers toto.xml.5.2.ori doivent être renomé en toto.xml--5.2.ori.
 
 ## vers 0.8.0

@@ -39,7 +39,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.8.7-SNAPSHOT</version>
+				<version>${owsi-alfresco.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

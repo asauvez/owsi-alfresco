@@ -16,6 +16,9 @@
 	</prerequisites>
 	
 	<properties>
+		<!-- A override dans les projets utilisant OWSI ... -->
+		<owsi-alfresco.version>${project.version}</owsi-alfresco.version>
+		
 		<!-- Alfresco Maven Plugin version to use -->
 		<alfresco.sdk.version>4.1.0</alfresco.sdk.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -79,7 +82,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.8.7-SNAPSHOT</version>
+				<version>${owsi-alfresco.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

@@ -389,14 +389,14 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.8.7-SNAPSHOT</version>
+						<version>${owsi-alfresco.version}</version>
 					</dependency>
 				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-				<version>0.8.7-SNAPSHOT</version>
+				<version>${owsi-alfresco.version}</version>
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>
