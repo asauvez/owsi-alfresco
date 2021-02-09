@@ -358,8 +358,11 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			
 			xml.writeStartElement("bean");
 			xml.writeAttribute("id", serviceId + ".customTriggersList");
-			xml.writeAttribute("class", "org.springframework.scheduling.quartz.SchedulerFactoryBean");
-
+			xml.writeAttribute("class", "org.springframework.scheduling.quartz.SchedulerAccessorBean");
+			xml.writeStartElement("property");
+			xml.writeAttribute("name", "scheduler");
+			xml.writeAttribute("ref", "schedulerFactory");
+			xml.writeEndElement(); // property
 			xml.writeStartElement("property");
 			xml.writeAttribute("name", "triggers");
 			xml.writeStartElement("list");

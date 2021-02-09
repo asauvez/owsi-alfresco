@@ -76,6 +76,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-parent-bom</artifactId>
+				<version>0.8.7-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<!-- This will import the dependencyManagement for all artifacts in the 
 				selected Alfresco platform. NOTE: You still need to define dependencies in 
 				your POM, but you can omit version as it's enforced by this dependencyManagement. 
