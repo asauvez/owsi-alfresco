@@ -355,7 +355,7 @@
 			<plugin>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-				<version>${owsi-alfresco.version}</version>
+				<version>0.8.7-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>

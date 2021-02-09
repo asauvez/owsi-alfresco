@@ -17,9 +17,6 @@
 	<description>Définition des dépendances et plugins partagées par les autres projets et modules</description>
 
 	<properties>
-		<!-- A override dans les projets utilisant OWSI ... -->
-		<owsi-alfresco.version>${project.version}</owsi-alfresco.version>
-		
 		<owsi-alfresco.maven-failsafe-plugin.version>2.19.1</owsi-alfresco.maven-failsafe-plugin.version>
 		<owsi-alfresco.git-commit-id-plugin.version>2.2.4</owsi-alfresco.git-commit-id-plugin.version>
 		<owsi-core.animal-sniffer-maven-plugin.version>1.18</owsi-core.animal-sniffer-maven-plugin.version>
