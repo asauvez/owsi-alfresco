@@ -32,6 +32,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-app-core</artifactId>
+				<type>test-jar</type>
 				<version>0.8.7</version>
 			</dependency>
 			<dependency>
