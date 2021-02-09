@@ -15,7 +15,6 @@
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
-			<version>0.8.7-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

@@ -12,7 +12,19 @@
 
 	<artifactId>owsi-alfresco-repo-wsgenerator</artifactId>
 	<packaging>pom</packaging>
-
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-parent-bom</artifactId>
+				<version>0.8.7-SNAPSHOT</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<modules>
 		<module>owsi-alfresco-repo-wsgenerator-annotation</module>
 		<module>owsi-alfresco-repo-wsgenerator-processor</module>
