@@ -37,7 +37,7 @@ import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
  */
 public abstract class AbstractPolicyService implements InitializingBean {
 	
-	private final Logger logger = LoggerFactory.getLogger(AbstractPolicyService.class);
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired protected PolicyRepositoryService policyRepositoryService;
 	@Autowired protected NodeModelRepositoryService nodeRepositoryService;
@@ -92,35 +92,40 @@ public abstract class AbstractPolicyService implements InitializingBean {
 		return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[] { interface_ }, new InvocationHandler() {
 			@Override
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				if (args != null) {
-					for (Object arg : args) {
-						if (arg instanceof NodeRef) {
-							if (! nodeRepositoryService.exists((NodeRef) arg)) {
-								logger.warn(arg + " does not exist anymore. Ignore.");
-								return null;
-							}
-						} else if (arg instanceof ChildAssociationRef) {
-							if (! nodeRepositoryService.exists(((ChildAssociationRef) arg).getParentRef())) {
-								logger.warn(arg + " does not exist anymore. Ignore.");
-								return null;
-							}
-							if (! nodeRepositoryService.exists(((ChildAssociationRef) arg).getChildRef())) {
-								logger.warn(arg + " does not exist anymore. Ignore.");
-								return null;
-							}
-						} else if (arg instanceof AssociationRef) {
-							if (! nodeRepositoryService.exists(((AssociationRef) arg).getSourceRef())) {
-								logger.warn(arg + " does not exist anymore. Ignore.");
-								return null;
-							}
-							if (! nodeRepositoryService.exists(((AssociationRef) arg).getTargetRef())) {
-								logger.warn(arg + " does not exist anymore. Ignore.");
-								return null;
+				logger.trace("--> Beginning of " + method.getName() + "()");
+				try {
+					if (args != null) {
+						for (Object arg : args) {
+							if (arg instanceof NodeRef) {
+								if (! nodeRepositoryService.exists((NodeRef) arg)) {
+									logger.warn(arg + " does not exist anymore. Ignore.");
+									return null;
+								}
+							} else if (arg instanceof ChildAssociationRef) {
+								if (! nodeRepositoryService.exists(((ChildAssociationRef) arg).getParentRef())) {
+									logger.warn(arg + " does not exist anymore. Ignore.");
+									return null;
+								}
+								if (! nodeRepositoryService.exists(((ChildAssociationRef) arg).getChildRef())) {
+									logger.warn(arg + " does not exist anymore. Ignore.");
+									return null;
+								}
+							} else if (arg instanceof AssociationRef) {
+								if (! nodeRepositoryService.exists(((AssociationRef) arg).getSourceRef())) {
+									logger.warn(arg + " does not exist anymore. Ignore.");
+									return null;
+								}
+								if (! nodeRepositoryService.exists(((AssociationRef) arg).getTargetRef())) {
+									logger.warn(arg + " does not exist anymore. Ignore.");
+									return null;
+								}
 							}
 						}
 					}
+					return method.invoke(AbstractPolicyService.this, args);
+				} finally {
+					logger.trace("<-- End of " + method.getName() + "()");
 				}
-				return method.invoke(AbstractPolicyService.this, args);
 			}
 		});
 	}

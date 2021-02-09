@@ -33,6 +33,11 @@ mvn gitflow:release
 Nouveautés
 ==========
 
+## 0.8.7
+Release du 09/02/2021
+- Affichage des scheduled jobs dans la console admin Alfresco
+- Fix pom si utilisation du SDK4-plus comme parent
+
 ## depuis 0.8.6
  * Classification: fix si une valeur était à null et ne l'est plus.
 

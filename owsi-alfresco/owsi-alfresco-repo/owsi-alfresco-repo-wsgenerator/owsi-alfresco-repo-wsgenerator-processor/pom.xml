@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-repo-wsgenerator</artifactId>
-		<version>0.8.6</version>
+		<version>0.8.7</version>
 	</parent>
 	<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
 	<packaging>jar</packaging>
@@ -15,7 +15,6 @@
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
