@@ -86,8 +86,8 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			if (res.size() >= maxPermissionChecks) {
 				LOGGER.warn("Search result may not have returned all results : " + res.size() + "/"+ maxPermissionChecks);
 			}
-			if (LOGGER_AUDIT.isInfoEnabled()) {
-				LOGGER.info("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
+			if (LOGGER_AUDIT.isDebugEnabled()) {
+				LOGGER.debug("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
 			}
 			return res;
 		} catch (FTSQueryException ex) {
