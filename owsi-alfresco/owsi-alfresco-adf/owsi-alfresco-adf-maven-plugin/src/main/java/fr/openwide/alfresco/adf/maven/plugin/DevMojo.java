@@ -69,14 +69,17 @@ public class DevMojo extends AbstractAdfMojo {
 //			replaceInFile("angular.json", "",
 //					"      \"root\": \"\",", 
 //					"      \"root\": \"" + project.getBuild().getFinalName() + "\",");
-			replaceInFile("src/index.html", "",
-					"<base href=\"/\" />", 
-					"<base href=\"/" + project.getBuild().getFinalName() + "/\" />");
+			
+			String serve = System.getProperty("serve");
+			if (serve == null) {
+				replaceInFile("src/index.html", "",
+						"<base href=\"/\" />", 
+						"<base href=\"/" + project.getBuild().getFinalName() + "/\" />");
+			}
 
 			createFileLinks(rootAppFolder, targetAppFolder, originalAppFolder, true);
 			//createFileLinks(rootAppFolder, targetAppFolder);
 			getLog().info("Getting command...");
-			String serve = System.getProperty("serve");
 			String serveDirectory = System.getProperty("serveDirectory", ".");
 			getLog().info("Command is " + serve);
 			
@@ -116,15 +119,19 @@ public class DevMojo extends AbstractAdfMojo {
 			Date date = new Date();
 			long time = date.getTime();
 			long lastModified = src.lastModified();
-			if(time - lastModified < 4500) {
-				if(dest.exists() && ! dest.delete()) {
-					throw new IllegalStateException("Ne peut pas effacer " + dest);
+			if (time - lastModified < 4500) {
+				if (   filesToIgnore.contains(src) 
+					|| filesToIgnore.contains(dest)) {
+					getLog().info("Ignore create target link" + dest);
+				} else {
+					if(dest.exists() && ! dest.delete()) {
+						throw new IllegalStateException("Ne peut pas effacer " + dest);
+					}
+					dest.getParentFile().mkdirs();
+					getLog().info("Create target link from " + src);
+					Files.copy(src.toPath(), dest.toPath());
+					dest.setLastModified(lastModified - 8000);
 				}
-				dest.getParentFile().mkdirs();
-				getLog().info("Create target link from " + src);
-				Files.copy(src.toPath(), dest.toPath());
-				dest.setLastModified(lastModified - 8000);
-				
 			}
 		}
 	}
