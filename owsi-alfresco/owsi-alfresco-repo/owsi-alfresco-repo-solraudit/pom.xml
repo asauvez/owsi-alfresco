@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
+		<version>0.8.8-SNAPSHOT</version>
+		<relativePath>../../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
+	</parent>
+	<artifactId>owsi-alfresco-repo-solraudit</artifactId>
+
+	<name>OWSI Alfresco - Repository - Solr Audit</name>
+
+	<properties>
+		<alfresco.module.name>owsi-alfresco-repo-solraudit</alfresco.module.name>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<!-- Permet de générer des WS avec une annotation -->
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>maven-processor-plugin-default</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<processors>
+								<processor>fr.openwide.alfresco.repo.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
+							</processors>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>fr.openwide.alfresco</groupId>
+						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+    
+</project>

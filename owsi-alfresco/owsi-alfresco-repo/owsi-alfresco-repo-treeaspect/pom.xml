@@ -24,10 +24,10 @@
 	<build>
 		<plugins>
 			<plugin>
-					<!-- Pour avoir module.version=${alfresco.module.version} -->
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-				</plugin>
+				<!-- Pour avoir module.version=${alfresco.module.version} -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 
