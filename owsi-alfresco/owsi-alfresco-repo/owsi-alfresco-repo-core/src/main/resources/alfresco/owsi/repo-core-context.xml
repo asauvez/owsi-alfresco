@@ -145,6 +145,8 @@
 		<property name="conversionService" ref="owsi.service.conversionService" />
 	</bean>
 	
+	<bean id="owsi.service.uniqueNameRepositoryService" class="fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameRepositoryServiceImpl"></bean>
+	
 	<!-- Authority webscripts -->
 
 	<bean id="webscript.owsi.authority" parent="webscript.owsi.remote" abstract="true">

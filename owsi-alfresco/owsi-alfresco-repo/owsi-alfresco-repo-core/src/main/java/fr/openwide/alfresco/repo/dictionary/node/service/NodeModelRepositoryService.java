@@ -43,6 +43,7 @@ public interface NodeModelRepositoryService {
 	void removeChild(NodeRef parentRef, NodeRef childRef, NameReference assocType);
 	void unlinkSecondaryParents(NodeRef nodeRef, ChildAssociationModel childAssociationModel);
 
+	boolean isFolder(NodeRef nodeRef);
 	boolean isType(NodeRef nodeRef, TypeModel typeModel);
 	NameReference getType(NodeRef nodeRef);
 	void setType(NodeRef nodeRef, NameReference type);
@@ -118,4 +119,7 @@ public interface NodeModelRepositoryService {
 	String getPath(NodeRef nodeRef);
 	
 	<C extends Serializable> void removeProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
+	
+	void setUniqueNodeName(NodeRef nodeRef, String newName);
+	void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder);
 }
