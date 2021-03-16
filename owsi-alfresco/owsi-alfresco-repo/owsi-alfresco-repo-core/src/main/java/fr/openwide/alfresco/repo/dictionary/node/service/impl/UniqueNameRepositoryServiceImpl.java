@@ -1,40 +1,45 @@
 package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.FileNameValidator;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.repo.dictionary.node.service.UniqueNameRepositoryService;
 
 public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryService {
-	private final Logger logger = LoggerFactory.getLogger(UniqueNameRepositoryServiceImpl.class);
 	
 	@Autowired
 	private FileFolderService fileFolderService;
 	
 	@Override
 	public String toValidName(String nodeName) {
-		String validName = FileNameValidator.getValidFileName(nodeName);
-    	while (validName.endsWith(" ") || validName.endsWith(".")) {
-    		validName = validName.substring(0, validName.length() - 1);
-    	}
-    	
-    	if (!nodeName.equals(validName)) {
-    		logger.trace("UniqueNameRepositoryService.toValidName : Old name = '" + nodeName + "', new name = " + validName);
-    	}
-    	return validName;
+		return toValidName(nodeName, "_");
+	}
+	
+	@Override
+	public String toValidName(String nodeName, String replacementStr) {
+		String validName = nodeName.replaceAll(FileNameValidator.FILENAME_ILLEGAL_REGEX, replacementStr);
+		while (validName.endsWith(" ") || validName.endsWith(".")) {
+			validName = validName.substring(0, validName.length() - 1);
+		}
+
+		return validName;
 	}
 	
 	@Override
 	public String getUniqueValidName(String newName, NodeRef parentNode) {
-		return getUniqueValidName(newName, parentNode, Optional.empty()).get();
+		return getUniqueValidName(newName, Collections.singletonList(parentNode), Optional.empty(), new UniqueNameGenerator()).get();
+	}
+	@Override
+	public String getUniqueValidName(String newName, NodeRef parentNode, UniqueNameGenerator nameGenerator) {
+		return getUniqueValidName(newName, Collections.singletonList(parentNode), Optional.empty(), nameGenerator).get();
 	}
 	
 	/**
@@ -42,28 +47,42 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 	 */
 	@Override
 	public Optional<String> getUniqueValidName(String newName, NodeRef parentNode, Optional<NodeRef> currentNode) {
-		String validNewName = toValidName(newName);
+		return getUniqueValidName(newName, Collections.singletonList(parentNode), currentNode, new UniqueNameGenerator());
+	}
+	@Override
+	public Optional<String> getUniqueValidName(String newName, Collection<NodeRef> parentNodes, Optional<NodeRef> currentNode) {
+		return getUniqueValidName(newName, parentNodes, currentNode, new UniqueNameGenerator());
+	}
+	@Override
+	public Optional<String> getUniqueValidName(String newName, Collection<NodeRef> parentNodes, Optional<NodeRef> currentNode, UniqueNameGenerator nameGenerator) {
+		String originalValidNewName = toValidName(newName);
+		String validNewName = originalValidNewName;
 		
-		int i = 0;
-		String extension = FilenameUtils.getExtension(validNewName);
-		if (StringUtils.isNotEmpty(extension)) {
-			extension = "." + extension;
-		}
-		String baseName = FilenameUtils.removeExtension(validNewName);
+		List<NodeRef> existingNodes = getExistingNodes(validNewName, parentNodes);
 		
-		NodeRef existingNode = fileFolderService.searchSimple(parentNode, validNewName);
-		while (existingNode != null) {
-			if (currentNode.isPresent() && existingNode.equals(currentNode.get())) {
+		while (!existingNodes.isEmpty()) {
+			if (existingNodes.size() == 1 && existingNodes.get(0).equals(currentNode.get())) {
 				// On est déjà dans le bon dossier avec le bon nom (ou renommer avec un -i et on ne trouvera pas plus petit comme nom)
 				return Optional.empty();
 			}
-			i++ ;
 			
-			validNewName = baseName + "-" + i + extension;
+			validNewName = nameGenerator.generateNextName(originalValidNewName);
 			
-			existingNode = fileFolderService.searchSimple(parentNode, validNewName);
+			existingNodes = getExistingNodes(validNewName, parentNodes);
 		}
 		
 		return Optional.of(validNewName);
+	}
+	
+	private List<NodeRef> getExistingNodes(String nodeName, Collection<NodeRef> folders) {
+		List<NodeRef> result = new ArrayList<NodeRef>();
+		for (NodeRef parentNode : folders) {
+			NodeRef existingNode = fileFolderService.searchSimple(parentNode, nodeName);
+			if (existingNode != null) {
+				result.add(existingNode);
+			}
+		}
+		
+		return result;
 	}
 }

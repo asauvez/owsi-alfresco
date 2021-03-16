@@ -1,4 +1,4 @@
-package fr.openwide.alfresco.repo.module.classification.model.builder;
+package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import org.apache.commons.io.FilenameUtils;
 

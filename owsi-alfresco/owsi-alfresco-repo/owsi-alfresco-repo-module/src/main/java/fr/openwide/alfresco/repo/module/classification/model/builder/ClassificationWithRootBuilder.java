@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameGenerator;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl;
 
@@ -139,13 +140,24 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder uniqueName() {
-		return uniqueName(new UniqueNameGenerator());
+		return uniqueName(Optional.empty(), new UniqueNameGenerator());
 	}
 	public ClassificationWithRootBuilder uniqueName(UniqueNameGenerator uniqueNameGenerator) {
-		String uniqueName = service.getUniqueName(getNodeRef(), getDestinationFolders(), uniqueNameGenerator);
+		return uniqueName(Optional.empty(), uniqueNameGenerator);
+	}
+	
+	public ClassificationWithRootBuilder uniqueName(String newName) {
+		return uniqueName(Optional.of(newName), new UniqueNameGenerator());
+	}
+	public ClassificationWithRootBuilder uniqueName(String newName, UniqueNameGenerator uniqueNameGenerator) {
+		return uniqueName(Optional.of(newName), uniqueNameGenerator);
+	}
+	private ClassificationWithRootBuilder uniqueName(Optional<String> newName, UniqueNameGenerator uniqueNameGenerator) {
+		String uniqueName = service.getUniqueName(getNodeRef(), newName, getDestinationFolders(), uniqueNameGenerator);
 		service.setNewName(getNodeRef(), uniqueName);
 		return this;
 	}
+	
 	
 	public ClassificationWithRootBuilder name(String newName) {
 		service.setNewName(getNodeRef(), newName);
@@ -175,6 +187,16 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		}
 		for (NodeRef destinationFolder : destinationFolders) {
 			service.moveNode(getNodeRef(), destinationFolder);
+		}
+		return this;
+	}
+	
+	public ClassificationWithRootBuilder renameAndMoveNode(String newName) {
+		if (destinationFolders.size() > 1) {
+			throw new UnsupportedOperationException("Can't move a node to more than one folder : " + destinationFolders);
+		}
+		for (NodeRef destinationFolder : destinationFolders) {
+			service.renameAndMoveNode(getNodeRef(), destinationFolder, newName);
 		}
 		return this;
 	}

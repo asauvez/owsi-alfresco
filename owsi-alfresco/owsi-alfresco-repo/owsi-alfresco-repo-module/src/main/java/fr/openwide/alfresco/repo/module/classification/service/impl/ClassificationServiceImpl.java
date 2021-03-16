@@ -65,13 +65,14 @@ import fr.openwide.alfresco.component.model.search.model.restriction.Restriction
 import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
 import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.node.service.UniqueNameRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameGenerator;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
-import fr.openwide.alfresco.repo.module.classification.model.builder.UniqueNameGenerator;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerClassificationPolicy;
@@ -101,6 +102,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private NodeRepositoryService nodeRepositoryService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
+	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
 	@Autowired private FileFolderService fileFolderService;
 	
 	private ConversionService conversionService;
@@ -400,22 +402,14 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	public String getUniqueName(NodeRef document, Collection<NodeRef> destinationFolders, UniqueNameGenerator uniqueNameGenerator) {
-		String originalName = nodeModelRepositoryService.getProperty(document, CmModel.object.name);
-		
-		String newName = originalName;
-		while (existsNewName(document, destinationFolders, newName)) {
-			newName = uniqueNameGenerator.generateNextName(originalName);
-		}
-		return newName;
+		return getUniqueName(document, Optional.empty(), destinationFolders, uniqueNameGenerator);
 	}
-	private boolean existsNewName(NodeRef document, Collection<NodeRef> destinationFolders, String newName) {
-		for (NodeRef folder : destinationFolders) {
-			Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(folder, newName);
-			if (childByName.isPresent() && ! childByName.get().equals(document)) {
-				return true;
-			}
-		}
-		return false;
+	public String getUniqueName(NodeRef document, Optional<String> newName, Collection<NodeRef> destinationFolders, 
+			UniqueNameGenerator uniqueNameGenerator) {
+		String expectedNewName = newName.orElse(nodeModelRepositoryService.getProperty(document, CmModel.object.name));
+		return uniqueNameRepositoryService.getUniqueValidName(expectedNewName, 
+				destinationFolders, Optional.of(document), uniqueNameGenerator)
+			.orElse(expectedNewName);
 	}
 	
 	public void setContentStore(NodeRef node, String storeName) {
@@ -448,6 +442,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		NodeRef copyNodeRef = nodeModelRepositoryService.copy(node, destinationFolder, newName);
 		getClassifiedNodes().add(copyNodeRef);
 		return copyNodeRef;
+	}
+	
+	public void renameAndMoveNode(NodeRef node, NodeRef destinationFolder, String newName) {
+		logger.debug("Move node {} to {} : {} with new name {}", node, destinationFolder, getPath(destinationFolder), newName);
+		nodeModelRepositoryService.moveWithUniqueName(node, newName, destinationFolder);
 	}
 	
 	public void createFileLink(NodeRef nodeRef, NodeRef destinationFolder, Optional<String> linkNameOpt) {
@@ -501,15 +500,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 
 	public NodeRef subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier, NodeRef destinationFolder) {
-		ChildAssociationModel associationType = CmModel.folder.contains;
-
-		String cleanFolderName = folderName.replace('"', ' ').replace('?', ' ').replace('*', ' ')
-				.replace('\\', ' ').replace('/', ' ').replace('|', ' ').replace(':', ' ')
-				.replace('<', ' ').replace('>', ' ').trim(); 
+		String cleanFolderName = uniqueNameRepositoryService.toValidName(folderName, " ");
 		
-		String cacheKey = destinationFolder + "/" + associationType + "/" + cleanFolderName;
+		String cacheKey = destinationFolder + "/" + cleanFolderName;
 		return subFolderCache.get(nodeModelRepositoryService, cacheKey, 
-				() -> nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType),
+				() -> nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName),
 				() -> {
 			BusinessNode folderNode = folderNodeSupplier.get();
 			
@@ -525,7 +520,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				folderNode.aspect(OwsiModel.deleteIfEmpty);
 			}
 			
-			folderNode.assocs().primaryParent(associationType).nodeReference(conversionService.get(destinationFolder));
+			folderNode.assocs().primaryParent(CmModel.folder.contains).nodeReference(conversionService.get(destinationFolder));
 			
 			if (logger.isDebugEnabled()) {
 				logger.debug("Create subfolder {}", cleanFolderName);
@@ -545,7 +540,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
 						@Override
 						public NodeRef execute() {
-							Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName, associationType);
+							Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName);
 							return childByName.get();
 						}
 					}, true, true);
