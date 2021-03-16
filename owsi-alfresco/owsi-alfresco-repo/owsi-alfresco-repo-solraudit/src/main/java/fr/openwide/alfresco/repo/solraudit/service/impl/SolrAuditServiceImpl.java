@@ -21,7 +21,6 @@ import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
@@ -47,7 +46,6 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	@Autowired private SearchService searchService;
 	@Autowired private FileFolderService fileFolderService;
 	@Autowired @Qualifier("repositoryHelper") private Repository repositoryHelper;
-	@Autowired private NodeService nodeService;
 	
 	@Autowired @Qualifier("global-properties")
 	private Properties globalProperties;
@@ -133,7 +131,7 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 		NodeRef folder = repositoryHelper.getCompanyHome();
 		for (String pathElement : pathElements.split("/")) {
 			if (! pathElement.trim().isEmpty()) {
-				NodeRef child = nodeService.getChildByName(folder, ContentModel.ASSOC_CONTAINS, pathElement.trim());
+				NodeRef child = fileFolderService.searchSimple(folder, pathElement.trim());
 				if (child != null) {
 					folder = child;
 				} else {
@@ -142,7 +140,7 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 			}
 		}
 		
-		NodeRef file = nodeService.getChildByName(folder, ContentModel.ASSOC_CONTAINS, fileName);
+		NodeRef file = fileFolderService.searchSimple(folder, fileName);
 		if (file == null) {
 			file = fileFolderService.create(folder, fileName, ContentModel.TYPE_CONTENT).getNodeRef();
 		} else {
