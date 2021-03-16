@@ -22,5 +22,8 @@ public interface UniqueNameRepositoryService {
 	Optional<String> getUniqueValidName(String newName, Collection<NodeRef> parentNodes, Optional<NodeRef> currentNode);
 	Optional<String> getUniqueValidName(String newName, Collection<NodeRef> parentNodes, Optional<NodeRef> currentNode,
 			UniqueNameGenerator nameGenerator);
-
+	
+	void setUniqueNodeName(NodeRef nodeRef, String newName);
+	void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder);
+	
 }

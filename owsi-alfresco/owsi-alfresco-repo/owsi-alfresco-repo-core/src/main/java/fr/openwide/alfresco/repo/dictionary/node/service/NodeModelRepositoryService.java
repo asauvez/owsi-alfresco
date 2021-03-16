@@ -90,7 +90,16 @@ public interface NodeModelRepositoryService {
 	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, ChildAssociationModel associationType);
 	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, NameReference associationType);
 
+
+	@Deprecated
+	/**
+	 * Utiliser le UniqueNameRepositoryService
+	 */
 	String getUniqueChildName(NodeRef folder, String originalName);
+	@Deprecated
+	/**
+	 * Utiliser le UniqueNameRepositoryService
+	 */
 	String getUniqueChildName(NodeRef folder, NodeRef document);
 	
 	void createAssociation(NodeRef sourceRef, NodeRef targetRef, AssociationModel assocType);
@@ -119,7 +128,4 @@ public interface NodeModelRepositoryService {
 	String getPath(NodeRef nodeRef);
 	
 	<C extends Serializable> void removeProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
-	
-	void setUniqueNodeName(NodeRef nodeRef, String newName);
-	void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder);
 }

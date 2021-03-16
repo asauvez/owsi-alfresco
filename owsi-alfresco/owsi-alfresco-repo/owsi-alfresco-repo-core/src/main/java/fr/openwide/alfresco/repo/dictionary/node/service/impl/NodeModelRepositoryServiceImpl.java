@@ -25,6 +25,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
@@ -50,7 +51,6 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.repo.core.node.service.impl.NodeRemoteServiceImpl;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
-import fr.openwide.alfresco.repo.dictionary.node.service.UniqueNameRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryService {
@@ -60,7 +60,6 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	private Repository repositoryHelper;
 
 	@Autowired private ConversionService conversionService;
-	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
 	
 	private String dataDictionaryChildName;
 	private SimpleCache<String, NodeRef> singletonCache; // eg. for dataDictionaryNodeRef
@@ -325,14 +324,36 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	
 	@Override
+	@Deprecated
+	/**
+	 * Utiliser le UniqueNameRepositoryService
+	 */
 	public String getUniqueChildName(NodeRef folder, String originalName) {
-		return uniqueNameRepositoryService.getUniqueValidName(originalName, folder);
+		String extension = FilenameUtils.getExtension(originalName);
+		if (! extension.isEmpty()) {
+			extension = "." + extension;
+		}
+		String baseName = FilenameUtils.removeExtension(originalName);
+		String name = originalName;
+		int index = 1;
+		while (getChildByName(folder, name).isPresent()) {
+			name = baseName + "-" + (index ++) + extension;
+		}
+		return name;
 	}
+	
 	@Override
+	@Deprecated
+	/**
+	 * Utiliser le UniqueNameRepositoryService
+	 */
 	public String getUniqueChildName(NodeRef folder, NodeRef document) {
-		String currentName = getProperty(document, CmModel.object.name);
-		// Si on est déjà dans le dossier avec le bon nom, renverra le nom actuel
-		return uniqueNameRepositoryService.getUniqueValidName(currentName, folder, Optional.of(document)).orElse(currentName);
+		String originalName = getProperty(document, CmModel.object.name);
+		Optional<NodeRef> childByName = getChildByName(folder, originalName);
+		if (! childByName.isPresent() || childByName.get().equals(document)) {
+			return originalName;
+		}
+		return getUniqueChildName(folder, originalName);
 	}
 	
 	@Override
@@ -412,8 +433,6 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	
 	
-	
-	
 	@Override
 	public List<NodeRef> getTargetAssocs(NodeRef nodeRef, ManyToManyAssociationModel assoc) {
 		return _getTargetAssocs(nodeRef, assoc);
@@ -464,44 +483,6 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		if (list.isEmpty()) return Optional.empty();
 		if (list.size() == 1) return Optional.of(list.get(0));
 		throw new IllegalStateException("list=" + list);
-	}
-	
-	
-	@Override
-	public void setUniqueNodeName(NodeRef nodeRef, String newName) {
-		Optional<NodeRef> parentNode = getPrimaryParent(nodeRef);
-		if (!parentNode.isPresent()) {
-			throw new IllegalStateException("Can't rename node without parent : " + nodeRef);
-		}
-		
-		Optional<String> validUniqueNewName = uniqueNameRepositoryService.getUniqueValidName(newName, parentNode.get(), Optional.of(nodeRef));
-		if (!validUniqueNewName.isPresent()) {
-			// On a déjà le bon nom, pas besoin de renommer
-			return ;
-		}
-		
-		try {
-			fileFolderService.rename(nodeRef, validUniqueNewName.get());
-		} catch (FileExistsException | FileNotFoundException e) {
-			throw new IllegalStateException("Exception while removing node " + nodeRef + " : " + validUniqueNewName.get(), e);
-		}
-	}
-	
-	@Override
-	public void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder) {
-		Optional<NodeRef> currentParent = getPrimaryParent(nodeRef);
-		if (currentParent.isPresent() && currentParent.get().equals(parentFolder)) {
-			// Déjà dans le bon dossier, on renomme juste
-			setUniqueNodeName(nodeRef, newName);
-			return ;
-		}
-		
-		String uniqueNewName = uniqueNameRepositoryService.getUniqueValidName(newName, parentFolder);
-		try {
-			fileFolderService.move(nodeRef, parentFolder, uniqueNewName);
-		} catch (FileExistsException | FileNotFoundException e) {
-			throw new IllegalStateException("Exception while moving node " + nodeRef + "  to " + parentFolder + " with name : " + uniqueNewName, e);
-		}
 	}
 	
 	
