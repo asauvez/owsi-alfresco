@@ -6,4 +6,6 @@ public interface SolrAuditService {
 
 	void generateAudit(PrintWriter out);
 
+	void storeAudit();
+
 }

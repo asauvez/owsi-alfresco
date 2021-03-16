@@ -13,10 +13,10 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 
 /*
- * http://localhost:8080/alfresco/s/owsi/solraudit
+ * http://localhost:8080/alfresco/s/owsi/solraudit.csv
  */
 @GenerateWebScript(
-	url="/owsi/solraudit",
+	url="/owsi/solraudit.csv",
 	description="Calcul des statistiques dans Solr",
 	authentication=GenerateWebScriptAuthentication.ADMIN,
 	family="OWSI")
@@ -27,6 +27,8 @@ public class SolrAuditWebScript extends AbstractWebScript {
 	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
+		res.setContentType("text/csv");
+		
 		solrAuditService.generateAudit(
 				new PrintWriter(res.getWriter()));
 	}
