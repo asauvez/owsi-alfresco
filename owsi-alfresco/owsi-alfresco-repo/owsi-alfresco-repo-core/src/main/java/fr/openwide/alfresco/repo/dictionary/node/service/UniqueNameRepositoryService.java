@@ -51,6 +51,7 @@ public interface UniqueNameRepositoryService {
 	void setUniqueNodeName(NodeRef nodeRef, String newName);
 	void setUniqueNodeName(NodeRef nodeRef, String newName, UniqueNameGenerator nameGenerator);
 	
+	void moveWithUniqueName(NodeRef nodeRef, NodeRef parentFolder);
 	void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder);
 	void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder, UniqueNameGenerator nameGenerator);
 	

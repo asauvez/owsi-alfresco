@@ -444,6 +444,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return copyNodeRef;
 	}
 	
+	public void moveWithUniqueName(NodeRef node, NodeRef destinationFolder) {
+		logger.debug("Move node {} to {} : {} with unique name", node, destinationFolder, getPath(destinationFolder));
+		uniqueNameRepositoryService.moveWithUniqueName(node, destinationFolder);
+	}
+	
 	public void renameAndMoveNode(NodeRef node, NodeRef destinationFolder, String newName) {
 		logger.debug("Move node {} to {} : {} with new name {}", node, destinationFolder, getPath(destinationFolder), newName);
 		uniqueNameRepositoryService.moveWithUniqueName(node, newName, destinationFolder);

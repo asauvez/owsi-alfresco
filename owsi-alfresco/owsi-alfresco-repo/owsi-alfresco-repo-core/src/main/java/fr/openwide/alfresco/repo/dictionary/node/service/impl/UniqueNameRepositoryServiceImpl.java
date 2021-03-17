@@ -13,6 +13,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.FileNameValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.UniqueNameRepositoryService;
 
@@ -70,7 +71,7 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 		
 		while (!existingNodes.isEmpty()) {
 			if (currentNode.isPresent() && existingNodes.size() == 1 && existingNodes.get(0).equals(currentNode.get())) {
-				// On est déjà dans le bon dossier avec le bon nom (ou renommer avec un -i et on ne trouvera pas plus petit comme nom)
+				// On est déjà dans le bon dossier avec le bon nom (ou renommé avec un -i et on ne trouvera pas plus petit comme nom)
 				return Optional.empty();
 			}
 			
@@ -105,6 +106,12 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 		} catch (FileExistsException | FileNotFoundException e) {
 			throw new IllegalStateException("Exception while removing node " + nodeRef + " : " + validUniqueNewName.get(), e);
 		}
+	}
+	
+	@Override
+	public void moveWithUniqueName(NodeRef nodeRef, NodeRef parentFolder) {
+		moveWithUniqueName(nodeRef, nodeModelRepositoryService.getProperty(nodeRef, CmModel.object.name), 
+				parentFolder, new UniqueNameGenerator());
 	}
 	
 	@Override

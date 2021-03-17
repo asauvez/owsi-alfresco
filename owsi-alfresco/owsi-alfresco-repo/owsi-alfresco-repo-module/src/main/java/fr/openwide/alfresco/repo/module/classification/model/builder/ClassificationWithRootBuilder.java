@@ -139,26 +139,6 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return destinationFolders;
 	}
 	
-	public ClassificationWithRootBuilder uniqueName() {
-		return uniqueName(Optional.empty(), new UniqueNameGenerator());
-	}
-	public ClassificationWithRootBuilder uniqueName(UniqueNameGenerator uniqueNameGenerator) {
-		return uniqueName(Optional.empty(), uniqueNameGenerator);
-	}
-	
-	public ClassificationWithRootBuilder uniqueName(String newName) {
-		return uniqueName(Optional.of(newName), new UniqueNameGenerator());
-	}
-	public ClassificationWithRootBuilder uniqueName(String newName, UniqueNameGenerator uniqueNameGenerator) {
-		return uniqueName(Optional.of(newName), uniqueNameGenerator);
-	}
-	private ClassificationWithRootBuilder uniqueName(Optional<String> newName, UniqueNameGenerator uniqueNameGenerator) {
-		String uniqueName = service.getUniqueName(getNodeRef(), newName, getDestinationFolders(), uniqueNameGenerator);
-		service.setNewName(getNodeRef(), uniqueName);
-		return this;
-	}
-	
-	
 	public ClassificationWithRootBuilder name(String newName) {
 		service.setNewName(getNodeRef(), newName);
 		return this;
@@ -187,6 +167,16 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		}
 		for (NodeRef destinationFolder : destinationFolders) {
 			service.moveNode(getNodeRef(), destinationFolder);
+		}
+		return this;
+	}
+	
+	public ClassificationWithRootBuilder moveWithUniqueName() {
+		if (destinationFolders.size() > 1) {
+			throw new UnsupportedOperationException("Can't move a node to more than one folder : " + destinationFolders);
+		}
+		for (NodeRef destinationFolder : destinationFolders) {
+			service.moveWithUniqueName(getNodeRef(), destinationFolder);
 		}
 		return this;
 	}
