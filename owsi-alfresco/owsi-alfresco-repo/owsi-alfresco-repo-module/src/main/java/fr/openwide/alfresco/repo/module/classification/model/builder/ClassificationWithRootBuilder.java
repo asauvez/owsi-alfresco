@@ -242,6 +242,18 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		}
 		return this;
 	}
+	
+	public ClassificationWithRootBuilder renameMoveFirstAndCreateSecondaryParents(String newName) {
+		// Nom unique dans tout les dossiers de destination
+		String newValidUniqueName = service.getUniqueName(getNodeRef(), Optional.of(newName), destinationFolders, new UniqueNameGenerator());
+		
+		service.renameAndMoveNode(getNodeRef(), destinationFolders.get(0), newValidUniqueName);
+		
+		for (NodeRef destinationFolder : destinationFolders.subList(1, destinationFolders.size())) {
+			service.createSecondaryParent(getNodeRef(), destinationFolder);
+		}
+		return this;
+	}
 
 	/**
 	 * Créer un raccourci dans le répertoire de destination.

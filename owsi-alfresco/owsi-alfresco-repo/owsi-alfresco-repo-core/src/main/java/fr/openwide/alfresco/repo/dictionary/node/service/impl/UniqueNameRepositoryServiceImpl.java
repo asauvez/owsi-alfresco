@@ -55,6 +55,11 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 		return getUniqueValidName(newName, Collections.singletonList(parentNode), currentNode, new UniqueNameGenerator());
 	}
 	@Override
+	public Optional<String> getUniqueValidName(String newName, NodeRef parentNode, Optional<NodeRef> currentNode, 
+			UniqueNameGenerator nameGenerator) {
+		return getUniqueValidName(newName, Collections.singletonList(parentNode), currentNode, nameGenerator);
+	}
+	@Override
 	public Optional<String> getUniqueValidName(String newName, Collection<NodeRef> parentNodes, Optional<NodeRef> currentNode) {
 		return getUniqueValidName(newName, parentNodes, currentNode, new UniqueNameGenerator());
 	}
@@ -82,12 +87,17 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 	
 	@Override
 	public void setUniqueNodeName(NodeRef nodeRef, String newName) {
+		setUniqueNodeName(nodeRef, newName, new UniqueNameGenerator());
+	}
+	
+	@Override
+	public void setUniqueNodeName(NodeRef nodeRef, String newName, UniqueNameGenerator nameGenerator) {
 		Optional<NodeRef> parentNode = nodeModelRepositoryService.getPrimaryParent(nodeRef);
 		if (!parentNode.isPresent()) {
 			throw new IllegalStateException("Can't rename node without parent : " + nodeRef);
 		}
 		
-		Optional<String> validUniqueNewName = getUniqueValidName(newName, parentNode.get(), Optional.of(nodeRef));
+		Optional<String> validUniqueNewName = getUniqueValidName(newName, parentNode.get(), Optional.of(nodeRef), nameGenerator);
 		if (!validUniqueNewName.isPresent()) {
 			// On a déjà le bon nom, pas besoin de renommer
 			return ;
@@ -102,14 +112,19 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 	
 	@Override
 	public void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder) {
+		moveWithUniqueName(nodeRef, newName, parentFolder, new UniqueNameGenerator());
+	}
+	
+	@Override
+	public void moveWithUniqueName(NodeRef nodeRef, String newName, NodeRef parentFolder, UniqueNameGenerator nameGenerator) {
 		Optional<NodeRef> currentParent = nodeModelRepositoryService.getPrimaryParent(nodeRef);
 		if (currentParent.isPresent() && currentParent.get().equals(parentFolder)) {
 			// Déjà dans le bon dossier, on renomme juste
-			setUniqueNodeName(nodeRef, newName);
+			setUniqueNodeName(nodeRef, newName, nameGenerator);
 			return ;
 		}
 		
-		String uniqueNewName = getUniqueValidName(newName, parentFolder);
+		String uniqueNewName = getUniqueValidName(newName, parentFolder, nameGenerator);
 		try {
 			fileFolderService.move(nodeRef, parentFolder, uniqueNewName);
 		} catch (FileExistsException | FileNotFoundException e) {
