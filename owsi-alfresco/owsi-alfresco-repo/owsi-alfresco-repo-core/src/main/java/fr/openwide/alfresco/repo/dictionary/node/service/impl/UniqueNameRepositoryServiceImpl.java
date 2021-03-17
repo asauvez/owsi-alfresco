@@ -47,9 +47,6 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 		return getUniqueValidName(newName, Collections.singletonList(parentNode), Optional.empty(), nameGenerator).get();
 	}
 	
-	/**
-	 * Renvoi un Optional Empty si on a déjà le bon nom
-	 */
 	@Override
 	public Optional<String> getUniqueValidName(String newName, NodeRef parentNode, Optional<NodeRef> currentNode) {
 		return getUniqueValidName(newName, Collections.singletonList(parentNode), currentNode, new UniqueNameGenerator());
