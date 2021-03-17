@@ -172,13 +172,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder moveWithUniqueName() {
-		if (destinationFolders.size() > 1) {
-			throw new UnsupportedOperationException("Can't move a node to more than one folder : " + destinationFolders);
-		}
-		for (NodeRef destinationFolder : destinationFolders) {
-			service.moveWithUniqueName(getNodeRef(), destinationFolder);
-		}
-		return this;
+		return renameAndMoveNode(getNodeName());
 	}
 	
 	public ClassificationWithRootBuilder renameAndMoveNode(String newName) {
@@ -233,6 +227,10 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return this;
 	}
 	
+	public ClassificationWithRootBuilder moveFirstUniqueNameAndCreateSecondaryParents() {
+		return renameMoveFirstAndCreateSecondaryParents(getNodeName());
+	}
+	
 	public ClassificationWithRootBuilder renameMoveFirstAndCreateSecondaryParents(String newName) {
 		// Nom unique dans tout les dossiers de destination
 		String newValidUniqueName = service.getUniqueName(getNodeRef(), Optional.of(newName), destinationFolders, new UniqueNameGenerator());
@@ -262,5 +260,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	public ClassificationWithRootBuilder otherDestinations() {
 		List<NodeRef> others = (destinationFolders.isEmpty()) ? Collections.emptyList() : destinationFolders.subList(1, destinationFolders.size());
 		return new ClassificationWithRootBuilder(service, getEvent(), others);
+	}
+	
+	private String getNodeName() {
+		return service.getNodeModelService().getProperty(getNodeRef(), CmModel.object.name);
 	}
 }

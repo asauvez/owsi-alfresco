@@ -153,9 +153,11 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		}
 		
 		if (uniqueName) {
-			rootBuilder.uniqueName();
+			rootBuilder.moveFirstUniqueNameAndCreateSecondaryParents();
 		}
-		rootBuilder.moveFirstAndCreateSecondaryParents();
+		else {
+			rootBuilder.moveFirstAndCreateSecondaryParents();
+		}
 	}
 	
 	private String processTemplate(Template template, Map<String, Object> dataModel) {
