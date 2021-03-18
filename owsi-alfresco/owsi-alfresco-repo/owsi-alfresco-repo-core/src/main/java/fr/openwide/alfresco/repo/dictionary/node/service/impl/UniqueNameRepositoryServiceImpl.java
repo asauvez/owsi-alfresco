@@ -1,10 +1,10 @@
 package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -67,10 +67,10 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 		String originalValidNewName = toValidName(newName);
 		String validNewName = originalValidNewName;
 		
-		List<NodeRef> existingNodes = getExistingNodes(validNewName, parentNodes);
+		Set<NodeRef> existingNodes = getExistingNodes(validNewName, parentNodes);
 		
 		while (!existingNodes.isEmpty()) {
-			if (currentNode.isPresent() && existingNodes.size() == 1 && existingNodes.get(0).equals(currentNode.get())) {
+			if (currentNode.isPresent() && existingNodes.size() == 1 && existingNodes.contains(currentNode.get())) {
 				// On est déjà dans le bon dossier avec le bon nom (ou renommé avec un -i et on ne trouvera pas plus petit comme nom)
 				return Optional.empty();
 			}
@@ -136,8 +136,8 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 		}
 	}
 	
-	private List<NodeRef> getExistingNodes(String nodeName, Collection<NodeRef> folders) {
-		List<NodeRef> result = new ArrayList<NodeRef>();
+	private Set<NodeRef> getExistingNodes(String nodeName, Collection<NodeRef> folders) {
+		Set<NodeRef> result = new HashSet<NodeRef>();
 		for (NodeRef parentNode : folders) {
 			nodeModelRepositoryService.getChildByName(parentNode, nodeName).ifPresent(existingNode -> result.add(existingNode));
 		}
