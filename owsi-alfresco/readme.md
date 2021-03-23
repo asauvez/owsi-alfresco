@@ -35,6 +35,7 @@ Nouveautés
 
 ## depuis 0.8.8
  * Solr Audit: pour savoir combien de fichier existe dans le repo.
+ * UniqueNameRepositoryService : Gestion des noms lors des déplacements / renommage / classifications
 
 ## depuis 0.8.7 Release du 09/02/2021
  *  Affichage des scheduled jobs dans la console admin Alfresco
@@ -132,7 +133,11 @@ Nouveautés
 Migration
 =========
 
-## depuis 0.8.3
+## vers 0.8.8
+* Classification, remplacer `.uniqueName().moveNode()` par `moveWithUniqueName()` , et pour les parents multiples `moveFirstUniqueNameAndCreateSecondaryParents()`
+* Remplacer `nodeModelRepositoryService.getUniqueChildName()` par `uniqueNameRepositoryService.getUniqueValidName()`
+
+## vers 0.8.3
 * Les fichiers toto.xml.5.2.ori doivent être renomé en toto.xml--5.2.ori.
 
 ## vers 0.8.0
