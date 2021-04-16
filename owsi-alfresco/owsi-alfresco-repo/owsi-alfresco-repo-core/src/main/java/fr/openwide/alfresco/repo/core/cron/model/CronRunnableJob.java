@@ -43,7 +43,7 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 						new RetryingTransactionCallback<Void>() {
 							@Override
 							public Void execute() throws Throwable {
-								((Runnable) runnable).run();
+								runnable.run();
 								return null;
 							}
 						}, readOnly, true);
