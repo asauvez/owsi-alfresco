@@ -75,8 +75,7 @@ public class EmailDemoClassificationPolicy implements ClassificationPolicy<CmEma
 			.subFolder("Par mois")
 			.subFolder(new SubFolderBuilder(model.sentDate)
 				.formatDate("yyyy.MM"))
-			.uniqueName()
-			.moveNode();
+			.moveWithUniqueName();
 	
 		builder.rootCompanyHome()
 			.subFolder("Email")

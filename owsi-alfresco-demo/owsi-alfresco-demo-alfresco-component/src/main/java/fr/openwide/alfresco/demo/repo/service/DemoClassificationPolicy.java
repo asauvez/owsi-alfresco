@@ -19,8 +19,7 @@ public class DemoClassificationPolicy implements ClassificationPolicy<DemoAspect
 				.subFolder("toto", node -> node
 					.aspect(CmModel.emailed)
 					.permissions().addAccessControlConsumer(AuthorityReference.GROUP_EVERYONE))
-				.uniqueName()
-				.moveNode();
+				.moveWithUniqueName();
 			return;
 		}
 		
