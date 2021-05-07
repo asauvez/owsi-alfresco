@@ -1,6 +1,10 @@
 package fr.openwide.alfresco.api.core.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * A factory for {@link ThresholdBuffer} objects.
@@ -43,6 +47,11 @@ public final class ThresholdBufferFactory {
      */
     public ThresholdBuffer newOutputStream() {
         return new ThresholdBuffer(tempDir, memoryThreshold, maxContentSize, encrypt);
+    }
+    public ThresholdBuffer newOutputStream(InputStream input) throws IOException {
+        ThresholdBuffer output = newOutputStream();
+        IOUtils.copy(input, output);
+        return output;
     }
 
     /**
