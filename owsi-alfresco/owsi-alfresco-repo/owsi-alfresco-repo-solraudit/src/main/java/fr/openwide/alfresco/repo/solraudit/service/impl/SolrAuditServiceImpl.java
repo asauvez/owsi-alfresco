@@ -20,6 +20,7 @@ import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericFacetRespo
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchParameters;
@@ -46,6 +47,7 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	@Autowired private SearchService searchService;
 	@Autowired private FileFolderService fileFolderService;
 	@Autowired @Qualifier("repositoryHelper") private Repository repositoryHelper;
+	@Autowired private MimetypeService mimetypeService;
 	
 	@Autowired @Qualifier("global-properties")
 	private Properties globalProperties;
@@ -64,6 +66,9 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 			}
 			out.append(pivot);
 			out.append(";");
+			if (isPivotMimeType(pivot)) {
+				out.append(pivot + "_Display;");
+			}
 		}
 		out.append("Nombre;Taille\n");
 
@@ -112,6 +117,12 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 						String value = values.get(pivot);
 						out.append((value != null) ? value : "");
 						out.append(";");
+						if (isPivotMimeType(pivot)) {
+							Map<String, String> displaysByMimetype = mimetypeService.getDisplaysByMimetype();
+							String valueDisplay = displaysByMimetype.getOrDefault(value, value);
+							out.append((valueDisplay != null) ? valueDisplay : "");
+							out.append(";");
+						}
 					}
 					out.append(count + ";" + sum + "\n");
 				} else {
@@ -148,10 +159,14 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 		}
 		
 		ContentWriter writer = fileFolderService.getWriter(file);
-		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(writer.getContentOutputStream(), "UTF-8"))) {
+		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(writer.getContentOutputStream(), "ISO-8859-1"))) {
 			generateAudit(out);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	private boolean isPivotMimeType(String pivot) {
+		return pivot.endsWith(".mimetype");
 	}
 }
