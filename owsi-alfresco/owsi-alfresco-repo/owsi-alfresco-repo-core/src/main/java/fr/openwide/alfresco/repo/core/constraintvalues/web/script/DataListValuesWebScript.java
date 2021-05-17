@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.alfresco.model.DataListModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -105,9 +104,9 @@ public class DataListValuesWebScript extends SwaggerWebScript implements Initial
 		if (typeDef == null) {
 			throw new IllegalArgumentException("Unknow type '" + dataListTypeName + "'");
 		}
-		if (! DataListModel.TYPE_DATALIST_ITEM.equals(typeDef.getParentName())) {
-			throw new IllegalArgumentException("Expected subtype of '" + DataListModel.TYPE_DATALIST_ITEM.toPrefixString(prefixResolver) + "' but got '" + dataListTypeName + "'");
-		}
+//		if (! DataListModel.TYPE_DATALIST_ITEM.equals(typeDef.getParentName())) {
+//			throw new IllegalArgumentException("Expected subtype of '" + DataListModel.TYPE_DATALIST_ITEM.toPrefixString(prefixResolver) + "' but got '" + dataListTypeName + "'");
+//		}
 		NameReference nameReference = conversionService.get(typeDef.getName());
 		
 		List<Map<String, Serializable>> options = new ArrayList<>();
@@ -116,6 +115,8 @@ public class DataListValuesWebScript extends SwaggerWebScript implements Initial
 		
 		for (NodeRef item : items) {
 			Map<String, Serializable> map = new HashMap<>();
+			map.put("nodeRef", item.toString());
+			
 			Map<QName, Serializable> properties = nodeService.getProperties(item);
 			for (Entry<QName, Serializable> entry : properties.entrySet()) {
 				QName property = entry.getKey();
