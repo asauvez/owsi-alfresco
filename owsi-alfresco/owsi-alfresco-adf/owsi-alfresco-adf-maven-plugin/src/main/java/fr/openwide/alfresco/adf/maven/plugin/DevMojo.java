@@ -41,9 +41,11 @@ public class DevMojo extends AbstractAdfMojo {
 
 	private static final long ORIGINAL_TIMESPAMP = 0L;
 
-	@Parameter private boolean adw = false;
-	@Parameter private String appUrl;
-	@Parameter private String appVersion;
+	@Parameter
+	private String appUrl = "https://github.com/Alfresco/alfresco-content-app/archive/{0}.zip";
+	
+	@Parameter
+	private String appVersion = "1.12.0";
 
 	private Set<File> filesToIgnore = new HashSet<>();
 
@@ -52,22 +54,6 @@ public class DevMojo extends AbstractAdfMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			if (adw) {
-				if (appUrl == null) { 
-					appUrl = "http://nexus.vitry.intranet/repository/alfresco/org/alfresco/alfresco-digital-workspace-app/{0}/alfresco-digital-workspace-app-{0}-sources.zip";
-				}
-				if (appVersion == null) {
-					appVersion = "2.1.0";
-				}
-			} else {
-				if (appUrl == null) { 
-					appUrl = "https://github.com/Alfresco/alfresco-content-app/archive/{0}.zip";
-				}
-				if (appVersion == null) {
-					appVersion = "1.12.0";
-				}
-			}
-			
 			File targetAppFolder = getTargetAppFolder();
 			File rootAppFolder = getRootSrcAppFolder();
 			File originalAppFolder = getOriginalAppFolder();
