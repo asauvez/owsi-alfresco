@@ -6,8 +6,6 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import fr.openwide.alfresco.api.core.authentication.model.UserReference;
-
 @JsonInclude(Include.NON_EMPTY)
 public class RemoteCallParameters implements Serializable {
 
@@ -17,7 +15,6 @@ public class RemoteCallParameters implements Serializable {
 	private static final ThreadLocal<RemoteCallParameters> CURRENT = new ThreadLocal<>();
 
 	private int compressionLevel = DEFAULT_COMPRESSION_LEVEL;
-	private UserReference runAs = null;
 	private Long contentRangeStart = null;
 	private Long contentRangeEnd = null;
 
@@ -29,17 +26,6 @@ public class RemoteCallParameters implements Serializable {
 	}
 	public RemoteCallParameters compressionLevel(int compressionLevel) {
 		this.compressionLevel = compressionLevel;
-		return this;
-	}
-	
-	public UserReference getRunAs() {
-		return runAs;
-	}
-	protected void setRunAs(UserReference runAs) { // pour JSon
-		this.runAs = runAs;
-	}
-	public RemoteCallParameters runAs(UserReference runAs) {
-		this.runAs = runAs;
 		return this;
 	}
 	

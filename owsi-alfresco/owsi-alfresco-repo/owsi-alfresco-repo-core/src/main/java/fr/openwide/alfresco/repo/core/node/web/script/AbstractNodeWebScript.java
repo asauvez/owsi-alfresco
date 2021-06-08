@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.apache.commons.io.IOUtils;
 import org.springframework.extensions.surf.util.Content;
@@ -22,7 +20,6 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.openwide.alfresco.api.core.authentication.model.UserReference;
 import fr.openwide.alfresco.api.core.node.binding.RemoteCallPayload;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializationParameters;
 import fr.openwide.alfresco.api.core.node.binding.content.NodeContentDeserializer;
@@ -44,8 +41,6 @@ public abstract class AbstractNodeWebScript<R, P extends WebScriptParam<R>> exte
 
 	protected NodeRemoteService nodeService;
 	private NodeContentSerializationComponent serializationComponent;
-
-	private boolean runAsEnabled;
 
 	private NodeContentSerializationParameters defaultSerializationParameters = new NodeContentSerializationParameters();
 	private NodeContentDeserializationParameters defaultDeserializationParameters = new NodeContentDeserializationParameters();
@@ -86,21 +81,8 @@ public abstract class AbstractNodeWebScript<R, P extends WebScriptParam<R>> exte
 					wrapper.getNode().getContents().put(wrapper.getContentProperty(), new NodeContentHolder(wrapper));
 				}
 				// Vrai appel du Service
-				UserReference runAs = remoteCallPayload.getRemoteCallParameters().getRunAs();
-				R result;
-				if (runAs == null) {
-					result = execute(remoteCallPayload.getPayload());
-				} else {
-					if (! runAsEnabled) {
-						throw new IllegalStateException("Can't specify a runAs userName because 'owsi-alfresco.run-as.enabled' is set to false.");
-					}
-					result = AuthenticationUtil.runAs(new RunAsWork<R>() {
-						@Override
-						public R doWork() throws Exception {
-							return execute(remoteCallPayload.getPayload());
-						}
-					}, runAs.getUsername());
-				}
+				R result = execute(remoteCallPayload.getPayload());
+				
 				resultRef.set(result);
 			}
 		};
@@ -174,8 +156,4 @@ public abstract class AbstractNodeWebScript<R, P extends WebScriptParam<R>> exte
 	public void setNodeService(NodeRemoteService nodeService) {
 		this.nodeService = nodeService;
 	}
-	public void setRunAsEnabled(boolean runAsEnabled) {
-		this.runAsEnabled = runAsEnabled;
-	}
-
 }

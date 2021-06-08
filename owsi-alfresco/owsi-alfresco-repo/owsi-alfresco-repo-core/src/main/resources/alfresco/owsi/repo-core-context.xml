@@ -70,7 +70,6 @@
 
 	<bean id="webscript.owsi.node" parent="webscript.owsi.remote" abstract="true">
 		<property name="nodeService" ref="owsi.service.nodeService" />
-		<property name="runAsEnabled" value="${owsi-alfresco.run-as.enabled}" />
 	</bean>
 
 	<bean id="webscript.owsi.remote.node.node-children.post" parent="webscript.owsi.node"
