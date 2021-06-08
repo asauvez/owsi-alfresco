@@ -135,16 +135,21 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 			rootBuilder = builder.rootCompanyHome();
 		}
 		
-		
+		boolean hasMultipleFolders = false;
 		for (Template template : subfoldersTemplates) {
 			String folderName = processTemplate(template, dataModel);
 			if (multiFolderSeparator.isPresent()) {
+				hasMultipleFolders = true;
 				Set<String> folderNames = new TreeSet<String>(Arrays.asList(folderName.split(multiFolderSeparator.get())));
 				folderNames.remove("");
 				rootBuilder.subFolders(folderNames);
 			} else {
 				rootBuilder.subFolder(folderName);
 			}
+		}
+		
+		if (hasMultipleFolders) {
+			builder.unlinkSecondaryParents();
 		}
 		
 		if (newNameTemplate.isPresent()) {
