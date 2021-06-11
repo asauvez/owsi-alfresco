@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repo.solraudit.webscript;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
@@ -29,7 +30,12 @@ public class SolrAuditWebScript extends AbstractWebScript {
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		res.setContentType("text/csv");
 		
+		StoreRef storeRef = "true".equals(req.getParameter("generateForTrashcan")) ?
+				StoreRef.STORE_REF_ARCHIVE_SPACESSTORE :
+				StoreRef.STORE_REF_WORKSPACE_SPACESSTORE;
+		
 		solrAuditService.generateAudit(
-				new PrintWriter(res.getWriter()));
+				new PrintWriter(res.getWriter()),
+				storeRef);
 	}
 }

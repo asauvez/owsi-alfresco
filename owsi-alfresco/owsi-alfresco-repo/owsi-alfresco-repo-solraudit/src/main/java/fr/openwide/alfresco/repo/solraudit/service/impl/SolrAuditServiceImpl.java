@@ -54,87 +54,19 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 
 	@Override
 	public void generateAudit(PrintWriter out) {
-		// owsi.solraudit.pivot=cm:creator,SITE,cm:content.mimetype
-		List<String> pivots = new ArrayList<>(Arrays.asList(
-				globalProperties.getProperty("owsi.solraudit.pivot", "SITE").split(",")));
-		String query = globalProperties.getProperty("owsi.solraudit.query", "TYPE:\"" + ContentModel.TYPE_CONTENT + "\"");
-		
-		// Ajout header CSV
-		for (String pivot : pivots) {
-			if (pivot.contains(":")) {
-				pivot = pivot.substring(pivot.indexOf(":")+1);
-			}
-			out.append(pivot);
-			out.append(";");
-			if (isPivotMimeType(pivot)) {
-				out.append(pivot + "_Display;");
-			}
-		}
-		out.append("Nombre;Taille\n");
-
-		pivots.add(0, PIVOT_LABEL);
-		SearchParameters params = new SearchParameters();
-		params.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-		params.setLanguage("fts-alfresco");
-		params.setQuery(query);
-		params.addPivots(pivots);
-		params.setMaxItems(0);
-		params.setStats(Arrays.asList(new StatsRequestParameters(
-				"cm:content.size", 
-				PIVOT_LABEL, 
-				null, null, null, 
-				true, true, // sum et count
-				null, null, null, null, null, null, null, null, null)));
-		
-		SolrJSONResultSet rset = (SolrJSONResultSet) searchService.query(params);
-		pivots.remove(0);
-		
-		manageFacets(out, "", pivots, rset.getPivotFacets(), new HashMap<String, String>());
+		generateAuditInternal(out, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, false);
 	}
-
-	private void manageFacets(PrintWriter out, String prefix, List<String> pivots, List<GenericFacetResponse> facets, Map<String, String> values) {
-		for (GenericFacetResponse facet : facets) {
-			logger.debug(prefix + facet.getLabel()); // cm:content.mimetype
-			
-			for (GenericBucket bucket : facet.getBuckets()) {
-				Integer count = null;
-				Long sum = null;
-				for (Metric metric : bucket.getMetrics())  {
-					switch (metric.getType()) {
-					case count: 
-						Object object = metric.getValue().get("count");
-						count = (object instanceof String) ? Integer.parseInt((String) object) : ((Number) object).intValue();
-						break;
-					case sum: sum = ((Number) metric.getValue().get("sum")).longValue(); break;
-					default: break;
-					}
-				}
-				logger.debug(prefix + "- " + bucket.getLabel() + "/ " + count + " / " + sum); // text/plain
-				
-				values.put(facet.getLabel(), bucket.getLabel());
-				if (bucket.getFacets().isEmpty()) {
-					for (String pivot : pivots) {
-						String value = values.get(pivot);
-						out.append((value != null) ? value : "");
-						out.append(";");
-						if (isPivotMimeType(pivot)) {
-							Map<String, String> displaysByMimetype = mimetypeService.getDisplaysByMimetype();
-							String valueDisplay = displaysByMimetype.getOrDefault(value, value);
-							out.append((valueDisplay != null) ? valueDisplay : "");
-							out.append(";");
-						}
-					}
-					out.append(count + ";" + sum + "\n");
-				} else {
-					manageFacets(out, prefix + "    ", pivots, bucket.getFacets(), values);
-				}
-				values.remove(facet.getLabel());
-			}
-		}
-	}
-	
 	@Override
-	public void storeAudit( ) {
+	public void generateAudit(PrintWriter out, StoreRef storeRef) {
+		generateAuditInternal(out, storeRef, false);
+	}
+
+	@Override
+	public void storeAudit() {
+		storeAudit(false);
+	}
+	@Override
+	public void storeAudit(boolean includeTrashcan) {
 		String pathElements = globalProperties.getProperty("owsi.solraudit.storePath", "solrAudit");
 		String fileName = globalProperties.getProperty("owsi.solraudit.storeFileName", "solrAudit_{0,date,yyyy-MM-dd}.csv");
 		fileName = MessageFormat.format(fileName, new Date());
@@ -160,9 +92,101 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 		
 		ContentWriter writer = fileFolderService.getWriter(file);
 		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(writer.getContentOutputStream(), "ISO-8859-1"))) {
-			generateAudit(out);
+			generateAuditInternal(out, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, true);
+			if (includeTrashcan) {
+				generateAuditInternal(out, StoreRef.STORE_REF_ARCHIVE_SPACESSTORE, false);
+			}
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
+		}
+	}
+	
+	private void generateAuditInternal(PrintWriter out, StoreRef storeRef, boolean includeHeaders) {
+		logger.debug("Generate audit for storeRef " + storeRef.getProtocol());
+		// owsi.solraudit.pivot=cm:creator,SITE,cm:content.mimetype
+		List<String> pivots = new ArrayList<>(Arrays.asList(
+				globalProperties.getProperty("owsi.solraudit.pivot", "SITE").split(",")));
+		String query = globalProperties.getProperty("owsi.solraudit.query", "TYPE:\"" + ContentModel.TYPE_CONTENT + "\"");
+		
+		// Ajout header CSV
+		if (includeHeaders) {
+			for (String pivot : pivots) {
+				if (pivot.contains(":")) {
+					pivot = pivot.substring(pivot.indexOf(":")+1);
+				}
+				out.append(pivot);
+				out.append(";");
+				if (isPivotMimeType(pivot)) {
+					out.append(pivot + "_Display;");
+				}
+			}
+			out.append("Corbeille;Nombre;Taille\n");
+		}
+
+		pivots.add(0, PIVOT_LABEL);
+		SearchParameters params = new SearchParameters();
+		params.addStore(storeRef);
+		params.setLanguage("fts-alfresco");
+		params.setQuery(query);
+		params.addPivots(pivots);
+		params.setMaxItems(0);
+		params.setStats(Arrays.asList(new StatsRequestParameters(
+				"cm:content.size", 
+				PIVOT_LABEL, 
+				null, null, null, 
+				true, true, // sum et count
+				null, null, null, null, null, null, null, null, null)));
+		
+		SolrJSONResultSet rset = (SolrJSONResultSet) searchService.query(params);
+		pivots.remove(0);
+		
+		manageFacets(out, "", pivots, rset.getPivotFacets(), new HashMap<String, String>(), StoreRef.STORE_REF_ARCHIVE_SPACESSTORE.equals(storeRef));
+	}
+
+	private void manageFacets(PrintWriter out, String prefix, List<String> pivots, List<GenericFacetResponse> facets, 
+			Map<String, String> values, boolean isTrashCan) {
+		for (GenericFacetResponse facet : facets) {
+			logger.debug(prefix + facet.getLabel()); // cm:content.mimetype
+			
+			for (GenericBucket bucket : facet.getBuckets()) {
+				Integer count = null;
+				Long sum = null;
+				for (Metric metric : bucket.getMetrics())  {
+					switch (metric.getType()) {
+					case count: 
+						Object object = metric.getValue().get("count");
+						count = (object instanceof String) ? Integer.parseInt((String) object) : ((Number) object).intValue();
+						break;
+					case sum: sum = ((Number) metric.getValue().get("sum")).longValue(); break;
+					default: break;
+					}
+				}
+				logger.debug(prefix + "- " + bucket.getLabel() + "/ " + count + " / " + sum); // text/plain
+				
+				values.put(facet.getLabel(), bucket.getLabel());
+				if (bucket.getFacets().isEmpty()) {
+					for (String pivot : pivots) {
+						String value = values.get(pivot);
+						out.append((value != null) ? value : "");
+						out.append(";");
+						if (isPivotMimeType(pivot)) {
+							if (value == null) {
+								out.append(";");
+							}
+							else {
+								Map<String, String> displaysByMimetype = mimetypeService.getDisplaysByMimetype();
+								String valueDisplay = displaysByMimetype.getOrDefault(value, value);
+								out.append((valueDisplay != null) ? valueDisplay : "");
+								out.append(";");
+							}
+						}
+					}
+					out.append(isTrashCan + ";" + count + ";" + sum + "\n");
+				} else {
+					manageFacets(out, prefix + "    ", pivots, bucket.getFacets(), values, isTrashCan);
+				}
+				values.remove(facet.getLabel());
+			}
 		}
 	}
 	
