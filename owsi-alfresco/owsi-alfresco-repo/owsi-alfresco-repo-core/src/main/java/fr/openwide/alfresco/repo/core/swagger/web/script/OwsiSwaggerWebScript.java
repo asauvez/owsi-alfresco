@@ -6,6 +6,9 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransaction;
 
+/**
+ * http://localhost:8080/alfresco/s/owsi/swagger.yaml
+ */
 @GenerateWebScript(
 		url="/owsi/swagger.yaml",
 		description="Retourne un Swagger pour les WS OWSI",

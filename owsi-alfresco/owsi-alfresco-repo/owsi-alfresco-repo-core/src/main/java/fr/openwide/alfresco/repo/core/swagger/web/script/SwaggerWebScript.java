@@ -32,7 +32,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter.SwaggerParameterIn;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerResponse;
 
-public class SwaggerWebScript extends AbstractWebScript {
+public abstract class SwaggerWebScript extends AbstractWebScript {
 
 	@Autowired private ApplicationContext applicationContext;
 	@Autowired private SysAdminParams sysAdminParams;
