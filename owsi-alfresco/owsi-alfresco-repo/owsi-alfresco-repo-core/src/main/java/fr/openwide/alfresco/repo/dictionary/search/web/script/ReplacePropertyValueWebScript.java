@@ -1,8 +1,13 @@
 package fr.openwide.alfresco.repo.dictionary.search.web.script;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -22,9 +27,9 @@ import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
-import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 /**
  * http://localhost:8080/alfresco/s/owsi/batch/replacePropertyValue?property=exif:manufacturer&old=OLYMPUS OPTICAL CO.,LTD&new=Manufacture 1
@@ -44,10 +49,9 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 	
 	@Autowired private NodeSearchModelRepositoryService nodeSearchModelRepositoryService;
 	@Autowired private NodeService nodeService;
-	@Autowired
-	@Qualifier("NamespaceService")
-	private NamespacePrefixResolver prefixResolver;
+	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
 	@Autowired private ConversionService conversionService;
+	@Autowired private DictionaryService dictionaryService;
 	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
@@ -59,6 +63,11 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 		String oldValue = req.getParameter("old");
 		String newValue = req.getParameter("new");
 		
+		PropertyDefinition propertyDefinition = dictionaryService.getProperty(property);
+		if (propertyDefinition == null) {
+			throw new IllegalStateException(property + " is not defined");
+		}
+		
 		BatchSearchQueryBuilder builder = new BatchSearchQueryBuilder();
 		builder.configurationName(
 				"owsi.replacePropertyValue", 
@@ -68,7 +77,17 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 		builder.consumer(new Consumer<NodeRef>() {
 			@Override
 			public void accept(NodeRef nodeRef) {
-				nodeService.setProperty(nodeRef, property, newValue);
+				if (propertyDefinition.isMultiValued()) {
+					@SuppressWarnings("unchecked")
+					Collection<String> oldCol = (Collection<String>) nodeService.getProperty(nodeRef, property);
+					ArrayList<String> newCol = new ArrayList<>();
+					for (String oldItem : oldCol) {
+						newCol.add(Objects.equals(oldValue, oldItem) ? newValue : oldItem);
+					}
+					nodeService.setProperty(nodeRef, property, newCol);
+				} else {
+					nodeService.setProperty(nodeRef, property, newValue);
+				}
 			}
 		});
 		int total = nodeSearchModelRepositoryService.searchBatch(builder);
