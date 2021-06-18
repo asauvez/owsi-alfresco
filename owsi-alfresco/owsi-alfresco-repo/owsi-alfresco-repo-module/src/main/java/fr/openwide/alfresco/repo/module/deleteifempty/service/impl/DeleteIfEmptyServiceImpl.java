@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.module.deleteifempty.service.impl;
 
+import java.util.Properties;
+
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
@@ -9,6 +11,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -21,11 +24,18 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 	@Autowired private NodeModelRepositoryService nodeModelService;
 	private PolicyRepositoryService policyRepositoryService;
 
+	@Autowired @Qualifier("global-properties")
+	private Properties globalProperties;
+	
+	private boolean deleteNodePermanently = true;
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		policyRepositoryService.onDeleteNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onMoveNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onDeleteChildAssociation(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
+		
+		deleteNodePermanently = Boolean.parseBoolean(globalProperties.getProperty("owsi.deleteIfEmpty.deleteNodePermanently", "true"));
 	}
 
 	@Override
@@ -52,7 +62,11 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 			if (   nodeModelService.exists(parentRef) 
 				&& nodeModelService.getChildrenAssocsContains(parentRef).isEmpty()) {
 				
-				nodeModelService.deleteNode(parentRef);
+				if (deleteNodePermanently) {
+					nodeModelService.deleteNodePermanently(parentRef);
+				} else {
+					nodeModelService.deleteNode(parentRef);
+				}
 			}
 			return null;
 		});
