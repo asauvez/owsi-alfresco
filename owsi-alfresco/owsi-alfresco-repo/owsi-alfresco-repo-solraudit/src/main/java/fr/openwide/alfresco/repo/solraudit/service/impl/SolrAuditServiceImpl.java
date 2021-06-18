@@ -54,11 +54,11 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 
 	@Override
 	public void generateAudit(PrintWriter out) {
-		generateAuditInternal(out, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, false);
+		generateAuditInternal(out, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, true);
 	}
 	@Override
 	public void generateAudit(PrintWriter out, StoreRef storeRef) {
-		generateAuditInternal(out, storeRef, false);
+		generateAuditInternal(out, storeRef, true);
 	}
 
 	@Override
