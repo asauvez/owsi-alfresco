@@ -55,6 +55,7 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	@Override
 	public void generateAudit(PrintWriter out) {
 		generateAuditInternal(out, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, true);
+		generateAuditInternal(out, StoreRef.STORE_REF_ARCHIVE_SPACESSTORE, false);
 	}
 	@Override
 	public void generateAudit(PrintWriter out, StoreRef storeRef) {
