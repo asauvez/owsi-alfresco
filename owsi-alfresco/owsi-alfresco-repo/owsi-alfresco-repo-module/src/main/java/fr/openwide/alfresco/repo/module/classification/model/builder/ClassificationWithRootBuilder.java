@@ -17,6 +17,8 @@ import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameGenerator;
@@ -57,7 +59,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	
 	@SuppressWarnings("unchecked")
 	public ClassificationWithRootBuilder subFolder(String folderName, 
-			ContainerModel folderType, SinglePropertyModel<?> ... properties) {
+			ContainerModel folderType, PropertyModel<?> ... properties) {
 		return subFolder(folderName, (node) -> {
 			if (folderType instanceof TypeModel) {
 				node.type((TypeModel) folderType);
@@ -66,9 +68,18 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 			} else {
 				throw new IllegalStateException(folderType.toString());
 			}
-			for (SinglePropertyModel<?> property : properties) {
-				Serializable value = getProperty(property);
-				node.properties().set((SinglePropertyModel<Serializable>) property, value);
+			for (PropertyModel<?> property : properties) {
+				if (property instanceof SinglePropertyModel) {
+					SinglePropertyModel<Serializable> sp = (SinglePropertyModel<Serializable>) property;
+					Serializable value = getProperty(sp);
+					node.properties().set(sp, value);
+				} else if (property instanceof MultiPropertyModel) {
+					MultiPropertyModel<Serializable> mp = (MultiPropertyModel<Serializable>) property;
+					List<Serializable> value = getProperty(mp);
+					node.properties().set(mp, value);
+				} else {
+					throw new IllegalStateException(property.toString());
+				}
 			}
 		});
 	}
