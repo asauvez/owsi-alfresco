@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repo.module.classification.model.builder;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +13,10 @@ import java.util.stream.Collectors;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.BusinessNode;
+import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameGenerator;
@@ -50,6 +54,25 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 				.collect(Collectors.toList());
 		return this;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public ClassificationWithRootBuilder subFolder(String folderName, 
+			ContainerModel folderType, SinglePropertyModel<?> ... properties) {
+		return subFolder(folderName, (node) -> {
+			if (folderType instanceof TypeModel) {
+				node.type((TypeModel) folderType);
+			} else if (folderType instanceof AspectModel) {
+				node.aspect((AspectModel) folderType);
+			} else {
+				throw new IllegalStateException(folderType.toString());
+			}
+			for (SinglePropertyModel<?> property : properties) {
+				Serializable value = getProperty(property);
+				node.properties().set((SinglePropertyModel<Serializable>) property, value);
+			}
+		});
+	}
+	
 	/**
 	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
 	 * du noeud fourni.

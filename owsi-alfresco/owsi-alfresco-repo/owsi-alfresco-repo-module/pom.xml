@@ -25,6 +25,10 @@
 			<artifactId>owsi-alfresco-repo-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-treeaspect</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>

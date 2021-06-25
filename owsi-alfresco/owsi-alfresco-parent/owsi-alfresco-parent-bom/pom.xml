@@ -75,6 +75,11 @@
 				<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
 				<version>0.8.8-SNAPSHOT</version>
 			</dependency>
+			<dependency>
+				<groupId>fr.openwide.alfresco</groupId>
+				<artifactId>owsi-alfresco-repo-treeaspect</artifactId>
+				<version>0.8.8-SNAPSHOT</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

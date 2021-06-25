@@ -79,6 +79,7 @@ import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerCl
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
 		OnAddAspectPolicy, OnUpdatePropertiesPolicy, 
@@ -104,6 +105,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private PolicyRepositoryService policyRepositoryService;
 	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
 	@Autowired private FileFolderService fileFolderService;
+	@Autowired private TreeAspectService treeAspectService;
 	
 	private ConversionService conversionService;
 	private TransactionService transactionService;
@@ -561,6 +563,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		queryCache.clear();
 		pathCache.clear();
 		subFolderCache.clear();
+	}
+	
+	@Override
+	public void registerTreeAspect(ContainerModel container) {
+		treeAspectService.registerAspect(conversionService.getRequired(container.getNameReference()));
 	}
 	
 	public List<NodeRef> searchReference(RestrictionBuilder restrictionBuilder) {

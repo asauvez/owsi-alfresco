@@ -1,7 +1,12 @@
 package fr.openwide.alfresco.repo.treeaspect.service.impl;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
@@ -23,7 +28,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -39,7 +43,7 @@ import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
  * @author recol
  */
 
-public class TreeAspectServiceImpl implements TreeAspectService, InitializingBean, OnCreateNodePolicy, OnUpdatePropertiesPolicy,
+public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePolicy, OnUpdatePropertiesPolicy,
 		OnMoveNodePolicy, OnAddAspectPolicy, OnRemoveAspectPolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TreeAspectServiceImpl.class);
@@ -57,6 +61,17 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 	}
 
 	@Override public void registerAspect(QName aspect, boolean breakInheritanceDuringMove) {
+		if (aspectToCopy.isEmpty()) {
+			policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME,
+					ContentModel.TYPE_CMOBJECT,
+					new JavaBehaviour(this, OnCreateNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+			policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
+					ContentModel.TYPE_CMOBJECT,
+					new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+			policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME,
+					ContentModel.TYPE_CMOBJECT,
+					new JavaBehaviour(this, OnMoveNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+		}
 		aspectToCopy.add(aspect);
 
 		policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME,
@@ -65,19 +80,6 @@ public class TreeAspectServiceImpl implements TreeAspectService, InitializingBea
 		policyComponent.bindClassBehaviour(OnRemoveAspectPolicy.QNAME,
 				aspect,
 				new JavaBehaviour(this, OnRemoveAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME,
-				ContentModel.TYPE_CMOBJECT,
-				new JavaBehaviour(this, OnCreateNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
-		policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
-				ContentModel.TYPE_CMOBJECT,
-				new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
-		policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME,
-				ContentModel.TYPE_CMOBJECT,
-				new JavaBehaviour(this, OnMoveNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
 	}
 	
 	@Override

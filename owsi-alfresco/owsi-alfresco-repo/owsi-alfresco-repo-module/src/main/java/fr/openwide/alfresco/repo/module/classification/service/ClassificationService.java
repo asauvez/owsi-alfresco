@@ -30,4 +30,6 @@ public interface ClassificationService {
 	void classify(NodeRef nodeRef);
 	
 	void clearCaches();
+	
+	void registerTreeAspect(ContainerModel container);
 }
