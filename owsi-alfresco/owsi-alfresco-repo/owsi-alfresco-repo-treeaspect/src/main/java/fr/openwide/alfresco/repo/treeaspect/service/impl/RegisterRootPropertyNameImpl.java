@@ -87,7 +87,8 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 
 		for (PropertiesForCopy properties : registerRootPropertyName) {
 			if (nodeService.hasAspect(nodeRef, properties.aspectForCopy)) {
-				nodeService.setProperty(nodeRef, properties.propertyWhereCopy, nodeService.getProperty(nodeRef, properties.propertyToCopy));
+				Serializable value = nodeService.getProperty(nodeRef, properties.propertyToCopy);
+				nodeService.setProperty(nodeRef, properties.propertyWhereCopy, value);
 			}
 		}
 		LOGGER.debug("End " + methodeName +"()");

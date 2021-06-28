@@ -56,6 +56,7 @@ import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -79,6 +80,7 @@ import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerCl
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repo.treeaspect.service.RegisterRootPropertyName;
 import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
@@ -106,6 +108,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
 	@Autowired private FileFolderService fileFolderService;
 	@Autowired private TreeAspectService treeAspectService;
+	@Autowired private RegisterRootPropertyName registerRootPropertyName;
 	
 	private ConversionService conversionService;
 	private TransactionService transactionService;
@@ -566,8 +569,20 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	@Override
-	public void registerTreeAspect(ContainerModel container) {
+	public void registerTreeAspect(AspectModel container) {
 		treeAspectService.registerAspect(conversionService.getRequired(container.getNameReference()));
+	}
+	@Override
+	public void registerCopyPropertyCmName(AspectModel aspectOfRootNode, PropertyModel<String> propertyToCopy) {
+		registerCopyProperty(aspectOfRootNode, propertyToCopy, CmModel.object.name);
+	}
+	@Override
+	public <T extends Serializable> void registerCopyProperty(AspectModel aspectOfRootNode,
+			PropertyModel<T> propertyToCopy, PropertyModel<T> propertyWhereCopy) {
+		registerRootPropertyName.registerCopyProperty(
+				conversionService.getRequired(aspectOfRootNode.getNameReference()), 
+				conversionService.getRequired(propertyToCopy.getNameReference()), 
+				conversionService.getRequired(propertyWhereCopy.getNameReference()));
 	}
 	
 	public List<NodeRef> searchReference(RestrictionBuilder restrictionBuilder) {

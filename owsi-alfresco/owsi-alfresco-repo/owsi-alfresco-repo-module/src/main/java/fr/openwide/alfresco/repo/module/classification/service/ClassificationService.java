@@ -1,11 +1,14 @@
 package fr.openwide.alfresco.repo.module.classification.service;
 
+import java.io.Serializable;
 import java.util.function.Consumer;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.Restriction;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
@@ -31,5 +34,7 @@ public interface ClassificationService {
 	
 	void clearCaches();
 	
-	void registerTreeAspect(ContainerModel container);
+	void registerTreeAspect(AspectModel aspect);
+	void registerCopyPropertyCmName(AspectModel aspectOfRootNode, PropertyModel<String> propertyToCopy);
+	<T extends Serializable> void registerCopyProperty(AspectModel aspectOfRootNode, PropertyModel<T> propertyToCopy, PropertyModel<T> propertyWhereCopy);
 }
