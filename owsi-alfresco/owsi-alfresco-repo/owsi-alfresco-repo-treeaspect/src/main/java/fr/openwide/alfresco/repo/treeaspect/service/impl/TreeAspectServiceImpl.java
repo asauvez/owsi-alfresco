@@ -72,14 +72,17 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 					ContentModel.TYPE_CMOBJECT,
 					new JavaBehaviour(this, OnMoveNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
 		}
-		aspectToCopy.add(aspect);
-
-		policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME,
-				aspect,
-				new JavaBehaviour(this, OnAddAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
-		policyComponent.bindClassBehaviour(OnRemoveAspectPolicy.QNAME,
-				aspect,
-				new JavaBehaviour(this, OnRemoveAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+		
+		if (! aspectToCopy.contains(aspect)) {
+			aspectToCopy.add(aspect);
+	
+			policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME,
+					aspect,
+					new JavaBehaviour(this, OnAddAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+			policyComponent.bindClassBehaviour(OnRemoveAspectPolicy.QNAME,
+					aspect,
+					new JavaBehaviour(this, OnRemoveAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+		}
 	}
 	
 	@Override
