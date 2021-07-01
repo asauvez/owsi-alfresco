@@ -41,9 +41,10 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 	family=OwsiSwaggerWebScript.WS_FAMILY,
 	authentication=GenerateWebScriptAuthentication.USER,
 	swaggerParameters={
-		@SwaggerParameter(name="property", description = "La propriété où chercher la valeur"),
-		@SwaggerParameter(name="old", description = "L'ancienne valeur à chercher"),
-		@SwaggerParameter(name="new", description = "La nouvelle valeur à affecter"),
+		@SwaggerParameter(name="property", description = "La propriété où modifier la valeur", required=true),
+		@SwaggerParameter(name="propertyWhere", description = "La propriété où chercher la valeur.", required=false),
+		@SwaggerParameter(name="old", description = "L'ancienne valeur à chercher", required=true),
+		@SwaggerParameter(name="new", description = "La nouvelle valeur à affecter", required=true),
 	})
 public class ReplacePropertyValueWebScript extends AbstractWebScript {
 	
@@ -57,36 +58,46 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		res.setContentType("text/plain");
 
-		QName property = QName.resolveToQName(prefixResolver, req.getParameter("property"));
-		NameReference propertyNameReference = conversionService.get(property);
-		TextPropertyModel propertyModel = new TextPropertyModel(new ContainerModel(propertyNameReference), propertyNameReference);
+		String property = req.getParameter("property");
+		String propertyWhere = req.getParameter("propertyWhere");
 		String oldValue = req.getParameter("old");
 		String newValue = req.getParameter("new");
 		
-		PropertyDefinition propertyDefinition = dictionaryService.getProperty(property);
+		if (propertyWhere == null) {
+			propertyWhere = property;
+		}
+		
+		QName propertyQName = QName.resolveToQName(prefixResolver, property);
+		PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
 		if (propertyDefinition == null) {
 			throw new IllegalStateException(property + " is not defined");
 		}
 		
-		BatchSearchQueryBuilder builder = new BatchSearchQueryBuilder();
-		builder.configurationName(
+		BatchSearchQueryBuilder builder = new BatchSearchQueryBuilder()
+			.configurationName(
 				"owsi.replacePropertyValue", 
-				"owsi.replacePropertyValue." + property.toPrefixString());
+				"owsi.replacePropertyValue." + propertyQName.toPrefixString());
+		
+		// Condition
+		NameReference propertyWhereNameReference = conversionService.get(QName.resolveToQName(prefixResolver,propertyWhere));
+		TextPropertyModel propertyWhereModel = new TextPropertyModel(new ContainerModel(propertyWhereNameReference), propertyWhereNameReference);
 		builder.restriction(new RestrictionBuilder()
-				.eq(propertyModel, oldValue).of());
+				.eq(propertyWhereModel, oldValue).of());
+		
+		// Action
 		builder.consumer(new Consumer<NodeRef>() {
 			@Override
 			public void accept(NodeRef nodeRef) {
 				if (propertyDefinition.isMultiValued()) {
 					@SuppressWarnings("unchecked")
-					Collection<String> oldCol = (Collection<String>) nodeService.getProperty(nodeRef, property);
+					Collection<String> oldCol = (Collection<String>) nodeService.getProperty(nodeRef, propertyQName);
 					ArrayList<String> newCol = new ArrayList<>();
 					for (String oldItem : oldCol) {
 						newCol.add(Objects.equals(oldValue, oldItem) ? newValue : oldItem);
 					}
-					nodeService.setProperty(nodeRef, property, newCol);
+					nodeService.setProperty(nodeRef, propertyQName, newCol);
 				} else {
-					nodeService.setProperty(nodeRef, property, newValue);
+					nodeService.setProperty(nodeRef, propertyQName, newValue);
 				}
 			}
 		});
