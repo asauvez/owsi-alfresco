@@ -102,6 +102,9 @@ public class PropertiesNode {
 	}
 	
 	public static <E extends Enum<E>> String enumToText(E e) {
+		if (e == null) {
+			return null;
+		}
 		String code = (e instanceof PropertyEnumeration) 
 				? ((PropertyEnumeration) e).getCode() 
 				: e.name();

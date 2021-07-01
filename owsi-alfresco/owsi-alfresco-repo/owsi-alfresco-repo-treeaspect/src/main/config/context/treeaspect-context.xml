@@ -3,8 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="owsi.service.treeaspect" class="fr.openwide.alfresco.repo.treeaspect.service.impl.TreeAspectServiceImpl" />
+	<bean id="owsi.service.treeaspect" 
+		class="fr.openwide.alfresco.repo.treeaspect.service.impl.TreeAspectServiceImpl" />
 
-	<bean id="owsi.service.registerRootPropertyName" class="fr.openwide.alfresco.repo.treeaspect.service.impl.RegisterRootPropertyNameImpl" />
+	<bean id="owsi.service.registerRootPropertyName" 
+		class="fr.openwide.alfresco.repo.treeaspect.service.impl.RegisterRootPropertyNameImpl" />
+
+	<bean id="owsi.service.childaspect" 
+		class="fr.openwide.alfresco.repo.treeaspect.service.impl.ChildAspectServiceImpl" />
 
 </beans>

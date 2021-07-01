@@ -26,17 +26,34 @@ public class AbstractClassificationBuilder<B extends AbstractClassificationBuild
 	public NodeModelRepositoryService getNodeModelService() {
 		return service.getNodeModelService();
 	}
+	@SuppressWarnings("unchecked")
 	public <C extends Serializable> C getProperty(NameReference property) {
-		return getNodeModelService().getProperty(getNodeRef(), property);
+		if (event.getValuesOverride() != null) {
+			return (C) event.getValuesOverride().get(service.getConversionService().getRequired(property));
+		} else {
+			return getNodeModelService().getProperty(getNodeRef(), property);
+		}
 	}
 	public <C extends Serializable> C getProperty(SinglePropertyModel<C> property) {
-		return getNodeModelService().getProperty(getNodeRef(), property);
+		if (event.getValuesOverride() != null) {
+			return service.getConversionService().getProperty(event.getValuesOverride(), property);
+		} else {
+			return getNodeModelService().getProperty(getNodeRef(), property);
+		}
 	}
 	public <C extends Serializable> List<C> getProperty(MultiPropertyModel<C> property) {
-		return getNodeModelService().getProperty(getNodeRef(), property);
+		if (event.getValuesOverride() != null) {
+			return service.getConversionService().getProperty(event.getValuesOverride(), property);
+		} else {
+			return getNodeModelService().getProperty(getNodeRef(), property);
+		}
 	}
 	public <E extends Enum<E>> E getProperty(EnumTextPropertyModel<E> property) {
-		return getNodeModelService().getProperty(getNodeRef(), property);
+		if (event.getValuesOverride() != null) {
+			return service.getConversionService().getProperty(event.getValuesOverride(), property);
+		} else {
+			return getNodeModelService().getProperty(getNodeRef(), property);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -39,6 +39,7 @@ Nouveautés
  * ConstraintValues WS : Retourne les valeurs possibles pour un champs donné d'après les contraintes ou d'après une DataList.
  * Supprime owsi-alfresco-component-query jamais utilisé.
  * /owsi/batch/replacePropertyValue Pour remplacer une valeur par une autre dans une propriété
+ * ChildAspectService : Affecte un aspect/type aux enfants des dossiers d'un aspect/type donné.
 
 ## depuis 0.8.7 Release du 09/02/2021
  *  Affichage des scheduled jobs dans la console admin Alfresco

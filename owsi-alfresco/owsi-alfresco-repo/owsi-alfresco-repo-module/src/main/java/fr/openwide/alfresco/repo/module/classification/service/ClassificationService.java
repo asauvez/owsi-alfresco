@@ -1,9 +1,11 @@
 package fr.openwide.alfresco.repo.module.classification.service;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -34,7 +36,14 @@ public interface ClassificationService {
 	
 	void clearCaches();
 	
+	ClassificationBuilder getBuilderForValues(Map<QName, Serializable> values);
+	
+	
 	void registerTreeAspect(AspectModel aspect);
+
 	void registerCopyPropertyCmName(AspectModel aspectOfRootNode, PropertyModel<String> propertyToCopy);
 	<T extends Serializable> void registerCopyProperty(AspectModel aspectOfRootNode, PropertyModel<T> propertyToCopy, PropertyModel<T> propertyWhereCopy);
+	
+	void registerChildAspectForFolder(ContainerModel parentAspect, ContainerModel childAspect);
+	void registerChildAspectForContent(ContainerModel parentAspect, ContainerModel childAspect);
 }

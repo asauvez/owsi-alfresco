@@ -80,6 +80,7 @@ import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerCl
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
+import fr.openwide.alfresco.repo.treeaspect.service.ChildAspectService;
 import fr.openwide.alfresco.repo.treeaspect.service.RegisterRootPropertyName;
 import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 
@@ -108,6 +109,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
 	@Autowired private FileFolderService fileFolderService;
 	@Autowired private TreeAspectService treeAspectService;
+	@Autowired private ChildAspectService childAspectService;
 	@Autowired private RegisterRootPropertyName registerRootPropertyName;
 	
 	private ConversionService conversionService;
@@ -569,6 +571,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	
 	@Override
+	public ClassificationBuilder getBuilderForValues(Map<QName, Serializable> values) {
+		return new ClassificationBuilder(this, new ClassificationEvent(values));
+	}
+	
+	@Override
 	public void registerTreeAspect(AspectModel container) {
 		treeAspectService.registerAspect(conversionService.getRequired(container.getNameReference()));
 	}
@@ -585,6 +592,20 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				conversionService.getRequired(propertyWhereCopy.getNameReference()));
 	}
 	
+	@Override
+	public void registerChildAspectForFolder(ContainerModel parentAspect, ContainerModel childAspect) {
+		childAspectService.registerChildAspectForFolder(
+				conversionService.getRequired(parentAspect.getNameReference()), 
+				conversionService.getRequired(childAspect.getNameReference()));
+	}
+	@Override
+	public void registerChildAspectForContent(ContainerModel parentAspect, ContainerModel childAspect) {
+		childAspectService.registerChildAspectForContent(
+				conversionService.getRequired(parentAspect.getNameReference()), 
+				conversionService.getRequired(childAspect.getNameReference()));
+	}
+	
+	
 	public List<NodeRef> searchReference(RestrictionBuilder restrictionBuilder) {
 		// Pas de cache
 		return nodeSearchModelService.searchReference(restrictionBuilder); 
@@ -598,6 +619,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	public NodeModelRepositoryService getNodeModelService() {
 		return nodeModelRepositoryService;
+	}
+	public ConversionService getConversionService() {
+		return conversionService;
 	}
 	
 	public Optional<NodeRef> getByNamedPath(String ... names) {

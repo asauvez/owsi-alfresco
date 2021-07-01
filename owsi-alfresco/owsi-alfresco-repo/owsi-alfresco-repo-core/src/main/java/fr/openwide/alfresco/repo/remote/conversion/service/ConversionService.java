@@ -33,7 +33,11 @@ public interface ConversionService {
 	Map<NameReference, Serializable> getForApplication(Map<QName, Serializable> properties);
 	Map<QName, Serializable> getForRepository(Map<NameReference, Serializable> properties);
 
-	<C extends Serializable> C getProperty(Map<QName, Serializable> value, SinglePropertyModel<C> property);
-	<C extends Serializable> List<C> getProperty(Map<QName, Serializable> value, MultiPropertyModel<C> property);
-	<E extends Enum<E>> E getProperty(Map<QName, Serializable> value, EnumTextPropertyModel<E> property);
+	<C extends Serializable> C getProperty(Map<QName, Serializable> values, SinglePropertyModel<C> property);
+	<C extends Serializable> List<C> getProperty(Map<QName, Serializable> values, MultiPropertyModel<C> property);
+	<E extends Enum<E>> E getProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property);
+
+	<C extends Serializable> void setProperty(Map<QName, Serializable> values, SinglePropertyModel<C> property, C value);
+	<C extends Serializable> void setProperty(Map<QName, Serializable> values, MultiPropertyModel<C> property, List<C> value);
+	<E extends Enum<E>> void setProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property, E value);
 }

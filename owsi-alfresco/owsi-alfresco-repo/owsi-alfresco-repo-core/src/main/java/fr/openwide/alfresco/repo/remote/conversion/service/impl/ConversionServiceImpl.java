@@ -148,19 +148,31 @@ public class ConversionServiceImpl implements ConversionService {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(Map<QName, Serializable> value, SinglePropertyModel<C> property) {
-		return (C) value.get(get(property.getNameReference()));
+	public <C extends Serializable> C getProperty(Map<QName, Serializable> values, SinglePropertyModel<C> property) {
+		return (C) values.get(get(property.getNameReference()));
 	}
 	@Override
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> List<C> getProperty(Map<QName, Serializable> value, MultiPropertyModel<C> property) {
-		return (List<C>) value.get(get(property.getNameReference()));
+	public <C extends Serializable> List<C> getProperty(Map<QName, Serializable> values, MultiPropertyModel<C> property) {
+		return (List<C>) values.get(get(property.getNameReference()));
 	}
 	@Override
-	public <E extends Enum<E>> E getProperty(Map<QName, Serializable> value, EnumTextPropertyModel<E> property) {
-		return PropertiesNode.textToEnum(property, (String) value.get(get(property.getNameReference())));
+	public <E extends Enum<E>> E getProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property) {
+		return PropertiesNode.textToEnum(property, (String) values.get(get(property.getNameReference())));
 	}
 	
+	@Override
+	public <C extends Serializable> void setProperty(Map<QName, Serializable> values, SinglePropertyModel<C> property, C value) {
+		values.put(get(property.getNameReference()), value);
+	}
+	@Override
+	public <C extends Serializable> void setProperty(Map<QName, Serializable> values, MultiPropertyModel<C> property, List<C> value) {
+		values.put(get(property.getNameReference()), (Serializable) value);
+	}
+	@Override
+	public <E extends Enum<E>> void setProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property, E value) {
+		values.put(get(property.getNameReference()), PropertiesNode.enumToText(value));
+	}
 	
 	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {
 		this.namespacePrefixResolver = namespacePrefixResolver;
