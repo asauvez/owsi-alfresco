@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.8.8</version>
+		<version>0.8.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-api</artifactId>
 	<packaging>pom</packaging>
@@ -25,7 +25,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.8.8</version>
+				<version>0.8.9-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -183,7 +183,7 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.8.8</version>
+						<version>0.8.9-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
 			</plugin>

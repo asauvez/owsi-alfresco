@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-api</artifactId>
-		<version>0.8.8</version>
+		<version>0.8.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-api-module</artifactId>
 
