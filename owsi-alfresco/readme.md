@@ -34,6 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.8
+Release du 05/07:2021
  * Solr Audit: pour savoir combien de fichier existe dans le repo.
  * UniqueNameRepositoryService : Gestion des noms lors des déplacements / renommage / classifications
  * ConstraintValues WS : Retourne les valeurs possibles pour un champs donné d'après les contraintes ou d'après une DataList.

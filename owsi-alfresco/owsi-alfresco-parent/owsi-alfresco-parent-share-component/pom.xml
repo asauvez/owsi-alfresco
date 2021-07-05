@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-api</artifactId>
-		<version>0.8.8-SNAPSHOT</version>
+		<version>0.8.8</version>
 		<relativePath>../owsi-alfresco-parent-api/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-share-component</artifactId>
@@ -355,7 +355,7 @@
 			<plugin>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-				<version>0.8.8-SNAPSHOT</version>
+				<version>0.8.8</version>
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>
