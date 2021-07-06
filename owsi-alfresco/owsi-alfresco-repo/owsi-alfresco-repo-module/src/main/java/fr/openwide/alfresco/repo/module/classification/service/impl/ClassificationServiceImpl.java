@@ -155,6 +155,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Override
 	public void autoClassification(ContainerModel containerModel) {
 		policyRepositoryService.onAddAspect(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onUpdateProperties(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
 	}
 
 	@Override
