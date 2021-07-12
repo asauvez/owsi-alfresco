@@ -1,7 +1,5 @@
 package fr.openwide.alfresco.repo.module.deleteifempty.service.impl;
 
-import java.util.Properties;
-
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
@@ -11,10 +9,10 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
+import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 
@@ -24,8 +22,8 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 	@Autowired private NodeModelRepositoryService nodeModelService;
 	private PolicyRepositoryService policyRepositoryService;
 
-	@Autowired @Qualifier("global-properties")
-	private Properties globalProperties;
+	@Autowired
+	private AlfrescoGlobalProperties globalProperties;
 	
 	private boolean deleteNodePermanently = true;
 	
@@ -35,7 +33,7 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 		policyRepositoryService.onMoveNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onDeleteChildAssociation(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
-		deleteNodePermanently = Boolean.parseBoolean(globalProperties.getProperty("owsi.deleteIfEmpty.deleteNodePermanently", "true"));
+		deleteNodePermanently = globalProperties.getPropertyBoolean("owsi.deleteIfEmpty.deleteNodePermanently", true);
 	}
 
 	@Override

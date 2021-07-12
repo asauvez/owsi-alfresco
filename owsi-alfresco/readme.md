@@ -34,7 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.9
-
+ * AlfrescoGlobalProperties : Permet d'accéder à la configuration.
 
 ## depuis 0.8.8
 Release du 05/07:2021

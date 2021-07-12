@@ -1,0 +1,61 @@
+package fr.openwide.alfresco.repo.core.configurationlogger;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+@Service("owsi.alfrescoGlobalProperties")
+public class AlfrescoGlobalProperties implements InitializingBean {
+
+	@Autowired @Qualifier("global-properties")
+	private Properties globalProperties;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		globalProperties = new Properties(globalProperties);
+		
+		// Rajoute les system properties, venant par exemple de docker-compose.
+		globalProperties.putAll(System.getProperties());
+	}
+
+	public Optional<String> getProperty(String key) {
+		return Optional.ofNullable(globalProperties.getProperty(key));
+	}
+	public String getPropertyMandatory(String key) {
+		String value = globalProperties.getProperty(key);
+		if (value == null) {
+			throw new IllegalStateException("Property '" + key + "' is missing.");
+		}
+		return value;
+	}
+	public String getProperty(String key, String defaultValue) {
+		return globalProperties.getProperty(key, defaultValue);
+	}
+	
+	public int getPropertyInt(String key) {
+		return Integer.parseInt(getPropertyMandatory(key));
+	}
+	public int getPropertyInt(String key, int defaultValue) {
+		return Integer.parseInt(getProperty(key, Integer.toString(defaultValue)));
+	}
+
+	public boolean getPropertyBoolean(String key) {
+		return Boolean.parseBoolean(getPropertyMandatory(key));
+	}
+	public boolean getPropertyBoolean(String key, boolean defaultValue) {
+		return Boolean.parseBoolean(getProperty(key, Boolean.toString(defaultValue)));
+	}
+	public List<String> getPropertyList(String key) {
+		return Arrays.asList(getPropertyMandatory(key).split(","));
+	}
+	public List<String> getPropertyList(String key, String defaultValue) {
+		return Arrays.asList(getProperty(key, defaultValue).split(","));
+	}
+
+}

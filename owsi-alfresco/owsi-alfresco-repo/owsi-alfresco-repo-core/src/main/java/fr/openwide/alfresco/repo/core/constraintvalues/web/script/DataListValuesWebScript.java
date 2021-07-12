@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -31,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.core.swagger.web.script.SwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
@@ -65,7 +65,7 @@ public class DataListValuesWebScript extends SwaggerWebScript implements Initial
 	@Autowired private NodeSearchModelRepositoryService nodeSearchModelRepositoryService;
 	@Autowired private ConversionService conversionService;
 	
-	@Autowired @Qualifier("global-properties") private Properties globalProperties;
+	@Autowired AlfrescoGlobalProperties globalProperties;
 	@Autowired private NodeService nodeService;
 	@Autowired private DictionaryService dictionaryService;
 	@Autowired @Qualifier("NamespaceService")
