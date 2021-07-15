@@ -8,9 +8,10 @@ import java.util.Properties;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
-@Service("owsi.alfrescoGlobalProperties")
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
+
+@GenerateService(id="owsi.alfrescoGlobalProperties")
 public class AlfrescoGlobalProperties implements InitializingBean {
 
 	@Autowired @Qualifier("global-properties")
