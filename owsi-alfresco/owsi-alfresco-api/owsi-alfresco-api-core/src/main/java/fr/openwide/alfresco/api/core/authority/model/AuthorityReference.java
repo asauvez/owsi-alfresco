@@ -10,6 +10,7 @@ public class AuthorityReference implements Serializable {
 	private static final long serialVersionUID = -5556589719655849321L;
 
 	public static final String GROUP_PREFIX = "GROUP_";
+	public static final String GROUP_SITE_PREFIX = "GROUP_site_";
 	public static final String ROLE_PREFIX = "ROLE_"; 
 	
 	public static final AuthorityReference USER_SYSTEM = AuthorityReference.authority("System");
@@ -52,6 +53,9 @@ public class AuthorityReference implements Serializable {
 	}
 	public boolean isGroup() {
 		return name.startsWith(GROUP_PREFIX);
+	}
+	public boolean isGroupSite() {
+		return name.startsWith(GROUP_SITE_PREFIX);
 	}
 	public boolean isRole() {
 		return name.startsWith(ROLE_PREFIX);
