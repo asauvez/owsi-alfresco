@@ -92,18 +92,18 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	
 	@Override
 	public List<RepositoryAccessControl> searchACL(NodeRef nodeRef, boolean inherited) {
-		Set<AccessPermission> permissions = inherited
-				? permissionService.getPermissions(nodeRef)
-				: permissionService.getAllSetPermissions(nodeRef);
-				
+		Set<AccessPermission> permissions = permissionService.getAllSetPermissions(nodeRef);
+		
 		List<RepositoryAccessControl> res = new ArrayList<>(permissions.size());
 		for (AccessPermission permission : permissions) {
-			NodeReference nodeReference = conversionService.get(nodeRef);
-			AuthorityReference authority = AuthorityReference.authority(permission.getAuthority());
-			PermissionReference permissionRef = PermissionReference.create(permission.getPermission());
-			boolean allowed = permission.getAccessStatus() == AccessStatus.ALLOWED;
-			
-			res.add(new RepositoryAccessControl(nodeReference, authority, permissionRef, allowed, permission.isInherited()));
+			if (inherited || ! permission.isInherited()) {
+				NodeReference nodeReference = conversionService.get(nodeRef);
+				AuthorityReference authority = AuthorityReference.authority(permission.getAuthority());
+				PermissionReference permissionRef = PermissionReference.create(permission.getPermission());
+				boolean allowed = permission.getAccessStatus() == AccessStatus.ALLOWED;
+				
+				res.add(new RepositoryAccessControl(nodeReference, authority, permissionRef, allowed, permission.isInherited()));
+			}
 		}
 		return res;
 	}
