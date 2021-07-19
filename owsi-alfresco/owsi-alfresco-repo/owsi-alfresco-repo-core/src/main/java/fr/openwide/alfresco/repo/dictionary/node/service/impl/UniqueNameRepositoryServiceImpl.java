@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -90,12 +91,12 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 	
 	@Override
 	public void setUniqueNodeName(NodeRef nodeRef, String newName, UniqueNameGenerator nameGenerator) {
-		Optional<NodeRef> parentNode = nodeModelRepositoryService.getPrimaryParent(nodeRef);
-		if (!parentNode.isPresent()) {
+		List<NodeRef> parentsNodes = nodeModelRepositoryService.getParentAssocs(nodeRef);
+		if (parentsNodes.isEmpty()) {
 			throw new IllegalStateException("Can't rename node without parent : " + nodeRef);
 		}
 		
-		Optional<String> validUniqueNewName = getUniqueValidName(newName, parentNode.get(), Optional.of(nodeRef), nameGenerator);
+		Optional<String> validUniqueNewName = getUniqueValidName(newName, parentsNodes, Optional.of(nodeRef), nameGenerator);
 		if (!validUniqueNewName.isPresent()) {
 			// On a déjà le bon nom, pas besoin de renommer
 			return ;
