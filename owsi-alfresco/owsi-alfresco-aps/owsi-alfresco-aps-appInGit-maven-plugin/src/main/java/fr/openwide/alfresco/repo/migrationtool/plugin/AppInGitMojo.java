@@ -46,66 +46,75 @@ public class AppInGitMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// Obligé d'aller tester l'existance des apps une par une car 
-		// /activiti-app/app/rest/runtime/app-definitions ne permet pas le Basic Auth
-		// et /activiti-app/api/enterprise/app-definitions n'existe pas
-		for (int i = 3; i < 10; i++) {
-			try {
-				String url = targetUrl + "/api/enterprise/app-definitions/" + i;
-				JSONObject res = callWS(new HttpGet(url));
-				int applId = res.getInt("id");
-				String name = res.getString("name");
-				manageApp(applId, name);
-			} catch (IOException e) {
-				throw new MojoExecutionException(e.toString(), e);
-			} catch (Erreur404Exception e) {
-				// Ignore
+		File srcActivitiFolder = new File(getBaseDir(), "src/activiti/");
+		
+		if (srcActivitiFolder.exists()) {
+			for (File app : srcActivitiFolder.listFiles()) {
+				File srcFolder = new File(getBaseDir(), "src/activiti/" + app.getName());
+				File zipFile = new File(getBaseDir(), "target/activiti/" + app.getName() + ".zip");
+
+				getLog().info("Create export " + zipFile);
+				zipFile.getParentFile().mkdirs();
+				try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile))) {
+					File[] children = srcFolder.listFiles();
+					for (File childFile : children) {
+						zipFile(childFile, childFile.getName(), zipOut);
+					}
+				} catch (IOException e) {
+					throw new MojoExecutionException(e.toString(), e);
+				}
+			}
+		} else {
+			// Obligé d'aller tester l'existance des apps une par une car 
+			// /activiti-app/app/rest/runtime/app-definitions ne permet pas le Basic Auth
+			// et /activiti-app/api/enterprise/app-definitions n'existe pas
+			for (int i = 3; i < 10; i++) {
+				try {
+					String url = targetUrl + "/api/enterprise/app-definitions/" + i;
+					JSONObject res = callWS(new HttpGet(url));
+					int applId = res.getInt("id");
+					String name = res.getString("name");
+					exportApp(applId, name);
+				} catch (IOException e) {
+					throw new MojoExecutionException(e.toString(), e);
+				} catch (Erreur404Exception e) {
+					// Ignore
+				}
 			}
 		}
 	}
 	
-	private void manageApp(int appId, String name) throws IOException, Erreur404Exception {
+	private void exportApp(int appId, String name) throws IOException, Erreur404Exception {
 		getLog().info("Manage application " + appId + " : '" + name + "'");
 		name = name.replace(' ', '-');
 
 		File srcFolder = new File(getBaseDir(), "src/activiti/" + name);
 		File zipFile = new File(getBaseDir(), "target/activiti/" + name + ".zip");
 
-		if (srcFolder.exists()) {
-			getLog().info("Create export " + zipFile);
-			zipFile.getParentFile().mkdirs();
-			try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile))) {
-				File[] children = srcFolder.listFiles();
-				for (File childFile : children) {
-					zipFile(childFile, childFile.getName(), zipOut);
-				}
-			}
-		} else {
-			String url = targetUrl + "/api/enterprise/app-definitions/" + appId + "/export";
-			getLog().info("Call to GET " + url);
-			getLog().info("Import processus to " + srcFolder);
-			
-			zipFile.getParentFile().mkdirs();
-			try (OutputStream out = new FileOutputStream(zipFile)) {
-				callWS(new HttpGet(url), out);
-				out.flush();
-			}
-			try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
-				ZipEntry zipEntry = zis.getNextEntry();
-				while (zipEntry != null) {
-					File newFile = new File(srcFolder, zipEntry.getName());
-					if (zipEntry.isDirectory()) {
-						newFile.mkdirs();
-					} else {
-						newFile.getParentFile().mkdirs();
-						if (! zipEntry.getName().endsWith(".png")) {
-							try (OutputStream out = new FileOutputStream(newFile)) {
-								IOUtils.copy(zis, out);
-							}
+		String url = targetUrl + "/api/enterprise/app-definitions/" + appId + "/export";
+		getLog().info("Call to GET " + url);
+		getLog().info("Import processus to " + srcFolder);
+		
+		zipFile.getParentFile().mkdirs();
+		try (OutputStream out = new FileOutputStream(zipFile)) {
+			callWS(new HttpGet(url), out);
+			out.flush();
+		}
+		try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
+			ZipEntry zipEntry = zis.getNextEntry();
+			while (zipEntry != null) {
+				File newFile = new File(srcFolder, zipEntry.getName());
+				if (zipEntry.isDirectory()) {
+					newFile.mkdirs();
+				} else {
+					newFile.getParentFile().mkdirs();
+					if (! zipEntry.getName().endsWith(".png")) {
+						try (OutputStream out = new FileOutputStream(newFile)) {
+							IOUtils.copy(zis, out);
 						}
 					}
-					zipEntry = zis.getNextEntry();
 				}
+				zipEntry = zis.getNextEntry();
 			}
 		}
 	}
