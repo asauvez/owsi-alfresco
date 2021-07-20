@@ -27,7 +27,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Mojo(name="appInGit", defaultPhase=LifecyclePhase.COMPILE)
@@ -47,43 +46,34 @@ public class AppInGitMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			manageApp("3", "xxxxxxxxxxxxxxxx");
-			
-			String url = targetUrl + "/app/rest/runtime/app-definitions";
-			getLog().info("Call to GET " + url);
-			JSONObject res = callWS(new HttpGet(url));
-			JSONArray data = res.getJSONArray("data");
-			for (int i=0; i<data.length(); i++) {
-				JSONObject app = data.getJSONObject(i);
-				String modelId = app.optString("modelId");
-				String name = app.optString("name");
-				if (modelId != null) {
-					manageApp(modelId, name);
-				}
+		// Obligé d'aller tester l'existance des apps une par une car 
+		// /activiti-app/app/rest/runtime/app-definitions ne permet pas le Basic Auth
+		// et /activiti-app/api/enterprise/app-definitions n'existe pas
+		for (int i = 3; i < 10; i++) {
+			try {
+				String url = targetUrl + "/api/enterprise/app-definitions/" + i;
+				JSONObject res = callWS(new HttpGet(url));
+				int applId = res.getInt("id");
+				String name = res.getString("name");
+				manageApp(applId, name);
+			} catch (IOException e) {
+				throw new MojoExecutionException(e.toString(), e);
+			} catch (Erreur404Exception e) {
+				// Ignore
 			}
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.toString(), e);
 		}
 	}
 	
-	private void manageApp(String appId, String name) throws IOException {
+	private void manageApp(int appId, String name) throws IOException, Erreur404Exception {
 		getLog().info("Manage application " + appId + " : '" + name + "'");
 		name = name.replace(' ', '-');
 
 		File srcFolder = new File(getBaseDir(), "src/activiti/" + name);
-		File targetFolder = new File(getBaseDir(), "target/activiti/" + name);
-		File zipFile = new File(targetFolder, name + ".zip");
+		File zipFile = new File(getBaseDir(), "target/activiti/" + name + ".zip");
 
-		if (false 
-				
-				
-				
-				
-				
-				
-				&& srcFolder.exists()) {
+		if (srcFolder.exists()) {
 			getLog().info("Create export " + zipFile);
+			zipFile.getParentFile().mkdirs();
 			try (ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(zipFile))) {
 				File[] children = srcFolder.listFiles();
 				for (File childFile : children) {
@@ -91,12 +81,11 @@ public class AppInGitMojo extends AbstractMojo {
 				}
 			}
 		} else {
-			targetFolder.mkdirs();
-			
 			String url = targetUrl + "/api/enterprise/app-definitions/" + appId + "/export";
 			getLog().info("Call to GET " + url);
 			getLog().info("Import processus to " + srcFolder);
 			
+			zipFile.getParentFile().mkdirs();
 			try (OutputStream out = new FileOutputStream(zipFile)) {
 				callWS(new HttpGet(url), out);
 				out.flush();
@@ -121,7 +110,10 @@ public class AppInGitMojo extends AbstractMojo {
 		}
 	}
 	
-	private void callWS(HttpUriRequest request, OutputStream out) throws IOException {
+	@SuppressWarnings("serial")
+	public static class Erreur404Exception extends Exception {}
+	
+	private void callWS(HttpUriRequest request, OutputStream out) throws IOException, Erreur404Exception {
 		CredentialsProvider provider = new BasicCredentialsProvider();
 		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(login, password);
 		provider.setCredentials(AuthScope.ANY, credentials);
@@ -130,14 +122,16 @@ public class AppInGitMojo extends AbstractMojo {
 			.setDefaultCredentialsProvider(provider)
 			.build();
 		try (CloseableHttpResponse response = httpClient.execute(request)) {
-			if (response.getStatusLine().getStatusCode() != 200) {
+			if (response.getStatusLine().getStatusCode() == 404) {
+				throw new Erreur404Exception();
+			} else if (response.getStatusLine().getStatusCode() != 200) {
 				throw new IOException(response.getStatusLine().toString());
 			}
 			response.getEntity().writeTo(out);
 		}
 	}
 	
-	private JSONObject callWS(HttpUriRequest request) throws IOException {
+	private JSONObject callWS(HttpUriRequest request) throws IOException, Erreur404Exception {
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			callWS(request, out);
 			return new JSONObject(new String(out.toByteArray(), "UTF-8"));
