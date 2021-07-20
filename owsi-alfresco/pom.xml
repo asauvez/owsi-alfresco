@@ -29,6 +29,7 @@
 		<module>owsi-alfresco-share</module>
 		<module>owsi-alfresco-adf</module>
 		<module>owsi-alfresco-test</module>
+		<module>owsi-alfresco-aps</module>
   </modules>
 
 	<build>
