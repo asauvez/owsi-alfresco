@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -32,7 +33,8 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 /**
- * http://localhost:8080/alfresco/s/owsi/batch/replacePropertyValue?property=exif:manufacturer&old=OLYMPUS OPTICAL CO.,LTD&new=Manufacture 1
+ * http://localhost:8080/alfresco/s/owsi/batch/replacePropertyValue
+ * 		?property=exif:manufacturer&old=OLYMPUS OPTICAL CO.,LTD&new=Manufacture 1
  */
 @GenerateWebScript(
 	url="/owsi/batch/replacePropertyValue?property={property}&old={oldValue}&new={newValue}",
@@ -42,7 +44,6 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 	authentication=GenerateWebScriptAuthentication.USER,
 	swaggerParameters={
 		@SwaggerParameter(name="property", description = "La propriété où modifier la valeur", required=true),
-		@SwaggerParameter(name="propertyWhere", description = "La propriété où chercher la valeur.", required=false),
 		@SwaggerParameter(name="old", description = "L'ancienne valeur à chercher", required=true),
 		@SwaggerParameter(name="new", description = "La nouvelle valeur à affecter", required=true),
 	})
@@ -56,16 +57,11 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
-		res.setContentType("text/plain");
+		res.setContentType("application/json");
 
 		String property = req.getParameter("property");
-		String propertyWhere = req.getParameter("propertyWhere");
 		String oldValue = req.getParameter("old");
 		String newValue = req.getParameter("new");
-		
-		if (propertyWhere == null) {
-			propertyWhere = property;
-		}
 		
 		QName propertyQName = QName.resolveToQName(prefixResolver, property);
 		PropertyDefinition propertyDefinition = dictionaryService.getProperty(propertyQName);
@@ -79,7 +75,7 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 				"owsi.replacePropertyValue." + propertyQName.toPrefixString());
 		
 		// Condition
-		NameReference propertyWhereNameReference = conversionService.get(QName.resolveToQName(prefixResolver,propertyWhere));
+		NameReference propertyWhereNameReference = conversionService.get(QName.resolveToQName(prefixResolver,property));
 		TextPropertyModel propertyWhereModel = new TextPropertyModel(new ContainerModel(propertyWhereNameReference), propertyWhereNameReference);
 		builder.restriction(new RestrictionBuilder()
 				.eq(propertyWhereModel, oldValue).of());
@@ -103,7 +99,7 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 		});
 		int total = nodeSearchModelRepositoryService.searchBatch(builder);
 		
-		res.getWriter().append(total + " node(s) traitée(s)");
+		res.getWriter().append(new JSONObject().put("total", total).toString());
 	}
 }
 
