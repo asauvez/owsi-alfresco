@@ -10,6 +10,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -44,6 +45,12 @@ public class AppInGitMojo extends AbstractMojo {
 	@Parameter(defaultValue="admin")
 	private String password = "admin";
 
+	@Parameter(defaultValue="3")
+	private String minAppId = "3";
+
+	@Parameter(defaultValue="20")
+	private String maxAppId = "20";
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		File srcActivitiFolder = new File(getBaseDir(), "src/activiti/");
@@ -68,7 +75,7 @@ public class AppInGitMojo extends AbstractMojo {
 			// Obligé d'aller tester l'existance des apps une par une car 
 			// /activiti-app/app/rest/runtime/app-definitions ne permet pas le Basic Auth
 			// et /activiti-app/api/enterprise/app-definitions n'existe pas
-			for (int i = 3; i < 10; i++) {
+			for (int i = Integer.parseInt(minAppId); i < Integer.parseInt(maxAppId); i++) {
 				try {
 					String url = targetUrl + "/api/enterprise/app-definitions/" + i;
 					JSONObject res = callWS(new HttpGet(url));
@@ -108,7 +115,22 @@ public class AppInGitMojo extends AbstractMojo {
 					newFile.mkdirs();
 				} else {
 					newFile.getParentFile().mkdirs();
-					if (! zipEntry.getName().endsWith(".png")) {
+					if (zipEntry.getName().endsWith(".json")) {
+						String content = IOUtils.toString(zis, "UTF-8");
+						content = new JSONObject(content).toString(4);
+						FileUtils.write(newFile, content);
+					} else if (zipEntry.getName().endsWith(".xml")) {
+						String content = IOUtils.toString(zis, "UTF-8");
+						//  modeler:exportDateTime="20210720161843190"
+						String exportKey = "modeler:exportDateTime=\"";
+						int pos = content.indexOf(exportKey);
+						if (pos != -1) {
+							content = content.substring(0, pos+exportKey.length()) 
+									+ "20000101010000000"
+									+ content.substring(content.indexOf("\"", pos+exportKey.length()));
+						}
+						FileUtils.write(newFile, content);
+					} else if (! zipEntry.getName().endsWith(".png")) {
 						try (OutputStream out = new FileOutputStream(newFile)) {
 							IOUtils.copy(zis, out);
 						}
