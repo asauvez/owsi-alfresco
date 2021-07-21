@@ -19,6 +19,7 @@ import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -93,7 +94,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 			for (ChildAssociationRef child : children) {
 				Map<QName, Serializable> properties = new HashMap<>();
 				
-				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(newAspect).getProperties();
+				Map<QName, PropertyDefinition> aspectProperties = getProperties(newAspect);
 				for (QName property : aspectProperties.keySet()) {
 					properties.put(property, nodeService.getProperty(nodeRef, property));
 				}
@@ -121,7 +122,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 		runAsSystem("copyAspectToNode", childRef, () -> {
 			Map<QName, Serializable> nodeProperties = nodeService.getProperties(parentRef);
 			if (nodeService.hasAspect(parentRef, aspect)) {
-				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
+				Map<QName, PropertyDefinition> aspectProperties = getProperties(aspect);
 
 				Map<QName, Serializable> newProperties = new HashMap<>();
 				for (QName property : aspectProperties.keySet()) {
@@ -142,7 +143,7 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
 			
 			for (QName aspect : aspectToCopy) {
-				Map<QName, PropertyDefinition> aspectProperties = dictionaryService.getAspect(aspect).getProperties();
+				Map<QName, PropertyDefinition> aspectProperties = getProperties(aspect);
 
 				for (QName property : aspectProperties.keySet()) {
 					Serializable beforeProperty = before.get(property);
@@ -155,6 +156,17 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 		});
 	}
 
+	private Map<QName, PropertyDefinition> getProperties(QName aspect) {
+		AspectDefinition aspectDefinition = dictionaryService.getAspect(aspect);
+		Map<QName, PropertyDefinition> aspectProperties = new HashMap<>(aspectDefinition.getProperties());
+		
+		for (AspectDefinition mandatoryAspect : aspectDefinition.getDefaultAspects(true)) {
+			aspectProperties.putAll(mandatoryAspect.getProperties());
+		}
+		
+		return aspectProperties;
+	}
+	
 	private void updateChildProperties(List<ChildAssociationRef> childAssocs, QName property, Serializable afterProperty) {
 		for (ChildAssociationRef child : childAssocs) {
 			NodeRef childRef = child.getChildRef();
