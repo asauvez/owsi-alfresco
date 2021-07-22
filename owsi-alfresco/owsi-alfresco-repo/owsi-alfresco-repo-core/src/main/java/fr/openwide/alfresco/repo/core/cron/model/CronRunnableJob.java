@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.repo.core.cron.model;
 
+import java.util.function.Consumer;
+
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.schedule.AbstractScheduledLockedJob;
@@ -17,7 +19,7 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 	@Override
 	public void executeJob(JobExecutionContext jobContext) throws JobExecutionException {
 		JobDataMap jobData = jobContext.getJobDetail().getJobDataMap();
-		Runnable runnable = (Runnable) jobData.get("runnable");
+		Object runnable = jobData.get("runnable");
 		TransactionService transactionService = (TransactionService) jobData.get("transactionService");
 		boolean readOnly = Boolean.parseBoolean((String) jobData.get("readOnly"));
 		boolean logAsInfo = Boolean.parseBoolean((String) jobData.get("logAsInfo"));
@@ -41,9 +43,16 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 				public Void doWork() throws Exception {
 					transactionService.getRetryingTransactionHelper().doInTransaction(
 						new RetryingTransactionCallback<Void>() {
+							@SuppressWarnings("unchecked")
 							@Override
 							public Void execute() throws Throwable {
-								runnable.run();
+								if (runnable instanceof Runnable) {
+									((Runnable) runnable).run();
+								} else if (runnable instanceof Consumer) {
+									((Consumer<JobExecutionContext>) runnable).accept(jobContext);
+								} else {
+									throw new IllegalStateException("Cron should extend type Runnable or Consumer<JobExecutionContext>, not " + runnable.getClass());
+								}
 								return null;
 							}
 						}, readOnly, true);
