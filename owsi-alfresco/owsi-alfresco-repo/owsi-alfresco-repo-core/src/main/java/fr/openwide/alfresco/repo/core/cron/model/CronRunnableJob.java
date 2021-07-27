@@ -1,11 +1,10 @@
 package fr.openwide.alfresco.repo.core.cron.model;
 
-import java.util.function.Consumer;
-
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.schedule.AbstractScheduledLockedJob;
 import org.alfresco.service.transaction.TransactionService;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -43,15 +42,14 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 				public Void doWork() throws Exception {
 					transactionService.getRetryingTransactionHelper().doInTransaction(
 						new RetryingTransactionCallback<Void>() {
-							@SuppressWarnings("unchecked")
 							@Override
 							public Void execute() throws Throwable {
 								if (runnable instanceof Runnable) {
 									((Runnable) runnable).run();
-								} else if (runnable instanceof Consumer) {
-									((Consumer<JobExecutionContext>) runnable).accept(jobContext);
+								} else if (runnable instanceof Job) {
+									((Job) runnable).execute(jobContext);
 								} else {
-									throw new IllegalStateException("Cron should extend type Runnable or Consumer<JobExecutionContext>, not " + runnable.getClass());
+									throw new IllegalStateException("Cron should extend type java.lang.Runnable our org.quartz.Job, not " + runnable.getClass());
 								}
 								return null;
 							}
