@@ -89,6 +89,8 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 	@Override
 	public void onAddAspect(final NodeRef nodeRef, QName newAspect) {
 		runAsSystem("onAddAspect", nodeRef, () -> {
+			if (! nodeService.exists(nodeRef)) return;
+
 			List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
 
 			for (ChildAssociationRef child : children) {
@@ -109,9 +111,9 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 		NodeRef parentRef = childAssocRef.getParentRef();
 		NodeRef childRef = childAssocRef.getChildRef();
 		
-		if (! nodeService.exists(childAssocRef.getParentRef())) return;
-		
 		runAsSystem("onCreateNode", childRef, () -> {
+			if (! nodeService.exists(childAssocRef.getParentRef()) || ! nodeService.exists(childAssocRef.getChildRef())) return;
+			
 			for (QName aspect : aspectToCopy) {
 				copyAspectToNode(parentRef, childRef, aspect);
 			}
@@ -140,6 +142,8 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		runAsSystem("onUpdateProperties", nodeRef, () -> {
+			if (! nodeService.exists(nodeRef)) return;
+			
 			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
 			
 			for (QName aspect : aspectToCopy) {
@@ -182,9 +186,9 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 		NodeRef newChild = newChildAssocRef.getChildRef();
 		NodeRef newParent = newChildAssocRef.getParentRef();
 
-		if (!nodeService.exists(newParent)) return;
-
 		runAsSystem("onMoveNode", newChild, () -> {
+			if (!nodeService.exists(newParent) || !nodeService.exists(newChild)) return;
+
 			for (QName aspect : aspectToCopy) {
 				if (nodeService.hasAspect(newChild, aspect) && !nodeService.hasAspect(newParent, aspect)) {
 					// Si le parent n'a pas l'aspect, c'est que le node en question est le node root
@@ -200,6 +204,8 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 
 	@Override public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName) {
 		runAsSystem("onRemoveAspect", nodeRef, () -> {
+			if (! nodeService.exists(nodeRef)) return;
+			
 			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL)) {
 				NodeRef childRef = child.getChildRef();
 				nodeService.removeAspect(childRef, aspectTypeQName);
