@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.core.swagger.web.script.SwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
@@ -37,7 +38,10 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		authentication=GenerateWebScriptAuthentication.NONE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON)
+		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
+		swaggerParameters={
+			@SwaggerParameter(name="property", description = "Le property où s'applique les contraintes", required=true),
+		})
 public class ConstraintValuesWebScript extends SwaggerWebScript {
 
 	private ObjectMapper mapper = new ObjectMapper();

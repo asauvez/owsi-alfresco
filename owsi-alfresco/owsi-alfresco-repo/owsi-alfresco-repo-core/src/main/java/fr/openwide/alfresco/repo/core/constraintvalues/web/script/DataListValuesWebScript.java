@@ -36,6 +36,7 @@ import fr.openwide.alfresco.repo.core.swagger.web.script.SwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
@@ -55,7 +56,10 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		authentication=GenerateWebScriptAuthentication.NONE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON)
+		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
+		swaggerParameters={
+			@SwaggerParameter(name="type", description = "Le type dont il faut renvoyer les valeurs", required=true),
+		})
 public class DataListValuesWebScript extends SwaggerWebScript implements InitializingBean {
 
 	private ObjectMapper mapper = new ObjectMapper();

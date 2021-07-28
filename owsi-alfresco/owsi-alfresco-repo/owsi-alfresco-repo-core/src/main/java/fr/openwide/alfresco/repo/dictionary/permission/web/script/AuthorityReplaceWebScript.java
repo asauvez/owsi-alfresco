@@ -21,6 +21,7 @@ import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractMessageRemoteWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
 
@@ -38,23 +39,21 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 @GenerateWebScript(
 		url={
 			"/owsi/authorityReplace?old={old}&new={new}",
-			"/owsi/authorityReplace?old={old}&new={new}&removeOldInSite={removeOldInSite}",
-			"/owsi/authorityReplace?old={old}&new={new}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}",
-			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}",
-			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}&removeOldInSite={removeOldInSite}",
-			"/owsi/authorityReplace?old={old}&new={new}&maxItem={maxItem}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}",
 			"/owsi/authorityReplace?inputFile={inputFile}",
-			"/owsi/authorityReplace?inputFile={inputFile}&removeOldInSite={removeOldInSite}",
-			"/owsi/authorityReplace?inputFile={inputFile}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}",
-			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}",
-			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}&removeOldInSite={removeOldInSite}",
-			"/owsi/authorityReplace?inputFile={inputFile}&maxItem={maxItem}&removeOldInSite={removeOldInSite}&deactivateOldUser={deactivateOldUser}"
 		},
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		shortName="Replace une authority par une autre",
 		transactionAllow=GenerateWebScriptTransactionAllow.READWRITE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		beanParent="webscript.owsi.remote")
+		beanParent="webscript.owsi.remote",
+		swaggerParameters={
+			@SwaggerParameter(name="old", description = "Le nom de l'autorité avant", required=false),
+			@SwaggerParameter(name="new", description = "Le nom de l'autorité après", required=false),
+			@SwaggerParameter(name="removeOldInSite", description = "Enleve les anciennes autorités sur les sites", required=false),
+			@SwaggerParameter(name="deactivateOldUser", description = "Desactive la licence des anciens utilisateurs", required=false),
+			@SwaggerParameter(name="maxItem", description = "Nombre max d'item à traiter", required=false),
+			@SwaggerParameter(name="inputFile", description = "Le fichier où lire les autorités à remplacer", required=false),
+		})
 public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<List<String>, WebScriptRequest> {
 
 
@@ -120,7 +119,7 @@ public class AuthorityReplaceWebScript extends AbstractMessageRemoteWebScript<Li
 						String malformedFileMessage = String.format("The input file is malformed at line starting with %s, aborting execution",oldUserId);
 						LOGGER.error(malformedFileMessage);
 						results.add(malformedFileMessage);
-						return results;
+						break;
 					}
 					String newUserId = scanner.next();
 					LOGGER.info(String.format("UserDuplicateWebScript replacingUser %s by %s", oldUserId, newUserId));

@@ -24,6 +24,7 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 
@@ -38,7 +39,11 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		description="Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.",
 		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		authentication=GenerateWebScriptAuthentication.ADMIN)
+		authentication=GenerateWebScriptAuthentication.ADMIN,
+		swaggerParameters={
+			@SwaggerParameter(name="module", description = "Le module dont il faut modifier la version", required=true),
+			@SwaggerParameter(name="version", description = "La version a mettre", required=false),
+		})
 public class SetModuleCurrentVersionWebScript extends AbstractWebScript {
 	
 	private static final String MODULE_PARAM = "module";
@@ -56,6 +61,7 @@ public class SetModuleCurrentVersionWebScript extends AbstractWebScript {
 
 		String _module = req.getParameter(MODULE_PARAM);
 		String _version = req.getParameter(VERSION_PARAM);
+		if (_version == null) _version = "0";
 		logger.info("ATTENTION, changement de la version courante du module "+_module);
 
 //		NodeRef nodeRef = getNodeRefFromPath("/sys:system-registry/module:modules/module:"+_module);

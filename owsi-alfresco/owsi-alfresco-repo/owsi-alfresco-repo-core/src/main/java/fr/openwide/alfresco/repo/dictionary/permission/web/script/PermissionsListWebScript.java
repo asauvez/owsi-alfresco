@@ -31,7 +31,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 		family=OwsiSwaggerWebScript.WS_FAMILY,
 		beanParent="webscript.owsi.remote",
 		swaggerParameters={
-			@SwaggerParameter(name="authority"),
+			@SwaggerParameter(name="authority", required = true),
 			@SwaggerParameter(name="includeParent", description="Doit on renvoyer les permissions attribuées à des groupes parents."),
 		})
 public class PermissionsListWebScript extends AbstractMessageRemoteWebScript<String, WebScriptRequest> {
