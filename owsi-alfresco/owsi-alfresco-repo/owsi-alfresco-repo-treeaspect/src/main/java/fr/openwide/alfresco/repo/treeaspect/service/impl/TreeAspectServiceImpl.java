@@ -122,8 +122,8 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 
 	private void copyAspectToNode(NodeRef parentRef, NodeRef childRef, QName aspect) {
 		runAsSystem("copyAspectToNode", childRef, () -> {
-			Map<QName, Serializable> nodeProperties = nodeService.getProperties(parentRef);
 			if (nodeService.hasAspect(parentRef, aspect)) {
+				Map<QName, Serializable> nodeProperties = nodeService.getProperties(parentRef);
 				Map<QName, PropertyDefinition> aspectProperties = getProperties(aspect);
 
 				Map<QName, Serializable> newProperties = new HashMap<>();
@@ -190,13 +190,6 @@ public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePol
 			if (!nodeService.exists(newParent) || !nodeService.exists(newChild)) return;
 
 			for (QName aspect : aspectToCopy) {
-				if (nodeService.hasAspect(newChild, aspect) && !nodeService.hasAspect(newParent, aspect)) {
-					// Si le parent n'a pas l'aspect, c'est que le node en question est le node root
-					if (!nodeService.hasAspect(oldChildAssocRef.getParentRef(), aspect)) {
-						LOGGER.debug("End onMoveNode nothing to do because is root aspect");
-						continue;
-					}
-				}
 				copyAspectToNode(newParent, newChild, aspect);
 			}
 		});
