@@ -21,6 +21,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
+		visibleInSwagger=false,
 		beanParent="webscript.owsi.remote")
 public class SearchNodeWebScript extends AbstractNodeListWebScript<SEARCH_NODE_SERVICE> {
 

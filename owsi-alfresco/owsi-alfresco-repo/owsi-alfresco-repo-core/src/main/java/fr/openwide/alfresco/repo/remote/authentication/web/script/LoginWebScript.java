@@ -22,6 +22,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		authentication=GenerateWebScriptAuthentication.NONE,
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
+		visibleInSwagger=false,
 		beanParent="webscript.owsi.remote")
 public class LoginWebScript extends AbstractMessageRemoteWebScript<RepositoryUser, LOGIN_REQUEST_SERVICE> {
 

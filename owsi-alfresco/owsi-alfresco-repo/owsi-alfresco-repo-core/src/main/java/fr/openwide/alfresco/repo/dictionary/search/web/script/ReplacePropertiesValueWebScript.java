@@ -25,7 +25,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 /**
  * http://localhost:8080/alfresco/s/owsi/batch/replacePropertiesValue
- * 		?where=@exif:manufacturer:value="OLYMPUS OPTICAL CO.,LTD"
+ * 		?where==exif:manufacturer:value:"OLYMPUS OPTICAL CO.,LTD"
  * 		&exif:software="New software 2.0"
  */
 @GenerateWebScript(
@@ -35,7 +35,9 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 	family=OwsiSwaggerWebScript.WS_FAMILY,
 	authentication=GenerateWebScriptAuthentication.USER,
 	swaggerParameters={
-		@SwaggerParameter(name="where", description = "Le critère de recherche en FTS", required=true),
+		@SwaggerParameter(name="where", description = "Le critère de recherche en FTS : =foo:bar:'value'", required=true),
+		@SwaggerParameter(name="cm:title", description = "Exemple de propriété à mettre à jour", required=true),
+		@SwaggerParameter(name="cm:description", description = "Autre exemple", required=true),
 	})
 public class ReplacePropertiesValueWebScript extends AbstractWebScript {
 	

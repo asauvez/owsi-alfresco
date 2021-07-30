@@ -18,6 +18,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 	formatDefaultEnum=GenerateWebScriptFormatDefault.JSON,
 	transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 	family=OwsiSwaggerWebScript.WS_FAMILY,
+	visibleInSwagger=false,
 	beanParent="webscript.owsi.node")
 public class GetNodeWebScript extends AbstractNodeWebScript<RepositoryNode, GET_NODE_SERVICE> {
 
