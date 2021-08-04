@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.importer.ImporterBootstrap;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -191,14 +192,24 @@ public class BootstrapServiceImpl implements BootstrapService {
 	
 	@Override
 	public SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility) {
-		SiteInfo siteInfo = siteService.getSite(siteName);
-		if (siteInfo == null) {
-			siteInfo = siteService.createSite("site-dashboard", siteName, siteTitle, siteDescription, siteVisibility);
-			// TODO siteService.setMembership(siteInfo.getShortName(), "admin", SiteRole.SiteManager.toString());
-			createDefaultDashboard(siteInfo);
-			siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
+		// The site service is funny about permissions,
+		// so even though we're running as the system we
+		// still need to identify us as the admin user
+		// https://hub.alfresco.com/t5/alfresco-content-services-forum/bootstrap-the-creation-of-a-site-does-not-work/td-p/256240
+		// Et cela ne marche pas avec un runAs
+		AuthenticationUtil.pushAuthentication();
+		try {
+			AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+			SiteInfo siteInfo = siteService.getSite(siteName);
+			if (siteInfo == null) {
+				siteInfo = siteService.createSite("site-dashboard", siteName, siteTitle, siteDescription, siteVisibility);
+				createDefaultDashboard(siteInfo);
+				siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
+			}
+			return siteInfo;
+		} finally {
+			AuthenticationUtil.popAuthentication();
 		}
-		return siteInfo;
 	}
 	@Override
 	public NodeRef createDataListContainer(SiteInfo siteInfo) {

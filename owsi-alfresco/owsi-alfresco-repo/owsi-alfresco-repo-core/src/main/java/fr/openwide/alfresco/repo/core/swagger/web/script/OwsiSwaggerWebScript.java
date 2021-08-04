@@ -11,7 +11,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  */
 @GenerateWebScript(
 		url="/owsi/swagger.yaml",
-		description="Retourne un Swagger pour les WS OWSI",
+		shortName="Retourne un Swagger pour les WS OWSI",
 		authentication=GenerateWebScriptAuthentication.NONE,
 		transaction=GenerateWebScriptTransaction.NONE,
 		family=OwsiSwaggerWebScript.WS_FAMILY)

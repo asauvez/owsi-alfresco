@@ -18,7 +18,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  */
 @GenerateWebScript(
 		url="/owsi/admin/configuration",
-		description="Renvoi la configuration tel qu'elle a été généré au démarrage dans les logs",
+		shortName="Renvoi la configuration tel qu'elle a été généré au démarrage dans les logs",
 		formatDefaultEnum=GenerateWebScriptFormatDefault.TEXT,
 		authentication=GenerateWebScriptAuthentication.ADMIN,
 		family=OwsiSwaggerWebScript.WS_FAMILY)

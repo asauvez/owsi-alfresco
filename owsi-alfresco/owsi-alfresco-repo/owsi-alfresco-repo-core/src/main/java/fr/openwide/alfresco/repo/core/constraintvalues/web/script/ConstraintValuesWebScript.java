@@ -34,7 +34,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  */
 @GenerateWebScript(
 		url="/owsi/constraint-values",
-		description="Liste les valeurs possibles pour une propriété",
+		shortName="Liste les valeurs possibles pour une propriété",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		authentication=GenerateWebScriptAuthentication.NONE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,

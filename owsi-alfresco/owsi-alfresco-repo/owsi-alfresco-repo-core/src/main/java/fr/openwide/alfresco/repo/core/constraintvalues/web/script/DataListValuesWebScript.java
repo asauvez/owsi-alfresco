@@ -52,7 +52,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  */
 @GenerateWebScript(
 		url="/owsi/datalist-values",
-		description="Liste les valeurs possibles d'une DataList",
+		shortName="Liste les valeurs possibles d'une DataList",
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		authentication=GenerateWebScriptAuthentication.NONE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,

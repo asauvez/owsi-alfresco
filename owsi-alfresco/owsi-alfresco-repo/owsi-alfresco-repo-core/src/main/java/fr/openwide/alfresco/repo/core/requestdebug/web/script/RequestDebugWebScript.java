@@ -17,7 +17,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 
 @GenerateWebScript(
 		url="/owsi/request-debug",
-		description="Retourne des informations sur la requête",
+		shortName="Retourne des informations sur la requête",
 		authentication=GenerateWebScriptAuthentication.ADMIN,
 		transaction=GenerateWebScriptTransaction.NONE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,

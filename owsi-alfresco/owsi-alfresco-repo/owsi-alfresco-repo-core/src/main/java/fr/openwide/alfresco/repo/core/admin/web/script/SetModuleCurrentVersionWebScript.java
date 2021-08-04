@@ -36,7 +36,8 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  */
 @GenerateWebScript(
 		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
-		description="Modifie la version courante enregistrée dans Alfresco pour un module. A utiliser avec précaution par un administrateur.",
+		shortName="Modifie la version courante enregistrée dans Alfresco pour un module.",
+		description = "A utiliser avec précaution par un administrateur.",
 		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
 		authentication=GenerateWebScriptAuthentication.ADMIN,

@@ -20,7 +20,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  */
 @GenerateWebScript(
 		url="/owsi/classification/clearcache",
-		description="Vide les caches de classification.",
+		shortName="Vide les caches de classification.",
 		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
 		authentication=GenerateWebScriptAuthentication.ADMIN,
