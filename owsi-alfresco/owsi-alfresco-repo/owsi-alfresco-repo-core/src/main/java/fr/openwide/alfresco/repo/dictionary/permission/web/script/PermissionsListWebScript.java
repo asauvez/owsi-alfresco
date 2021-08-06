@@ -24,7 +24,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
  * http://localhost:8080/alfresco/s/owsi/permissions.csv?authority=GROUP_EVERYONE
  */
 @GenerateWebScript(
-		url="/owsi/permissions.csv?authority={authority}",
+		url="/owsi/permissions.csv",
 		shortName="List node permissions for an authority",
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,

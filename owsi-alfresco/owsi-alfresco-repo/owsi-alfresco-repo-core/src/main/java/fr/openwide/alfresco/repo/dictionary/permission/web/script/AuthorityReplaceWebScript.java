@@ -37,10 +37,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  *
  */
 @GenerateWebScript(
-		url={
-			"/owsi/authorityReplace?old={old}&new={new}",
-			"/owsi/authorityReplace?inputFile={inputFile}",
-		},
+		url="/owsi/authorityReplace",
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		shortName="Replace une authority par une autre",
 		transactionAllow=GenerateWebScriptTransactionAllow.READWRITE,

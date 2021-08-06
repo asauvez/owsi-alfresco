@@ -35,7 +35,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
  * Si Alfresco ne démarre pas, vous pouvez aussi utiliser @see ResetModuleVersionServiceImpl
  */
 @GenerateWebScript(
-		url="/owsi/admin/setModuleCurrentVersion?module={moduleId}&version={version}",
+		url="/owsi/admin/setModuleCurrentVersion",
 		shortName="Modifie la version courante enregistrée dans Alfresco pour un module.",
 		description = "A utiliser avec précaution par un administrateur.",
 		formatDefaultEnum=GenerateWebScriptFormatDefault.HTML,

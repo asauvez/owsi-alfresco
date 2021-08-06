@@ -26,16 +26,16 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 @GenerateWebScript(
 	url="/owsi/batch/replacePropertiesValue?where={where}",
 	shortName="Remplace en masse les valeurs de plusieurs propriétés sur toutes les nodes correspondantes à un critère.",
-	description = "http://localhost:8080/alfresco/s/owsi/batch/replacePropertiesValue\n" + 
-			"		?where==exif:manufacturer:value:\"OLYMPUS OPTICAL CO.,LTD\"\n" + 
-			"		&exif:software=\"New software 2.0\"",
+	description = "http://localhost:8080/alfresco/s/owsi/batch/replacePropertiesValue" + 
+			"?where==exif:manufacturer:value:\"OLYMPUS OPTICAL CO.,LTD\"" + 
+			"&exif:software=\"New software 2.0\"",
 	formatDefaultEnum=GenerateWebScriptFormatDefault.TEXT,
 	family=OwsiSwaggerWebScript.WS_FAMILY,
 	authentication=GenerateWebScriptAuthentication.USER,
 	swaggerParameters={
 		@SwaggerParameter(name="where", description = "Le critère de recherche en FTS : =foo:bar:'value'", required=true),
-		@SwaggerParameter(name="cm:title", description = "Exemple de propriété à mettre à jour", required=true),
-		@SwaggerParameter(name="cm:description", description = "Autre exemple", required=true),
+		@SwaggerParameter(name="cm:title", description = "Exemple de propriété à mettre à jour", required=false),
+		@SwaggerParameter(name="cm:description", description = "Autre exemple", required=false),
 	})
 public class ReplacePropertiesValueWebScript extends AbstractWebScript {
 	
