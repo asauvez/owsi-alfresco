@@ -38,6 +38,7 @@ Nouveautés
  * UniqueNameService : Fix en cas de renommage d'un document qui a des secondary parents
  * aps-appInGit-maven-plugin : Permet de stocker les processus APS dans le projet.
  * TreeAspect : Copie aussi les properties des mandatory-aspects.
+ * /owsi/alfresco.log : Retourne les dernières lignes de alfresco.log.
 
 ## depuis 0.8.8
 Release du 05/07:2021

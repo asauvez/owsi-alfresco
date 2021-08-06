@@ -24,7 +24,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 @GenerateWebScript(
-	url="/owsi/batch/replacePropertiesValue?where={where}",
+	url="/owsi/batch/replacePropertiesValue",
 	shortName="Remplace en masse les valeurs de plusieurs propriétés sur toutes les nodes correspondantes à un critère.",
 	description = "http://localhost:8080/alfresco/s/owsi/batch/replacePropertiesValue" + 
 			"?where==exif:manufacturer:value:\"OLYMPUS OPTICAL CO.,LTD\"" + 

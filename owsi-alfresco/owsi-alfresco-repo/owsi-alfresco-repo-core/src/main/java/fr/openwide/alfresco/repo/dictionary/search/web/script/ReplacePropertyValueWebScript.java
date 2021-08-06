@@ -33,7 +33,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 @GenerateWebScript(
-	url="/owsi/batch/replacePropertyValue?property={property}&old={oldValue}&new={newValue}",
+	url="/owsi/batch/replacePropertyValue",
 	shortName="Remplace la valeur d'une propriété sur toutes les nodes où elle valait une autre valeur",
 	description = "http://localhost:8080/alfresco/s/owsi/batch/replacePropertyValue\n" + 
 			"		?property=exif:manufacturer&old=OLYMPUS OPTICAL CO.,LTD&new=Manufacture 1",
