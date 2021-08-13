@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.activiti.engine.impl.util.json.JSONObject;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -41,6 +44,7 @@ public class ReplacePropertiesValueWebScript extends AbstractWebScript {
 	
 	@Autowired private NodeSearchModelRepositoryService nodeSearchModelRepositoryService;
 	@Autowired private NodeService nodeService;
+	@Autowired private DictionaryService dictionaryService;
 	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
 	
 	@Override
@@ -67,7 +71,25 @@ public class ReplacePropertiesValueWebScript extends AbstractWebScript {
 					if (parameter.contains(":")) {
 						QName propertyQName = QName.resolveToQName(prefixResolver, parameter);
 						String newValue = req.getParameter(parameter);
-						nodeService.setProperty(nodeRef, propertyQName, newValue);
+						
+						PropertyDefinition definition = dictionaryService.getProperty(propertyQName);
+						if (definition == null) {
+							throw new IllegalArgumentException("Unknown property " + propertyQName);
+						} else if (DataTypeDefinition.BOOLEAN.equals(definition.getDataType().getName())) {
+							// Alfresco ne semble pas convertir les booleans
+							switch (newValue) {
+							case "true":
+								nodeService.setProperty(nodeRef, propertyQName, true);
+								break;
+							case "false":
+								nodeService.setProperty(nodeRef, propertyQName, false);
+								break;
+							default:
+								throw new IllegalArgumentException("Invalid boolean value " + newValue);
+							}
+						} else {
+							nodeService.setProperty(nodeRef, propertyQName, newValue);
+						}
 					}
 				}
 			}
@@ -77,4 +99,3 @@ public class ReplacePropertiesValueWebScript extends AbstractWebScript {
 		res.getWriter().append(new JSONObject().put("total", total).toString());
 	}
 }
-
