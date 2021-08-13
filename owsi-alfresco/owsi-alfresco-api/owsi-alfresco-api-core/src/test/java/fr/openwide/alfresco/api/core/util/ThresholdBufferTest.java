@@ -3,7 +3,6 @@ package fr.openwide.alfresco.api.core.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,9 +18,13 @@ public class ThresholdBufferTest {
 			Assert.assertNull(out.tempFile);
 			out.write("12345".getBytes());
 			Assert.assertNull(out.tempFile);
-			Assert.assertEquals("12345", new BufferedReader(new InputStreamReader(out.newInputStream())).readLine());
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(out.newInputStream()))) {
+				Assert.assertEquals("12345", reader.readLine());
+			}
 			Assert.assertNull(out.tempFile);
-			Assert.assertEquals("12345", new BufferedReader(new InputStreamReader(out.newInputStream())).readLine());
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(out.newInputStream()))) {
+				Assert.assertEquals("12345", reader.readLine());
+			}
 		}
 	}
 
@@ -44,14 +47,15 @@ public class ThresholdBufferTest {
 			Assert.assertNotNull(out.tempFile);
 			Assert.assertEquals(1, tempFolder.list().length);
 
-			InputStream in = out.newInputStream();
-			Assert.assertEquals(StringUtils.repeat(value, 20_000), new BufferedReader(new InputStreamReader(in)).readLine());
-			in.close();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(out.newInputStream()))) {
+				Assert.assertEquals(StringUtils.repeat(value, 20_000), reader.readLine());
+			}
 			Assert.assertNotNull(out.tempFile);
 			
 			// Relecture
-			in = out.newInputStream();
-			Assert.assertEquals(StringUtils.repeat(value, 20_000), new BufferedReader(new InputStreamReader(in)).readLine());
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(out.newInputStream()))) {
+				Assert.assertEquals(StringUtils.repeat(value, 20_000), reader.readLine());
+			}
 
 			Assert.assertEquals(1, tempFolder.list().length);
 		}

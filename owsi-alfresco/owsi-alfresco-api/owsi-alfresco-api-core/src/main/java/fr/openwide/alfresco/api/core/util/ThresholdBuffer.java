@@ -353,6 +353,7 @@ public class ThresholdBuffer extends OutputStream {
 
         private int pos = 0;
         private int mark = -1;
+        private boolean isClosed = false;
 
         @Override
         public boolean isInMemory() {
@@ -361,7 +362,7 @@ public class ThresholdBuffer extends OutputStream {
 
         @Override
         public byte[] getBytes() {
-            if (buf == null) {
+            if (buf == null || isClosed) {
                 throw new IllegalStateException("Stream is already closed!");
             }
 
@@ -370,7 +371,7 @@ public class ThresholdBuffer extends OutputStream {
 
         @Override
         public void rewind() throws IOException {
-            if (buf == null) {
+            if (buf == null || isClosed) {
                 throw new IOException("Stream is already closed!");
             }
 
@@ -401,7 +402,7 @@ public class ThresholdBuffer extends OutputStream {
 
         @Override
         public int available() {
-            if (buf == null) {
+            if (buf == null || isClosed) {
                 return 0;
             }
 
@@ -420,7 +421,7 @@ public class ThresholdBuffer extends OutputStream {
 
         @Override
         public int read(byte[] b, int off, int len) {
-            if ((pos >= bufSize) || (buf == null)) {
+            if ((pos >= bufSize) || (buf == null || isClosed)) {
                 return -1;
             }
 
@@ -440,7 +441,7 @@ public class ThresholdBuffer extends OutputStream {
 
         @Override
         public long skip(long n) {
-            if (buf == null) {
+            if (buf == null || isClosed) {
                 return -1;
             }
 
@@ -459,7 +460,7 @@ public class ThresholdBuffer extends OutputStream {
 
         @Override
         public void close() throws IOException {
-            buf = null;
+        	isClosed = true;
             mark = -1;
         }
     }
