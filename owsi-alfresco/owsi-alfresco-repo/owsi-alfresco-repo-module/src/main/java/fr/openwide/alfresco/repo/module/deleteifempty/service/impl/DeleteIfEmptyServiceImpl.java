@@ -1,5 +1,8 @@
 package fr.openwide.alfresco.repo.module.deleteifempty.service.impl;
 
+import java.util.List;
+
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnMoveNodePolicy;
@@ -7,6 +10,7 @@ import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +24,7 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 		OnDeleteChildAssociationPolicy, OnMoveNodePolicy, OnDeleteNodePolicy {
 	
 	@Autowired private NodeModelRepositoryService nodeModelService;
+	@Autowired private NodeService nodeService;
 	private PolicyRepositoryService policyRepositoryService;
 
 	@Autowired
@@ -58,7 +63,7 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 		AuthenticationUtil.runAsSystem(() -> {
 			// Si le noeud parent a encore d'autres enfants
 			if (   nodeModelService.exists(parentRef) 
-				&& nodeModelService.getChildrenAssocsContains(parentRef).isEmpty()) {
+				&& isFolderEmpty(parentRef)) {
 				
 				if (deleteNodePermanently) {
 					nodeModelService.deleteNodePermanently(parentRef);
@@ -68,6 +73,17 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 			}
 			return null;
 		});
+	}
+	
+	private boolean isFolderEmpty(NodeRef folderRef) {
+		List<ChildAssociationRef> children = nodeService.getChildAssocs(folderRef);
+		for (ChildAssociationRef childRef : children) {
+			// Ne tient compte que des sous nodes primaires
+			if (childRef.isPrimary() && ContentModel.ASSOC_CONTAINS.equals(childRef.getTypeQName())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public void setPolicyRepositoryService(PolicyRepositoryService policyRepositoryService) {
