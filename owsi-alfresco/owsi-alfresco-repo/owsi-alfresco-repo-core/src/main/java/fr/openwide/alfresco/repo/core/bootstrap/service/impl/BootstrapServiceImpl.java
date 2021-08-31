@@ -202,6 +202,12 @@ public class BootstrapServiceImpl implements BootstrapService {
 			AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
 			SiteInfo siteInfo = siteService.getSite(siteName);
 			if (siteInfo == null) {
+				if (authorityService.authorityExists(siteService.getSiteGroup(siteName))) {
+					throw new IllegalStateException(
+							"Le site " + siteName + " n'existe plus, mais ses groupes existent toujours. "
+							+ "Vider le site de la corbeille pour pouvoir le recréer.");
+				}
+				
 				siteInfo = siteService.createSite("site-dashboard", siteName, siteTitle, siteDescription, siteVisibility);
 				createDefaultDashboard(siteInfo);
 				siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
