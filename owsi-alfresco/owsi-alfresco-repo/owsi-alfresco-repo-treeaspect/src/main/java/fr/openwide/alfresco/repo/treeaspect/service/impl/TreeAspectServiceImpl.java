@@ -31,9 +31,10 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 
@@ -48,7 +49,7 @@ import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
  */
 
 public class TreeAspectServiceImpl implements TreeAspectService, 
-	InitializingBean,
+	ApplicationListener<ContextRefreshedEvent>,
 	OnCreateNodePolicy, OnUpdatePropertiesPolicy, OnMoveNodePolicy, OnAddAspectPolicy, OnRemoveAspectPolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TreeAspectServiceImpl.class);
@@ -63,7 +64,7 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 	private Set<QName> aspectToCopy = new HashSet<>();
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void onApplicationEvent(ContextRefreshedEvent event) {
 		String aspectNames = globalProperties.getProperty("owsi.treeaspect.register", "");
 		for (String aspectName : aspectNames.split(",")) {
 			if (! aspectName.trim().isEmpty()) {
