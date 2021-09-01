@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
@@ -25,10 +26,12 @@ import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -44,19 +47,31 @@ import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
  * @author recol
  */
 
-public class TreeAspectServiceImpl implements TreeAspectService, OnCreateNodePolicy, OnUpdatePropertiesPolicy,
-		OnMoveNodePolicy, OnAddAspectPolicy, OnRemoveAspectPolicy {
+public class TreeAspectServiceImpl implements TreeAspectService, 
+	InitializingBean,
+	OnCreateNodePolicy, OnUpdatePropertiesPolicy, OnMoveNodePolicy, OnAddAspectPolicy, OnRemoveAspectPolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TreeAspectServiceImpl.class);
-
 
 	@Autowired private PolicyComponent policyComponent;
 	@Autowired private NodeService nodeService;
 	@Autowired private DictionaryService dictionaryService;
 	@Autowired @Qualifier("policyBehaviourFilter") private BehaviourFilter behaviourFilter;
+	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
+	@Autowired @Qualifier("global-properties") private Properties globalProperties;
 
 	private Set<QName> aspectToCopy = new HashSet<>();
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		String aspectNames = globalProperties.getProperty("owsi.treeaspect.register", "");
+		for (String aspectName : aspectNames.split(",")) {
+			if (! aspectName.trim().isEmpty()) {
+				registerAspect(QName.createQName(aspectName, prefixResolver));
+			}
+		}
+	}
+	
 	@Override public void registerAspect(QName aspect) {
 		registerAspect(aspect, true);
 	}
