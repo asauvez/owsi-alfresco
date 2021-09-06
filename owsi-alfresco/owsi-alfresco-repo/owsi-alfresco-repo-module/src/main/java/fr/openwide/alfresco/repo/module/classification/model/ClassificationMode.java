@@ -6,6 +6,6 @@ public enum ClassificationMode {
 	CREATE,
 	UPDATE,
 	RECLASSIFY,
-	MANUAL
-	
+	MANUAL,
+	VALUES_OVERRIDE
 }

@@ -2,10 +2,14 @@ package fr.openwide.alfresco.repo.module.classification.model.builder;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -54,6 +58,21 @@ public class AbstractClassificationBuilder<B extends AbstractClassificationBuild
 		} else {
 			return getNodeModelService().getProperty(getNodeRef(), property);
 		}
+	}
+	
+	public boolean hasPropertiesChanged(PropertyModel<?> ... properties) {
+		Map<QName, Serializable> before = event.getBefore();
+		Map<QName, Serializable> after = event.getAfter();
+		if (before == null || after == null) return true;
+		
+		for (PropertyModel<?> property : properties) {
+			Serializable beforeValue = before.get(service.getConversionService().getRequired(property.getNameReference()));
+			Serializable  afterValue =  after.get(service.getConversionService().getRequired(property.getNameReference()));
+			if (! Objects.equals(beforeValue, afterValue)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")

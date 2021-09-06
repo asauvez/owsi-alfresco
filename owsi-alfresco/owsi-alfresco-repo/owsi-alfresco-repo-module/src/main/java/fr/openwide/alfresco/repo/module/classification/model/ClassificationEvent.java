@@ -13,21 +13,34 @@ public class ClassificationEvent {
 
 	private final NodeRef nodeRef;
 	private final ClassificationMode mode;
-	private final ContainerModel model;
+	private ContainerModel model;
 	private final Map<QName, Serializable> valuesOverride;
+	private final Map<QName, Serializable> before;
+	private final Map<QName, Serializable> after;
 
-	public ClassificationEvent(NodeRef nodeRef, ClassificationMode mode, ContainerModel model) {
+	public ClassificationEvent(NodeRef nodeRef, ClassificationMode mode) {
 		this.nodeRef = nodeRef;
 		this.mode = mode;
-		this.model = model;
 		this.valuesOverride = null;
+		this.before = null;
+		this.after = null;
+	}
+	public ClassificationEvent(NodeRef nodeRef, 
+			Map<QName, Serializable> before, Map<QName, Serializable> after) {
+		this.nodeRef = nodeRef;
+		this.mode = ClassificationMode.UPDATE;
+		this.valuesOverride = null;
+		this.before = before;
+		this.after = after;
 	}
 
 	public ClassificationEvent(Map<QName, Serializable> values) {
 		this.nodeRef = null;
-		this.mode = null;
+		this.mode = ClassificationMode.VALUES_OVERRIDE;
 		this.model = null;
 		this.valuesOverride = values;
+		this.before = null;
+		this.after = null;
 	}
 
 	public NodeRef getNodeRef() {
@@ -42,7 +55,17 @@ public class ClassificationEvent {
 	public ContainerModel getModel() {
 		return model;
 	}
+	public void setModel(ContainerModel model) {
+		this.model = model;
+	}
 	public Map<QName, Serializable> getValuesOverride() {
 		return valuesOverride;
+	}
+	
+	public Map<QName, Serializable> getBefore() {
+		return before;
+	}
+	public Map<QName, Serializable> getAfter() {
+		return after;
 	}
 }

@@ -40,6 +40,7 @@ Nouveautés
  * TreeAspect : Copie aussi les properties des mandatory-aspects.
  * TreeAspect : Permet de déclarer des aspects avec owsi.treeaspect.register.
  * /owsi/alfresco.log : Retourne les dernières lignes de alfresco.log.
+ * ClassificationBuilder.hasPropertiesChanged() : Pour savoir si une propriété à changer. Toujours vrai si nouveau node. 
 
 ## depuis 0.8.8
 Release du 05/07:2021

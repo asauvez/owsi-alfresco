@@ -217,7 +217,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				.consumer(new Consumer<NodeRef>() {
 			@Override
 			public void accept(NodeRef nodeRef) {
-				classify(nodeRef, ClassificationMode.RECLASSIFY);
+				classify(new ClassificationEvent(nodeRef, ClassificationMode.RECLASSIFY));
 			}
 		}));
 		logger.info("End reclassify of " + model + " (" + nbTotal + ")");
@@ -232,7 +232,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 		
 		if (OwsiModel.classifiable.getNameReference().equals(conversionService.get(aspectTypeQName))) {
-			classify(nodeRef, ClassificationMode.CREATE);
+			classify(new ClassificationEvent(nodeRef, ClassificationMode.CREATE));
 		} else {
 			nodeModelRepositoryService.addAspect(nodeRef, OwsiModel.classifiable);
 		}
@@ -269,7 +269,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				if (logger.isDebugEnabled()) {
 					logger.debug("Reclassify node on new {}, removed {}, changed {}", newFields, removedFields, changedFields);
 				}
-				classify(nodeRef, ClassificationMode.UPDATE);
+				classify(new ClassificationEvent(nodeRef, before, after));
 			}
 		}
 	}
@@ -332,10 +332,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	@Override
 	public void classify(NodeRef nodeRef) {
-		classify(nodeRef, ClassificationMode.MANUAL);
+		classify(new ClassificationEvent(nodeRef, ClassificationMode.MANUAL));
 	}
 	
-	private void classify(NodeRef nodeRef, ClassificationMode mode) {
+	private void classify(ClassificationEvent event) {
+		NodeRef nodeRef = event.getNodeRef();
 		Set<NodeRef> classifiedNodes = getClassifiedNodes();
 		if (! classifiedNodes.add(nodeRef)) {
 			if (logger.isDebugEnabled()) {
@@ -352,6 +353,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		@SuppressWarnings("unchecked")
 		ClassificationPolicy<ContainerModel> policy = (ClassificationPolicy<ContainerModel>) policies.get(type);
 		ContainerModel model = models.get(type);
+		event.setModel(model);
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Begin classification of node {} with policy for {}.", nodeRef, type);
@@ -362,7 +364,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return;
 		}
 
-		ClassificationEvent event = new ClassificationEvent(nodeRef, mode, model);
 		ClassificationBuilder builder = new ClassificationBuilder(this, event);
 		try {
 			policyRepositoryService.disableBehaviours(Arrays.asList(
