@@ -122,7 +122,10 @@ public class NodeSearchModelRepositoryServiceImpl
 					sp.setSkipCount(skipCount);
 					sp.setMaxItems(searchBuilder.getFrameSize());
 				
-					nbTotal += consumeInFrame(searchBuilder, sp);
+					int consumedInFrame = consumeInFrame(searchBuilder, sp);
+					if (consumedInFrame == 0) break;
+					
+					nbTotal += consumedInFrame;
 				}
 			}
 			
