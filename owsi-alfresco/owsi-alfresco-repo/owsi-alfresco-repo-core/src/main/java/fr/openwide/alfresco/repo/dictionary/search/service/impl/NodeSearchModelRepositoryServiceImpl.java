@@ -72,8 +72,8 @@ public class NodeSearchModelRepositoryServiceImpl
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Returning {} result(s)", res.size());
 			}
-			if (LOGGER_AUDIT.isInfoEnabled()) {
-				LOGGER.info("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
+			if (LOGGER_AUDIT.isDebugEnabled()) {
+				LOGGER_AUDIT.debug("{} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
 			}
 			return res;
 		} catch (FTSQueryException ex) {
@@ -129,8 +129,8 @@ public class NodeSearchModelRepositoryServiceImpl
 				}
 			}
 			
-			if (LOGGER_AUDIT.isInfoEnabled()) {
-				LOGGER_AUDIT.info("* {} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
+			if (LOGGER_AUDIT.isDebugEnabled()) {
+				LOGGER_AUDIT.debug("* {} : {} ms", rsp.getQuery().replace("\n", " "), System.currentTimeMillis() - before);
 			}
 			return nbTotal;
 		} catch (FTSQueryException ex) {
