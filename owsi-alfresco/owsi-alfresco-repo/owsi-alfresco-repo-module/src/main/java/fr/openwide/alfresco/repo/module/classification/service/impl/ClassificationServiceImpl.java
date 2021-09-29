@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -61,8 +59,8 @@ import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
-import fr.openwide.alfresco.component.model.search.model.restriction.Restriction;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
 import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
@@ -73,6 +71,7 @@ import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
+import fr.openwide.alfresco.repo.module.classification.model.ReclassifyParams;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
@@ -98,9 +97,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
-	@Autowired @Qualifier("global-properties")
-	private Properties globalProperties;
-	
+	@Autowired private AlfrescoGlobalProperties globalProperties;
 	@Autowired private NodeModelService nodeModelService;
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
 	@Autowired private NodeRepositoryService nodeRepositoryService;
@@ -138,7 +135,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	/** On fait dans ContextRefreshedEvent car les models peuvent ne pas avoir été initialisé */
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		for (String nameReference : globalProperties.getProperty("owsi.classification.freemarker.models", "").split(",")) {
+		for (String nameReference : globalProperties.getPropertyList("owsi.classification.freemarker.models", "")) {
 			if (! nameReference.trim().isEmpty()) {
 				ContainerModel containerModel = new ContainerModel(NameReference.create(nameReference.trim()));
 				try {
@@ -174,53 +171,54 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public <T extends ContainerModel> void addClassification(T model, Consumer<ClassificationBuilder> consumer) {
 		addClassification(model, new ConsumerClassificationPolicy<T>(consumer));
 	}
-
-	@Override
-	public int reclassifyAll(Integer batchSize) {
-		int total = 0;
-		for (ContainerModel model : models.values()) {
-			total += reclassify(model, batchSize);
-		}
-		return total;
-	}
-	@Override
-	public int reclassify(NameReference modelName, Integer batchSize) {
-		ContainerModel model = models.get(modelName);
-		if (model == null) {
-			throw new IllegalStateException("Unknown " + modelName);
-		}
-		return reclassify(model, batchSize);
-	}
 	
 	@Override
-	public int reclassify(ContainerModel model, Integer batchSize, Restriction ...restrictions) {
+	public int reclassify(ReclassifyParams params) {
 		clearCaches();
 		
-		RestrictionBuilder restriction = new RestrictionBuilder();
-		if (model instanceof TypeModel) {
-			restriction.isType((TypeModel) model);
-		} else {
-			restriction.hasAspect((AspectModel) model);
-		}
-		for (Restriction curRestriction : restrictions) {
-			restriction.and(curRestriction);
+		if (params.getContainer() == null) {
+			int total = 0;
+			for (ContainerModel model : models.values()) {
+				params.container(model);
+				total += reclassify(params);
+			}
+			params.container((NameReference) null);
+			return total;
 		}
 		
-		logger.info("Begin reclassify of " + model);
+		ContainerModel container = models.get(params.getContainer());
+		if (container == null) {
+			throw new IllegalStateException("Unknown " + params.getContainer());
+		}
+		
+		RestrictionBuilder restrictions = new RestrictionBuilder();
+		if (container instanceof TypeModel) {
+			restrictions.isType((TypeModel) container);
+		} else {
+			restrictions.hasAspect((AspectModel) container);
+		}
+		restrictions.add(params.getRestrictions());
+		
+		logger.info("Begin reclassify of " + container + " : " + restrictions.toFtsQuery());
 
 		BatchSearchQueryBuilder searchQueryBuilder = new BatchSearchQueryBuilder();
-		searchQueryBuilder.restriction(restriction);
+		if (params.isUseCmis()) {
+			searchQueryBuilder.restrictionCmisContent(restrictions);
+		} else {
+			searchQueryBuilder.restriction(restrictions);
+		}
+		
 		int nbTotal = nodeSearchModelService.searchBatch(searchQueryBuilder
-				.configurationName("reclassify", "reclassify." + model)
-				.frameSize(batchSize)
-				.transactionSize(batchSize)
+				.configurationName("reclassify", "reclassify." + container)
+				.frameSize(params.getBatchSize())
+				.transactionSize(params.getBatchSize())
 				.consumer(new Consumer<NodeRef>() {
 			@Override
 			public void accept(NodeRef nodeRef) {
 				classify(new ClassificationEvent(nodeRef, ClassificationMode.RECLASSIFY));
 			}
 		}));
-		logger.info("End reclassify of " + model + " (" + nbTotal + ")");
+		logger.info("End reclassify of " + container + " (" + nbTotal + ")");
 		return nbTotal;
 	}
 

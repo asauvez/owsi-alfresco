@@ -41,7 +41,7 @@ Nouveautés
  * TreeAspect : Permet de déclarer des aspects avec owsi.treeaspect.register.
  * /owsi/alfresco.log : Retourne les dernières lignes de alfresco.log.
  * ClassificationBuilder.hasPropertiesChanged() : Pour savoir si une propriété à changer. 
- * Classification : Fix reclassify batch.
+ * Classification : ReclassifyParams
  * RunAtEveryLaunchPatch : patch lancé à chaque démarrage
 
 ## depuis 0.8.8

@@ -13,5 +13,9 @@ public class CustomRestriction extends Restriction {
 	protected String toFtsQueryInternal() {
 		return customFtsQuery;
 	}
+	@Override
+	protected String toCmisQueryWhereInternal() {
+		return customFtsQuery;
+	}
 
 }

@@ -143,7 +143,7 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 		// nop
 	}
 	protected String toCmisQueryWhereInternal() {
-		throw new UnsupportedOperationException();
+		return "CONTAINS(o, '" + toFtsQueryInternal().replace("'", "\'") + "')";
 	}
 	
 	protected static String toFtsLuceneValue(String value) {

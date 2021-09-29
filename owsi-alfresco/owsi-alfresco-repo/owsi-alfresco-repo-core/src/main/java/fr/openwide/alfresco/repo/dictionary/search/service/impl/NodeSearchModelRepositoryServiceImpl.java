@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
-import fr.openwide.alfresco.component.model.repository.model.SysModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl;
@@ -112,7 +111,7 @@ public class NodeSearchModelRepositoryServiceImpl
 			} else {
 				sp.setLimitBy(LimitBy.FINAL_SIZE);
 				// Force sort pour que tri soit prédictif
-				sp.addSort(SysModel.referenceable.nodeUuid.getNameReference().getFullName(), true);
+				// sp.addSort(SysModel.referenceable.nodeUuid.getNameReference().getFullName(), true);
 				
 				for (int batchNumber = 0; ; batchNumber ++) {
 					int skipCount = batchNumber * searchBuilder.getFrameSize();

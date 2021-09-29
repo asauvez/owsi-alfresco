@@ -32,6 +32,10 @@ public class RestrictionBuilderTest {
 				"AND cm\\:name:<\"abc\" TO \\\\uFFFF]\n" +
 				"AND cm\\:name:[\\\\u0000 TO \"def\"]\n" +
 				"AND SITE:\"swsdp\"\n" +
+				"AND ISNULL:\"{http://www.alfresco.org/model/content/1.0}author\"\n" + 
+				"AND ISNOTNULL:\"{http://www.alfresco.org/model/content/1.0}author\"\n" + 
+				"AND ISUNSET:\"{http://www.alfresco.org/model/content/1.0}author\"\n" + 
+				"AND EXISTS:\"{http://www.alfresco.org/model/content/1.0}author\"\n" + 
 				"AND FINGERPRINT:aeb883c2-ad52-43f1-ab9f-1bf16137e79c_20_80\n" +
 				"AND (=cm\\:name:\"titi\"\n" +
 				"	OR =cm\\:name:\"tata\")\n" + 
@@ -53,6 +57,10 @@ public class RestrictionBuilderTest {
 				.gt(CmModel.object.name, "abc").of()
 				.le(CmModel.object.name, "def").of()
 				.site("swsdp").of()
+				.isNull(CmModel.author.author).of()
+				.isNotNull(CmModel.author.author).of()
+				.isUnset(CmModel.author.author).of()
+				.exists(CmModel.author.author).of()
 				.fingerPrint(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c"))
 					.overlap(20)
 					.confident(80).of()
@@ -83,6 +91,7 @@ public class RestrictionBuilderTest {
 				"AND cm_titled.cm:title='toto'\n" +
 				"AND o.cmis:name='toto'\n" +
 				"AND NOT o.cmis:name='tata'\n" +
+				"AND CONTAINS(o, 'ISUNSET:\"{http://www.alfresco.org/model/content/1.0}author\"')\n" +
 				"AND o.cmis:lastModificationDate > TIMESTAMP '2009-02-13T23:31:30.123Z'\n" +
 				"AND o.cmis:lastModificationDate <= TIMESTAMP '2009-02-13T23:31:30.123Z'\n" +
 				"AND o.cmis:lastModificationDate >= TIMESTAMP '2009-02-13T23:31:30.123Z'\n" +
@@ -99,6 +108,7 @@ public class RestrictionBuilderTest {
 				.eq(CmModel.object.name, "toto").of()
 				.eq(CmModel.object.name, "tata").not().of()
 				.hasAspect(CmModel.workingCopy).of()
+				.isUnset(CmModel.author.author).of()
 				.gt(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.le(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.between(CmModel.auditable.modified, new Date(1234567890123L), new Date(1234567890999L))

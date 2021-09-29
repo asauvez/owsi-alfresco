@@ -1,8 +1,10 @@
 package fr.openwide.alfresco.repo.module.classification.web.script;
 
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
@@ -11,11 +13,12 @@ import org.springframework.extensions.webscripts.WebScriptRequest;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
+import fr.openwide.alfresco.repo.module.classification.model.ReclassifyParams;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
-import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 @GenerateWebScript(
 		url="/owsi/classification/reclassify",
@@ -25,7 +28,12 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		authentication=GenerateWebScriptAuthentication.ADMIN,
 		useViewFile=true,
 		swaggerParameters={
-			@SwaggerParameter(name="model", description = "Le type dont il faut reclassifier les nodes.", required=false),
+			@SwaggerParameter(name="container", description = "Le type dont il faut reclassifier les nodes.", required=false),
+			@SwaggerParameter(name="batchSize", description = "Le nombre de nodes à traiter par transaction.", required=false),
+			@SwaggerParameter(name="olderThanMinutes", description = "Ne traite que les documents classifiés depuis plus que ce nombre de minutes.", required=false),
+			@SwaggerParameter(name="withoutClassificationDate", description = "Ne traite que les documents classifiés qui n'ont pas de owsi:classificationDate.", required=false),
+			@SwaggerParameter(name="customQuery", description = "Query FTS plus restrictive.", required=false),
+			@SwaggerParameter(name="useCmis", description = "Utilise CMIS au lieu de FTS si true", required=false),
 		})
 public class ReclassifyWebScript extends DeclarativeWebScript {
 	
@@ -34,17 +42,42 @@ public class ReclassifyWebScript extends DeclarativeWebScript {
 	
 	@Override
 	protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
-		String batchSizeS = req.getParameter("batchSize");
-		int batchSize = (batchSizeS != null) ? Integer.parseInt(batchSizeS) : ClassificationService.DEFAULT_RECLASSIFY_BATCH_SIZE;
+		ReclassifyParams params = new ReclassifyParams();
 
-		String modelNameS = req.getParameter("model");
-		int total;
-		if (modelNameS != null) {
+		String modelNameS = req.getParameter("container");
+		if (StringUtils.isNotEmpty(modelNameS)) {
 			NameReference modelName = NameReference.create(modelNameS);
-			total = classificationService.reclassify(modelName, batchSize);
-		} else {
-			total = classificationService.reclassifyAll(batchSize);
+			params.container(modelName);
 		}
+
+		String batchSizeS = req.getParameter("batchSize");
+		if (StringUtils.isNotEmpty(batchSizeS)) {
+			params.batchSize(Integer.parseInt(batchSizeS));
+		}
+		
+		String olderThanMinutes = req.getParameter("olderThanMinutes");
+		if (StringUtils.isNotEmpty(olderThanMinutes)) {
+			params.olderThan(-1 * Integer.parseInt(olderThanMinutes), ChronoUnit.MINUTES);
+		}
+		
+		String withoutClassificationDate = req.getParameter("withoutClassificationDate");
+		if (StringUtils.isNotEmpty(withoutClassificationDate)) {
+			params.withoutClassificationDate();
+		}
+
+		String customQuery = req.getParameter("customQuery");
+		if (StringUtils.isNotEmpty(customQuery)) {
+			params.getRestrictions()
+				.custom(customQuery).of();
+		}
+
+		String useCmis = req.getParameter("useCmis");
+		if (useCmis != null && Boolean.parseBoolean(useCmis)) {
+			params.useCmis();
+		}
+
+		int total = classificationService.reclassify(params);
+		
 		Map<String, Object> model = new HashMap<>();
 		model.put("total", total);
 		return model;

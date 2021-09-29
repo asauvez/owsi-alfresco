@@ -19,6 +19,7 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.AbstractDatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
+import fr.openwide.alfresco.component.model.search.model.restriction.PropertyRestriction.PropertyRestrictionMethod;
 
 public class RestrictionBuilder extends Restriction {
 
@@ -156,9 +157,31 @@ public class RestrictionBuilder extends Restriction {
 	public BetweenRestriction<Date> gt(AbstractDatePropertyModel property, Integer min, TemporalUnit unit) {
 		return between(property, min, null, unit);
 	}
+	public BetweenRestriction<Date> le(AbstractDatePropertyModel property, Integer max, TemporalUnit unit) {
+		return between(property, null, max, unit)
+				.maxInclusive(true);
+	}
+	public BetweenRestriction<Date> ge(AbstractDatePropertyModel property, Integer min, TemporalUnit unit) {
+		return between(property, min, null, unit)
+				.minInclusive(true);
+	}
 	public BetweenRestriction<Date> between(AbstractDatePropertyModel property, Integer min, Integer max, TemporalUnit unit) {
 		return add(new BetweenRelativeTimeRestriction(this, property, min, max, unit));
 	}
+
+	public PropertyRestriction isNull(PropertyModel<?> property) {
+		return add(new PropertyRestriction(this, PropertyRestrictionMethod.ISNULL, property));
+	}
+	public PropertyRestriction isNotNull(PropertyModel<?> property) {
+		return add(new PropertyRestriction(this, PropertyRestrictionMethod.ISNOTNULL, property));
+	}
+	public PropertyRestriction isUnset(PropertyModel<?> property) {
+		return add(new PropertyRestriction(this, PropertyRestrictionMethod.ISUNSET, property));
+	}
+	public PropertyRestriction exists(PropertyModel<?> property) {
+		return add(new PropertyRestriction(this, PropertyRestrictionMethod.EXISTS, property));
+	}
+
 	
 	public SiteRestriction site(String siteShortName) {
 		return add(new SiteRestriction(this, siteShortName));
