@@ -11,15 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.apache.commons.lang3.StringUtils;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationWithRootBuilder;
@@ -48,24 +46,24 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 	private boolean uniqueName;
 	private Optional<String> multiFolderSeparator;
 
-	public FreeMarkerClassificationPolicy(Properties globalProperties, ContainerModel model) throws IOException {
+	public FreeMarkerClassificationPolicy(AlfrescoGlobalProperties globalProperties, ContainerModel model) throws IOException {
 		Configuration cfg = new Configuration();
 
 		String policyKey = model.getNameReference().getFullName().replace(':', '_');
 		
 		String ftsRootPropertyKey = "owsi.classification." + policyKey + ".root.fts";
-		String ftsRootTemplatesAsString = globalProperties.getProperty(ftsRootPropertyKey);
-		if (StringUtils.isNoneEmpty(ftsRootTemplatesAsString)) {
-			ftsRootTemplate = Optional.of(new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString), cfg));
+		Optional<String> ftsRootTemplatesAsString = globalProperties.getProperty(ftsRootPropertyKey);
+		if (ftsRootTemplatesAsString.isPresent()) {
+			ftsRootTemplate = Optional.of(new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString.get()), cfg));
 		}
 
 		String multiFolderSeparatorKey = "owsi.classification." + policyKey + ".multiFolderSeparator";
 		multiFolderSeparator = Optional.ofNullable(globalProperties.getProperty(multiFolderSeparatorKey, null));
 
 		String subfoldersPropertyKey = "owsi.classification." + policyKey + ".subfolders";
-		String subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
-		if (subfoldersTemplatesAsString != null) {
-			for (String templateAsString : splitIgnoreBracket(subfoldersTemplatesAsString)) {
+		Optional<String> subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
+		if (subfoldersTemplatesAsString.isPresent()) {
+			for (String templateAsString : splitIgnoreBracket(subfoldersTemplatesAsString.get())) {
 				if (! templateAsString.isEmpty()) {
 					subfoldersTemplates.add(new Template(subfoldersPropertyKey, new StringReader(templateAsString), cfg));
 				}
@@ -73,9 +71,9 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		}
 
 		String newNamePropertyKey = "owsi.classification." + policyKey + ".name";
-		String newNameAsString = globalProperties.getProperty(newNamePropertyKey);
-		if (newNameAsString != null) {
-			newNameTemplate = Optional.of(new Template(newNamePropertyKey, new StringReader(newNameAsString), cfg));
+		Optional<String> newNameAsString = globalProperties.getProperty(newNamePropertyKey);
+		if (newNameAsString.isPresent()) {
+			newNameTemplate = Optional.of(new Template(newNamePropertyKey, new StringReader(newNameAsString.get()), cfg));
 		}
 		
 		String uniqueNamePropertyKey = "owsi.classification." + policyKey + ".uniquename";
