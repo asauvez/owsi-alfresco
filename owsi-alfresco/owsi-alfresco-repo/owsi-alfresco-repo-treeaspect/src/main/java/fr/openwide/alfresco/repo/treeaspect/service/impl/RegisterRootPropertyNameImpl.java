@@ -9,10 +9,14 @@ import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.io.Serializable;
 import java.util.*;
@@ -28,13 +32,18 @@ import java.util.*;
  * @author recol
  */
 
-public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, OnUpdatePropertiesPolicy, OnAddAspectPolicy, OnCreateNodePolicy {
+public class RegisterRootPropertyNameImpl implements 
+		RegisterRootPropertyName, 
+		ApplicationListener<ContextRefreshedEvent>,
+		OnUpdatePropertiesPolicy, OnAddAspectPolicy, OnCreateNodePolicy {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegisterRootPropertyNameImpl.class);
 
 
 	@Autowired private PolicyComponent policyComponent;
 	@Autowired private NodeService nodeService;
+	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
+	@Autowired @Qualifier("global-properties") private Properties globalProperties;
 
 	private static class PropertiesForCopy {
 		public QName aspectForCopy;
@@ -49,6 +58,24 @@ public class RegisterRootPropertyNameImpl implements RegisterRootPropertyName, O
 	}
 
 	private List<PropertiesForCopy> registerRootPropertyName = new ArrayList<>();
+
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		String aspectNames = globalProperties.getProperty("owsi.copyproperty.register", "");
+		for (String aspectName : aspectNames.split(",")) {
+			if (! aspectName.trim().isEmpty()) {
+				String policyKey = aspectName.replace(':', '_');
+				
+				String propertyToCopy = globalProperties.getProperty("owsi.copyproperty." + policyKey + ".propertyToCopy", "cm:name");
+				String propertyWhereCopy = globalProperties.getProperty("owsi.copyproperty." + policyKey + ".propertyWhereCopy");
+				
+				registerCopyProperty(
+						QName.createQName(aspectName, prefixResolver),
+						QName.createQName(propertyToCopy, prefixResolver),
+						QName.createQName(propertyWhereCopy, prefixResolver));
+			}
+		}
+	}
 
 	@Override public void registerCopyPropertyCmName(QName aspectOfRootNode, QName propertyWhereCopy) {
 		registerCopyProperty(aspectOfRootNode, ContentModel.PROP_NAME, propertyWhereCopy);

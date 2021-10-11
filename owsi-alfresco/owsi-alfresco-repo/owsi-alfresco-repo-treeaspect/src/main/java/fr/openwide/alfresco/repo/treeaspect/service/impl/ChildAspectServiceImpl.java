@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.repo.treeaspect.service.impl;
 
+import java.util.Properties;
 import java.util.function.Consumer;
 
 import org.alfresco.model.ContentModel;
@@ -11,19 +12,53 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import fr.openwide.alfresco.repo.treeaspect.service.ChildAspectService;
 
 /**
  * Permet d'affecter un type ou un aspect aux enfants des nodes d'un type ou aspect donné.
+ * 
+ * owsi.childaspect.register=demo:parentFolderAspect
+ * owsi.childaspect.demo_parentFolder.childFolderAspect=demo:childFolderAspect
+ * owsi.childaspect.demo_parentFolder.childContentAspect=demo:childContentAspect
  */
-public class ChildAspectServiceImpl implements ChildAspectService {
+public class ChildAspectServiceImpl implements ChildAspectService, ApplicationListener<ContextRefreshedEvent> {
 
 	@Autowired private PolicyComponent policyComponent;
 	@Autowired private NodeService nodeService;
 	@Autowired private DictionaryService dictionaryService;
+	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
+	@Autowired @Qualifier("global-properties") private Properties globalProperties;
+	
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		String aspectNamesForFolder = globalProperties.getProperty("owsi.childaspect.register", "");
+		for (String aspectName : aspectNamesForFolder.split(",")) {
+			if (! aspectName.trim().isEmpty()) {
+				String policyKey = aspectName.replace(':', '_');
+				
+				String childFolderAspect = globalProperties.getProperty("owsi.childaspect." + policyKey + ".childFolderAspect");
+				if (childFolderAspect != null) {
+					registerChildAspectForFolder(
+							QName.createQName(aspectName, prefixResolver),
+							QName.createQName(childFolderAspect, prefixResolver));
+				}
+
+				String childContentAspect = globalProperties.getProperty("owsi.childaspect." + policyKey + ".childContentAspect");
+				if (childContentAspect != null) {
+					registerChildAspectForContent(
+							QName.createQName(aspectName, prefixResolver),
+							QName.createQName(childContentAspect, prefixResolver));
+				}
+			}
+		}
+	}
 
 	@Override
 	public void registerChildAspectForFolder(QName parentAspect, QName childAspect) {

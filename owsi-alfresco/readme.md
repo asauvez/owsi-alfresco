@@ -39,6 +39,7 @@ Nouveautés
  * aps-appInGit-maven-plugin : Permet de stocker les processus APS dans le projet.
  * TreeAspect : Copie aussi les properties des mandatory-aspects.
  * TreeAspect : Permet de déclarer des aspects avec owsi.treeaspect.register.
+ * TreeAspect : N'hérite les métas que pour les childs assoc primary.
  * /owsi/alfresco.log : Retourne les dernières lignes de alfresco.log.
  * ClassificationBuilder.hasPropertiesChanged() : Pour savoir si une propriété à changer. 
  * Classification : ReclassifyParams

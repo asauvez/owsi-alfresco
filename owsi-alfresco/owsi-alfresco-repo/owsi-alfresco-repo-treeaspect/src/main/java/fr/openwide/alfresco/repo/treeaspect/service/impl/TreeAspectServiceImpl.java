@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
@@ -107,18 +108,17 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 		runAsSystem("onAddAspect", nodeRef, () -> {
 			if (! nodeService.exists(nodeRef)) return;
 
-			List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+			List<NodeRef> children = getChildren(nodeRef);
 
-			for (ChildAssociationRef child : children) {
+			for (NodeRef child : children) {
 				Map<QName, Serializable> properties = new HashMap<>();
 				
 				Map<QName, PropertyDefinition> aspectProperties = getProperties(newAspect);
 				for (QName property : aspectProperties.keySet()) {
 					properties.put(property, nodeService.getProperty(nodeRef, property));
 				}
-				NodeRef childRef = child.getChildRef();
-				nodeService.addAspect(childRef, newAspect, properties);
-				onAddAspect(childRef, newAspect);
+				nodeService.addAspect(child, newAspect, properties);
+				onAddAspect(child, newAspect);
 			}
 		});
 	}
@@ -149,8 +149,8 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 					}
 				}
 				nodeService.addAspect(childRef, aspect, newProperties);
-				for (ChildAssociationRef childAssociationRef : nodeService.getChildAssocs(childRef)) {
-					copyAspectToNode(childRef, childAssociationRef.getChildRef(), aspect);
+				for (NodeRef subChild : getChildren(childRef)) {
+					copyAspectToNode(childRef, subChild, aspect);
 				}
 			}
 		});
@@ -160,7 +160,7 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 		runAsSystem("onUpdateProperties", nodeRef, () -> {
 			if (! nodeService.exists(nodeRef)) return;
 			
-			List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+			List<NodeRef> children = getChildren(nodeRef);
 			
 			for (QName aspect : aspectToCopy) {
 				Map<QName, PropertyDefinition> aspectProperties = getProperties(aspect);
@@ -169,7 +169,7 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 					Serializable beforeProperty = before.get(property);
 					Serializable afterProperty = after.get(property);
 					if (!Objects.equals(beforeProperty, afterProperty)) {
-						updateChildProperties(childAssocs, property, afterProperty);
+						updateChildProperties(children, property, afterProperty);
 					}
 				}
 			}
@@ -187,13 +187,12 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 		return aspectProperties;
 	}
 	
-	private void updateChildProperties(List<ChildAssociationRef> childAssocs, QName property, Serializable afterProperty) {
-		for (ChildAssociationRef child : childAssocs) {
-			NodeRef childRef = child.getChildRef();
+	private void updateChildProperties(List<NodeRef> children, QName property, Serializable afterProperty) {
+		for (NodeRef childRef : children) {
 
 			runAsSystem("updateChildProperties", childRef, () -> {
 				nodeService.setProperty(childRef, property, afterProperty);
-				updateChildProperties(nodeService.getChildAssocs(childRef), property, afterProperty);
+				updateChildProperties(getChildren(childRef), property, afterProperty);
 			});
 		}
 	}
@@ -215,12 +214,19 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 		runAsSystem("onRemoveAspect", nodeRef, () -> {
 			if (! nodeService.exists(nodeRef)) return;
 			
-			for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL)) {
-				NodeRef childRef = child.getChildRef();
+			for (NodeRef childRef : getChildren(nodeRef)) {
 				nodeService.removeAspect(childRef, aspectTypeQName);
 				onRemoveAspect(childRef, aspectTypeQName);
 			}
 		});
+	}
+	
+	private List<NodeRef> getChildren(NodeRef parentRef) {
+		return nodeService.getChildAssocs(parentRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL)
+				.stream()
+				.filter(assoc -> assoc.isPrimary())
+				.map(assoc -> assoc.getChildRef())
+				.collect(Collectors.toList());
 	}
 	
 	private void runAsSystem(String methodName, NodeRef nodeRef, Runnable runnable) {
