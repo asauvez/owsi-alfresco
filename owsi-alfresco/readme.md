@@ -44,6 +44,7 @@ Nouveautés
  * ClassificationBuilder.hasPropertiesChanged() : Pour savoir si une propriété à changer. 
  * Classification : ReclassifyParams
  * RunAtEveryLaunchPatch : patch lancé à chaque démarrage
+ * AlfrescoUrlService : Pour obtenir les URL dans Share ou Content-App.
 
 ## depuis 0.8.8
 Release du 05/07:2021
