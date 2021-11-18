@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.policy.AssociationPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.ClassPolicy;
@@ -57,7 +59,17 @@ public abstract class AbstractPolicyService implements InitializingBean {
 	}
 	
 	private <T extends ClassPolicy> void bindClassBehaviour(Class<T> interface_) {
-		policyRepositoryService.bindClassBehaviour(model, getNotificationFrequency(), interface_, getProxyCheckExist(interface_));
+		// Si on attend le commit, la node est déjà supprimé
+		NotificationFrequency notificationFrequency = getNotificationFrequency();
+		if (isCheckNodeExists()) { 
+			if (BeforeDeleteNodePolicy.class.isAssignableFrom(interface_)) {
+				notificationFrequency = NotificationFrequency.EVERY_EVENT;
+			} else if (OnDeleteNodePolicy.class.isAssignableFrom(interface_)) {
+				throw new IllegalStateException("Please use BeforeDeleteNodePolicy instead of OnDeleteNodePolicy. Else the node will already be deleted.");
+			}
+		}
+		
+		policyRepositoryService.bindClassBehaviour(model, notificationFrequency, interface_, getProxyCheckExist(interface_));
 	}
 	private <T extends AssociationPolicy> void bindAssociationBehaviour(Class<T> interface_) {
 		policyRepositoryService.bindAssociationBehaviour(model, getChildAssociationModel(), getNotificationFrequency(), interface_, getProxyCheckExist(interface_));
