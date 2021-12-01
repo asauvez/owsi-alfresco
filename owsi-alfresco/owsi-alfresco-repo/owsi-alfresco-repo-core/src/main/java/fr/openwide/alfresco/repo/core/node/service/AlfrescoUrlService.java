@@ -131,7 +131,7 @@ public class AlfrescoUrlService {
 				+ ((site != null) 
 						? "site/" + site.getShortName() + "/documentlibrary"
 						: "repository")
-				+ "#filter=path%7C" + encodeUrl(path.toString()) + "%7C";
+				+ ((path.length() > 0) ? "#filter=path%7C" + encodeUrl(path.toString()) + "%7C" : "");
 		} else {
 			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
 				+ ((site != null) ? "site/" + site.getShortName() : "")
