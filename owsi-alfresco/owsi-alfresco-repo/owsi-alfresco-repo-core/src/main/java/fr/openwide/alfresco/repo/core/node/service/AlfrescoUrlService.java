@@ -1,6 +1,6 @@
 package fr.openwide.alfresco.repo.core.node.service;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,7 +69,7 @@ public class AlfrescoUrlService {
 	@Autowired private FileFolderService fileFolderService;
 	
 	/** Inspired by: https://github.com/Alfresco/share/blob/6.0/share/src/main/webapp/components/documentlibrary/actions.js */
-	public String getShareOnlineEditionUrl(NodeRef nodeRef) throws IOException {
+	public String getShareOnlineEditionUrl(NodeRef nodeRef) {
 		String originalNameDocument = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 		String msType = msProtocoleNames.get(FilenameUtils.getExtension(originalNameDocument).toLowerCase());
 		
@@ -91,8 +91,9 @@ public class AlfrescoUrlService {
 			it.next(); // ignore "/"
 			it.next(); // ignore company_home
 			while (it.hasNext()) {
-				QName qName = ((ChildAssocElement) it.next()).getRef().getQName();
-				buf.append("/").append(URLEncoder.encode(qName.getLocalName(), "UTF-8").replace("+", "%20"));
+				ChildAssociationRef assoc = ((ChildAssocElement) it.next()).getRef();
+				String folderName = (String) nodeService.getProperty(assoc.getParentRef(), ContentModel.PROP_NAME);
+				buf.append("/").append(encodeUrl(folderName));
 			}
 			finalurl = buf.toString();
 		}
@@ -105,11 +106,45 @@ public class AlfrescoUrlService {
 	public String getShareViewUrl(NodeRef nodeRef) {
 		SiteInfo site = siteService.getSite(nodeRef);
 		
-		// TODO manage folder
-		
-		return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
-			+ ((site != null) ? "site/" + site.getShortName() : "")
-			+ "/document-details?nodeRef=" + nodeRef;
+		FileInfo fileInfo = fileFolderService.getFileInfo(nodeRef);
+		if (fileInfo == null) {
+			throw new IllegalStateException("Node does not exist " + nodeRef);
+		}
+		if (fileInfo.isFolder()) {
+			StringBuilder path = new StringBuilder();
+			
+			Iterator<Element> it = nodeService.getPath(nodeRef).iterator();
+			it.next(); // ignore "/"
+			it.next(); // ignore company_home
+			if (site != null) {
+				it.next(); // ignore "sites"
+				it.next(); // ignore nom du site
+				it.next(); // ignore documentlibrary
+			}
+			while (it.hasNext()) {
+				ChildAssociationRef assoc = ((ChildAssocElement) it.next()).getRef();
+				String folderName = (String) nodeService.getProperty(assoc.getParentRef(), ContentModel.PROP_NAME);
+					path.append("/").append(encodeUrl(folderName));
+			}
+
+			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
+				+ ((site != null) 
+						? "site/" + site.getShortName() + "/documentlibrary"
+						: "repository")
+				+ "#filter=path%7C" + encodeUrl(path.toString()) + "%7C";
+		} else {
+			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
+				+ ((site != null) ? "site/" + site.getShortName() : "")
+				+ "/document-details?nodeRef=" + nodeRef;
+		}
+	}
+	
+	private String encodeUrl(String s) {
+		try {
+			return URLEncoder.encode(s, "UTF-8").replace("+", "%20");
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 	
 	public String getDownloadUrl(NodeRef nodeRef, QName property) {
