@@ -9,7 +9,7 @@ import fr.openwide.alfresco.component.model.repository.model.RnModel;
 public class RnRendition2 extends AspectModel {
 
 	public RnRendition2() {
-		super(NameReference.create(RnModel.NAMESPACE, "rendition"));
+		super(NameReference.create(RnModel.NAMESPACE, "rendition2"));
 	}
 
 	protected RnRendition2(NameReference nameReference) {
