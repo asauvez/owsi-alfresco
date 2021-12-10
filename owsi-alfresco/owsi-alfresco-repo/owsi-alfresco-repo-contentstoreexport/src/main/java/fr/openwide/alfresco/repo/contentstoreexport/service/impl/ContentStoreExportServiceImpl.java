@@ -258,10 +258,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 		// module.properties
 		zipOutPutStream.putNextEntry(new ZipEntry("alfresco/module/"+ OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME + "/module.properties"));
 		try {
-			PrintWriter writer = new PrintWriter(new OutputStreamWriter(zipOutPutStream));
-			writer.println("module.id=" + OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME);
-			writer.println("module.version=1.0");
-			writer.flush();
+			zipOutPutStream.write(("module.id=" + OWSI_CONTENTSTOREEXPORT_VIEW_MODULE_NAME).getBytes());
+			zipOutPutStream.write("module.version=1.0".getBytes());
 		} finally {
 			zipOutPutStream.closeEntry();
 		}

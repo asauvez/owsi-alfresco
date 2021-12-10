@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.repo.dictionary.search.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
@@ -12,6 +13,8 @@ import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder
 public interface NodeSearchModelRepositoryService extends NodeSearchModelService {
 
 	List<NodeRef> searchReference(RestrictionBuilder restrictionBuilder);
+	Optional<NodeRef> searchReferenceUnique(RestrictionBuilder restrictionBuilder);
+	NodeRef searchReferenceMandatory(RestrictionBuilder restrictionBuilder);
 	List<NodeRef> searchReference(SearchQueryBuilder searchBuilder);
 
 	int searchBatch(BatchSearchQueryBuilder searchBuilder);

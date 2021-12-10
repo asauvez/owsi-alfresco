@@ -3,6 +3,7 @@ package fr.openwide.alfresco.repo.dictionary.search.service.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -202,5 +203,25 @@ public class NodeSearchModelRepositoryServiceImpl
 		return nbInBatch;
 	}
 	
+	@Override
+	public Optional<NodeRef> searchReferenceUnique(RestrictionBuilder restrictionBuilder) {
+		List<NodeRef> results = searchReference(restrictionBuilder);
+		if (results.size() > 1) {
+			throw new IllegalStateException(results.size() + " results, expected 0 or 1. Query : " + restrictionBuilder.toFtsQuery());
+		} else if (results.size() == 1) {
+			return Optional.of(results.get(0));
+		} else {
+			return Optional.empty();
+		}
+	}
 	
+	@Override
+	public NodeRef searchReferenceMandatory(RestrictionBuilder restrictionBuilder) {
+		List<NodeRef> results = searchReference(restrictionBuilder);
+		if (results.size() != 1) {
+			throw new IllegalStateException(results.size() + " results, expected 1. Query : " + restrictionBuilder.toFtsQuery());
+		} else {
+			return results.get(0);
+		}
+	}
 }
