@@ -16,7 +16,7 @@ public class RunAtEveryLaunchService extends AbstractLifecycleBean {
 
 	private final Logger logger = LoggerFactory.getLogger(RunAtEveryLaunchService.class);
 	
-	@Autowired private List<RunAtEveryLaunchPatch> patches;
+	@Autowired(required = false) private List<RunAtEveryLaunchPatch> patches;
 	
 	@Override
 	protected void onBootstrap(ApplicationEvent event) {
@@ -24,10 +24,12 @@ public class RunAtEveryLaunchService extends AbstractLifecycleBean {
 	}
 	
 	public void launchPatches() {
-		for (RunAtEveryLaunchPatch patch : patches) {
-			logger.info("Run " + patch.getId());
-			
-			patch.applyAsync();
+		if (patches != null) {
+			for (RunAtEveryLaunchPatch patch : patches) {
+				logger.info("Run " + patch.getId());
+				
+				patch.applyAsync();
+			}
 		}
 	}
 
