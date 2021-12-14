@@ -46,6 +46,13 @@ public @interface GenerateWebScript {
 	enum GenerateWebScriptLifecycle { DEFAULT, NONE, SAMPLE, DRAFT, PUBLIC_API, DRAFT_PUBLIC_API, DEPRECATED, INTERNAL }
 	GenerateWebScriptLifecycle lifecycle() default GenerateWebScriptLifecycle.DEFAULT;
 
+	@interface WebScriptCache {
+		boolean never() default true;
+		boolean isPublic() default false;
+		boolean mustrevalidate() default true;
+	}
+	WebScriptCache cache() default @WebScriptCache();
+	
 	String beanParent() default "webscript";
 	
 	/** Mettre à true s'il le WS implémente DeclarativeWebScript */

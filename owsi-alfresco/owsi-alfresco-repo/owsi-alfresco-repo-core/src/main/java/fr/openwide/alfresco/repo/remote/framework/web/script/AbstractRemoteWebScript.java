@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.transaction.UserTransaction;
 
@@ -288,5 +289,14 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	public void setMaxContentSize(Long maxContentSize) {
 		this.maxContentSize = maxContentSize.longValue();
+	}
+	
+	protected void setCache(WebScriptResponse res, int duration, TimeUnit unit, boolean isPublic) {
+		Cache cache = new Cache();
+		cache.setNeverCache(false);
+		cache.setMustRevalidate(false);
+		cache.setIsPublic(isPublic);
+		cache.setMaxAge(unit.toSeconds(duration));
+		res.setCache(cache);
 	}
 }

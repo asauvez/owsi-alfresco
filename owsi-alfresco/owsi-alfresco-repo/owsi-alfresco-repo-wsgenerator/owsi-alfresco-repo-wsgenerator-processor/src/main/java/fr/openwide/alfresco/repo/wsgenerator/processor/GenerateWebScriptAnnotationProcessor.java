@@ -159,10 +159,30 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			
 			xml.writeStartElement("transaction"); 
 			xml.writeAttribute("allow", generateWebScript.transactionAllow().name().toLowerCase());
-			xml.writeCharacters(generateWebScript.transaction().name().toLowerCase()); 
+			xml.writeCharacters(generateWebScript.transaction().name().toLowerCase());
 			xml.writeEndElement();
 
 			xml.writeStartElement("family"); xml.writeCharacters(family); xml.writeEndElement();
+			
+			if (   generateWebScript.cache().never() != true 
+				|| generateWebScript.cache().isPublic() != false 
+				|| generateWebScript.cache().mustrevalidate() != true) {
+				xml.writeStartElement("cache");
+				
+				xml.writeStartElement("never");
+				xml.writeCharacters(Boolean.toString(generateWebScript.cache().never()));
+				xml.writeEndElement(); // never
+
+				xml.writeStartElement("public");
+				xml.writeCharacters(Boolean.toString(generateWebScript.cache().isPublic()));
+				xml.writeEndElement(); // public
+
+				xml.writeStartElement("mustrevalidate");
+				xml.writeCharacters(Boolean.toString(generateWebScript.cache().mustrevalidate()));
+				xml.writeEndElement(); // mustrevalidate
+
+				xml.writeEndElement(); // cache
+			}
 
 			if (generateWebScript.lifecycle() != GenerateWebScriptLifecycle.DEFAULT) {
 				xml.writeStartElement("lifecycle"); xml.writeCharacters(generateWebScript.lifecycle().name().toLowerCase()); xml.writeEndElement();
