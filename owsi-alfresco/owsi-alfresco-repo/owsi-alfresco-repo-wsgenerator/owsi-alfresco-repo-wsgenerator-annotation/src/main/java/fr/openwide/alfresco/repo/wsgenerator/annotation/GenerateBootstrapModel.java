@@ -11,9 +11,22 @@ import java.lang.annotation.Target;
  * 
  * @GenerateBootstrapModel(
  *	importModels = "alfresco/module/xxx-ged-platform/xxx-model.xml",
+ *	importViews = {
+ *		@BootstrapView(
+ *			checkPath="/${spaces.company_home.childname}/st:sites/cm:acme/cm:dataLists/cm:myDatalist",
+ *			path="/${spaces.company_home.childname}/st:sites/cm:acme",
+ *			location="alfresco/module/xxx-ged-platform/view/tableDomaine.model.xml", 
+ *			dependsOn="patch.fr.smile.myPatch"
+ *		)
+ *	}
  *	dependsOn = "owsi.dictionaryBootstrap"
  * )
+ * 
+ * Pour l'import des vues :
+ * https://docs.alfresco.com/content-services/latest/develop/repo-ext-points/bootstrap-content/
  */
+
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GenerateBootstrapModel {
@@ -22,6 +35,7 @@ public @interface GenerateBootstrapModel {
 	
 	String[] importModels() default {};
 	String[] importLabels() default {};
+	BootstrapView[] importViews() default {};
 
 	String[] dependsOn() default {};
 }

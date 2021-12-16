@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import fr.openwide.alfresco.repo.wsgenerator.annotation.BootstrapView;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch;
@@ -281,6 +282,44 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 				xml.writeEndElement(); // property
 			}
 			xml.writeEndElement(); // bean
+			
+			// https://docs.alfresco.com/content-services/latest/develop/repo-ext-points/bootstrap-content/
+			int viewNumber = 1;
+			for (BootstrapView view : generateBootstrapModel.importViews()) {
+				xml.writeStartElement("bean");
+				String id = view.id();
+				if (id.isEmpty()) {
+					id = modelName + ".view" + viewNumber;
+				}
+				xml.writeAttribute("id", id);
+				viewNumber ++;
+				
+				xml.writeAttribute("class", "org.alfresco.repo.admin.patch.impl.GenericBootstrapPatch");
+				xml.writeAttribute("parent", "basePatch");
+				xml.writeAttribute("depends-on", String.join(", ", view.dependsOn()));
+				generateProperty(xml, "id", id);
+				generateProperty(xml, "description", view.description());
+				generateProperty(xml, "fixesFromSchema", "0");
+				generateProperty(xml, "fixesToSchema", "${version.schema}");
+				generateProperty(xml, "targetSchema", "99999");
+				xml.writeStartElement("property");
+				xml.writeAttribute("name", "importerBootstrap");
+				xml.writeAttribute("ref", "spacesBootstrap");
+				xml.writeEndElement(); // property importerBootstrap
+				generateProperty(xml, "checkPath", view.checkPath());
+				
+				xml.writeStartElement("property");
+				xml.writeAttribute("name", "bootstrapView");
+				xml.writeStartElement("props");
+				generateProp(xml, "uuidBinding", view.uuidBinding().name());
+				generateProp(xml, "path", view.path());
+				generateProp(xml, "location", view.location());
+				
+				xml.writeEndElement(); // props 
+				xml.writeEndElement(); // property bootstrapView
+				xml.writeEndElement(); // bean
+			}
+			
 		});
 	}
 
@@ -450,6 +489,12 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		xml.writeStartElement("entry");
 		xml.writeAttribute("key", key);
 		xml.writeAttribute("value", value);
+		xml.writeEndElement(); // entry
+	}
+	private void generateProp(XMLStreamWriter xml, String key, String value) throws XMLStreamException {
+		xml.writeStartElement("prop");
+		xml.writeAttribute("key", key);
+		xml.writeCharacters(value);
 		xml.writeEndElement(); // entry
 	}
 

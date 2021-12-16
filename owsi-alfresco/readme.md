@@ -47,6 +47,7 @@ Nouveautés
  * RunAtEveryLaunchPatch : patch lancé à chaque démarrage
  * AlfrescoUrlService : Pour obtenir les URL dans Share ou Content-App.
  * @GenerateWebscript : Permet de déclarer un cache.
+ * @GenerateBootstrapModel : importViews pour importer des users, datalist
 
 ## depuis 0.8.8
 Release du 05/07:2021
