@@ -39,9 +39,6 @@
 		<owsi-alfresco.share.spring-surf-core.version>6.18</owsi-alfresco.share.spring-surf-core.version>
 		<owsi-alfresco.share.freemarker.version>2.3.20-alfresco-patched</owsi-alfresco.share.freemarker.version>
 		
-		<!-- La version 3.1.0 qui vient avec owsi-core 0.14 ne semble pas marcher avec les AMP -->
-		<owsi-core.maven-war-plugin.version>2.6</owsi-core.maven-war-plugin.version>
-		
 		<owsi.migration.enabled>true</owsi.migration.enabled>
 		<owsi.migration.createMissingFile>true</owsi.migration.createMissingFile>
 		<owsi.migration.createMissingIgnoreFile>false</owsi.migration.createMissingIgnoreFile>

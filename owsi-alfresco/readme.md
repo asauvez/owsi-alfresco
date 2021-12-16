@@ -34,6 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.9
+ * Ne dépend plus de owsi-core, sauf pour la partie Spring MVC (owsi-alfresco-app)
  * AlfrescoGlobalProperties : Permet d'accéder à la configuration.
  * UniqueNameService : Fix en cas de renommage d'un document qui a des secondary parents
  * aps-appInGit-maven-plugin : Permet de stocker les processus APS dans le projet.

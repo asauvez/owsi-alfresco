@@ -16,7 +16,7 @@
 		<owsi-alfresco.api.jackson.version>2.9.5</owsi-alfresco.api.jackson.version> <!-- alfresco version -->
 		<owsi-alfresco.api.spring.version>5.0.4.RELEASE</owsi-alfresco.api.spring.version> <!-- alfresco version -->
 		<owsi-alfresco.api.slf4j.version>1.7.21</owsi-alfresco.api.slf4j.version> <!-- alfresco version -->
-		<owsi-alfresco.api.junit.version>4.12</owsi-alfresco.api.junit.version> <!-- owsi-core version -->
+		<owsi-alfresco.api.junit.version>4.13.2</owsi-alfresco.api.junit.version>
 		<owsi-alfresco.api.commons-lang3.version>3.3.2</owsi-alfresco.api.commons-lang3.version> <!-- alfresco version -->
 	</properties>
 

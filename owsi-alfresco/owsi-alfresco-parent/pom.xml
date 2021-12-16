@@ -1,13 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.smile.core.parents</groupId>
-		<artifactId>owsi-core-parent-maven-configuration-common</artifactId>
-		<version>0.20</version>
-		<relativePath />
-	</parent>
-
 	<groupId>fr.openwide.alfresco</groupId>
 	<artifactId>owsi-alfresco-parent</artifactId>
 	<version>0.8.9-SNAPSHOT</version>
@@ -17,9 +10,9 @@
 	<description>Définition des dépendances et plugins partagées par les autres projets et modules</description>
 
 	<properties>
+		<jdk.version>11</jdk.version>
 		<owsi-alfresco.maven-failsafe-plugin.version>2.19.1</owsi-alfresco.maven-failsafe-plugin.version>
 		<owsi-alfresco.git-commit-id-plugin.version>2.2.4</owsi-alfresco.git-commit-id-plugin.version>
-		<owsi-core.animal-sniffer-maven-plugin.version>1.18</owsi-core.animal-sniffer-maven-plugin.version>
 	</properties>
 
 	<modules>
@@ -62,6 +55,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -76,6 +70,17 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+					<configuration>
+						<source>${jdk.version}</source>
+						<target>${jdk.version}</target>
+						<compilerArgument>-proc:none</compilerArgument>
+						<testCompilerArgument>-proc:none</testCompilerArgument>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>com.amashchenko.maven.plugin</groupId>
 					<artifactId>gitflow-maven-plugin</artifactId>
 					<version>1.14.0</version>
@@ -88,10 +93,27 @@
 						</gitFlowConfig>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<!-- Pour les AMP, il semble falloir un version 2.6 -->
+					<version>2.6</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus.internal.snapshots</id>
+			<url>http://nexus.vitry.intranet/repository/InternalSmileSnapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>nexus.internal.releases</id>
+			<url>http://nexus.vitry.intranet/repository/InternalSmileReleases/</url>
+		</repository>
+	</distributionManagement>
+        
 	<repositories>
 		<repository>
 			<id>alfresco-artifacts-repository</id>
