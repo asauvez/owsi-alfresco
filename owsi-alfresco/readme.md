@@ -34,6 +34,7 @@ Nouveautés
 ==========
 
 ## depuis 0.8.9
+Release du 05/12/2021
  * Ne dépend plus de owsi-core, sauf pour la partie Spring MVC (owsi-alfresco-app)
  * AlfrescoGlobalProperties : Permet d'accéder à la configuration.
  * UniqueNameService : Fix en cas de renommage d'un document qui a des secondary parents
@@ -51,7 +52,7 @@ Nouveautés
  * @GenerateXxx : Un seul fichier de context Spring /alfresco/extension/owsi-generator-context.xml
 
 ## depuis 0.8.8
-Release du 05/07:2021
+Release du 05/07/2021
  * Solr Audit: pour savoir combien de fichier existe dans le repo.
  * UniqueNameRepositoryService : Gestion des noms lors des déplacements / renommage / classifications
  * ConstraintValues WS : Retourne les valeurs possibles pour un champs donné d'après les contraintes ou d'après une DataList.
@@ -60,7 +61,7 @@ Release du 05/07:2021
  * ChildAspectService : Affecte un aspect/type aux enfants des dossiers d'un aspect/type donné.
 
 ## depuis 0.8.7 Release du 09/02/2021
- *  Affichage des scheduled jobs dans la console admin Alfresco
+ * Affichage des scheduled jobs dans la console admin Alfresco
  * Fix pom si utilisation du SDK4-plus comme parent
 
 ## depuis 0.8.6
