@@ -66,7 +66,6 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		if (springContextXml != null) {
 			throw new IllegalStateException("Init déjà appelé");
 		}
-		
 		Filer filer = processingEnv.getFiler();
 		try {
 			FileObject fileObject = filer.createResource(StandardLocation.CLASS_OUTPUT, 

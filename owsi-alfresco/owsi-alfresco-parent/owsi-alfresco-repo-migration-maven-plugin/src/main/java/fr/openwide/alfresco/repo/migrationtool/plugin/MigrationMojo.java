@@ -179,7 +179,8 @@ public class MigrationMojo extends AbstractMigrationMojo {
 			"/git.properties",
 			"/module.properties",
 			"/log4j.properties",
-			"/overview.html"
+			"/overview.html",
+			"/alfresco/extension/owsi-generator-context.xml"
 		));
 
 	private void putDependency(Map<String, Artifact> map, String key, Artifact artifact, boolean inWebInfClasses, InputStream in) throws IOException {
