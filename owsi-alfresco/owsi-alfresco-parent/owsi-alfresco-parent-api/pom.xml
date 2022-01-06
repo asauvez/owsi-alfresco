@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
+		<version>0.9.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-api</artifactId>
 	<packaging>pom</packaging>
@@ -25,7 +25,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.9.0-SNAPSHOT</version>
+				<version>0.9.1-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -165,6 +165,7 @@
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
+				<version>3.3.3</version>
 				<executions>
 					<execution>
 						<id>maven-processor-plugin-default</id>
@@ -183,7 +184,7 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.9.0-SNAPSHOT</version>
+						<version>0.9.1-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
 			</plugin>
