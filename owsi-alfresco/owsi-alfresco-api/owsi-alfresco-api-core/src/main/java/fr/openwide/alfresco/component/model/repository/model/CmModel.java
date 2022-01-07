@@ -14,6 +14,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCopiedFrom;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmCountable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmEmailed;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmFailedThumbnail;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeneralClassifiable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmGeographic;
@@ -24,6 +25,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmObject;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmOwnable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPerson;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmPreferences;
+import fr.openwide.alfresco.component.model.repository.model.cm.CmRating;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmStoreSelector;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmSummarizable;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmTaggable;
@@ -33,7 +35,7 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmWorkingCopy;
 
 public interface CmModel {
 
-	// https://github.com/Alfresco/alfresco-repository/blob/master/src/main/resources/alfresco/model/contentModel.xml
+	// https://github.com/Alfresco/alfresco-community-repo/blob/master/repository/src/main/resources/alfresco/model/contentModel.xml
 	NamespaceReference NAMESPACE = NamespaceReference.create("cm", "http://www.alfresco.org/model/content/1.0");
 
 	// ---- Aspects
@@ -96,4 +98,7 @@ public interface CmModel {
 	CmCategory category = new CmCategory();
 	
 	CmLink link = new CmLink();
+	
+	CmRating rating = new CmRating();
+	CmFailedThumbnail failedThumbnail = new CmFailedThumbnail();
 }
