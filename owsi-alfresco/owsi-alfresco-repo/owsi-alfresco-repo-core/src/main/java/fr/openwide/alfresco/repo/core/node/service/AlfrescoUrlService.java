@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.DataListModel;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -126,8 +127,8 @@ public class AlfrescoUrlService {
 			}
 			while (it.hasNext()) {
 				ChildAssociationRef assoc = ((ChildAssocElement) it.next()).getRef();
-				String folderName = (String) nodeService.getProperty(assoc.getParentRef(), ContentModel.PROP_NAME);
-					path.append("/").append(encodeUrl(folderName));
+				String folderName = (String) nodeService.getProperty(assoc.getChildRef(), ContentModel.PROP_NAME);
+				path.append("/").append(encodeUrl(folderName));
 			}
 
 			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
@@ -135,6 +136,11 @@ public class AlfrescoUrlService {
 						? "site/" + site.getShortName() + "/documentlibrary"
 						: "repository")
 				+ ((path.length() > 0) ? "#filter=path%7C" + encodeUrl(path.toString()) + "%7C" : "");
+			
+		} else if (nodeService.getType(nodeRef).equals(DataListModel.TYPE_DATALIST)) {
+			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
+					+ ((site != null) ? "site/" + site.getShortName() : "")
+					+ "/data-lists?list=" + nodeRef.getId();
 		} else {
 			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
 				+ ((site != null) ? "site/" + site.getShortName() : "")
