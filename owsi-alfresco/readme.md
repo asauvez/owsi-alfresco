@@ -33,6 +33,8 @@ mvn gitflow:release
 Nouveautés
 ==========
 
+## depuis 0.9.2
+
 ## depuis 0.8.9
 Release du 05/12/2021
  * Ne dépend plus de owsi-core, sauf pour la partie Spring MVC (owsi-alfresco-app)
