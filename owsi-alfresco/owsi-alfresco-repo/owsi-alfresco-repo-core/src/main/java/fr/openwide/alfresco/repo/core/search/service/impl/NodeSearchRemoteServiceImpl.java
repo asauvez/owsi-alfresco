@@ -122,6 +122,13 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 			sp.setLimitBy(LimitBy.FINAL_SIZE);
 		}
 		
+		if (rsp.getMaxPermissionChecks() != null) {
+			sp.setMaxPermissionChecks(rsp.getMaxPermissionChecks());
+		}
+		if (rsp.getMaxPermissionCheckTimeMillis() != null) {
+			sp.setMaxPermissionCheckTimeMillis(rsp.getMaxPermissionCheckTimeMillis());
+		}
+		
 		for (SortDefinition sd : rsp.getSorts()) {
 			sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
 		}

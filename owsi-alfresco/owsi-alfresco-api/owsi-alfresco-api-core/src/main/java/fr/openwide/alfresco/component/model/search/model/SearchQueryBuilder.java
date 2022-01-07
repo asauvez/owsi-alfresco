@@ -60,6 +60,15 @@ public class SearchQueryBuilder extends AbstractQueryBuilder<SearchQueryBuilder,
 		return this;
 	}
 
+	public SearchQueryBuilder maxPermissionChecks(Integer maxPermissionChecks) {
+		getParameters().setMaxPermissionChecks(maxPermissionChecks);
+		return this;
+	}
+	public SearchQueryBuilder maxPermissionCheckTimeMillis(Long maxPermissionCheckTimeMillis) {
+		getParameters().setMaxPermissionCheckTimeMillis(maxPermissionCheckTimeMillis);
+		return this;
+	}
+	
 	public SearchQueryBuilder queryConsistency(RepositoryQueryConsistency queryConsistency) {
 		getParameters().setQueryConsistency(queryConsistency);
 		return this;

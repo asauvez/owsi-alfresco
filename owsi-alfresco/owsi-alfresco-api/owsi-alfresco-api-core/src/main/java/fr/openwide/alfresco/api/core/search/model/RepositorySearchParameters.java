@@ -19,7 +19,9 @@ public class RepositorySearchParameters extends AbstractQueryParameters {
 	
 	private Integer firstResult;
 	private Integer maxResults;
-	
+	private Integer maxPermissionChecks;
+	private Long maxPermissionCheckTimeMillis;
+
 	public String getQuery() {
 		return query;
 	}
@@ -52,6 +54,20 @@ public class RepositorySearchParameters extends AbstractQueryParameters {
 	}
 	public void setMaxResults(Integer maxResults) {
 		this.maxResults = maxResults;
+	}
+	
+	public Integer getMaxPermissionChecks() {
+		return maxPermissionChecks;
+	}
+	public void setMaxPermissionChecks(Integer maxPermissionChecks) {
+		this.maxPermissionChecks = maxPermissionChecks;
+	}
+	
+	public Long getMaxPermissionCheckTimeMillis() {
+		return maxPermissionCheckTimeMillis;
+	}
+	public void setMaxPermissionCheckTimeMillis(Long maxPermissionCheckTimeMillis) {
+		this.maxPermissionCheckTimeMillis = maxPermissionCheckTimeMillis;
 	}
 
 	public RepositoryQueryConsistency getQueryConsistency() {

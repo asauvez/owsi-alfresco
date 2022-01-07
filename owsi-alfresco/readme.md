@@ -34,6 +34,8 @@ Nouveautés
 ==========
 
 ## depuis 0.9.2
+ * AlfrescoUrlService : Fix URL dossier Share
+ * SearchQueryBuilder: maxPermissionChecks/maxPermissionCheckTimeMillis
 
 ## depuis 0.8.9
 Release du 05/12/2021
