@@ -119,6 +119,9 @@ public class AlfrescoUrlService {
 			if (site != null) {
 				it.next(); // ignore "sites"
 				it.next(); // ignore nom du site
+				if (! it.hasNext()) {
+					return UrlUtil.getShareUrl(sysAdminParams) + "/page/site/" + site.getShortName() + "/dashboard";
+				}
 				it.next(); // ignore documentlibrary
 			}
 			while (it.hasNext()) {
