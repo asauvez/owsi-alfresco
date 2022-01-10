@@ -21,6 +21,7 @@ import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
@@ -172,6 +173,10 @@ public class ConversionServiceImpl implements ConversionService {
 	@Override
 	public <E extends Enum<E>> void setProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property, E value) {
 		values.put(get(property.getNameReference()), PropertiesNode.enumToText(value));
+	}
+	@Override
+	public void setProperty(Map<QName, Serializable> values, NodeReferencePropertyModel property, NodeRef value) {
+		values.put(get(property.getNameReference()), value);
 	}
 	
 	public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver) {

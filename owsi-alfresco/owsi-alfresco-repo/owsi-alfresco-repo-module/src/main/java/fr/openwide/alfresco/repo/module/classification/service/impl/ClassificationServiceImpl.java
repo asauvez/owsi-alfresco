@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -405,8 +406,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void createFileLink(NodeRef nodeRef, NodeRef destinationFolder, Optional<String> linkNameOpt) {
 		String linkName = linkNameOpt.isPresent() ? linkNameOpt.get() 
 				: "Link to " + nodeModelRepositoryService.getProperty(nodeRef, CmModel.object.name);
-		nodeModelService.create(new BusinessNode(conversionService.get(destinationFolder), AppModel.fileLink, linkName)
-				.properties().set(AppModel.fileLink.destination, conversionService.get(nodeRef)));
+		Map<QName, Serializable> properties = new HashMap<>();
+		conversionService.setProperty(properties, AppModel.fileLink.destination, nodeRef);
+		nodeModelRepositoryService.createNode(destinationFolder, AppModel.fileLink, linkName, properties);
 	}
 	
 	public void createSecondaryParent(NodeRef node, NodeRef destinationFolder) {
@@ -452,6 +454,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return newResult;
 	}
 
+	@Deprecated
 	public NodeRef subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier, NodeRef destinationFolder) {
 		String cleanFolderName = uniqueNameRepositoryService.toValidName(folderName, " ");
 		
@@ -501,6 +504,48 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			} else {
 				return conversionService.getRequired(nodeModelService.create(folderNode));
 			}
+		});
+	} 
+	
+	public NodeRef subFolder(String folderName, NodeRef destinationFolder) {
+		String cleanFolderName = uniqueNameRepositoryService.toValidName(folderName, " ");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Create subfolder {}", cleanFolderName);
+		}
+		
+		String cacheKey = destinationFolder + "/" + cleanFolderName;
+		return subFolderCache.get(nodeModelRepositoryService, cacheKey, 
+				() -> nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName),
+				() -> {
+
+			NodeRef newFolderRef;
+			if (createSubFolderInInnerTransaction) {
+				try {
+					// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
+					newFolderRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+						@Override
+						public NodeRef execute() {
+							return nodeModelRepositoryService.createNode(destinationFolder, CmModel.folder, cleanFolderName);
+						}
+					}, false, true);
+				} catch (DuplicateChildNodeNameRemoteException ex) {
+					// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
+					newFolderRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
+						@Override
+						public NodeRef execute() {
+							Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName);
+							return childByName.get();
+						}
+					}, true, true);
+				}
+			} else {
+				newFolderRef = nodeModelRepositoryService.createNode(destinationFolder, CmModel.folder, cleanFolderName);
+			}
+			
+			if (addDeleteIfEmptyAspect) {
+				nodeModelRepositoryService.addAspect(newFolderRef, OwsiModel.deleteIfEmpty);
+			}
+			return newFolderRef;
 		});
 	} 
 	

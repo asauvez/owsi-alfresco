@@ -43,14 +43,19 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 * Créer un sous dossier par rapport au noeud en cours, si ce dossier n'existe pas encore.
 	 */
 	public ClassificationWithRootBuilder subFolder(String folderName) {
-		return subFolder(new BusinessNode()
-			.properties().name(folderName));
+		destinationFolders = destinationFolders.stream()
+				.map(destinationFolder -> service.subFolder(folderName, destinationFolder))
+				.collect(Collectors.toList());
+		return this;
 	}
+	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
 	public ClassificationWithRootBuilder subFolder(String folderName, Consumer<BusinessNode> folderNodeConsumer) {
 		BusinessNode node = new BusinessNode();
 		folderNodeConsumer.accept(node);
 		return subFolder(folderName, () -> node);
 	}
+	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
+	@SuppressWarnings("deprecation")
 	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
 		destinationFolders = destinationFolders.stream()
 				.map(destinationFolder -> service.subFolder(folderName, folderNodeSupplier, destinationFolder))
@@ -58,37 +63,17 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return this;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public ClassificationWithRootBuilder subFolder(String folderName, 
 			ContainerModel folderType, PropertyModel<?> ... properties) {
-		return subFolder(folderName, (node) -> {
-			if (folderType instanceof TypeModel) {
-				node.type((TypeModel) folderType);
-			} else if (folderType instanceof AspectModel) {
-				node.aspect((AspectModel) folderType);
-			} else {
-				throw new IllegalStateException(folderType.toString());
-			}
-			for (PropertyModel<?> property : properties) {
-				if (property instanceof SinglePropertyModel) {
-					SinglePropertyModel<Serializable> sp = (SinglePropertyModel<Serializable>) property;
-					Serializable value = getProperty(sp);
-					node.properties().set(sp, value);
-				} else if (property instanceof MultiPropertyModel) {
-					MultiPropertyModel<Serializable> mp = (MultiPropertyModel<Serializable>) property;
-					List<Serializable> value = getProperty(mp);
-					node.properties().set(mp, value);
-				} else {
-					throw new IllegalStateException(property.toString());
-				}
-			}
-		});
+		subFolder(folderName);
+		return addAspectToFolder(folderType, properties);
 	}
 	
 	/**
 	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
 	 * du noeud fourni.
 	 */
+	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
 	public ClassificationWithRootBuilder subFolder(BusinessNode folderNode) {
 		return subFolder(
 				folderNode.properties().getName(),
@@ -96,15 +81,25 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder) {
-		return subFolder(subFolderBuilder, () -> new BusinessNode());
+		Set<String> foldersName = subFolderBuilder.getFoldersName(this);
+		return subFolders(foldersName);
 	}
+	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder, Supplier<BusinessNode> folderNodeSupplier) {
 		Set<String> foldersName = subFolderBuilder.getFoldersName(this);
 		return subFolders(foldersName, folderNodeSupplier);
 	}
+	
 	public ClassificationWithRootBuilder subFolders(Collection<String> foldersName) {
-		return subFolders(foldersName, () -> new BusinessNode());
+		destinationFolders = destinationFolders.stream()
+			.flatMap(destinationFolder -> 
+				foldersName.stream()
+					.map(folderName -> service.subFolder(folderName, destinationFolder)))
+			.collect(Collectors.toList());
+		return this;
 	}
+	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
+	@SuppressWarnings("deprecation")
 	public ClassificationWithRootBuilder subFolders(Collection<String> foldersName, Supplier<BusinessNode> folderNodeSupplier) {
 		destinationFolders = destinationFolders.stream()
 			.flatMap(destinationFolder -> 
@@ -135,6 +130,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property) {
 		return subFolder(new SubFolderBuilder(property));
 	}
+	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
 	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property, Supplier<BusinessNode> folderNodeSupplier) {
 		return subFolder(new SubFolderBuilder(property), folderNodeSupplier);
 	}

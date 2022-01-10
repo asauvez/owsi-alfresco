@@ -45,6 +45,7 @@ import fr.openwide.alfresco.component.model.repository.model.DlModel;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
 import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 
 @GenerateService(
@@ -55,6 +56,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 	
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
 	@Autowired private MutableAuthenticationService authenticationService;
+	@Autowired private ConversionService conversionService;
 	@Autowired private PersonService personService;
 	@Autowired private AuthorityService authorityService;
 	@Autowired private CategoryService categoryService;
@@ -273,10 +275,19 @@ public class BootstrapServiceImpl implements BootstrapService {
 				Collections.singletonMap(SiteModel.PROP_COMPONENT_ID, "dataLists"));
 	}
 	@Override
+	public NodeRef getOrCreateDataListContainer(SiteInfo siteInfo) {
+		NodeRef dataListContainerNodeRef = siteService.getContainer(siteInfo.getShortName(), "dataLists");
+		if (dataListContainerNodeRef == null) {
+			dataListContainerNodeRef = createDataListContainer(siteInfo);
+		}
+		return dataListContainerNodeRef;
+	}
+	@Override
 	public NodeRef createDataList(NodeRef dataListContainer, String name, DlDataListItem dataListItemType) {
-		NodeRef dataList = nodeModelRepositoryService.createNode(dataListContainer, DlModel.dataList, name);
-		nodeModelRepositoryService.setProperty(dataList, DlModel.dataList.dataListItemType, dataListItemType.getNameReference().getFullName());
-		return dataList;
+		Map<QName, Serializable> properties = new HashMap<>();
+		conversionService.setProperty(properties, DlModel.dataList.dataListItemType, dataListItemType.getNameReference().getFullName());
+
+		return nodeModelRepositoryService.createNode(dataListContainer, DlModel.dataList, name, properties);
 	}
 
 	private void createDefaultDashboard(SiteInfo siteInfo) {

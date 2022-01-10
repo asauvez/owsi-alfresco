@@ -13,6 +13,7 @@ import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 
 public interface ConversionService {
@@ -40,4 +41,5 @@ public interface ConversionService {
 	<C extends Serializable> void setProperty(Map<QName, Serializable> values, SinglePropertyModel<C> property, C value);
 	<C extends Serializable> void setProperty(Map<QName, Serializable> values, MultiPropertyModel<C> property, List<C> value);
 	<E extends Enum<E>> void setProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property, E value);
+	void setProperty(Map<QName, Serializable> values, NodeReferencePropertyModel property, NodeRef value);
 }

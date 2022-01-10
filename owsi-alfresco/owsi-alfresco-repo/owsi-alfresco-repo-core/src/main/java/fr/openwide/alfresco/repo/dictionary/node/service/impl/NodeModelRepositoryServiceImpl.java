@@ -2,7 +2,7 @@ package fr.openwide.alfresco.repo.dictionary.node.service.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -66,12 +66,20 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	
 	@Override
 	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException {
+		return createNode(parentRef, type, name, new HashMap<>());
+	}
+	@Override
+	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws DuplicateChildNodeNameRemoteException {
+		conversionService.setProperty(properties, CmModel.object.name, name);
+		
 		return nodeService.createNode(parentRef, 
 				ContentModel.ASSOC_CONTAINS, 
 				createAssociationName(name), 
 				conversionService.getRequired(type.getNameReference()),
-				Collections.singletonMap(ContentModel.PROP_NAME, name)).getChildRef();
+				properties).getChildRef();
 	}
+	
+	
 	@Override
 	public NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
 		try {

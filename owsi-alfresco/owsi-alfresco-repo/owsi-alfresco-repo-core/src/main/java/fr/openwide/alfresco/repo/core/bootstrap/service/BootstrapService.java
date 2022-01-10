@@ -36,5 +36,6 @@ public interface BootstrapService {
 	NodeRef getOrCreateDocumentLibrary(SiteInfo siteInfo);
 	
 	NodeRef createDataListContainer(SiteInfo siteInfo);
+	NodeRef getOrCreateDataListContainer(SiteInfo siteInfo);
 	NodeRef createDataList(NodeRef dataListContainer, String title, DlDataListItem dataListItemType);
 }

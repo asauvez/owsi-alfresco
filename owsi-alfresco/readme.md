@@ -37,6 +37,7 @@ Nouveautés
  * AlfrescoUrlService : Fix URL dossier Share
  * SearchQueryBuilder: maxPermissionChecks/maxPermissionCheckTimeMillis
  * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
+ * ClassificationService: Deprecie l'utilisation de BusinessNode
 
 ## depuis 0.8.9
 Release du 05/12/2021
