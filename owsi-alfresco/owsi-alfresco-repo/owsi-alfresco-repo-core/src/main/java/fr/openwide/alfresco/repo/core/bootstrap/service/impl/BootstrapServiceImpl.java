@@ -107,6 +107,13 @@ public class BootstrapServiceImpl implements BootstrapService {
 	public AuthorityReference createTestUser(String username, AuthorityReference ... parentAuthorities) {
 		return createUser(username, "Test", username, username + "@test.fr", username, parentAuthorities);
 	}
+	@Override
+	public AuthorityReference getOrCreateTestUser(String username, AuthorityReference... parentAuthorities) {
+		if (! personService.personExists(username)) {
+			createTestUser(username, parentAuthorities);
+		}
+		return AuthorityReference.user(username);
+	}
 	
 	@Override
 	public AuthorityReference createUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities) {
@@ -124,6 +131,14 @@ public class BootstrapServiceImpl implements BootstrapService {
 		AuthorityReference authority = AuthorityReference.user(username);
 		addAuthority(parentAuthorities, authority);
 		return authority;
+	}
+	@Override
+	public AuthorityReference getOrCreateUser(String username, String firstName, String lastName, String email,
+			String password, AuthorityReference... parentAuthorities) {
+		if (! personService.personExists(username)) {
+			createUser(username, firstName, lastName, email, password, parentAuthorities);
+		}
+		return AuthorityReference.user(username);
 	}
 	
 	private void addAuthority(AuthorityReference[] parentAuthorities, AuthorityReference authority) {
@@ -210,6 +225,48 @@ public class BootstrapServiceImpl implements BootstrapService {
 			AuthenticationUtil.popAuthentication();
 		}
 	}
+	@Override
+	public SiteInfo getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility) {
+		SiteInfo siteInfo = siteService.getSite(siteName);
+		if (siteInfo == null) {
+			siteInfo = createSite(siteName, siteTitle, siteDescription, siteVisibility);
+		}
+		return siteInfo;
+	}
+	@Override
+	public void deleteSiteSwsdp() {
+		if (siteService.getSite("swsdp") != null) {
+			siteService.deleteSite("swsdp");
+		}
+	}
+	
+	@Override
+	public NodeRef createDocumentLibrary(SiteInfo siteInfo) {
+		return siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
+	}
+	@Override
+	public NodeRef getOrCreateDocumentLibrary(SiteInfo siteInfo) {
+		NodeRef documentLibraryNodeRef = siteService.getContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY);
+		if (documentLibraryNodeRef == null) {
+			documentLibraryNodeRef = createDocumentLibrary(siteInfo);
+		}
+		return documentLibraryNodeRef;
+	}
+	
+	@Override
+	public NodeRef createFolder(NodeRef parentRef, String folderName) {
+		FileInfo file = fileFolderService.create(parentRef, folderName, ContentModel.TYPE_FOLDER);
+		return file.getNodeRef();
+	}
+	@Override
+	public NodeRef getOrCreateFolder(NodeRef parentRef, String folderName) {
+		NodeRef folderRef = fileFolderService.searchSimple(parentRef, folderName);
+		if (folderRef == null) {
+			folderRef = createFolder(parentRef, folderName);
+		}
+		return folderRef;
+	}
+	
 	@Override
 	public NodeRef createDataListContainer(SiteInfo siteInfo) {
 		return siteService.createContainer(siteInfo.getShortName(), "dataLists", null, 

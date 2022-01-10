@@ -15,8 +15,10 @@ public interface BootstrapService {
 	void importGroupsFile(String fileName);
 
 	AuthorityReference createUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities);
+	AuthorityReference getOrCreateUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities);
 	AuthorityReference createTestUser(String username, AuthorityReference ... parentAuthorities);
-
+	AuthorityReference getOrCreateTestUser(String username, AuthorityReference ... parentAuthorities);
+	
 	NodeRef createRootCategory(String categoryName);
 	NodeRef createCategory(NodeRef parentCategory, String categoryName);
 
@@ -24,6 +26,15 @@ public interface BootstrapService {
 	void importView(NodeRef parentRef, String viewFileName, String messageFileName);
 
 	SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
+	SiteInfo getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
+	void deleteSiteSwsdp();
+	
+	NodeRef createFolder(NodeRef parentRef, String folderName);
+	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName);
+	
+	NodeRef createDocumentLibrary(SiteInfo siteInfo);
+	NodeRef getOrCreateDocumentLibrary(SiteInfo siteInfo);
+	
 	NodeRef createDataListContainer(SiteInfo siteInfo);
 	NodeRef createDataList(NodeRef dataListContainer, String title, DlDataListItem dataListItemType);
 }

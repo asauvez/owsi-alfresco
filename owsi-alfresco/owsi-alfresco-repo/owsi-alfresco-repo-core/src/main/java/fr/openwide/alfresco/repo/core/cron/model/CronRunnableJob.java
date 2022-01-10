@@ -49,7 +49,7 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 								} else if (runnable instanceof Job) {
 									((Job) runnable).execute(jobContext);
 								} else {
-									throw new IllegalStateException("Cron should extend type java.lang.Runnable our org.quartz.Job, not " + runnable.getClass());
+									throw new IllegalStateException("Cron should extend type java.lang.Runnable or org.quartz.Job, not " + runnable.getClass());
 								}
 								return null;
 							}
