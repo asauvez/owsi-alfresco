@@ -8,7 +8,10 @@ import java.util.Optional;
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.FieldHighlightParameters;
+import org.alfresco.service.cmr.search.GeneralHighlightParameters;
 import org.alfresco.service.cmr.search.LimitBy;
+import org.alfresco.service.cmr.search.QueryConsistency;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchParameters;
@@ -19,19 +22,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
+import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
+import fr.openwide.alfresco.api.core.search.model.SortDefinition;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryFieldHighlightParameters;
+import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryGeneralHighlightParameters;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
-import fr.openwide.alfresco.component.model.search.service.impl.NodeSearchModelServiceImpl;
-import fr.openwide.alfresco.repo.core.search.service.impl.NodeSearchRemoteServiceImpl;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
+import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 
-public class NodeSearchModelRepositoryServiceImpl 
-	extends NodeSearchModelServiceImpl
-	implements NodeSearchModelRepositoryService {
+public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepositoryService {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(NodeSearchModelRepositoryServiceImpl.class);
 	private final Logger LOGGER_AUDIT = LoggerFactory.getLogger(NodeSearchModelRepositoryServiceImpl.class.getName() + "_Audit");
@@ -39,14 +43,73 @@ public class NodeSearchModelRepositoryServiceImpl
 	@Autowired private SearchService searchService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private Environment environment;
+	@Autowired private ConversionService conversionService;
 	
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
 	
-	private NodeSearchRemoteServiceImpl nodeSearchRemoteService;
-	
-	public NodeSearchModelRepositoryServiceImpl(NodeSearchRemoteServiceImpl nodeSearchRemoteService) {
-		super(nodeSearchRemoteService);
-		this.nodeSearchRemoteService = nodeSearchRemoteService;
+	@Override
+	public SearchParameters getSearchParameters(RepositorySearchParameters rsp) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Searching for query : {}", rsp.getQuery().replace("\n", " "));
+		}
+
+		if (rsp.getQuery() == null || rsp.getQuery().isEmpty()) {
+			throw new InvalidPayloadException("The query should not be an empty string.");
+		}
+
+		SearchParameters sp = new SearchParameters();
+		for (StoreReference storeReference : rsp.getStoreReferences()) {
+			sp.addStore(conversionService.getRequired(storeReference));
+		}
+		sp.setLanguage(rsp.getLanguage().getAlfrescoName());
+		sp.setQuery(rsp.getQuery());
+		sp.excludeDataInTheCurrentTransaction(true);
+		sp.setQueryConsistency(QueryConsistency.valueOf(rsp.getQueryConsistency().name()));
+		
+		if (rsp.getFirstResult() != null) {
+			sp.setSkipCount(rsp.getFirstResult());
+			sp.setLimitBy(LimitBy.FINAL_SIZE);
+		}
+		if (rsp.getMaxResults() != null) {
+			sp.setMaxItems(rsp.getMaxResults());
+			sp.setLimitBy(LimitBy.FINAL_SIZE);
+		}
+		
+		if (rsp.getMaxPermissionChecks() != null) {
+			sp.setMaxPermissionChecks(rsp.getMaxPermissionChecks());
+		}
+		if (rsp.getMaxPermissionCheckTimeMillis() != null) {
+			sp.setMaxPermissionCheckTimeMillis(rsp.getMaxPermissionCheckTimeMillis());
+		}
+		
+		for (SortDefinition sd : rsp.getSorts()) {
+			sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
+		}
+		
+		RepositoryGeneralHighlightParameters rhighlight = rsp.getHighlight();
+		if (rhighlight != null) {
+			List<FieldHighlightParameters> fields = new ArrayList<>();
+			for (RepositoryFieldHighlightParameters field : rhighlight.getFields()) {
+				fields.add(new FieldHighlightParameters(
+						field.getField().getFullName(), 
+						field.getSnippetCount(), 
+						field.getFragmentSize(), 
+						field.getMergeContiguous(), 
+						field.getPrefix(), 
+						field.getPostfix()));
+			}
+			sp.setHighlight(new GeneralHighlightParameters(
+					rhighlight.getSnippetCount(), 
+					rhighlight.getFragmentSize(), 
+					rhighlight.getMergeContiguous(), 
+					rhighlight.getPrefix(), 
+					rhighlight.getPostfix(),
+					rhighlight.getMaxAnalyzedChars(), 
+					rhighlight.getUsePhraseHighlighter(), 
+					fields));
+		}
+		
+		return sp;
 	}
 	
 	@Override
@@ -61,7 +124,7 @@ public class NodeSearchModelRepositoryServiceImpl
 		try {
 			long before = System.currentTimeMillis();
 
-			SearchParameters sp = nodeSearchRemoteService.getSearchParameters(rsp);
+			SearchParameters sp = getSearchParameters(rsp);
 			List<NodeRef> res = new ArrayList<>();
 			ResultSet resultSet = searchService.query(sp);
 			try {
@@ -105,7 +168,7 @@ public class NodeSearchModelRepositoryServiceImpl
 						+ new RestrictionBuilder().hasAspect(searchBuilder.getAlreadyDoneAspect()).not().of().toFtsQuery()); 
 			}
 			
-			SearchParameters sp = nodeSearchRemoteService.getSearchParameters(rsp);
+			SearchParameters sp = getSearchParameters(rsp);
 			int nbTotal = 0;
 			if (searchBuilder.getFrameSize() == null) {
 				nbTotal += consumeInFrame(searchBuilder, sp);

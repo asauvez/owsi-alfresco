@@ -11,7 +11,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
@@ -55,8 +54,6 @@ public interface NodeModelRepositoryService {
 	
 	void addAspect(NodeRef nodeRef, NameReference aspect);
 	void addAspect(NodeRef nodeRef, AspectModel aspect);
-	void addAspect(NodeRef nodeRef, NameReference aspect, BusinessNode node);
-	void addAspect(NodeRef nodeRef, AspectModel aspect, BusinessNode node);
 	
 	void removeAspect(NodeRef nodeRef, NameReference aspect);
 	void removeAspect(NodeRef nodeRef, AspectModel aspect);

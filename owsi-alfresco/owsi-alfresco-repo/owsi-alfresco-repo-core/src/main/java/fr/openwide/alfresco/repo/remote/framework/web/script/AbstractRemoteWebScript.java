@@ -71,7 +71,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	protected TransactionService transactionService;
-	protected ObjectMapper objectMapper;
+	protected ObjectMapper objectMapper = new ObjectMapper();
 	private int maxRetries = 0;
 
 	// @see RepositoryContainer
@@ -268,9 +268,6 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	public void setTransactionService(TransactionService transactionService) {
 		this.transactionService = transactionService;
-	}
-	public void setObjectMapper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
 	}
 	public void setMaxRetries(int maxRetries) {
 		this.maxRetries = maxRetries;

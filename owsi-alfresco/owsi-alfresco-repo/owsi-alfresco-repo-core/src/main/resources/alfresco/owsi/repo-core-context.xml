@@ -3,14 +3,9 @@
 
 <beans>
 
-	<!-- Framework configuration -->
-	<bean id="owsi.objectMapper" 
-			class="fr.openwide.alfresco.repo.remote.framework.service.impl.ObjectMapperProvider" />
-
 	<bean id="webscript.owsi.remote" parent="webscript" abstract="true"
 			class="fr.openwide.alfresco.repo.remote.framework.web.script.AbstractRemoteWebScript">
 		<property name="transactionService" ref="transactionService" />
-		<property name="objectMapper" ref="owsi.objectMapper" />
 		<property name="maxRetries" value="${server.transaction.max-retries}"/>
 		<property name="encryptTempFiles" value="${webscripts.encryptTempFiles}" />
 		<property name="tempDirectoryName" value="${webscripts.tempDirectoryName}" />
@@ -21,18 +16,6 @@
 	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.repo.remote.conversion.service.impl.ConversionServiceImpl">
 		<property name="namespacePrefixResolver" ref="NamespaceService" />
 		<property name="mimetypeService" ref="MimetypeService" />
-	</bean>
-	
-	<!-- Authentication service -->
-
-	<bean id="owsi.service.authentication" 
-			class="fr.openwide.alfresco.repo.remote.authentication.service.impl.AuthenticationRemoteServiceImpl">
-		<property name="authenticationService" ref="AuthenticationService"/>
-		<property name="ticketComponent" ref="ticketComponent"/>
-		<property name="personService" ref="PersonService" />
-		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
-		<property name="conversionService" ref="owsi.service.conversionService" />
-		<property name="authorityService" ref="AuthorityService" />
 	</bean>
 	
 	<!-- Utilitaires -->
@@ -54,63 +37,8 @@
 		<property name="maxRetries" value="${server.transaction.max-retries}"/>
 	</bean>
 
-	<!-- Node service -->
-	
-	<bean id="owsi.service.nodeService" class="fr.openwide.alfresco.repo.core.node.service.impl.NodeRemoteServiceImpl">
-		<property name="nodeService" ref="NodeService" />
-		<property name="contentService" ref="ContentService" />
-		<property name="permissionService" ref="PermissionService" />
-		<property name="renditionService" ref="RenditionService" />
-		<property name="transactionService" ref="transactionService" />
-		<property name="conversionService" ref="owsi.service.conversionService" />
-		<property name="chaosMonkey" ref="owsi.service.chaosMonkey" />
-	</bean>
-
-	<!-- Node webscripts -->
-
-	<bean id="webscript.owsi.node" parent="webscript.owsi.remote" abstract="true">
-		<property name="nodeService" ref="owsi.service.nodeService" />
-	</bean>
-
-	<bean id="webscript.owsi.remote.node.node-children.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repo.core.node.web.script.ChildrenNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-sourceAssoc.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repo.core.node.web.script.SourceAssocNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-targetAssoc.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repo.core.node.web.script.TargetAssocNodeWebScript" />
-
-	<bean id="webscript.owsi.remote.node.node-create.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repo.core.node.web.script.CreateNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-update.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repo.core.node.web.script.UpdateNodeWebScript" />
-	<bean id="webscript.owsi.remote.node.node-delete.post" parent="webscript.owsi.node"
-			class="fr.openwide.alfresco.repo.core.node.web.script.DeleteNodeWebScript" />
-
-	<!-- Node search service -->
-	
-	<bean id="owsi.service.nodeSearchService" class="fr.openwide.alfresco.repo.core.search.service.impl.NodeSearchRemoteServiceImpl">
-		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
-		<property name="searchService" ref="SearchService" />
-		<property name="conversionService" ref="owsi.service.conversionService" />
-		<property name="maxPermissionChecks" value="${system.acl.maxPermissionChecks}"/>
-	</bean>
-
-	<!-- Authority service -->
-	
-	<bean id="owsi.service.authorityService" class="fr.openwide.alfresco.repo.core.authority.service.impl.AuthorityRemoteServiceImpl">
-		<property name="nodeRemoteService" ref="owsi.service.nodeService" />
-		<property name="conversionService" ref="owsi.service.conversionService" />
-		<property name="authorityService" ref="AuthorityService" />
-		<property name="authenticationService" ref="AuthenticationService" />
-		<property name="personService" ref="PersonService" />
-		<property name="nodeService" ref="NodeService" />
-	</bean>
-
 	<!-- Services with model -->
 
-	<bean id="owsi.service.nodeModelService" class="fr.openwide.alfresco.component.model.node.service.impl.NodeModelServiceImpl">
-		<constructor-arg ref="owsi.service.nodeService"/>
-	</bean>
 	<bean id="owsi.service.nodeModelRepositoryService" class="fr.openwide.alfresco.repo.dictionary.node.service.impl.NodeModelRepositoryServiceImpl">
 		<property name="repositoryHelper" ref="repositoryHelper" />
 		<property name="singletonCache" ref="immutableSingletonCache" />
@@ -132,10 +60,6 @@
 		<constructor-arg ref="owsi.service.nodeSearchService"/>
 	</bean>
 
-	<bean id="owsi.service.authorityModelService" class="fr.openwide.alfresco.component.model.authority.service.impl.AuthorityModelServiceImpl">
-		<constructor-arg ref="owsi.service.authorityService"/>
-	</bean>
-
 	<bean id="owsi.service.workflowContextService" class="fr.openwide.alfresco.repo.dictionary.workflow.service.impl.WorkflowContextServiceImpl"/>
 
 	<bean id="owsi.service.policyService" class="fr.openwide.alfresco.repo.dictionary.policy.service.impl.PolicyRepositoryServiceImpl">
@@ -145,32 +69,5 @@
 	</bean>
 	
 	<bean id="owsi.service.uniqueNameRepositoryService" class="fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameRepositoryServiceImpl"></bean>
-	
-	<!-- Authority webscripts -->
-
-	<bean id="webscript.owsi.authority" parent="webscript.owsi.remote" abstract="true">
-		<property name="authorityRemoteService" ref="owsi.service.authorityService" />
-	</bean>
-
-	<bean id="webscript.owsi.remote.authority.get-user.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.GetUserWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-contained-authorities.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.GetContainedAuthoritiesWebScript" />
-	<bean id="webscript.owsi.remote.authority.create-user.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.CreateUserWebScript" />
-	<bean id="webscript.owsi.remote.authority.delete-user.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.DeleteUserWebScript" />
-	<bean id="webscript.owsi.remote.authority.update-user-password.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.UpdateUserPasswordWebScript" />
-	<bean id="webscript.owsi.remote.authority.get-group.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.GetGroupWebScript" />
-	<bean id="webscript.owsi.remote.authority.create-root-group.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.CreateRootGroupWebScript" />
-	<bean id="webscript.owsi.remote.authority.add-to-group.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.AddToGroupWebScript" />
-	<bean id="webscript.owsi.remote.authority.remove-from-group.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.RemoveFromGroupWebScript" />
-	<bean id="webscript.owsi.remote.authority.delete-group.post" parent="webscript.owsi.authority"
-			class="fr.openwide.alfresco.repo.core.authority.web.script.DeleteGroupWebScript" />
 
 </beans>

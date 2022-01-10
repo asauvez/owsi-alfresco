@@ -2,6 +2,7 @@ target/
 .settings/
 .project
 .classpath
+.factorypath
 *.log.*
 .metadata
 .recommenders/
@@ -12,3 +13,4 @@ Servers/
 idea/
 *.iml
 overlays/
+

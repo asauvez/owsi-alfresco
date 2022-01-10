@@ -27,10 +27,8 @@ import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileNotFoundException;
@@ -45,8 +43,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
-import fr.openwide.alfresco.api.core.node.model.ChildAssociationReference;
-import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -61,8 +57,6 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
-import fr.openwide.alfresco.repo.core.node.model.PreNodeCreationCallback;
-import fr.openwide.alfresco.repo.core.node.service.NodeRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.UniqueNameRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameGenerator;
@@ -85,7 +79,6 @@ import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
 
 public class ClassificationServiceImpl implements ClassificationService, InitializingBean, 
 		OnAddAspectPolicy, OnUpdatePropertiesPolicy, 
-		PreNodeCreationCallback, 
 		ApplicationListener<ContextRefreshedEvent> {
 	
 	private static final String CLASSIFIED_NODE_TRANSACTION_KEY = ClassificationServiceImpl.class +  ".classifiedNodes";
@@ -100,7 +93,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private AlfrescoGlobalProperties globalProperties;
 	@Autowired private NodeModelService nodeModelService;
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
-	@Autowired private NodeRepositoryService nodeRepositoryService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
 	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
@@ -128,8 +120,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public void afterPropertiesSet() throws Exception {
 		policyRepositoryService.onAddAspect(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onUpdateProperties(OwsiModel.classifiable, NotificationFrequency.TRANSACTION_COMMIT, this);
-		
-		nodeRepositoryService.addPreNodeCreationCallback(this);
 	}
 	
 	/** On fait dans ContextRefreshedEvent car les models peuvent ne pas avoir été initialisé */
@@ -272,55 +262,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		}
 	}
 	
-	/** 
-	 * Si un service demande à créer un noeud sans spécifier de parent et qu'une politique de classement est défini
-	 * pour son type, on le copie dans le home folder puis on le classe.
-	 */
-	@Override
-	public void onPreNodeCreationCallback(RepositoryNode node) {
-		ChildAssociationReference primaryParent = node.getPrimaryParentAssociation();
-		if (primaryParent == null || primaryParent.getParentNode() == null || primaryParent.getParentNode().getNodeReference() == null) {
-			if (isClassifiable(node)) {
-				Optional<NodeRef> homeFolder = getHomeFolder();
-				if (homeFolder.isPresent()) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Node without parent is assigned to current user {} home folder. "
-								+ "Will then be moved then to the classify folder.", AuthenticationUtil.getRunAsUser());
-					}
-					node.setPrimaryParentAssociation(new ChildAssociationReference(
-							new RepositoryNode(conversionService.get(homeFolder.get())), 
-							CmModel.folder.contains.getNameReference()));
-				} else {
-					logger.error("Node without parent has aspect {}, but user {} does not have a home folder.", 
-							OwsiModel.classifiable, AuthenticationUtil.getRunAsUser());
-				}
-			}
-		}
-	}
-	
-	private boolean isClassifiable(RepositoryNode node) {
-		TypeDefinition type = dictionaryService.getType(conversionService.getRequired(node.getType()));
-		QName classifiable = conversionService.getRequired(OwsiModel.classifiable.getNameReference());
-
-		for (AspectDefinition defaultAspect : type.getDefaultAspects(true)) {
-			if (classifiable.equals(defaultAspect.getName())) {
-				return true;
-			}
-		}
-		for (NameReference aspectName : node.getAspects()) {
-			if (OwsiModel.classifiable.getNameReference().equals(aspectName)) {
-				return true;
-			}
-			AspectDefinition aspect = dictionaryService.getAspect(conversionService.getRequired(aspectName));
-			for (AspectDefinition defaultAspect : aspect.getDefaultAspects(true)) {
-				if (classifiable.equals(defaultAspect.getName())) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	public Optional<NodeRef> getHomeFolder() {
 		return nodeModelRepositoryService.getUserHome();
 	}
@@ -613,8 +554,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public Optional<NodeRef> searchUniqueReference(RestrictionBuilder restrictionBuilder) {
 		String cacheKey = restrictionBuilder.toFtsQuery();
 		return queryCache.get(nodeModelRepositoryService, cacheKey, 
-				() -> nodeSearchModelService.searchUniqueReference(restrictionBuilder)
-					.map(node -> conversionService.getRequired(node)));
+				() -> nodeSearchModelService.searchReferenceUnique(restrictionBuilder));
 	}
 
 	public NodeModelRepositoryService getNodeModelService() {

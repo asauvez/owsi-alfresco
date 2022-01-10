@@ -36,6 +36,7 @@ Nouveautés
 ## depuis 0.9.2
  * AlfrescoUrlService : Fix URL dossier Share
  * SearchQueryBuilder: maxPermissionChecks/maxPermissionCheckTimeMillis
+ * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
 
 ## depuis 0.8.9
 Release du 05/12/2021
@@ -159,6 +160,9 @@ Release du 05/07/2021
 
 Migration
 =========
+
+## vers 0.9.2
+* Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
 
 ## vers 0.8.8
 * Classification, remplacer `.uniqueName().moveNode()` par `moveWithUniqueName()` , et pour les parents multiples `moveFirstUniqueNameAndCreateSecondaryParents()`

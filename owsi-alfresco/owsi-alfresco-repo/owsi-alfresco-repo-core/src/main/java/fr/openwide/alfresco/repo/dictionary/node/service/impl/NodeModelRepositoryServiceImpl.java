@@ -23,6 +23,7 @@ import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.io.FilenameUtils;
@@ -33,7 +34,6 @@ import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteExceptio
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
@@ -49,7 +49,6 @@ import fr.openwide.alfresco.component.model.node.model.property.single.NodeRefer
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
-import fr.openwide.alfresco.repo.core.node.service.impl.NodeRemoteServiceImpl;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
@@ -69,7 +68,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException {
 		return nodeService.createNode(parentRef, 
 				ContentModel.ASSOC_CONTAINS, 
-				NodeRemoteServiceImpl.createAssociationName(name), 
+				createAssociationName(name), 
 				conversionService.getRequired(type.getNameReference()),
 				Collections.singletonMap(ContentModel.PROP_NAME, name)).getChildRef();
 	}
@@ -148,22 +147,14 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 
 	@Override
-	public void addAspect(NodeRef nodeRef, AspectModel aspect) {
-		addAspect(nodeRef, aspect, new BusinessNode());
-	}
-	@Override
 	public void addAspect(NodeRef nodeRef, NameReference aspect) {
-		addAspect(nodeRef, aspect, new BusinessNode());
-	}
-	@Override
-	public void addAspect(NodeRef nodeRef, NameReference aspect, BusinessNode node) {
 		nodeService.addAspect(nodeRef, 
 				conversionService.getRequired(aspect), 
-				conversionService.getForRepository(node.getRepositoryNode().getProperties()));
+				null);
 	}
 	@Override
-	public void addAspect(NodeRef nodeRef, AspectModel aspect, BusinessNode node) {
-		addAspect(nodeRef, aspect.getNameReference(), node);
+	public void addAspect(NodeRef nodeRef, AspectModel aspect) {
+		addAspect(nodeRef, aspect.getNameReference());
 	}
 	
 	@Override
@@ -370,7 +361,11 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		nodeService.addChild(parentRef, 
 				childRef, 
 				conversionService.getRequired(assocType), 
-				NodeRemoteServiceImpl.createAssociationName(childName));
+				createAssociationName(childName));
+	}
+	
+	private QName createAssociationName(String nodeName) {
+		return QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(nodeName));
 	}
 	
 	@Override
@@ -387,7 +382,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
 				parentRef, 
 				conversionService.getRequired(assocType), 
-				NodeRemoteServiceImpl.createAssociationName(childName));
+				createAssociationName(childName));
 		for (ChildAssociationRef assoc : assocs) {
 			if (assoc.getChildRef().equals(childRef)) {
 				nodeService.removeChildAssociation(assoc);

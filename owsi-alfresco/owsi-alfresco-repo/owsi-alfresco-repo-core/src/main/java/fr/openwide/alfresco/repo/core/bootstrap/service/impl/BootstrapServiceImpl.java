@@ -34,21 +34,17 @@ import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
-import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.DlModel;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
 import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 
 @GenerateService(
@@ -57,10 +53,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 
 	private final Logger logger = LoggerFactory.getLogger(BootstrapServiceImpl.class);
 	
-	@Autowired private NodeModelService nodeModelService;
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
-	@Autowired private ConversionService conversionService;
-	
 	@Autowired private MutableAuthenticationService authenticationService;
 	@Autowired private PersonService personService;
 	@Autowired private AuthorityService authorityService;
@@ -163,10 +156,10 @@ public class BootstrapServiceImpl implements BootstrapService {
 	@Override
 	public NodeRef importFileFromClassPath(NodeRef parentRef, String fileName) {
 		try (InputStream content = getClass().getClassLoader().getResourceAsStream(fileName)) {
-			return conversionService.getRequired(nodeModelService.create(
-					new BusinessNode(conversionService.get(parentRef), CmModel.content, 
-							FilenameUtils.getName(fileName))
-					.contents().set(content)));
+			NodeRef nodeRef = nodeModelRepositoryService.createNode(parentRef, CmModel.content, fileName);
+			contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true)
+				.putContent(content);
+			return nodeRef;
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
