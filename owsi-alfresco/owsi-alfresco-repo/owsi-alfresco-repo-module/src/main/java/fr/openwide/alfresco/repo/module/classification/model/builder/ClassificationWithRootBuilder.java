@@ -8,13 +8,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
@@ -48,20 +46,6 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 				.collect(Collectors.toList());
 		return this;
 	}
-	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
-	public ClassificationWithRootBuilder subFolder(String folderName, Consumer<BusinessNode> folderNodeConsumer) {
-		BusinessNode node = new BusinessNode();
-		folderNodeConsumer.accept(node);
-		return subFolder(folderName, () -> node);
-	}
-	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
-	@SuppressWarnings("deprecation")
-	public ClassificationWithRootBuilder subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier) {
-		destinationFolders = destinationFolders.stream()
-				.map(destinationFolder -> service.subFolder(folderName, folderNodeSupplier, destinationFolder))
-				.collect(Collectors.toList());
-		return this;
-	}
 	
 	public ClassificationWithRootBuilder subFolder(String folderName, 
 			ContainerModel folderType, PropertyModel<?> ... properties) {
@@ -69,25 +53,9 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		return addAspectToFolder(folderType, properties);
 	}
 	
-	/**
-	 * @param folderNode Si le dossier n'existe pas encore, on va le créer avec le type, les propriétés et les permissions
-	 * du noeud fourni.
-	 */
-	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
-	public ClassificationWithRootBuilder subFolder(BusinessNode folderNode) {
-		return subFolder(
-				folderNode.properties().getName(),
-				() -> folderNode);
-	}
-
 	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder) {
 		Set<String> foldersName = subFolderBuilder.getFoldersName(this);
 		return subFolders(foldersName);
-	}
-	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
-	public ClassificationWithRootBuilder subFolder(SubFolderBuilder subFolderBuilder, Supplier<BusinessNode> folderNodeSupplier) {
-		Set<String> foldersName = subFolderBuilder.getFoldersName(this);
-		return subFolders(foldersName, folderNodeSupplier);
 	}
 	
 	public ClassificationWithRootBuilder subFolders(Collection<String> foldersName) {
@@ -95,16 +63,6 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 			.flatMap(destinationFolder -> 
 				foldersName.stream()
 					.map(folderName -> service.subFolder(folderName, destinationFolder)))
-			.collect(Collectors.toList());
-		return this;
-	}
-	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
-	@SuppressWarnings("deprecation")
-	public ClassificationWithRootBuilder subFolders(Collection<String> foldersName, Supplier<BusinessNode> folderNodeSupplier) {
-		destinationFolders = destinationFolders.stream()
-			.flatMap(destinationFolder -> 
-				foldersName.stream()
-					.map(folderName -> service.subFolder(folderName, folderNodeSupplier, destinationFolder)))
 			.collect(Collectors.toList());
 		return this;
 	}
@@ -129,10 +87,6 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	 */
 	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property) {
 		return subFolder(new SubFolderBuilder(property));
-	}
-	/** @Deprecated @see #doWithDestinationFolder(Consumer) */
-	public ClassificationWithRootBuilder subFolderProperty(SinglePropertyModel<?> property, Supplier<BusinessNode> folderNodeSupplier) {
-		return subFolder(new SubFolderBuilder(property), folderNodeSupplier);
 	}
 
 	public ClassificationWithRootBuilder subFolderYear() {

@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.alfresco.model.ContentModel;
@@ -47,12 +46,10 @@ import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemote
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.component.model.node.service.NodeModelService;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
@@ -92,7 +89,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
 	
 	@Autowired private AlfrescoGlobalProperties globalProperties;
-	@Autowired private NodeModelService nodeModelService;
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
@@ -454,59 +450,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return newResult;
 	}
 
-	@Deprecated
-	public NodeRef subFolder(String folderName, Supplier<BusinessNode> folderNodeSupplier, NodeRef destinationFolder) {
-		String cleanFolderName = uniqueNameRepositoryService.toValidName(folderName, " ");
-		
-		String cacheKey = destinationFolder + "/" + cleanFolderName;
-		return subFolderCache.get(nodeModelRepositoryService, cacheKey, 
-				() -> nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName),
-				() -> {
-			BusinessNode folderNode = folderNodeSupplier.get();
-			
-			folderNode.properties().name(cleanFolderName);
-			if (! cleanFolderName.equals(folderName) && folderNode.properties().get(CmModel.titled.title) == null) {
-				folderNode.properties().set(CmModel.titled.title, folderName);
-			}
-			if (folderNode.getRepositoryNode().getType() == null) {
-				folderNode.getRepositoryNode().setType(CmModel.folder.getNameReference());
-			}
-			
-			if (addDeleteIfEmptyAspect) {
-				folderNode.aspect(OwsiModel.deleteIfEmpty);
-			}
-			
-			folderNode.assocs().primaryParent(CmModel.folder.contains).nodeReference(conversionService.get(destinationFolder));
-			
-			if (logger.isDebugEnabled()) {
-				logger.debug("Create subfolder {}", cleanFolderName);
-			}
-
-			if (createSubFolderInInnerTransaction) {
-				try {
-					// Execute dans une sous transaction. Sinon, une éventuelle DuplicateChildNodeNameException rollback la transaction en cours.
-					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
-						@Override
-						public NodeRef execute() {
-							return conversionService.getRequired(nodeModelService.create(folderNode));
-						}
-					}, false, true);
-				} catch (DuplicateChildNodeNameRemoteException ex) {
-					// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
-					return transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
-						@Override
-						public NodeRef execute() {
-							Optional<NodeRef> childByName = nodeModelRepositoryService.getChildByName(destinationFolder, cleanFolderName);
-							return childByName.get();
-						}
-					}, true, true);
-				}
-			} else {
-				return conversionService.getRequired(nodeModelService.create(folderNode));
-			}
-		});
-	} 
-	
 	public NodeRef subFolder(String folderName, NodeRef destinationFolder) {
 		String cleanFolderName = uniqueNameRepositoryService.toValidName(folderName, " ");
 		if (logger.isDebugEnabled()) {

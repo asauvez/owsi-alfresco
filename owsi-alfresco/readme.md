@@ -164,6 +164,7 @@ Migration
 
 ## vers 0.9.2
 * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
+* ClassificationWithRooBuilder.subFolder(BussinessNode) doit utiliser doWithDestinationFolder() à la place.
 
 ## vers 0.8.8
 * Classification, remplacer `.uniqueName().moveNode()` par `moveWithUniqueName()` , et pour les parents multiples `moveFirstUniqueNameAndCreateSecondaryParents()`
