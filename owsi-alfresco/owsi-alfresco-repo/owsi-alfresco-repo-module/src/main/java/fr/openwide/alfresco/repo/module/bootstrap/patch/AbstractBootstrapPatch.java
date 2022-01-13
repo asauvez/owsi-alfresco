@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.api.module.identification.service.IdentificationService;
 import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repo.module.identification.service.IdentificationRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 /**
@@ -24,7 +24,7 @@ public abstract class AbstractBootstrapPatch extends AbstractModuleComponent {
 	
 	@Autowired protected BootstrapService bootstrapService;
 	@Autowired protected NodeModelRepositoryService nodeModelService;
-	@Autowired protected IdentificationService identificationService;
+	@Autowired protected IdentificationRepositoryService identificationService;
 	@Autowired protected ConversionService conversionService;
 
 	protected String getModuleConfigPath() {
