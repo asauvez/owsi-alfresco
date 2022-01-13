@@ -35,6 +35,8 @@ public class AlfrescoLogWebScript extends SwaggerWebScript {
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		String linesS = req.getParameter("lines");
 		int nbLines = (linesS != null) ? Integer.parseInt(linesS) : 50;
+
+		res.setContentType("text/plain");
 		
 		File file = new File("logs/alfresco.log");
 		if (nbLines == -1) {
