@@ -13,12 +13,11 @@ import org.slf4j.LoggerFactory;
 
 public class CronRunnableJob extends AbstractScheduledLockedJob {
 	
-	private static final Logger logger = LoggerFactory.getLogger(CronRunnableJob.class);
-
 	@Override
 	public void executeJob(JobExecutionContext jobContext) throws JobExecutionException {
 		JobDataMap jobData = jobContext.getJobDetail().getJobDataMap();
 		Object runnable = jobData.get("runnable");
+		Logger logger = LoggerFactory.getLogger(runnable.getClass());
 		TransactionService transactionService = (TransactionService) jobData.get("transactionService");
 		boolean readOnly = Boolean.parseBoolean((String) jobData.get("readOnly"));
 		boolean logAsInfo = Boolean.parseBoolean((String) jobData.get("logAsInfo"));
@@ -31,9 +30,9 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 		}
 		
 		if (logAsInfo) {
-			logger.info(runnable.getClass().getName() + " schedule start");
+			logger.info( ">>> Scheduled start");
 		} else {
-			logger.debug(runnable.getClass().getName() + " schedule start");
+			logger.debug(">>> Scheduled start");
 		}
 		
 		try {
@@ -59,9 +58,9 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 			}, runAs);
 
 			if (logAsInfo) {
-				logger.info(runnable.getClass().getName() + " schedule end");
+				logger.info( "<<< Schedule end");
 			} else {
-				logger.debug(runnable.getClass().getName() + " schedule end");
+				logger.debug("<<< Schedule end");
 			}
 		} catch (Exception ex) {
 			logger.error(runnable.getClass().getName(), ex);
