@@ -156,13 +156,21 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 
 	@Override
 	public void addAspect(NodeRef nodeRef, NameReference aspect) {
+		addAspect(nodeRef, aspect, null);
+	}
+	@Override
+	public void addAspect(NodeRef nodeRef, NameReference aspect, Map<QName, Serializable> properties) {
 		nodeService.addAspect(nodeRef, 
 				conversionService.getRequired(aspect), 
-				null);
+				properties);
 	}
 	@Override
 	public void addAspect(NodeRef nodeRef, AspectModel aspect) {
 		addAspect(nodeRef, aspect.getNameReference());
+	}
+	@Override
+	public void addAspect(NodeRef nodeRef, AspectModel aspect, Map<QName, Serializable> properties) {
+		addAspect(nodeRef, aspect.getNameReference(), properties);
 	}
 	
 	@Override

@@ -55,7 +55,9 @@ public interface NodeModelRepositoryService {
 	boolean hasAspect(NodeRef nodeRef, AspectModel aspect);
 	
 	void addAspect(NodeRef nodeRef, NameReference aspect);
+	void addAspect(NodeRef nodeRef, NameReference aspect, Map<QName, Serializable> properties);
 	void addAspect(NodeRef nodeRef, AspectModel aspect);
+	void addAspect(NodeRef nodeRef, AspectModel aspect, Map<QName, Serializable> properties);
 	
 	void removeAspect(NodeRef nodeRef, NameReference aspect);
 	void removeAspect(NodeRef nodeRef, AspectModel aspect);
