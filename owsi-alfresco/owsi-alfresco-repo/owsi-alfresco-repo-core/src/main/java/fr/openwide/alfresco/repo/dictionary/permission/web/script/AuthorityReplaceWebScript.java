@@ -42,7 +42,6 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.Genera
 		shortName="Replace une authority par une autre",
 		transactionAllow=GenerateWebScriptTransactionAllow.READWRITE,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		beanParent="webscript.owsi.remote",
 		swaggerParameters={
 			@SwaggerParameter(name="old", description = "Le nom de l'autorité avant", required=false),
 			@SwaggerParameter(name="new", description = "Le nom de l'autorité après", required=false),

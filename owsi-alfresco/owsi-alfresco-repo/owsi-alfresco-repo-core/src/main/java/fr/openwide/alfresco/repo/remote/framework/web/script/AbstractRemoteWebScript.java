@@ -19,6 +19,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.TempFileProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.Container;
@@ -44,6 +45,7 @@ import fr.openwide.alfresco.api.core.remote.exception.IntegrityRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
 import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.util.ThresholdBufferFactory;
+import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 import fr.openwide.alfresco.repo.remote.framework.model.InnerTransactionParameters;
 
@@ -70,7 +72,9 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 	private static final String KEY_INNER_TRANSACTION = "innerTransaction";
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-	protected TransactionService transactionService;
+	@Autowired protected TransactionService transactionService;
+	@Autowired private AlfrescoGlobalProperties alfrescoGlobalProperties;
+	
 	protected ObjectMapper objectMapper = new ObjectMapper();
 	private int maxRetries = 0;
 
@@ -83,11 +87,14 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 
 	@Override
 	public void init(Container container, Description description) {
-		if (tempDirectoryName == null) {
-			throw new IllegalStateException(this.getClass() + " : Vous devez déclarer votre WS avec @GenerateWebScript(..., beanParent=\"webscript.owsi.remote\").");
-		}
-		
 		super.init(container, description);
+
+		maxRetries = alfrescoGlobalProperties.getPropertyInt("server.transaction.max-retries");
+		encryptTempFiles = alfrescoGlobalProperties.getPropertyBoolean("webscripts.encryptTempFiles");
+		tempDirectoryName = alfrescoGlobalProperties.getPropertyMandatory("webscripts.tempDirectoryName");
+		memoryThreshold = alfrescoGlobalProperties.getPropertyInt("webscripts.memoryThreshold");
+		maxContentSize = alfrescoGlobalProperties.getPropertyLong("webscripts.setMaxContentSize");
+		
 		// Retrieve transaction parameters
 		if (description instanceof DescriptionImpl) {
 			DescriptionImpl descriptionImpl = (DescriptionImpl) description;
@@ -264,28 +271,6 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 			throw new InvalidMessageRemoteException("Could not get required parameter: " + name);
 		}
 		return value;
-	}
-
-	public void setTransactionService(TransactionService transactionService) {
-		this.transactionService = transactionService;
-	}
-	public void setMaxRetries(int maxRetries) {
-		this.maxRetries = maxRetries;
-	}
-	public void setEncryptTempFiles(Boolean encryptTempFiles) {
-		this.encryptTempFiles = encryptTempFiles.booleanValue();
-	}
-
-	public void setTempDirectoryName(String tempDirectoryName) {
-		this.tempDirectoryName = tempDirectoryName;
-	}
-
-	public void setMemoryThreshold(Integer memoryThreshold) {
-		this.memoryThreshold = memoryThreshold.intValue();
-	}
-
-	public void setMaxContentSize(Long maxContentSize) {
-		this.maxContentSize = maxContentSize.longValue();
 	}
 	
 	protected void setCache(WebScriptResponse res, int duration, TimeUnit unit, boolean isPublic) {

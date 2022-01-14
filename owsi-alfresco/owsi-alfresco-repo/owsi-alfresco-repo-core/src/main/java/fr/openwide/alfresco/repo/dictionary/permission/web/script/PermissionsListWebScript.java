@@ -29,7 +29,6 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 		authentication = GenerateWebScriptAuthentication.ADMIN,
 		transactionAllow=GenerateWebScriptTransactionAllow.READONLY,
 		family=OwsiSwaggerWebScript.WS_FAMILY,
-		beanParent="webscript.owsi.remote",
 		swaggerParameters={
 			@SwaggerParameter(name="authority", required = true),
 			@SwaggerParameter(name="includeParent", description="Doit on renvoyer les permissions attribuées à des groupes parents."),

@@ -46,6 +46,13 @@ public class AlfrescoGlobalProperties implements InitializingBean {
 		return Integer.parseInt(getProperty(key, Integer.toString(defaultValue)));
 	}
 
+	public long getPropertyLong(String key) {
+		return Long.parseLong(getPropertyMandatory(key));
+	}
+	public long getPropertyLong(String key, long defaultValue) {
+		return Long.parseLong(getProperty(key, Long.toString(defaultValue)));
+	}
+
 	public boolean getPropertyBoolean(String key) {
 		return Boolean.parseBoolean(getPropertyMandatory(key));
 	}

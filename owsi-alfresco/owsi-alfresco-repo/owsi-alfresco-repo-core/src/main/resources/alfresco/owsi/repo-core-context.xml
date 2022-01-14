@@ -2,16 +2,8 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
 <beans>
-
-	<bean id="webscript.owsi.remote" parent="webscript" abstract="true"
-			class="fr.openwide.alfresco.repo.remote.framework.web.script.AbstractRemoteWebScript">
-		<property name="transactionService" ref="transactionService" />
-		<property name="maxRetries" value="${server.transaction.max-retries}"/>
-		<property name="encryptTempFiles" value="${webscripts.encryptTempFiles}" />
-		<property name="tempDirectoryName" value="${webscripts.tempDirectoryName}" />
-		<property name="memoryThreshold" value="${webscripts.memoryThreshold}" />
-		<property name="maxContentSize" value="${webscripts.setMaxContentSize}" />
-	</bean>
+	<!-- Garder pour des raisons historiques. Plus nécessaire de le déclarer en parent. -->
+	<bean id="webscript.owsi.remote" parent="webscript" abstract="true" />
 
 	<bean id="owsi.service.conversionService" class="fr.openwide.alfresco.repo.remote.conversion.service.impl.ConversionServiceImpl">
 		<property name="namespacePrefixResolver" ref="NamespaceService" />
