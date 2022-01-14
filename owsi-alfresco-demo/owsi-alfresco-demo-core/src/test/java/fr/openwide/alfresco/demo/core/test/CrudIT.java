@@ -46,15 +46,15 @@ public class CrudIT extends AbstractDemoIT {
 
 		// Read CMIS
 		list = nodeSearchModelService.search(new SearchQueryBuilder()
-			.restrictionCmisContent(restriction)
-			.nodeScopeBuilder(nodeScopeBuilder));
+			.restrictionCmisContent(restriction),
+			nodeScopeBuilder);
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals("demo.txt", list.get(0).properties().get(CmModel.object.name));
 		
 		list = nodeSearchModelService.search(new SearchQueryBuilder()
 				.restrictionCmisFolder(new RestrictionBuilder()
-						.eq(CmModel.object.name, "Demo").of())
-				.nodeScopeBuilder(nodeScopeBuilder));
+						.eq(CmModel.object.name, "Demo").of()),
+				nodeScopeBuilder);
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals("Demo", list.get(0).properties().get(CmModel.object.name));
 		

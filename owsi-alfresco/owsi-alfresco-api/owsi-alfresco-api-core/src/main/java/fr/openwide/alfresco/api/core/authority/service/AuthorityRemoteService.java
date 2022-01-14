@@ -47,8 +47,9 @@ public interface AuthorityRemoteService {
 	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/authority/get-contained-authorities")
 	class GET_CONTAINED_AUTHORITIES extends WebScriptParam<List<RepositoryNode>> {
 		public AuthorityQueryParameters searchParameters;
+		public NodeScope nodeScope;
 	}
-	List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters);
+	List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters, NodeScope nodeScope);
 
 	@WebScriptEndPoint(method=WebScriptMethod.POST, url="/owsi/authority/get-group")
 	class GET_GROUP extends WebScriptParam<RepositoryNode> {

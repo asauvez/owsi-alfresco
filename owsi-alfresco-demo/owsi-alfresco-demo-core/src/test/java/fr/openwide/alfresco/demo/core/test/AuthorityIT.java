@@ -60,10 +60,11 @@ public class AuthorityIT extends AbstractDemoIT {
 
 	@Test
 	public void testGetContainedUsers() {
-		List<BusinessNode> users = authorityModelService.getContainedUsers(new AuthorityQueryBuilder()
-				.parentAuthority(AuthorityReference.GROUP_ALFRESCO_ADMINISTRATORS)
-				.nodeScopeBuilder(new NodeScopeBuilder()
-					.properties().set(CmModel.person.userName)));
+		List<BusinessNode> users = authorityModelService.getContainedUsers(
+			new AuthorityQueryBuilder()
+				.parentAuthority(AuthorityReference.GROUP_ALFRESCO_ADMINISTRATORS),
+			new NodeScopeBuilder()
+				.properties().set(CmModel.person.userName));
 		boolean foundAdmin = false;
 		for (BusinessNode node : users) {
 			if ("admin".equals(node.properties().get(CmModel.person.userName))) {

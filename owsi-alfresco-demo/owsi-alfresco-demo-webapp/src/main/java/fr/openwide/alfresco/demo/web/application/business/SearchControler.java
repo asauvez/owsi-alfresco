@@ -34,9 +34,9 @@ public class SearchControler extends BusinessController {
 					.match(CmModel.titled.description, query).of()
 					.match(CmModel.content.content, query).of()
 					.of())
-			.nodeScopeBuilder(new NodeScopeBuilder()
-					.properties().name())
-			.sort().sortByName());
+			.sort().sortByName(),
+			new NodeScopeBuilder()
+				.properties().name());
 		
 		List<NodeWrap> results = new ArrayList<NodeWrap>();
 		for (BusinessNode i : list){

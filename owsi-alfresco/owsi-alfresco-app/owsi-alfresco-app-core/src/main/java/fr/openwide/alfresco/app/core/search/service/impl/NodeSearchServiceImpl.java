@@ -25,17 +25,17 @@ public class NodeSearchServiceImpl implements NodeSearchService {
 	public List<RepositoryNode> search(String query, NodeScope nodeScope) {
 		RepositorySearchParameters searchParameters = new RepositorySearchParameters();
 		searchParameters.setQuery(query);
-		searchParameters.setNodeScope(nodeScope);
-		return search(searchParameters);
+		return search(searchParameters, nodeScope);
 	}
 
 	@Override
-	public List<RepositoryNode> search(RepositorySearchParameters searchParameters) {
+	public List<RepositoryNode> search(RepositorySearchParameters searchParameters, NodeScope nodeScope) {
 		LOGGER.debug(searchParameters.getQuery().replace("\n", " "));
 		
 		SEARCH_NODE_SERVICE payload = new SEARCH_NODE_SERVICE();
 		payload.searchParameters = searchParameters;
-		return repositoryRemoteBinding.callNodeListSerializer(payload, searchParameters.getNodeScope());
+		payload.nodeScope = nodeScope;
+		return repositoryRemoteBinding.callNodeListSerializer(payload, nodeScope);
 	}
 
 }

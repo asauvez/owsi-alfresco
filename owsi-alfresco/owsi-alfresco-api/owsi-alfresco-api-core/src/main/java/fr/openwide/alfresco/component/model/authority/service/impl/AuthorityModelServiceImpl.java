@@ -80,25 +80,25 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 		cacheUsers.clear();
 	}
 	
-	
 	@Override
 	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
+		return getContainedUsers(authorityQueryBuilder, 
+			new NodeScopeBuilder()
+				.nodeReference()
+				.properties().set(CmModel.person));
+	}
+	@Override
+	public List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder, NodeScopeBuilder nodeScopeBuilder) {
 		authorityQueryBuilder.type(AuthorityTypeReference.USER);
 		
 		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.person.lastName);
 		}
-		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
-			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
-				.nodeReference()
-				.properties().set(CmModel.person));
-		}
-		return getContainedAuthorities(authorityQueryBuilder);
+		return getContainedAuthorities(authorityQueryBuilder, nodeScopeBuilder);
 	}
 	@Override
 	public List<CachedUser> getContainedCachedUsers(AuthorityQueryBuilder authorityQueryBuilder) {
-		authorityQueryBuilder.nodeScopeBuilder(CACHED_USER_NODESCOPEBUILDER);
-		List<BusinessNode> nodes = getContainedUsers(authorityQueryBuilder);
+		List<BusinessNode> nodes = getContainedUsers(authorityQueryBuilder, CACHED_USER_NODESCOPEBUILDER);
 		List<CachedUser> users = new ArrayList<>();
 		for (BusinessNode node : nodes) {
 			users.add(nodeToCachedUser(node));
@@ -108,23 +108,24 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 	
 	@Override
 	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
+		return getContainedGroups(authorityQueryBuilder, 
+			new NodeScopeBuilder()
+				.nodeReference()
+				.properties().set(CmModel.authorityContainer));
+	}
+	@Override
+	public List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder, NodeScopeBuilder nodeScopeBuilder) {
 		authorityQueryBuilder.type(AuthorityTypeReference.GROUP);
 		
 		if (authorityQueryBuilder.getParameters().getFilterProperty() == null) {
 			authorityQueryBuilder.filterProperty(CmModel.authorityContainer.authorityDisplayName);
 		}
-		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
-			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
-				.nodeReference()
-				.properties().set(CmModel.authorityContainer));
-		}
-		return getContainedAuthorities(authorityQueryBuilder);
+		return getContainedAuthorities(authorityQueryBuilder, nodeScopeBuilder);
 	}
 
 	@Override
 	public List<CachedGroup> getContainedCachedGroups(AuthorityQueryBuilder authorityQueryBuilder) {
-		authorityQueryBuilder.nodeScopeBuilder(CACHED_GROUP_NODESCOPEBUILDER);
-		List<BusinessNode> nodes = getContainedGroups(authorityQueryBuilder);
+		List<BusinessNode> nodes = getContainedGroups(authorityQueryBuilder, CACHED_GROUP_NODESCOPEBUILDER);
 		List<CachedGroup> groups = new ArrayList<>();
 		for (BusinessNode node : nodes) {
 			groups.add(nodeToCachedGroup(node));
@@ -134,21 +135,25 @@ public class AuthorityModelServiceImpl implements AuthorityModelService {
 
 	@Override
 	public List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder) {
-		if (authorityQueryBuilder.getParameters().getNodeScope() == null) {
-			authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
+		return getContainedAuthorities(authorityQueryBuilder, 
+			new NodeScopeBuilder()
 				.nodeReference()
 				.properties().set(CmModel.person)
 				.properties().set(CmModel.authorityContainer));
-		}
-		return new BusinessNodeList(authorityService.getContainedAuthorities(authorityQueryBuilder.getParameters()));
+	}
+	@Override
+	public List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder, NodeScopeBuilder nodeScopeBuilder) {
+		return new BusinessNodeList(authorityService.getContainedAuthorities(
+				authorityQueryBuilder.getParameters(), 
+				nodeScopeBuilder.getScope()));
 	}
 
 	@Override
 	public Map<AuthorityReference, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder) {
-		authorityQueryBuilder.nodeScopeBuilder(new NodeScopeBuilder()
+		NodeScopeBuilder nodeScopeBuilder = new NodeScopeBuilder()
 			.properties().set(CmModel.authorityContainer.authorityName)
-			.properties().set(CmModel.authorityContainer.authorityDisplayName));
-		List<BusinessNode> groups = getContainedGroups(authorityQueryBuilder);
+			.properties().set(CmModel.authorityContainer.authorityDisplayName);
+		List<BusinessNode> groups = getContainedGroups(authorityQueryBuilder, nodeScopeBuilder);
 		return getAsAuthority(groups);
 	}
 

@@ -19,7 +19,7 @@ public class DemoPatch extends AbstractBootstrapPatch {
 		if (! demoFolder.isPresent()) {
 			demoFolder = Optional.of(nodeModelService.createFolder(companyHome, DEMO_FOLDER_NAME));
 		}
-		identificationService.setIdentifier(conversionService.get(demoFolder.get()), DemoModel.DEMO_ROOT_FOLDER);
+		identificationService.setIdentifier(demoFolder.get(), DemoModel.DEMO_ROOT_FOLDER);
 	}
 
 }

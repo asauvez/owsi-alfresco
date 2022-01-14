@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
+import fr.openwide.alfresco.api.core.node.model.NodeScope;
 import fr.openwide.alfresco.api.core.node.model.RepositoryNode;
 import fr.openwide.alfresco.api.core.node.service.NodeRemoteService;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
@@ -41,7 +42,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 	private int maxPermissionChecks;
 	
 	@Override
-	public List<RepositoryNode> search(RepositorySearchParameters rsp) {
+	public List<RepositoryNode> search(RepositorySearchParameters rsp, NodeScope nodeScope) {
 		try {
 			long before = System.currentTimeMillis();
 
@@ -57,7 +58,7 @@ public class NodeSearchRemoteServiceImpl implements NodeSearchRemoteService {
 				List<NodeRef> nodeRefs = resultSet.getNodeRefs();
 				for (NodeRef nodeRef : nodeRefs) {
 					try {
-						RepositoryNode node = nodeRemoteService.get(conversionService.get(nodeRef), rsp.getNodeScope());
+						RepositoryNode node = nodeRemoteService.get(conversionService.get(nodeRef), nodeScope);
 						res.add(node);
 						
 						List<Pair<String, List<String>>> highlightingForNode = highlighting.get(nodeRef);

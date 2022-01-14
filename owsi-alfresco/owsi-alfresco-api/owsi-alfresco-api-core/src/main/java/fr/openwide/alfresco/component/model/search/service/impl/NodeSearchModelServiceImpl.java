@@ -25,14 +25,15 @@ public class NodeSearchModelServiceImpl implements NodeSearchModelService {
 	@Override
 	public List<BusinessNode> search(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder) {
 		return search(new SearchQueryBuilder()
-				.restriction(restrictionBuilder)
-				.nodeScopeBuilder(nodeScopeBuilder));
+				.restriction(restrictionBuilder),
+			nodeScopeBuilder);
 	}
 
 	@Override
-	public List<BusinessNode> search(SearchQueryBuilder searchBuilder) {
+	public List<BusinessNode> search(SearchQueryBuilder searchBuilder, NodeScopeBuilder nodeScopeBuilder) {
 		return new BusinessNodeList(nodeSearchService.search(
-				searchBuilder.getParameters()));
+				searchBuilder.getParameters(),
+			nodeScopeBuilder.getScope()));
 	}
 	
 	@Override

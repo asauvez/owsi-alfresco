@@ -24,11 +24,14 @@ public interface AuthorityModelService {
 	void clearCachedGroups();
 
 	List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder);
+	List<BusinessNode> getContainedAuthorities(AuthorityQueryBuilder authorityQueryBuilder, NodeScopeBuilder nodeScopeBuilder);
 
 	List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder);
+	List<BusinessNode> getContainedUsers(AuthorityQueryBuilder authorityQueryBuilder, NodeScopeBuilder nodeScopeBuilder);
 	List<CachedUser> getContainedCachedUsers(AuthorityQueryBuilder authorityQueryBuilder);
 
 	List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder);
+	List<BusinessNode> getContainedGroups(AuthorityQueryBuilder authorityQueryBuilder, NodeScopeBuilder nodeScopeBuilder);
 	Map<AuthorityReference, String> getContainedGroupsAsAuthority(AuthorityQueryBuilder authorityQueryBuilder);
 	List<CachedGroup> getContainedCachedGroups(AuthorityQueryBuilder authorityQueryBuilder);
 

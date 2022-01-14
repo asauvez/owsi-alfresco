@@ -56,10 +56,11 @@ public class AuthorityServiceImpl implements AuthorityService {
 	}
 	
 	@Override
-	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters) {
+	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters, NodeScope nodeScope) {
 		GET_CONTAINED_AUTHORITIES payload = new GET_CONTAINED_AUTHORITIES();
 		payload.searchParameters = searchParameters;
-		return repositoryRemoteBinding.callNodeListSerializer(payload, searchParameters.getNodeScope());
+		payload.nodeScope = nodeScope;
+		return repositoryRemoteBinding.callNodeListSerializer(payload, nodeScope);
 	}
 	
 	@Override

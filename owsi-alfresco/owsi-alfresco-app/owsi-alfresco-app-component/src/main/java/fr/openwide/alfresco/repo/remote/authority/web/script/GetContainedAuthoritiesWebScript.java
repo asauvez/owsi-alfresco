@@ -11,7 +11,8 @@ public class GetContainedAuthoritiesWebScript extends AbstractAuthorityWebScript
 	@Override
 	protected List<RepositoryNode> execute(GET_CONTAINED_AUTHORITIES payload) {
 		return authorityRemoteService.getContainedAuthorities(
-				Objects.requireNonNull(payload.searchParameters, "SearchParameters"));
+				Objects.requireNonNull(payload.searchParameters, "SearchParameters"),
+				payload.nodeScope);
 	}
 
 	@Override

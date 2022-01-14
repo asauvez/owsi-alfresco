@@ -165,6 +165,7 @@ Migration
 ## vers 0.9.2
 * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
 * ClassificationWithRooBuilder.subFolder(BussinessNode) doit utiliser doWithDestinationFolder() à la place.
+* Les méthodes de AuthorityModelService et NodeSearchModelService prennent un NodeScopeBuilder en deuxième paramètre.
 * IdentificationService devient IdentificationRepositoryService côté repo.
 
 ## vers 0.8.8

@@ -13,7 +13,7 @@ import fr.openwide.alfresco.component.model.search.model.restriction.Restriction
 public interface NodeSearchModelService {
 
 	List<BusinessNode> search(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder);
-	List<BusinessNode> search(SearchQueryBuilder searchBuilder);
+	List<BusinessNode> search(SearchQueryBuilder searchBuilder, NodeScopeBuilder nodeScopeBuilder);
 
 	Optional<BusinessNode> searchUnique(RestrictionBuilder restrictionBuilder, NodeScopeBuilder nodeScopeBuilder);
 	Optional<NodeReference> searchUniqueReference(RestrictionBuilder restrictionBuilder);

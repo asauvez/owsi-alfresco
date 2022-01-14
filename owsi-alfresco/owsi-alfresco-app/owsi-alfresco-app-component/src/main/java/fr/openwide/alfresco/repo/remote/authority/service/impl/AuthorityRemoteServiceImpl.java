@@ -96,7 +96,7 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 	}
 
 	@Override
-	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters) {
+	public List<RepositoryNode> getContainedAuthorities(AuthorityQueryParameters searchParameters, NodeScope nodeScope) {
 		AuthorityType authorityType = (searchParameters.getAuthorityType() != null) ? AuthorityType.valueOf(searchParameters.getAuthorityType().name()) : null;
 		
 		Collection<String> authorities;
@@ -133,7 +133,7 @@ public class AuthorityRemoteServiceImpl implements AuthorityRemoteService {
 				}
 			}
 			
-			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), searchParameters.getNodeScope()));
+			nodes.add(nodeRemoteService.get(conversionService.get(nodeRef), nodeScope));
 		}
 		
 		sortNodes(nodes, searchParameters.getSorts());

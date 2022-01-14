@@ -1,7 +1,6 @@
 package fr.openwide.alfresco.app.core.site.service.impl;
 
 import java.util.List;
-
 import java.util.Optional;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
@@ -15,9 +14,10 @@ import fr.openwide.alfresco.api.core.site.model.SiteReference;
 import fr.openwide.alfresco.app.core.remote.service.impl.RepositoryRemoteBinding;
 import fr.openwide.alfresco.app.core.site.model.CreateSiteParameters;
 import fr.openwide.alfresco.app.core.site.service.SiteService;
+import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
 import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
-import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 
 public class SiteServiceImpl implements SiteService {
 	
@@ -50,8 +50,9 @@ public class SiteServiceImpl implements SiteService {
 		searchParameters.setLanguage(SearchQueryLanguage.FTS_ALFRESCO);
 		String query = "TYPE:st\\:site AND =cm\\:name:\"" + siteReference.getName() + "\"";
 		searchParameters.setQuery(query);
-		searchParameters.getNodeScope().setNodeReference(true);
-		List<RepositoryNode> list = nodeSearchService.search(searchParameters);
+		List<RepositoryNode> list = nodeSearchService.search(
+				searchParameters,
+				new NodeScopeBuilder().nodeReference().getScope());
 		if (list.size() > 1) {
 			throw new IllegalStateException(query);
 		}
