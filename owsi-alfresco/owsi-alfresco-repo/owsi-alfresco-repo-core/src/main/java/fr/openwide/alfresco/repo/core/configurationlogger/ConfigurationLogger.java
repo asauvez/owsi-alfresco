@@ -46,10 +46,13 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 			return;
 		}
 		
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		StrSubstitutor strSubstitutor = new StrSubstitutor((Map) globalProperties);
+		Properties propertiesAvecSystem = new Properties(globalProperties);
+		propertiesAvecSystem.putAll(System.getProperties());
 		
-		logProperties(globalProperties::getProperty, strSubstitutor::replace);
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		StrSubstitutor strSubstitutor = new StrSubstitutor((Map) propertiesAvecSystem);
+		
+		logProperties(propertiesAvecSystem::getProperty, strSubstitutor::replace);
 	}
 	
 	@Override

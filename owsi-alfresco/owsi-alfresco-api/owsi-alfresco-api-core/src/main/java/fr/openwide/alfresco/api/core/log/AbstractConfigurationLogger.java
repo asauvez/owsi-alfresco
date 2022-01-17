@@ -34,7 +34,6 @@ public abstract  class AbstractConfigurationLogger {
 	protected abstract void logInfo(String msg);
 	protected abstract void logCustoms();
 	
-	@SuppressWarnings("restriction")
 	protected void logProperties(Function<String, String> getProperty, Function<String, String> valueSubstitutor) {
 		logInfo("Configuration logging");
 
@@ -75,7 +74,7 @@ public abstract  class AbstractConfigurationLogger {
 				}
 				logPropertyAsInfo(propertyName, value);
 			} else {
-				throw new IllegalStateException("Property not found " + propertyName);
+				value = "<undefined>";
 			}
 		}
 		
