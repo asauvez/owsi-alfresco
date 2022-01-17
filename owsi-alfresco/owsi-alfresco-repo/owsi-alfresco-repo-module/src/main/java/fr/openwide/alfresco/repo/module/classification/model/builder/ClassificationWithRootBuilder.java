@@ -211,7 +211,12 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 				}
 			}
 		});
-	}	
+	}
+	public ClassificationWithRootBuilder addAspectToFolderWithAllProperties(ContainerModel folderType) {
+		Collection<PropertyModel<?>> properties = folderType.getProperties().values();
+		return addAspectToFolder(folderType, properties.toArray(new PropertyModel[properties.size()]));
+	}
+	
 	public void delete() {
 		service.getNodeModelService().deleteNode(getNodeRef());
 	}
