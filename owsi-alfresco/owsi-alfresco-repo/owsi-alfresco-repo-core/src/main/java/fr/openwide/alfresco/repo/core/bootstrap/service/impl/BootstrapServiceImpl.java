@@ -118,6 +118,17 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 	
 	@Override
+	public void deleteTestUsers() {
+		personService.deletePerson("abeecher");
+		personService.deletePerson("mjackson");
+	}
+	
+	@Override
+	public void disableUserAdmin() {
+		authenticationService.deleteAuthentication("admin");
+	}
+	
+	@Override
 	public AuthorityReference createUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities) {
 		logger.debug("Create user " + username);
 		

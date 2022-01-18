@@ -18,6 +18,8 @@ public interface BootstrapService {
 	AuthorityReference getOrCreateUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities);
 	AuthorityReference createTestUser(String username, AuthorityReference ... parentAuthorities);
 	AuthorityReference getOrCreateTestUser(String username, AuthorityReference ... parentAuthorities);
+	void deleteTestUsers();
+	void disableUserAdmin();
 	
 	NodeRef createRootCategory(String categoryName);
 	NodeRef createCategory(NodeRef parentCategory, String categoryName);
