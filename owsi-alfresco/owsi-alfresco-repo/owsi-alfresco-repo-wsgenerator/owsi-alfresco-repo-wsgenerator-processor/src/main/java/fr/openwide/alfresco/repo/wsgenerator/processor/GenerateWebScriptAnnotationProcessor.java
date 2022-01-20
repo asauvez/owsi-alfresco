@@ -39,6 +39,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptLifecycle;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
 import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
@@ -145,10 +146,16 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 
 	private void processWs(Element annotatedClassElement) throws XMLStreamException {
 		GenerateWebScript generateWebScript = annotatedClassElement.getAnnotation(GenerateWebScript.class);
-		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+		for (WebScriptMethod method : generateWebScript.method()) {
+			processWs(annotatedClassElement, method);
+		}
+	}
 
+	private void processWs(Element annotatedClassElement, WebScriptMethod methodEnum) throws XMLStreamException {
+		GenerateWebScript generateWebScript = annotatedClassElement.getAnnotation(GenerateWebScript.class);
 		String[] urls = generateWebScript.url();
-		String method = generateWebScript.method().name().toLowerCase();
+		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+		String method = methodEnum.name().toLowerCase();
 		
 		try {
 			generateWebScript.paramClass();

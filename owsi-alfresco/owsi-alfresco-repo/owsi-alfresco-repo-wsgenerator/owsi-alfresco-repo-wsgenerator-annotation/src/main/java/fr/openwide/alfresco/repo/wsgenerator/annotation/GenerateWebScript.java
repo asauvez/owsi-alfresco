@@ -14,8 +14,8 @@ public @interface GenerateWebScript {
 	@SuppressWarnings("rawtypes")
 	Class<? extends WebScriptParam> paramClass() default WebScriptParam.class; 
 	
-	enum WebScriptMethod { GET, PUT, POST, DELETE, HEAD, OPTIONS; }
-	WebScriptMethod method() default WebScriptMethod.GET;
+	enum WebScriptMethod { GET, PUT, POST, PATCH, DELETE, HEAD, OPTIONS; }
+	WebScriptMethod[] method() default WebScriptMethod.GET;
 
 	String[] url() default {};
 	
