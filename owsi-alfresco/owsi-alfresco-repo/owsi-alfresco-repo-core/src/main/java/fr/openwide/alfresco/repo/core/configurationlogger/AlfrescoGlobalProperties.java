@@ -25,7 +25,7 @@ public class AlfrescoGlobalProperties implements InitializingBean {
 		globalProperties.putAll(System.getProperties());
 	}
 
-	public Optional<String> getProperty(String key) {
+	public Optional<String> getPropertyOptional(String key) {
 		return Optional.ofNullable(globalProperties.getProperty(key));
 	}
 	public String getPropertyMandatory(String key) {
