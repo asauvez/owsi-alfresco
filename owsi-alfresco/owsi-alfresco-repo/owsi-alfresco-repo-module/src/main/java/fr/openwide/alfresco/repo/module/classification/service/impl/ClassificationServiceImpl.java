@@ -315,12 +315,11 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			});
 			
 		} catch (RuntimeException ex) {
-			// On log en debug uniquement, car cela peut être une erreur retryable, qui provoque en relance de la transaction.
+			// On log en warn uniquement, car cela peut être une erreur retryable, qui provoque en relance de la transaction.
 			// Dans ce cas, on ne veut pas avoir l'information en erreur, puisque l'appelant ne verra rien.
-			// C'est à l'appelant de tracer l'exception.
-			if (logger.isDebugEnabled()) {
-				logger.debug("Error during classify of " + nodeRef + " of type " + type, ex);
-			}
+			// C'est à l'appelant de tracer l'exception en error.
+			logger.warn("Error during classify of " + nodeRef + " of type " + type, ex);
+			
 			throw new IllegalStateException("Error during classify of " + nodeRef + " of type " + type, ex);
 		}
 	}
