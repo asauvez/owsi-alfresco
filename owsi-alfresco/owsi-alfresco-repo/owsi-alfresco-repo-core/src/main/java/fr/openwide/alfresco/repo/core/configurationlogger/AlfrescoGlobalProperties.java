@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +27,8 @@ public class AlfrescoGlobalProperties implements InitializingBean {
 	}
 
 	public Optional<String> getPropertyOptional(String key) {
-		return Optional.ofNullable(globalProperties.getProperty(key));
+		String value = globalProperties.getProperty(key);
+		return (StringUtils.isNotEmpty(value)) ? Optional.of(value) : Optional.empty();
 	}
 	public String getPropertyMandatory(String key) {
 		String value = globalProperties.getProperty(key);
