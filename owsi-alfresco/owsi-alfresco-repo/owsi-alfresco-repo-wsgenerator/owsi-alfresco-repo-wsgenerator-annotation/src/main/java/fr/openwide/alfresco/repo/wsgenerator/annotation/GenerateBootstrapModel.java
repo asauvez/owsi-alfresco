@@ -34,7 +34,10 @@ public @interface GenerateBootstrapModel {
 	String id() default "";
 	
 	String[] importModels() default {};
+	boolean generateJava() default false;
+	
 	String[] importLabels() default {};
+	
 	BootstrapView[] importViews() default {};
 
 	String[] dependsOn() default {};
