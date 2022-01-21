@@ -52,16 +52,16 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		String policyKey = model.getNameReference().getFullName().replace(':', '_');
 		
 		String ftsRootPropertyKey = "owsi.classification." + policyKey + ".root.fts";
-		Optional<String> ftsRootTemplatesAsString = globalProperties.getProperty(ftsRootPropertyKey);
+		Optional<String> ftsRootTemplatesAsString = globalProperties.getPropertyOptional(ftsRootPropertyKey);
 		if (ftsRootTemplatesAsString.isPresent()) {
 			ftsRootTemplate = Optional.of(new Template(ftsRootPropertyKey, new StringReader(ftsRootTemplatesAsString.get()), cfg));
 		}
 
 		String multiFolderSeparatorKey = "owsi.classification." + policyKey + ".multiFolderSeparator";
-		multiFolderSeparator = Optional.ofNullable(globalProperties.getProperty(multiFolderSeparatorKey, null));
+		multiFolderSeparator = globalProperties.getPropertyOptional(multiFolderSeparatorKey);
 
 		String subfoldersPropertyKey = "owsi.classification." + policyKey + ".subfolders";
-		Optional<String> subfoldersTemplatesAsString = globalProperties.getProperty(subfoldersPropertyKey);
+		Optional<String> subfoldersTemplatesAsString = globalProperties.getPropertyOptional(subfoldersPropertyKey);
 		if (subfoldersTemplatesAsString.isPresent()) {
 			for (String templateAsString : splitIgnoreBracket(subfoldersTemplatesAsString.get())) {
 				if (! templateAsString.isEmpty()) {
@@ -71,13 +71,13 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 		}
 
 		String newNamePropertyKey = "owsi.classification." + policyKey + ".name";
-		Optional<String> newNameAsString = globalProperties.getProperty(newNamePropertyKey);
+		Optional<String> newNameAsString = globalProperties.getPropertyOptional(newNamePropertyKey);
 		if (newNameAsString.isPresent()) {
 			newNameTemplate = Optional.of(new Template(newNamePropertyKey, new StringReader(newNameAsString.get()), cfg));
 		}
 		
 		String uniqueNamePropertyKey = "owsi.classification." + policyKey + ".uniquename";
-		uniqueName = Boolean.valueOf(globalProperties.getProperty(uniqueNamePropertyKey, "false"));
+		uniqueName = globalProperties.getPropertyBoolean(uniqueNamePropertyKey, false);
 	}
 	
 	private static List<String> splitIgnoreBracket(String input) {

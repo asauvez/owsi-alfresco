@@ -28,6 +28,7 @@ import fr.openwide.alfresco.repo.core.swagger.model.SwaggerRoot;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerSchema;
 import fr.openwide.alfresco.repo.core.swagger.model.SwaggerWS;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter.SwaggerParameterIn;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerResponse;
@@ -82,52 +83,54 @@ public abstract class SwaggerWebScript extends AbstractWebScript {
 		for (WebScript webscript : webscripts.values()) {
 			GenerateWebScript annotation = webscript.getClass().getAnnotation(GenerateWebScript.class);
 			if (isWebScriptFiltered(annotation, webscript)) {
-				for (String url : annotation.url()) {
-					Map<String, SwaggerWS> methods = root.paths.get(url);
-					if (methods == null) {
-						root.paths.put(url,  methods = new TreeMap<>());
-					}
-					SwaggerWS ws = new SwaggerWS();
-					ws.summary = annotation.shortName();
-					ws.description = annotation.description();
-					ws.operationId = annotation.wsName();
-					ws.tags = new String[] { annotation.family() };
-					
-					switch (annotation.formatDefault()) {
-					case "text": ws.produces.add("text/plain"); break;
-					case "json": ws.produces.add("application/json"); break;
-					case "html": ws.produces.add("text/html"); break;
-					}
-					
-					for (SwaggerParameter param : annotation.swaggerParameters()) {
-						SwaggerParameterModel model = new SwaggerParameterModel();
-						model.name = param.name();
-						model.description = param.description();
-						model.in = param.in().name().toLowerCase();
-						model.required = param.required();
+				for (WebScriptMethod method : annotation.method()) {
+					for (String url : annotation.url()) {
+						Map<String, SwaggerWS> methods = root.paths.get(url);
+						if (methods == null) {
+							root.paths.put(url,  methods = new TreeMap<>());
+						}
+						SwaggerWS ws = new SwaggerWS();
+						ws.summary = annotation.shortName();
+						ws.description = annotation.description();
+						ws.operationId = annotation.wsName();
+						ws.tags = new String[] { annotation.family() };
 						
-						if (param.schema() != Void.class) {
-							model.schema = new SwaggerSchema(schemaGenerator.generateSchema(param.schema()));
-						}else {
-							if (param.in() == SwaggerParameterIn.BODY) {
-								model.schema = new SwaggerSchema(param.type(), "binary");
-							} else {
-								model.type = param.type();
+						switch (annotation.formatDefault()) {
+						case "text": ws.produces.add("text/plain"); break;
+						case "json": ws.produces.add("application/json"); break;
+						case "html": ws.produces.add("text/html"); break;
+						}
+						
+						for (SwaggerParameter param : annotation.swaggerParameters()) {
+							SwaggerParameterModel model = new SwaggerParameterModel();
+							model.name = param.name();
+							model.description = param.description();
+							model.in = param.in().name().toLowerCase();
+							model.required = param.required();
+							
+							if (param.schema() != Void.class) {
+								model.schema = new SwaggerSchema(schemaGenerator.generateSchema(param.schema()));
+							}else {
+								if (param.in() == SwaggerParameterIn.BODY) {
+									model.schema = new SwaggerSchema(param.type(), "binary");
+								} else {
+									model.type = param.type();
+								}
 							}
+							
+							ws.parameters.add(model);
+						}
+						for (SwaggerResponse resp : annotation.swaggerResponses()) {
+							SwaggerResponseModel model = new SwaggerResponseModel();
+							model.description = resp.description();
+							if (resp.schema() != Void.class) {
+								model.schema = new SwaggerSchema(schemaGenerator.generateSchema(resp.schema()));
+							}
+							ws.responses.put(Integer.toString(resp.statusCode()), model);
 						}
 						
-						ws.parameters.add(model);
+						methods.put(method.name().toLowerCase(), ws);
 					}
-					for (SwaggerResponse resp : annotation.swaggerResponses()) {
-						SwaggerResponseModel model = new SwaggerResponseModel();
-						model.description = resp.description();
-						if (resp.schema() != Void.class) {
-							model.schema = new SwaggerSchema(schemaGenerator.generateSchema(resp.schema()));
-						}
-						ws.responses.put(Integer.toString(resp.statusCode()), model);
-					}
-					
-					methods.put(annotation.method().name().toLowerCase(), ws);
 				}
 			}
 		}
