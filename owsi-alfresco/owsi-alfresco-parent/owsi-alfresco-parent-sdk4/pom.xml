@@ -397,11 +397,11 @@
 	<distributionManagement>
 		<snapshotRepository>
 			<id>nexus.internal.snapshots</id>
-			<url>http://nexus.vitry.intranet/repository/InternalSmileSnapshots/</url>
+			<url>https://nexus.galaxy.intranet/repository/InternalSmileSnapshots/</url>
 		</snapshotRepository>
 		<repository>
 			<id>nexus.internal.releases</id>
-			<url>http://nexus.vitry.intranet/repository/InternalSmileReleases/</url>
+			<url>https://nexus.galaxy.intranet/repository/InternalSmileReleases/</url>
 		</repository>
 	</distributionManagement>
 	<repositories>
