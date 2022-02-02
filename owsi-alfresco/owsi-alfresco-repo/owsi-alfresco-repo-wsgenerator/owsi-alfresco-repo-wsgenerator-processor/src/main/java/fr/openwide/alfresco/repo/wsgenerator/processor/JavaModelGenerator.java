@@ -15,6 +15,7 @@ import javax.tools.JavaFileObject;
 
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Class;
+import org.alfresco.repo.dictionary.M2ClassAssociation;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Namespace;
 import org.alfresco.repo.dictionary.M2Property;
@@ -51,10 +52,14 @@ public class JavaModelGenerator {
 							.append(namespace.getPrefix()).append("\", \"").append(namespace.getUri()).append("\");\n\n");
 					
 					for (M2Aspect aspect : model.getAspects()) {
-						manageClass(writer, javaRootInterfaceName, aspect, filer);
+						if (isSameNameSpace(namespace.getPrefix() + ":", aspect.getName())) {
+							manageClass(writer, javaRootInterfaceName, aspect, filer);
+						}
 					}
 					for (M2Type type : model.getTypes()) {
-						manageClass(writer, javaRootInterfaceName, type, filer);
+						if (isSameNameSpace(namespace.getPrefix() + ":", type.getName())) {
+							manageClass(writer, javaRootInterfaceName, type, filer);
+						}
 					}
 					writer.append("}\n");
 				}
@@ -85,25 +90,35 @@ public class JavaModelGenerator {
 	}
 
 	private void manageClass(Writer javaRootInterfaceWriter, String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
-		String prefix = StringUtils.substringBefore(m2Class.getName(), ":");
-		String name = StringUtils.substringAfter(m2Class.getName(), ":");
-		String className = toJavaName(StringUtils.capitalize(prefix) + StringUtils.capitalize(name));
-		javaRootInterfaceWriter.append("	").append(className).append(" ").append(name).append(" = new ").append(className).append("();\n");
+		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
+		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
+		String className = getClassName(m2Class.getName());
+		javaRootInterfaceWriter.append("	").append(className).append(" ").append(containerName).append(" = new ").append(className).append("();\n");
 		
-		String packageName = getPackageName(prefix);
+		String packageName = getPackageName(classPrefix);
 		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
 		try (Writer writer = classObject.openWriter()) {
-			String containerType = (m2Class instanceof M2Aspect) ? "AspectModel" : "TypeModel";
 			writer.append("package ").append(packageName).append(";\n\n");
 
 			Set<String> classesToImport = new TreeSet<>();
 			classesToImport.add("fr.openwide.alfresco.api.core.remote.model.NameReference");
-			classesToImport.add("fr.openwide.alfresco.component.model.node.model." + containerType);
+			
+			String containerType = (m2Class instanceof M2Aspect) ? "AspectModel" : "TypeModel";
+			if (m2Class.getParentName() != null 
+				&& classPrefix.equals(StringUtils.substringBefore(m2Class.getParentName(), ":"))) {
+				containerType = getClassName(m2Class.getParentName());
+			} else {
+				classesToImport.add("fr.openwide.alfresco.component.model.node.model." + containerType);
+			}
+			
 			for (M2Property property : m2Class.getProperties()) {
 				classesToImport.add("fr.openwide.alfresco.component.model.node.model.property.PropertyModels");
 				classesToImport.add("fr.openwide.alfresco.component.model.node.model.property."
 						+ (property.isMultiValued() ? "multi.Multi" : "single.")
 						+ getType(property.getType()) + "PropertyModel ");
+			}
+			for (M2ClassAssociation assoc : m2Class.getAssociations()) {
+				classesToImport.add("fr.openwide.alfresco.component.model.node.model.association." + getAssocClassName(assoc));
 			}
 			for (String classToImport : classesToImport) {
 				writer.append("import ").append(classToImport).append(";\n");
@@ -112,7 +127,7 @@ public class JavaModelGenerator {
 			writer.append("\npublic class ").append(className).append(" extends ")
 					.append(containerType).append(" {\n\n")
 				.append("	public ").append(className).append("() {\n")
-				.append("		super(NameReference.create(").append(javaRootInterfaceName).append(".NAMESPACE, \"").append(name).append("\"));\n")
+				.append("		super(NameReference.create(").append(javaRootInterfaceName).append(".NAMESPACE, \"").append(containerName).append("\"));\n")
 				.append("	}\n\n")
 				.append("	protected ").append(className).append("(NameReference nameReference) {\n")
 				.append("		super(nameReference);\n")
@@ -121,9 +136,26 @@ public class JavaModelGenerator {
 			for (M2Property property : m2Class.getProperties()) {
 				manageProperty(writer, javaRootInterfaceName, property);
 			}
+
+			for (M2ClassAssociation assoc : m2Class.getAssociations()) {
+				manageAssoc(writer, javaRootInterfaceName, assoc);
+			}
+
+			for (String aspect : m2Class.getMandatoryAspects()) {
+				// On ne gére que les aspects du même modèle pour le moment.
+				if (isSameNameSpace(m2Class.getName(), aspect)) {
+					manageMandatoryAspect(writer, javaRootInterfaceName, aspect);
+				}
+			}
 			
 			writer.append("}\n");
 		}
+	}
+	
+	private boolean isSameNameSpace(String name1, String name2) {
+		String prefix1 = StringUtils.substringBefore(name1, ":");
+		String prefix2 = StringUtils.substringBefore(name2, ":");
+		return prefix1.contentEquals(prefix2);
 	}
 	
 	private void manageProperty(Writer writer, String javaRootInterfaceName, M2Property property) throws IOException {
@@ -134,15 +166,45 @@ public class JavaModelGenerator {
 			.append(" = PropertyModels.new").append(multi).append(type).append("(this, ").append(javaRootInterfaceName)
 			.append(".NAMESPACE, \"").append(name).append("\");\n");
 	}
-	
+
+	private void manageAssoc(Writer writer, String javaRootInterfaceName, M2ClassAssociation assoc) throws IOException {
+		String name = StringUtils.substringAfter(assoc.getName(), ":");
+		String className = getAssocClassName(assoc);
+		
+		writer.append("	public final ").append(className).append(" ").append(toJavaName(name))
+			.append(" = new ").append(className).append("(NameReference.create(")
+			.append(javaRootInterfaceName).append(".NAMESPACE, \"").append(name).append("\"));\n");
+	}
+	private String getAssocClassName(M2ClassAssociation assoc) {
+		return (assoc.isSourceMany() ? "Many" : "One")
+			+ "To" + (assoc.isTargetMany() ? "Many" : "One")
+			+ "AssociationModel";
+	}
+
+	private void manageMandatoryAspect(Writer writer, String javaRootInterfaceName, String aspectName) throws IOException {
+		String name = StringUtils.substringAfter(aspectName, ":");
+		writer.append("	public final ").append(getClassName(aspectName))
+			.append(" ").append(name)
+			.append(" = addMandatoryAspect(").append(javaRootInterfaceName)
+			.append(".").append(name).append(");\n");
+	}
+
 	private String getType(String type) {
 		switch (type) {
 		case "d:int": return "Integer";
 		case "d:datetime": return "DateTime";
-		case "d:noderef": return "NodeRef";
+		case "d:noderef": return "NodeReference";
 		case "d:qname": return "NameReference";
+		case "d:category": return "NodeReference";
+		case "d:mltext": return "Text";
 		}
 		return StringUtils.capitalize(StringUtils.substringAfter(type, ":"));
+	}
+	
+	private String getClassName(String containerName) {
+		String prefix = StringUtils.substringBefore(containerName, ":");
+		String name = StringUtils.substringAfter(containerName, ":");
+		return toJavaName(StringUtils.capitalize(prefix) + StringUtils.capitalize(name));
 	}
 	
 	private String toJavaName(String s) {
