@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
+import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
@@ -183,6 +185,17 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 		}
 		return this;
 	}
+	
+	public ClassificationWithRootBuilder setInheritParentPermissions(boolean inheritParentPermissions) {
+		return doWithDestinationFolder(destinationFolder -> {
+			service.getPermissionRepositoryService().setInheritParentPermissions(destinationFolder, inheritParentPermissions);
+		});
+	} 
+	public ClassificationWithRootBuilder setPermission(AuthorityReference authority, PermissionReference permission) {
+		return doWithDestinationFolder(destinationFolder -> {
+			service.getPermissionRepositoryService().setPermission(destinationFolder, authority, permission);
+		});
+	} 
 	
 	public ClassificationWithRootBuilder addAspectToFolder(ContainerModel folderType, PropertyModel<?> ... properties) {
 		return doWithDestinationFolder(destinationFolder -> {

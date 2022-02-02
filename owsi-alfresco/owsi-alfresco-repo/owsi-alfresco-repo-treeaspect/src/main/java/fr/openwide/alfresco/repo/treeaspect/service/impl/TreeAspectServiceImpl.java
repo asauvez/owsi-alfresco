@@ -63,6 +63,7 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 	@Autowired @Qualifier("global-properties") private Properties globalProperties;
 
 	private Set<QName> aspectToCopy = new HashSet<>();
+	private Set<QName> propertiesToCopy = new HashSet<>();
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -83,9 +84,6 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 			policyComponent.bindClassBehaviour(OnCreateNodePolicy.QNAME,
 					ContentModel.TYPE_CMOBJECT,
 					new JavaBehaviour(this, OnCreateNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
-			policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
-					ContentModel.TYPE_CMOBJECT,
-					new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
 			policyComponent.bindClassBehaviour(OnMoveNodePolicy.QNAME,
 					ContentModel.TYPE_CMOBJECT,
 					new JavaBehaviour(this, OnMoveNodePolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
@@ -93,13 +91,22 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 		
 		if (! aspectToCopy.contains(aspect)) {
 			aspectToCopy.add(aspect);
-	
+			
+			AspectDefinition aspectDefinition = dictionaryService.getAspect(aspect);
+			propertiesToCopy.addAll(aspectDefinition.getProperties().keySet());
+			for (AspectDefinition mandatoryAspect : aspectDefinition.getDefaultAspects(true)) {
+				propertiesToCopy.addAll(mandatoryAspect.getProperties().keySet());
+			}
+			
 			policyComponent.bindClassBehaviour(OnAddAspectPolicy.QNAME,
 					aspect,
 					new JavaBehaviour(this, OnAddAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
 			policyComponent.bindClassBehaviour(OnRemoveAspectPolicy.QNAME,
 					aspect,
 					new JavaBehaviour(this, OnRemoveAspectPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
+			policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME,
+					aspect,
+					new JavaBehaviour(this, OnUpdatePropertiesPolicy.QNAME.getLocalName(), NotificationFrequency.TRANSACTION_COMMIT));
 		}
 	}
 	
@@ -126,6 +133,8 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 	@Override public void onCreateNode(ChildAssociationRef childAssocRef) {
 		NodeRef parentRef = childAssocRef.getParentRef();
 		NodeRef childRef = childAssocRef.getChildRef();
+		
+		if (! childAssocRef.getTypeQName().equals(ContentModel.ASSOC_CONTAINS)) return;
 		
 		runAsSystem("onCreateNode", childRef, () -> {
 			if (! nodeService.exists(childAssocRef.getParentRef()) || ! nodeService.exists(childAssocRef.getChildRef())) return;
@@ -158,19 +167,17 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 
 	@Override public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
 		runAsSystem("onUpdateProperties", nodeRef, () -> {
-			if (! nodeService.exists(nodeRef)) return;
+			List<NodeRef> children = null;
 			
-			List<NodeRef> children = getChildren(nodeRef);
-			
-			for (QName aspect : aspectToCopy) {
-				Map<QName, PropertyDefinition> aspectProperties = getProperties(aspect);
-
-				for (QName property : aspectProperties.keySet()) {
-					Serializable beforeProperty = before.get(property);
-					Serializable afterProperty = after.get(property);
-					if (!Objects.equals(beforeProperty, afterProperty)) {
-						updateChildProperties(children, property, afterProperty);
+			for (QName property : propertiesToCopy) {
+				Serializable beforeProperty = before.get(property);
+				Serializable afterProperty = after.get(property);
+				if (! Objects.equals(beforeProperty, afterProperty)) {
+					if (children == null) {
+						// créer en lazy uniquement s'il y a une différence
+						children = getChildren(nodeRef);
 					}
+					updateChildProperties(children, property, afterProperty);
 				}
 			}
 		});
@@ -189,7 +196,6 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 	
 	private void updateChildProperties(List<NodeRef> children, QName property, Serializable afterProperty) {
 		for (NodeRef childRef : children) {
-
 			runAsSystem("updateChildProperties", childRef, () -> {
 				nodeService.setProperty(childRef, property, afterProperty);
 				updateChildProperties(getChildren(childRef), property, afterProperty);
@@ -202,7 +208,7 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 		NodeRef newParent = newChildAssocRef.getParentRef();
 
 		runAsSystem("onMoveNode", newChild, () -> {
-			if (!nodeService.exists(newParent) || !nodeService.exists(newChild)) return;
+			if (!nodeService.exists(newParent)) return;
 
 			for (QName aspect : aspectToCopy) {
 				copyAspectToNode(newParent, newChild, aspect);
@@ -212,8 +218,6 @@ public class TreeAspectServiceImpl implements TreeAspectService,
 
 	@Override public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName) {
 		runAsSystem("onRemoveAspect", nodeRef, () -> {
-			if (! nodeService.exists(nodeRef)) return;
-			
 			for (NodeRef childRef : getChildren(nodeRef)) {
 				nodeService.removeAspect(childRef, aspectTypeQName);
 				onRemoveAspect(childRef, aspectTypeQName);

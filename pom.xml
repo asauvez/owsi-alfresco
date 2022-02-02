@@ -54,14 +54,14 @@
     <repositories>
         <repository>
             <id>nexus.internal.releases</id>
-            <url>https://nexus.vitry.intranet/content/repositories/InternalSmileReleases/</url>
+            <url>https://nexus.galaxy.intranet/content/repositories/InternalSmileReleases/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
         <repository>
             <id>nexus.internal.snapshots</id>
-            <url>https://nexus.vitry.intranet/content/repositories/InternalSmileSnapshots/</url>
+            <url>https://nexus.galaxy.intranet/content/repositories/InternalSmileSnapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -69,11 +69,11 @@
 
         <repository>
             <id>nexus.internal.third-party</id>
-            <url>https://nexus.vitry.intranet/content/repositories/nonCentralArtifacts/</url>
+            <url>https://nexus.galaxy.intranet/content/repositories/nonCentralArtifacts/</url>
         </repository>
         <repository>
             <id>nexus.mirror.alfresco.release.repo</id>
-            <url>http://nexus.vitry.intranet/repository/alfresco-artifacts-repository/</url>
+            <url>https://nexus.galaxy.intranet/repository/alfresco-artifacts-repository/</url>
         </repository>
     </repositories>
 

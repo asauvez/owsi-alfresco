@@ -58,6 +58,7 @@ import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperti
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.UniqueNameRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.node.service.impl.UniqueNameGenerator;
+import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
@@ -92,6 +93,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
+	@Autowired private PermissionRepositoryService permissionRepositoryService;
 	@Autowired private UniqueNameRepositoryService uniqueNameRepositoryService;
 	@Autowired private FileFolderService fileFolderService;
 	@Autowired private TreeAspectService treeAspectService;
@@ -546,6 +548,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 
 	public NodeModelRepositoryService getNodeModelService() {
 		return nodeModelRepositoryService;
+	}
+	public PermissionRepositoryService getPermissionRepositoryService() {
+		return permissionRepositoryService;
 	}
 	public ConversionService getConversionService() {
 		return conversionService;
