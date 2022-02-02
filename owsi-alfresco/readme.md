@@ -38,6 +38,7 @@ Nouveautés
  * SearchQueryBuilder: maxPermissionChecks/maxPermissionCheckTimeMillis
  * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
  * ClassificationService: Deprecie l'utilisation de BusinessNode
+ * @GenerateBootstrapModel: generateJava=true pour générer le modèle en Java.
 
 ## depuis 0.8.9
 Release du 05/12/2021

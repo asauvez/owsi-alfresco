@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
  * 
  * @GenerateBootstrapModel(
  *	importModels = "alfresco/module/xxx-ged-platform/xxx-model.xml",
+ *  generateJava = true,
  *	importViews = {
  *		@BootstrapView(
  *			checkPath="/${spaces.company_home.childname}/st:sites/cm:acme/cm:dataLists/cm:myDatalist",

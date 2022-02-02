@@ -61,6 +61,8 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 	
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		System.setProperty("javax.xml.stream.XMLOutputFactory", "com.sun.xml.internal.stream.XMLOutputFactoryImpl");
+
 		processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Process " + annotations.toString());
 		
 		try {
