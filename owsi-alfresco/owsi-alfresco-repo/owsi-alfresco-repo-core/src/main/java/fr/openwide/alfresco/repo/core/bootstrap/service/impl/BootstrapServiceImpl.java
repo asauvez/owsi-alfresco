@@ -248,8 +248,8 @@ public class BootstrapServiceImpl implements BootstrapService {
 		return siteInfo;
 	}
 	@Override
-	public void setMembership(SiteInfo info, AuthorityReference authority, SiteRole role) {
-		siteService.setSiteMembership(info.getShortName(), authority.getName(), role.toString());
+	public void setSiteMembership(SiteInfo info, AuthorityReference authority, SiteRole role) {
+		siteService.setMembership(info.getShortName(), authority.getName(), role.toString());
 	}
 	
 	@Override
