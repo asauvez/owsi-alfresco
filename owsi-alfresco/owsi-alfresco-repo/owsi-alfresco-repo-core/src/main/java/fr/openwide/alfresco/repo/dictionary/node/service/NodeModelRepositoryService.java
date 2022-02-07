@@ -32,6 +32,7 @@ public interface NodeModelRepositoryService {
 	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws DuplicateChildNodeNameRemoteException;
 	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean properties) throws DuplicateChildNodeNameRemoteException;
 	NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
+	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
 	
 	boolean exists(NodeRef nodeRef);
 	void moveNode(NodeRef nodeRef, NodeRef newParentRef);

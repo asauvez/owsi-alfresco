@@ -6,6 +6,7 @@ import org.alfresco.service.cmr.site.SiteRole;
 import org.alfresco.service.cmr.site.SiteVisibility;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
 
 
@@ -33,8 +34,8 @@ public interface BootstrapService {
 	void setSiteMembership(SiteInfo info, AuthorityReference authority, SiteRole role);
 	void deleteSiteSwsdp();
 	
-	NodeRef createFolder(NodeRef parentRef, String folderName);
-	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName);
+	NodeRef createFolder(NodeRef parentRef, String folderName, AspectModel ... aspects);
+	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName, AspectModel ... aspects);
 	
 	NodeRef createDocumentLibrary(SiteInfo siteInfo);
 	NodeRef getOrCreateDocumentLibrary(SiteInfo siteInfo);

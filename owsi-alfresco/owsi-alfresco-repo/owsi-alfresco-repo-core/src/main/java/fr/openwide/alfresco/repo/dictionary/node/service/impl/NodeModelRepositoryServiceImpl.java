@@ -97,6 +97,15 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 			throw new DuplicateChildNodeNameRemoteException("FileExistsException with FileFolderService", e);
 		}
 	}
+	@Override
+	public NodeRef getOrCreateFolder(NodeRef parentRef, String folderName)
+			throws DuplicateChildNodeNameRemoteException {
+		NodeRef folderRef = fileFolderService.searchSimple(parentRef, folderName);
+		if (folderRef == null) {
+			folderRef = createFolder(parentRef, folderName);
+		}
+		return folderRef;
+	}
 	
 	@Override
 	public boolean exists(NodeRef nodeRef) {

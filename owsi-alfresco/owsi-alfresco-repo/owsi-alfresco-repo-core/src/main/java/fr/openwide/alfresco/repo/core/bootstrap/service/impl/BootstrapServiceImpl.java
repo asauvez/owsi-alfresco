@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
+import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.DlModel;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
@@ -273,15 +274,23 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 	
 	@Override
-	public NodeRef createFolder(NodeRef parentRef, String folderName) {
-		FileInfo file = fileFolderService.create(parentRef, folderName, ContentModel.TYPE_FOLDER);
-		return file.getNodeRef();
+	public NodeRef createFolder(NodeRef parentRef, String folderName, AspectModel ... aspects) {
+		NodeRef folderRef = fileFolderService.create(parentRef, folderName, ContentModel.TYPE_FOLDER).getNodeRef();
+
+		for (AspectModel aspect : aspects) {
+			nodeModelRepositoryService.addAspect(folderRef, aspect);
+		}
+		return folderRef;
 	}
 	@Override
-	public NodeRef getOrCreateFolder(NodeRef parentRef, String folderName) {
+	public NodeRef getOrCreateFolder(NodeRef parentRef, String folderName, AspectModel ... aspects) {
 		NodeRef folderRef = fileFolderService.searchSimple(parentRef, folderName);
 		if (folderRef == null) {
-			folderRef = createFolder(parentRef, folderName);
+			folderRef = fileFolderService.create(parentRef, folderName, ContentModel.TYPE_FOLDER).getNodeRef();
+		}
+		
+		for (AspectModel aspect : aspects) {
+			nodeModelRepositoryService.addAspect(folderRef, aspect);
 		}
 		return folderRef;
 	}
