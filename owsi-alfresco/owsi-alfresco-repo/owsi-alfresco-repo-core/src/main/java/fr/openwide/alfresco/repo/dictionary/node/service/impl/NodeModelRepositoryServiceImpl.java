@@ -41,6 +41,7 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAss
 import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
@@ -77,6 +78,14 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 				createAssociationName(name), 
 				conversionService.getRequired(type.getNameReference()),
 				properties).getChildRef();
+	}
+	@Override
+	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean bean) throws DuplicateChildNodeNameRemoteException {
+		Map<QName, Serializable> properties = new HashMap<>();
+		for (Entry<NameReference, Serializable> entry : bean.getProperties().entrySet()) {
+			properties.put(conversionService.getRequired(entry.getKey()), entry.getValue());
+		}
+		return createNode(parentRef, type, name, properties);
 	}
 	
 	
@@ -170,6 +179,14 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	@Override
 	public void addAspect(NodeRef nodeRef, AspectModel aspect, Map<QName, Serializable> properties) {
+		addAspect(nodeRef, aspect.getNameReference(), properties);
+	}
+	@Override
+	public void addAspect(NodeRef nodeRef, AspectModel aspect, NodeBean bean) {
+		Map<QName, Serializable> properties = new HashMap<>();
+		for (Entry<NameReference, Serializable> entry : bean.getProperties().entrySet()) {
+			properties.put(conversionService.getRequired(entry.getKey()), entry.getValue());
+		}
 		addAspect(nodeRef, aspect.getNameReference(), properties);
 	}
 	

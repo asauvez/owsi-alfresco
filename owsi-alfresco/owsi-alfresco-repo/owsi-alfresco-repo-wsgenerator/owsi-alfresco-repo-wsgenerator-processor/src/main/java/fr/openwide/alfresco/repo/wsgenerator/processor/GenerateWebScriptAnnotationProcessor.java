@@ -20,6 +20,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
+import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.tools.Diagnostic;
@@ -127,7 +128,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 	}
 	
 	private void generateComment(Element annotatedClassElement) throws XMLStreamException {
-		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+		Name className = ((QualifiedNameable) annotatedClassElement).getQualifiedName();
 		springContextXml.writeCharacters("\n\n  ");
 		springContextXml.writeComment("Generated for " + className);
 	}
@@ -293,7 +294,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 
 	private void processBootstrapModel(Element annotatedClassElement, Filer filer) throws XMLStreamException {
 		GenerateBootstrapModel generateBootstrapModel = annotatedClassElement.getAnnotation(GenerateBootstrapModel.class);
-		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
+		Name className = ((QualifiedNameable) annotatedClassElement).getQualifiedName();
 
 		String modelName = generateBootstrapModel.id();
 		if (modelName.isEmpty()) {

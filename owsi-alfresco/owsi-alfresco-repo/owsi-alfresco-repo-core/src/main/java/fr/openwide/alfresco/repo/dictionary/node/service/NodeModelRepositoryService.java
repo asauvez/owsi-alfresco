@@ -19,6 +19,7 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAss
 import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -29,6 +30,7 @@ public interface NodeModelRepositoryService {
 
 	NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException;
 	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws DuplicateChildNodeNameRemoteException;
+	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean properties) throws DuplicateChildNodeNameRemoteException;
 	NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
 	
 	boolean exists(NodeRef nodeRef);
@@ -58,6 +60,7 @@ public interface NodeModelRepositoryService {
 	void addAspect(NodeRef nodeRef, NameReference aspect, Map<QName, Serializable> properties);
 	void addAspect(NodeRef nodeRef, AspectModel aspect);
 	void addAspect(NodeRef nodeRef, AspectModel aspect, Map<QName, Serializable> properties);
+	void addAspect(NodeRef nodeRef, AspectModel aspect, NodeBean properties);
 	
 	void removeAspect(NodeRef nodeRef, NameReference aspect);
 	void removeAspect(NodeRef nodeRef, AspectModel aspect);

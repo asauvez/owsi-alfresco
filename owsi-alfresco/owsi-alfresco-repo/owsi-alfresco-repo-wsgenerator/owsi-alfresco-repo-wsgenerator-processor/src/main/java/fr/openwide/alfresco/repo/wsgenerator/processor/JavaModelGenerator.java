@@ -41,8 +41,9 @@ public class JavaModelGenerator {
 			
 			M2Model model = loadModel(modelFile);
 			for (M2Namespace namespace : model.getNamespaces()) {
-				String packageName = getPackageName(namespace.getPrefix());
+				String packageName = getPackageName(namespace.getPrefix()) + ".model";
 				String javaRootInterfaceName = StringUtils.capitalize(namespace.getPrefix()) + "Model";
+				
 				JavaFileObject javaRootInterface = filer.createSourceFile(packageName + "." + javaRootInterfaceName);
 				try (Writer writer = javaRootInterface.openWriter()) {
 					writer.append("package ").append(packageName).append(";\n\n")
@@ -90,18 +91,24 @@ public class JavaModelGenerator {
 	}
 
 	private void manageClass(Writer javaRootInterfaceWriter, String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
+		manageClassModel(javaRootInterfaceWriter, javaRootInterfaceName, m2Class, filer);
+		manageClassBean(javaRootInterfaceName, m2Class, filer);
+	}
+
+	private void manageClassModel(Writer javaRootInterfaceWriter, String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
 		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
 		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
 		String className = getClassName(m2Class.getName());
 		javaRootInterfaceWriter.append("	").append(className).append(" ").append(containerName).append(" = new ").append(className).append("();\n");
 		
-		String packageName = getPackageName(classPrefix);
+		String packageName = getPackageName(classPrefix) + ".model";
 		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
 		try (Writer writer = classObject.openWriter()) {
 			writer.append("package ").append(packageName).append(";\n\n");
 
 			Set<String> classesToImport = new TreeSet<>();
 			classesToImport.add("fr.openwide.alfresco.api.core.remote.model.NameReference");
+			classesToImport.add(getPackageName(classPrefix) + ".bean." + className + "Bean");
 			
 			String containerType = (m2Class instanceof M2Aspect) ? "AspectModel" : "TypeModel";
 			if (m2Class.getParentName() != null 
@@ -115,7 +122,7 @@ public class JavaModelGenerator {
 				classesToImport.add("fr.openwide.alfresco.component.model.node.model.property.PropertyModels");
 				classesToImport.add("fr.openwide.alfresco.component.model.node.model.property."
 						+ (property.isMultiValued() ? "multi.Multi" : "single.")
-						+ getType(property.getType()) + "PropertyModel ");
+						+ getModelType(property.getType()) + "PropertyModel ");
 			}
 			for (M2ClassAssociation assoc : m2Class.getAssociations()) {
 				classesToImport.add("fr.openwide.alfresco.component.model.node.model.association." + getAssocClassName(assoc));
@@ -131,7 +138,11 @@ public class JavaModelGenerator {
 				.append("	}\n\n")
 				.append("	protected ").append(className).append("(NameReference nameReference) {\n")
 				.append("		super(nameReference);\n")
+				.append("	}\n\n")
+				.append("	public ").append(className).append("Bean bean() {\n")
+				.append("		return new ").append(className).append("Bean();\n")
 				.append("	}\n\n");
+
 			
 			for (M2Property property : m2Class.getProperties()) {
 				manageProperty(writer, javaRootInterfaceName, property);
@@ -152,6 +163,58 @@ public class JavaModelGenerator {
 		}
 	}
 	
+	private void manageClassBean(String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
+		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
+		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
+		String className = getClassName(m2Class.getName()) + "Bean";
+		
+		String packageName = getPackageName(classPrefix) + ".bean";
+		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
+		try (Writer writer = classObject.openWriter()) {
+			writer.append("package ").append(packageName).append(";\n\n");
+
+			Set<String> classesToImport = new TreeSet<>();
+			classesToImport.add("fr.openwide.alfresco.component.model.node.model.bean.NodeBean");
+			if (! m2Class.getProperties().isEmpty()) {
+				classesToImport.add("com.fasterxml.jackson.annotation.JsonProperty");
+				classesToImport.add(getPackageName(classPrefix) + ".model." + javaRootInterfaceName);
+			}
+			for (String classToImport : classesToImport) {
+				writer.append("import ").append(classToImport).append(";\n");
+			}
+				
+			writer.append("\npublic class ").append(className).append(" extends NodeBean {\n\n");
+			
+			for (M2Property property : m2Class.getProperties()) {
+				String propertyJavaName = toJavaName(StringUtils.substringAfter(property.getName(), ":"));
+				String propertyPath = javaRootInterfaceName + "." + containerName + "." + propertyJavaName;
+				String type = getJavaType(property.getType());
+				if (property.isMultiValued()) {
+					type = "java.util.List<" + type + ">";
+				}
+				
+				writer
+					.append("	@JsonProperty(\"").append(property.getName()).append("\")\n")
+					.append("	public ").append(type).append(" get").append(StringUtils.capitalize(propertyJavaName)).append("() {\n")
+					.append("		return getProperty(").append(propertyPath).append(");\n")
+					.append("	}\n")
+					.append("	public void set").append(StringUtils.capitalize(propertyJavaName)).append("(").append(type).append(" value) {\n")
+					.append("		setProperty(").append(propertyPath).append(", value);\n")
+					.append("	}\n")
+					.append("	public ").append(className).append(" ").append(propertyJavaName).append("(").append(type).append(" value) {\n")
+					.append("		set").append(StringUtils.capitalize(propertyJavaName)).append("(value);\n")
+					.append("		return this;\n")
+					.append("	}\n")
+					.append("	public ").append(className).append(" unset").append(StringUtils.capitalize(propertyJavaName)).append("() {\n")
+					.append("		unsetProperty(").append(propertyPath).append(");\n")
+					.append("		return this;\n")
+					.append("	}\n\n");
+			}
+
+			writer.append("}\n");
+		}
+	}
+	
 	private boolean isSameNameSpace(String name1, String name2) {
 		String prefix1 = StringUtils.substringBefore(name1, ":");
 		String prefix2 = StringUtils.substringBefore(name2, ":");
@@ -160,7 +223,7 @@ public class JavaModelGenerator {
 	
 	private void manageProperty(Writer writer, String javaRootInterfaceName, M2Property property) throws IOException {
 		String name = StringUtils.substringAfter(property.getName(), ":");
-		String type = getType(property.getType());
+		String type = getModelType(property.getType());
 		String multi = property.isMultiValued() ? "Multi" : "";
 		writer.append("	public final ").append(multi).append(type).append("PropertyModel ").append(toJavaName(name))
 			.append(" = PropertyModels.new").append(multi).append(type).append("(this, ").append(javaRootInterfaceName)
@@ -189,7 +252,7 @@ public class JavaModelGenerator {
 			.append(".").append(name).append(");\n");
 	}
 
-	private String getType(String type) {
+	private String getModelType(String type) {
 		switch (type) {
 		case "d:int": return "Integer";
 		case "d:datetime": return "DateTime";
@@ -200,7 +263,22 @@ public class JavaModelGenerator {
 		}
 		return StringUtils.capitalize(StringUtils.substringAfter(type, ":"));
 	}
-	
+
+	private String getJavaType(String type) {
+		switch (type) {
+		case "d:int": return "Integer";
+		case "d:date": return "java.util.Date";
+		case "d:time": return "java.util.Date";
+		case "d:datetime": return "java.util.Date";
+		case "d:noderef": return "fr.openwide.alfresco.api.core.remote.model.NodeReference";
+		case "d:qname": return "fr.openwide.alfresco.api.core.remote.model.NameReference";
+		case "d:category": return "fr.openwide.alfresco.api.core.remote.model.NodeReference";
+		case "d:text": return "String";
+		case "d:mltext": return "String";
+		}
+		return StringUtils.capitalize(StringUtils.substringAfter(type, ":"));
+	}
+
 	private String getClassName(String containerName) {
 		String prefix = StringUtils.substringBefore(containerName, ":");
 		String name = StringUtils.substringAfter(containerName, ":");
@@ -215,6 +293,6 @@ public class JavaModelGenerator {
 	}
 
 	private String getPackageName(String prefix) {
-		return "fr.openwide.alfresco." + toJavaName(prefix) + ".model";
+		return "fr.openwide.alfresco." + toJavaName(prefix);
 	}
 }

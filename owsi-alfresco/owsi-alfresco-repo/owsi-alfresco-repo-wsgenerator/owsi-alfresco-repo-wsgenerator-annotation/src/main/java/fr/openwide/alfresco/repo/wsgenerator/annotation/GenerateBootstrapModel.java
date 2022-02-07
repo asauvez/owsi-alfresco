@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  */
 
 
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.PACKAGE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GenerateBootstrapModel {
 
