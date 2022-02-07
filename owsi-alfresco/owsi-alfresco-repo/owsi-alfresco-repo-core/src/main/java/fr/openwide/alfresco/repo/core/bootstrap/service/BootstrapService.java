@@ -2,6 +2,7 @@ package fr.openwide.alfresco.repo.core.bootstrap.service;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
+import org.alfresco.service.cmr.site.SiteRole;
 import org.alfresco.service.cmr.site.SiteVisibility;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
@@ -29,6 +30,7 @@ public interface BootstrapService {
 
 	SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
 	SiteInfo getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
+	void setSiteMembership(SiteInfo info, AuthorityReference authority, SiteRole role);
 	void deleteSiteSwsdp();
 	
 	NodeRef createFolder(NodeRef parentRef, String folderName);

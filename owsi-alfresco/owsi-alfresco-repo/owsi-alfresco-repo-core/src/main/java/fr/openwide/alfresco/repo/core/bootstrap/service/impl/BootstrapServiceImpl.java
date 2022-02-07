@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteInfo;
+import org.alfresco.service.cmr.site.SiteRole;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.service.namespace.NamespaceService;
@@ -246,6 +247,11 @@ public class BootstrapServiceImpl implements BootstrapService {
 		}
 		return siteInfo;
 	}
+	@Override
+	public void setMembership(SiteInfo info, AuthorityReference authority, SiteRole role) {
+		siteService.setSiteMembership(info.getShortName(), authority.getName(), role.toString());
+	}
+	
 	@Override
 	public void deleteSiteSwsdp() {
 		if (siteService.getSite("swsdp") != null) {
