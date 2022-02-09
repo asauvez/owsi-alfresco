@@ -23,13 +23,16 @@ import org.alfresco.repo.dictionary.M2Type;
 import org.apache.commons.lang3.StringUtils;
 import org.jibx.runtime.impl.IXMLReaderFactory;
 
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateJavaModel;
+
 public class JavaModelGenerator {
 
-	public void generate(String modelPath, Filer filer) {
+	public void generate(GenerateJavaModel generateJavaModel, String packageName, String modelPath, Filer filer) {
 		try {
 			File moduleFolder = getModuleFolder(filer);
-			File resourceFolder = new File(moduleFolder, "src/main/resources/");
-			File modelFile = new File(resourceFolder, modelPath);
+			File modelFile = (modelPath.startsWith("../"))
+					? new File(moduleFolder, modelPath)
+					: new File(new File(moduleFolder, "src/main/resources/"), modelPath);
 			if (! modelFile.exists() && modelPath.startsWith("alfresco/module/")) {
 				File configFolder = new File(moduleFolder, "src/main/config");
 				String modelPathConfig = StringUtils.substringAfter(modelPath.substring("src/main/resources/".length()), "/");
@@ -41,25 +44,45 @@ public class JavaModelGenerator {
 			
 			M2Model model = loadModel(modelFile);
 			for (M2Namespace namespace : model.getNamespaces()) {
-				String packageName = getPackageName(namespace.getPrefix()) + ".model";
 				String javaRootInterfaceName = StringUtils.capitalize(namespace.getPrefix()) + "Model";
+				String namespacePackage = packageName + "." + toJavaName(namespace.getPrefix());
 				
 				JavaFileObject javaRootInterface = filer.createSourceFile(packageName + "." + javaRootInterfaceName);
 				try (Writer writer = javaRootInterface.openWriter()) {
-					writer.append("package ").append(packageName).append(";\n\n")
-						.append("import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;\n\n")
-						.append("public interface ").append(javaRootInterfaceName).append(" {\n\n")
+					writer.append("package ").append(packageName).append(";\n\n");
+					
+					Set<String> classesToImport = new TreeSet<>();
+					classesToImport.add("fr.openwide.alfresco.api.core.remote.model.NamespaceReference");
+					for (M2Aspect aspect : model.getAspects()) {
+						if (isSameNameSpace(namespace.getPrefix() + ":", aspect.getName())) {
+							classesToImport.add(namespacePackage + "." + getClassName(aspect.getName()));
+						}
+					}
+					for (M2Type type : model.getTypes()) {
+						if (isSameNameSpace(namespace.getPrefix() + ":", type.getName())) {
+							classesToImport.add(namespacePackage + "." + getClassName(type.getName()));
+						}
+					}
+					for (String classToImport : classesToImport) {
+						writer.append("import ").append(classToImport).append(";\n");
+					}
+					
+					writer.append("\npublic interface ").append(javaRootInterfaceName).append(" {\n\n")
 						.append("	NamespaceReference NAMESPACE = NamespaceReference.create(\"")
 							.append(namespace.getPrefix()).append("\", \"").append(namespace.getUri()).append("\");\n\n");
 					
 					for (M2Aspect aspect : model.getAspects()) {
 						if (isSameNameSpace(namespace.getPrefix() + ":", aspect.getName())) {
-							manageClass(writer, javaRootInterfaceName, aspect, filer);
+							manageClass(generateJavaModel, writer, 
+									namespacePackage, javaRootInterfaceName, 
+									aspect, filer);
 						}
 					}
 					for (M2Type type : model.getTypes()) {
 						if (isSameNameSpace(namespace.getPrefix() + ":", type.getName())) {
-							manageClass(writer, javaRootInterfaceName, type, filer);
+							manageClass(generateJavaModel, writer, 
+									namespacePackage, javaRootInterfaceName, 
+									type, filer);
 						}
 					}
 					writer.append("}\n");
@@ -71,6 +94,10 @@ public class JavaModelGenerator {
 	}
 	
 	private M2Model loadModel(File modelFile) throws IOException {
+		if (! modelFile.exists()) {
+			throw new IllegalStateException("Model do not exist " + modelFile.getAbsolutePath());
+		}
+		
 		ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 		try (InputStream input = new BufferedInputStream(new FileInputStream(modelFile))) {
 			Thread.currentThread().setContextClassLoader(IXMLReaderFactory.class.getClassLoader());
@@ -90,25 +117,34 @@ public class JavaModelGenerator {
 		}
 	}
 
-	private void manageClass(Writer javaRootInterfaceWriter, String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
-		manageClassModel(javaRootInterfaceWriter, javaRootInterfaceName, m2Class, filer);
-		manageClassBean(javaRootInterfaceName, m2Class, filer);
+	private void manageClass(GenerateJavaModel generateJavaModel, Writer javaRootInterfaceWriter, 
+			String packageName,
+			String javaRootInterfaceName, 
+			M2Class m2Class, 
+			Filer filer) throws IOException {
+		manageClassModel(generateJavaModel, javaRootInterfaceWriter, packageName, javaRootInterfaceName, m2Class, filer);
+		if (generateJavaModel.useBean()) {
+			manageClassBean(generateJavaModel, packageName, javaRootInterfaceName, m2Class, filer);
+		}
 	}
 
-	private void manageClassModel(Writer javaRootInterfaceWriter, String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
+	private void manageClassModel(GenerateJavaModel generateJavaModel, Writer javaRootInterfaceWriter,
+			String packageName,
+			String javaRootInterfaceName, 
+			M2Class m2Class, 
+			Filer filer) throws IOException {
 		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
 		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
 		String className = getClassName(m2Class.getName());
 		javaRootInterfaceWriter.append("	").append(className).append(" ").append(containerName).append(" = new ").append(className).append("();\n");
 		
-		String packageName = getPackageName(classPrefix) + ".model";
 		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
 		try (Writer writer = classObject.openWriter()) {
 			writer.append("package ").append(packageName).append(";\n\n");
 
 			Set<String> classesToImport = new TreeSet<>();
 			classesToImport.add("fr.openwide.alfresco.api.core.remote.model.NameReference");
-			classesToImport.add(getPackageName(classPrefix) + ".bean." + className + "Bean");
+			classesToImport.add(StringUtils.substringBeforeLast(packageName, ".") + "." + javaRootInterfaceName);
 			
 			String containerType = (m2Class instanceof M2Aspect) ? "AspectModel" : "TypeModel";
 			if (m2Class.getParentName() != null 
@@ -138,11 +174,12 @@ public class JavaModelGenerator {
 				.append("	}\n\n")
 				.append("	protected ").append(className).append("(NameReference nameReference) {\n")
 				.append("		super(nameReference);\n")
-				.append("	}\n\n")
-				.append("	public ").append(className).append("Bean bean() {\n")
-				.append("		return new ").append(className).append("Bean();\n")
 				.append("	}\n\n");
-
+			if (generateJavaModel.useBean()) {
+				writer.append("	public ").append(className).append("Bean bean() {\n")
+					.append("		return new ").append(className).append("Bean();\n")
+					.append("	}\n\n");
+			}
 			
 			for (M2Property property : m2Class.getProperties()) {
 				manageProperty(writer, javaRootInterfaceName, property);
@@ -163,12 +200,12 @@ public class JavaModelGenerator {
 		}
 	}
 	
-	private void manageClassBean(String javaRootInterfaceName, M2Class m2Class, Filer filer) throws IOException {
-		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
+	private void manageClassBean(GenerateJavaModel generateJavaModel, 
+			String packageName, String javaRootInterfaceName, 
+			M2Class m2Class, Filer filer) throws IOException {
 		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
 		String className = getClassName(m2Class.getName()) + "Bean";
 		
-		String packageName = getPackageName(classPrefix) + ".bean";
 		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
 		try (Writer writer = classObject.openWriter()) {
 			writer.append("package ").append(packageName).append(";\n\n");
@@ -176,8 +213,10 @@ public class JavaModelGenerator {
 			Set<String> classesToImport = new TreeSet<>();
 			classesToImport.add("fr.openwide.alfresco.component.model.node.model.bean.NodeBean");
 			if (! m2Class.getProperties().isEmpty()) {
-				classesToImport.add("com.fasterxml.jackson.annotation.JsonProperty");
-				classesToImport.add(getPackageName(classPrefix) + ".model." + javaRootInterfaceName);
+				if (generateJavaModel.useJackson()) {
+					classesToImport.add("com.fasterxml.jackson.annotation.JsonProperty");
+				}
+				classesToImport.add(StringUtils.substringBeforeLast(packageName, ".") + "." + javaRootInterfaceName);
 			}
 			for (String classToImport : classesToImport) {
 				writer.append("import ").append(classToImport).append(";\n");
@@ -193,8 +232,11 @@ public class JavaModelGenerator {
 					type = "java.util.List<" + type + ">";
 				}
 				
+				if (generateJavaModel.useJackson()) {
+					writer.append("	@JsonProperty(\"").append(property.getName()).append("\")\n");
+				}
+				
 				writer
-					.append("	@JsonProperty(\"").append(property.getName()).append("\")\n")
 					.append("	public ").append(type).append(" get").append(StringUtils.capitalize(propertyJavaName)).append("() {\n")
 					.append("		return getProperty(").append(propertyPath).append(");\n")
 					.append("	}\n")
@@ -290,9 +332,5 @@ public class JavaModelGenerator {
 			s = s + "_";
 		}
 		return s.replace("-", "_");
-	}
-
-	private String getPackageName(String prefix) {
-		return "fr.openwide.alfresco." + toJavaName(prefix);
 	}
 }

@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.BootstrapView;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateJavaModel;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
@@ -50,6 +51,7 @@ import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel",
+	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateJavaModel",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GeneratePatch",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron",
 })
@@ -89,6 +91,9 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateBootstrapModel.class)) {
 				generateComment(annotatedClassElement);
 				processBootstrapModel(annotatedClassElement, processingEnv.getFiler());
+			}
+			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateJavaModel.class)) {
+				processJavaModel(annotatedClassElement, processingEnv.getFiler());
 			}
 			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GeneratePatch.class)) {
 				generateComment(annotatedClassElement);
@@ -315,10 +320,6 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 				springContextXml.writeStartElement("value");
 				springContextXml.writeCharacters(model);
 				springContextXml.writeEndElement(); // value
-				
-				if (generateBootstrapModel.generateJava()) {
-					new JavaModelGenerator().generate(model, filer);
-				}
 			}
 			springContextXml.writeEndElement(); // list
 			springContextXml.writeEndElement(); // property
@@ -378,6 +379,26 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		}
 	}
 
+	private void processJavaModel(Element annotatedClassElement, Filer filer) throws XMLStreamException {
+		JavaModelGenerator javaModelGenerator = new JavaModelGenerator();
+		String packageName = ((QualifiedNameable) annotatedClassElement).getQualifiedName().toString();
+		if (annotatedClassElement instanceof TypeElement) {
+			packageName = StringUtils.substringBeforeLast(packageName, ".");
+		}
+
+		GenerateJavaModel generateJavaModel = annotatedClassElement.getAnnotation(GenerateJavaModel.class);
+		for (String model : generateJavaModel.importModels()) {
+			javaModelGenerator.generate(generateJavaModel, packageName, model, filer);
+		}
+
+		GenerateBootstrapModel generateBootstrapModel = annotatedClassElement.getAnnotation(GenerateBootstrapModel.class);
+		if (generateBootstrapModel != null) {
+			for (String model : generateBootstrapModel.importModels()) {
+				javaModelGenerator.generate(generateJavaModel, packageName, model, filer);
+			}
+		}
+	}
+	
 	private void processPatch(Element annotatedClassElement) throws XMLStreamException {
 		GeneratePatch generatePatch = annotatedClassElement.getAnnotation(GeneratePatch.class);
 		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();

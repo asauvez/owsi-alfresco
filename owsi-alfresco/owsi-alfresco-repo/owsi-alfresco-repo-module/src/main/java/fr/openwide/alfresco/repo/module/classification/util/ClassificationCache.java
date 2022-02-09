@@ -14,6 +14,7 @@ public class ClassificationCache {
 	
 	private Map<String, NodeRef> cache 
 			= Collections.synchronizedMap(new LinkedHashMap<String, NodeRef>(16, 10.75f, true) {
+		private static final long serialVersionUID = 3057991717141359392L;
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, NodeRef> eldest) {
 			return size() > maxSize;

@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
  * 
  * @GenerateBootstrapModel(
  *	importModels = "alfresco/module/xxx-ged-platform/xxx-model.xml",
- *  generateJava = true,
  *	importViews = {
  *		@BootstrapView(
  *			checkPath="/${spaces.company_home.childname}/st:sites/cm:acme/cm:dataLists/cm:myDatalist",
@@ -35,8 +34,6 @@ public @interface GenerateBootstrapModel {
 	String id() default "";
 	
 	String[] importModels() default {};
-	boolean generateJava() default false;
-	
 	String[] importLabels() default {};
 	
 	BootstrapView[] importViews() default {};
