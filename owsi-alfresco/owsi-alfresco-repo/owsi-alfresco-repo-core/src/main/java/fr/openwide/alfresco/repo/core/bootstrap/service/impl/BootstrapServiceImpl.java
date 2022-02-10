@@ -80,6 +80,20 @@ public class BootstrapServiceImpl implements BootstrapService {
 	public AuthorityReference createGroup(String groupName, AuthorityReference ... parentAuthorities) {
 		return createGroup(AuthorityReference.group(groupName), parentAuthorities);
 	}
+	
+	@Override
+	public AuthorityReference getOrCreateGroup(AuthorityReference group, AuthorityReference... parentAuthorities) {
+		if (! authorityService.authorityExists(group.getName())) {
+			authorityService.createAuthority(AuthorityType.GROUP, group.getGroupShortName());
+		}
+		addAuthority(parentAuthorities, group);
+		return group;
+	}
+	@Override
+	public AuthorityReference getOrCreateGroup(String groupName, AuthorityReference... parentAuthorities) {
+		return getOrCreateGroup(AuthorityReference.group(groupName), parentAuthorities);
+	}
+	
 
 	@Override
 	public void importGroupsFile(String fileName) {

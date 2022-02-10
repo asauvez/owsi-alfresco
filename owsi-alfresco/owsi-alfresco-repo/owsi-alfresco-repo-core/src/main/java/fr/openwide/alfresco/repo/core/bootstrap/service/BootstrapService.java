@@ -14,6 +14,8 @@ public interface BootstrapService {
 
 	AuthorityReference createGroup(AuthorityReference group, AuthorityReference ... parentAuthorities);
 	AuthorityReference createGroup(String groupName, AuthorityReference ... parentAuthorities);
+	AuthorityReference getOrCreateGroup(AuthorityReference group, AuthorityReference ... parentAuthorities);
+	AuthorityReference getOrCreateGroup(String groupName, AuthorityReference ... parentAuthorities);
 	void importGroupsFile(String fileName);
 
 	AuthorityReference createUser(String username, String firstName, String lastName, String email, String password, AuthorityReference ... parentAuthorities);
