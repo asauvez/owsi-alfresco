@@ -228,7 +228,11 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		}
 		return res;
 	}
-	
+	@Override
+	public <B extends NodeBean> B getProperties(NodeRef nodeRef, B bean) {
+		bean.getProperties().putAll(getProperties(nodeRef));
+		return bean;
+	}
 	
 	@Override
 	@SuppressWarnings("unchecked")

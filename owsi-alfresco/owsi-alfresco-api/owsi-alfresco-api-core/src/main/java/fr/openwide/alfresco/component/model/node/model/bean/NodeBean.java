@@ -20,9 +20,16 @@ public abstract class NodeBean {
 	public Map<NameReference, Serializable> getProperties() {
 		return properties;
 	}
+	public void setProperties(Map<NameReference, Serializable> properties) {
+		this.properties = properties;
+	}
 	public NodeBean merge(NodeBean otherBean) {
 		this.properties.putAll(otherBean.getProperties());
 		return this;
+	}
+	public <B extends NodeBean> B getAspect(B otherBean) {
+		otherBean.setProperties(getProperties());
+		return otherBean;
 	}
 	
 	@SuppressWarnings("unchecked")

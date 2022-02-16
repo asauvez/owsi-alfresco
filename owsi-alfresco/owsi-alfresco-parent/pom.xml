@@ -154,6 +154,10 @@
 				<enabled>false</enabled>
 			</releases>
 		</pluginRepository>
+		<pluginRepository>
+			<id>alfresco-artifacts-repository</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/private/</url>
+		</pluginRepository>
 	</pluginRepositories>
 
 

@@ -4,6 +4,7 @@ import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiAnyPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiBooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDateTimePropertyModel;
@@ -14,6 +15,7 @@ import fr.openwide.alfresco.component.model.node.model.property.multi.MultiLongP
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNameReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiTextPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.AnyPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
@@ -116,4 +118,10 @@ public final class PropertyModels {
 		return new MultiNameReferencePropertyModel(type, NameReference.create(namespace, name));
 	}
 
+	public static AnyPropertyModel newAny(ContainerModel type, NamespaceReference namespace, String name) {
+		return new AnyPropertyModel(type, NameReference.create(namespace, name));
+	}
+	public static MultiAnyPropertyModel newMultiAny(ContainerModel type, NamespaceReference namespace, String name) {
+		return new MultiAnyPropertyModel(type, NameReference.create(namespace, name));
+	}
 }

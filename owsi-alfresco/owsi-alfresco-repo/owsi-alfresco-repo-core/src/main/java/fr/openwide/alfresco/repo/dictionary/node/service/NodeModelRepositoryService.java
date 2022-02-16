@@ -70,6 +70,7 @@ public interface NodeModelRepositoryService {
 	void deleteNodePermanently(NodeRef nodeRef);
 	
 	Map<NameReference, Serializable> getProperties(NodeRef nodeRef);
+	<B extends NodeBean> B getProperties(NodeRef nodeRef, B bean);
 	<C extends Serializable> C getProperty(NodeRef nodeRef, NameReference property);
 	<C extends Serializable> C getProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
 	NodeRef getProperty(NodeRef nodeRef, NodeReferencePropertyModel property);
