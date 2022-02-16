@@ -233,6 +233,18 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		bean.getProperties().putAll(getProperties(nodeRef));
 		return bean;
 	}
+	@Override
+	public void setProperties(NodeRef nodeRef, Map<NameReference, Serializable> properties) {
+		Map<QName, Serializable> props = new HashMap<>();
+		for (Entry<NameReference, Serializable> entry : properties.entrySet()) {
+			props.put(conversionService.getRequired(entry.getKey()), entry.getValue());
+		}
+		nodeService.setProperties(nodeRef, props);
+	}
+	@Override
+	public void setProperties(NodeRef nodeRef, NodeBean bean) {
+		setProperties(nodeRef, bean.getProperties());
+	}
 	
 	@Override
 	@SuppressWarnings("unchecked")

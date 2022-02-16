@@ -71,6 +71,9 @@ public interface NodeModelRepositoryService {
 	
 	Map<NameReference, Serializable> getProperties(NodeRef nodeRef);
 	<B extends NodeBean> B getProperties(NodeRef nodeRef, B bean);
+	void setProperties(NodeRef nodeRef, Map<NameReference, Serializable> properties);
+	void setProperties(NodeRef nodeRef, NodeBean bean);
+
 	<C extends Serializable> C getProperty(NodeRef nodeRef, NameReference property);
 	<C extends Serializable> C getProperty(NodeRef nodeRef, SinglePropertyModel<C> property);
 	NodeRef getProperty(NodeRef nodeRef, NodeReferencePropertyModel property);
