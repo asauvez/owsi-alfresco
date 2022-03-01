@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.node.model.bean;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.SinglePro
 
 public abstract class NodeBean {
 	
-	private Map<NameReference, Serializable> properties;
+	private Map<NameReference, Serializable> properties = new HashMap<>();
 	
 	public Map<NameReference, Serializable> getProperties() {
 		return properties;

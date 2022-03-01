@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -403,6 +404,15 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 			return originalName;
 		}
 		return getUniqueChildName(folder, originalName);
+	}
+	
+	@Override
+	public void visitAllChildrenContains(NodeRef nodeRef, Consumer<NodeRef> visitor) {
+		visitor.accept(nodeRef);
+		
+		for (NodeRef childRef : getChildrenAssocsContains(nodeRef)) {
+			visitAllChildrenContains(childRef, visitor);
+		}
 	}
 	
 	@Override

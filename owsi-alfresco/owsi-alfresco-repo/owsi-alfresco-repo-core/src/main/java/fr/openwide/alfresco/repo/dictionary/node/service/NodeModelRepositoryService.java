@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -94,6 +95,7 @@ public interface NodeModelRepositoryService {
 	Optional<NodeRef> getChildAssocs(NodeRef nodeRef, ChildAssociationModel associationType, NameReference assocName);
 	List<NodeRef> getChildrenAssocs(NodeRef nodeRef, ChildAssociationModel associationType);
 	List<NodeRef> getChildrenAssocsContains(NodeRef nodeRef);
+	void visitAllChildrenContains(NodeRef nodeRef, Consumer<NodeRef> visitor);
 
 	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName);
 	Optional<NodeRef> getChildByName(NodeRef nodeRef, String childName, ChildAssociationModel associationType);
