@@ -3,7 +3,7 @@
 
     <groupId>fr.openwide.alfresco</groupId>
     <artifactId>owsi-alfresco-root</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OWSI Alfresco root</name>
