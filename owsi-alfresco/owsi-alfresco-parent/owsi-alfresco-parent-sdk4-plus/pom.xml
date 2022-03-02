@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent-sdk4</artifactId>
-		<version>0.9.2-SNAPSHOT</version>
+		<version>0.9.3-SNAPSHOT</version>
 		<relativePath>../owsi-alfresco-parent-sdk4/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-parent-sdk4-plus</artifactId>
@@ -85,7 +85,7 @@
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>0.9.2-SNAPSHOT</version>
+						<version>0.9.3-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
 			</plugin>
@@ -93,7 +93,7 @@
 				<!-- Aide à la migration des surcharges de Alfresco -->
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
-				<version>0.9.2-SNAPSHOT</version>
+				<version>0.9.3-SNAPSHOT</version>
 				<executions>
 					<execution>
 						<id>migration-maven-plugin</id>

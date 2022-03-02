@@ -32,6 +32,8 @@ mvn gitflow:release
 
 Nouveautés
 ==========
+## depuis 0.9.3
+
 
 ## depuis 0.9.2
  * AlfrescoUrlService : Fix URL dossier Share
@@ -39,6 +41,7 @@ Nouveautés
  * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
  * ClassificationService: Deprecie l'utilisation de BusinessNode
  * @GenerateJavaModel: pour générer le modèle en Java.
+ * Suppression de l'enforcer dans owsi-alfresco-parent-app
 
 ## depuis 0.8.9
 Release du 05/12/2021

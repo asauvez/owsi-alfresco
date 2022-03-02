@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
 		<artifactId>owsi-alfresco-parent</artifactId>
-		<version>0.9.2-SNAPSHOT</version>
+		<version>0.9.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-parent-app</artifactId>
 	<packaging>pom</packaging>
@@ -39,7 +39,7 @@
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-parent-bom</artifactId>
-				<version>0.9.2-SNAPSHOT</version>
+				<version>0.9.3-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -167,47 +167,6 @@
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>enforce</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<DependencyConvergence />
-								<bannedDependencies>
-									<excludes>
-										<exclude>org.springframework:spring</exclude> <!-- Use spring-context ou spring-web -->
-										<exclude>org.springframework:spring-ldap</exclude> <!-- Replace by org.springframework.ldap:spring-ldap-core -->
-										<exclude>commons-logging:commons-logging</exclude> <!-- Replace by org.slf4j:jcl-over-slf4j -->
-										<exclude>cglib:cglib</exclude> <!-- Replace by cglib:cglib-nodep -->
-										<exclude>rhino:rhino</exclude> <!-- Now included in Java -->
-										<exclude>rhino:js</exclude> <!-- Now included in Java -->
-										<exclude>javassist:javassist</exclude> <!-- Replace by org.javassist:javassist -->
-										<exclude>xml-apis:xml-apis</exclude>
-										<exclude>apache-xerces:xml-apis</exclude>
-										<exclude>javax.servlet:servlet-api</exclude> <!-- Replace by javax.servlet:javax.servlet-api -->
-										<exclude>net.sf.ehcache:ehcache-core</exclude>
-										<exclude>postgresql:postgresql</exclude> <!-- Replace by org.postgresql:postgresql -->
-									</excludes>
-								</bannedDependencies>
-								<requireMavenVersion>
-									<version>[${minimal.maven.version},)</version>
-								</requireMavenVersion>
-								<requireJavaVersion>
-									<version>${jdk.version}</version>
-								</requireJavaVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
