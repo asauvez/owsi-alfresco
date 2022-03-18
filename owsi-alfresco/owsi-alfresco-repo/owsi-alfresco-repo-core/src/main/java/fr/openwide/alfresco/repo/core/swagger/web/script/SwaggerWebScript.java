@@ -46,10 +46,11 @@ public abstract class SwaggerWebScript extends AbstractWebScript {
 
 		//res.setContentType("application/x-yaml");
 		res.setContentType("text/plain");
+		res.setContentEncoding("UTF-8");
 		SwaggerRoot root = getRoot();
 		String yaml = objectMapper.writeValueAsString(root);
 		yaml = yaml.substring("---\n".length());
-		res.getWriter().append(yaml).flush();
+		res.getOutputStream().write(yaml.getBytes("UTF-8"));
 	}
 	
 	/** Protected pour permettre aux sous classes de modifier ce qui est généré */

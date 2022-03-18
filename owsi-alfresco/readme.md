@@ -33,7 +33,7 @@ mvn gitflow:release
 Nouveautés
 ==========
 ## depuis 0.9.3
-
+ * Fix encoding swagger
 
 ## depuis 0.9.2
  * AlfrescoUrlService : Fix URL dossier Share
