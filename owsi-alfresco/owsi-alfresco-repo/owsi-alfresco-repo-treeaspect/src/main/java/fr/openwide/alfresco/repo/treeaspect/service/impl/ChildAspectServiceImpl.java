@@ -97,7 +97,7 @@ public class ChildAspectServiceImpl implements ChildAspectService, ApplicationLi
 			@Override
 			public void onCreateChildAssociation(ChildAssociationRef childAssocRef, boolean isNewNode) {
 				if (   ! nodeService.exists(childAssocRef.getParentRef()) 
-					|| ! nodeService.exists(childAssocRef.getParentRef())) {
+					|| ! nodeService.exists(childAssocRef.getChildRef())) {
 					return;
 				}
 				QName childType = nodeService.getType(childAssocRef.getChildRef());

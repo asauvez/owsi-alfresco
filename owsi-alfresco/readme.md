@@ -33,6 +33,7 @@ mvn gitflow:release
 Nouveautés
 ==========
 ## depuis 0.9.3
+ * Fix ChildAspectServiceImpl sur revert ancienne version
  * Fix encoding swagger
 
 ## depuis 0.9.2
