@@ -33,6 +33,7 @@ mvn gitflow:release
 Nouveautés
 ==========
 ## depuis 0.9.3
+ * Déplace owsi-alfresco-app à la racine
  * Fix ChildAspectServiceImpl sur revert ancienne version
  * Fix encoding swagger
 
