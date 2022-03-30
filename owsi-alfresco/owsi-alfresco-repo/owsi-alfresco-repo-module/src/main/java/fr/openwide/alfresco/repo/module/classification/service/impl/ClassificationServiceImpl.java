@@ -84,7 +84,9 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private static final Set<QName> IGNORED_PROPERTIES = new HashSet<>(Arrays.asList(
 			ContentModel.PROP_CONTENT,
 			ContentModel.PROP_CASCADE_CRC,
-			ContentModel.PROP_CASCADE_TX
+			ContentModel.PROP_CASCADE_TX,
+			ContentModel.PROP_VERSION_LABEL,
+			ContentModel.PROP_VERSION_TYPE
 		));
 	
 	private final Logger logger = LoggerFactory.getLogger(ClassificationServiceImpl.class);
