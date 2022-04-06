@@ -8,11 +8,11 @@ import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
-import fr.openwide.alfresco.repo.core.swagger.web.script.SwaggerWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
@@ -29,8 +29,12 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 	swaggerParameters = {
 		@SwaggerParameter(name="lines", description="Nombre de lignes à retourner à la fin du fichier. -1 pour tout.")
 	})
-public class AlfrescoLogWebScript extends SwaggerWebScript {
+public class AlfrescoLogWebScript extends AbstractWebScript {
 
+	protected String getLogFile() {
+		return "logs/alfresco.log";
+	}
+	
 	@Override
 	public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException {
 		String linesS = req.getParameter("lines");
@@ -38,7 +42,7 @@ public class AlfrescoLogWebScript extends SwaggerWebScript {
 
 		res.setContentType("text/plain");
 		
-		File file = new File("logs/alfresco.log");
+		File file = new File(getLogFile());
 		if (nbLines == -1) {
 			FileUtils.copyFile(file, res.getOutputStream());
 		} else {
