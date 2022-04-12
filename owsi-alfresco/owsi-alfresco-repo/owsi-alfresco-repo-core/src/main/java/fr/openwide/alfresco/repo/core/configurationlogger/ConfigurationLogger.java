@@ -3,6 +3,8 @@ package fr.openwide.alfresco.repo.core.configurationlogger;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.alfresco.service.license.LicenseDescriptor;
 import org.alfresco.service.license.LicenseService;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -38,7 +40,7 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 	private Properties globalProperties;
 	private StringBuilder messagesGenerated = new StringBuilder();
 
-	@Autowired private BasicDataSource dataSource;
+	@Autowired private DataSource dataSource;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -57,8 +59,10 @@ public class ConfigurationLogger extends AbstractConfigurationLogger
 	
 	@Override
 	protected void logCustoms() {
-		if (dataSource != null) {
-			logPropertyAsInfo("db.maximumPoolSize", dataSource.getMaxIdle() + " / " + dataSource.getMaxActive());
+		// Plus vrai en 7.2
+		if (dataSource instanceof BasicDataSource) {
+			BasicDataSource basicDataSource = (BasicDataSource) dataSource;
+			logPropertyAsInfo("db.maximumPoolSize", basicDataSource.getMaxIdle() + " / " + basicDataSource.getMaxActive());
 		}
 		
 		LicenseService licenseService = applicationContext.getBean(LicenseService.class);
