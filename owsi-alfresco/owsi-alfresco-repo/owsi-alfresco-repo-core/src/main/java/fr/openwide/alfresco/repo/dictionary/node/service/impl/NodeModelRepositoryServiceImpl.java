@@ -554,6 +554,10 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		return repositoryHelper.getCompanyHome();
 	}
 	@Override
+	public NodeRef getSharedHome() {
+		return repositoryHelper.getSharedHome();
+	}
+	@Override
 	public NodeRef getDataDictionary() {
 		NodeRef dataDictionaryRef = singletonCache.get(KEY_DATADICTIONARY_NODEREF);
 		if (dataDictionaryRef == null) {

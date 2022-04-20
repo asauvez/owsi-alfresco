@@ -132,6 +132,7 @@ public interface NodeModelRepositoryService {
 
 	
 	NodeRef getCompanyHome();
+	NodeRef getSharedHome();
 	NodeRef getDataDictionary();
 	Optional<NodeRef> getUserHome();
 	
