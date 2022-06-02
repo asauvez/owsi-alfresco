@@ -175,6 +175,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 			List<String> list = new ArrayList<>();
 			for (AuthorityReference parentAuthority : parentAuthorities) {
 				list.add(parentAuthority.getName());
+				authorityService.removeAuthority(parentAuthority.getName(), authority.getName());
 			}
 			authorityService.addAuthority(list, authority.getName());
 		}
