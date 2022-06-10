@@ -93,4 +93,8 @@ public class AbstractClassificationBuilder<B extends AbstractClassificationBuild
 	public B classificationState(Enum<?> newState) {
 		return classificationState(newState.name());
 	}
+	
+	public PreviousVersionBuilder<B> getPreviousNodeWith(SinglePropertyModel<?> ... properties) {
+		return new PreviousVersionBuilder<B>(self(), properties);
+	}
 }

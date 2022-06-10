@@ -11,7 +11,7 @@ import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
 public class ClassificationEvent {
 
-	private final NodeRef nodeRef;
+	private NodeRef nodeRef;
 	private final ClassificationMode mode;
 	private ContainerModel model;
 	private final Map<QName, Serializable> valuesOverride;
@@ -49,6 +49,10 @@ public class ClassificationEvent {
 		}
 		return nodeRef;
 	}
+	public void setNodeRef(NodeRef nodeRef) {
+		this.nodeRef = nodeRef;
+	}
+	
 	public ClassificationMode getMode() {
 		return mode;
 	}

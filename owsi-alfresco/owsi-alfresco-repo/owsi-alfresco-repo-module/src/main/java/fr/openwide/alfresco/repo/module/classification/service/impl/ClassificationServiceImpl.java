@@ -32,6 +32,9 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileNotFoundException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -50,6 +53,7 @@ import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
@@ -65,6 +69,7 @@ import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelReposi
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.ReclassifyParams;
+import fr.openwide.alfresco.repo.module.classification.model.builder.AbstractClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
@@ -105,6 +110,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private ConversionService conversionService;
 	private TransactionService transactionService;
 	private DictionaryService dictionaryService;
+	@Autowired private ContentService contentService;
 
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
@@ -646,4 +652,40 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		nodeModelRepositoryService.setProperty(nodeRef, OwsiModel.classifiable.classificationState, newState);
 	}
 
+	
+	
+	public Optional<NodeRef> getPreviousWith(AbstractClassificationBuilder<?> builder, SinglePropertyModel<?>[] properties) {
+		RestrictionBuilder restrictionBuilder = new RestrictionBuilder();
+		for (SinglePropertyModel<?> property : properties) {
+			addEq(builder, restrictionBuilder, property);
+		}
+		List<NodeRef> results = nodeSearchModelService.searchReference(restrictionBuilder);
+		results.remove(builder.getNodeRef());
+		if (results.size() > 1) {
+			throw new IllegalStateException(results.size() + " results, expected 0 or 1. Query : " + restrictionBuilder.toFtsQuery());
+		} else if (results.size() == 1) {
+			return Optional.of(results.get(0));
+		} else {
+			return Optional.empty();
+		}
+	}
+	private <T extends Serializable> void addEq(
+			AbstractClassificationBuilder<?> restrictionBuilder, 
+			RestrictionBuilder restrictions, 
+			SinglePropertyModel<T> property) {
+		T value = restrictionBuilder.getProperty(property);
+		restrictions.eq(property, value);
+	}
+	
+	public void newContentVersion(NodeRef source, NodeRef target, PropertyModel<?>[] propertiesToCopy) {
+		for (PropertyModel<?> property : propertiesToCopy) {
+			nodeModelRepositoryService.copyProperty(source, target, property);
+		}
+		
+		ContentReader reader = contentService.getReader(source, ContentModel.PROP_CONTENT);
+		if (reader != null) {
+			ContentWriter writer = contentService.getWriter(target, ContentModel.PROP_CONTENT, true);
+			writer.putContent(reader);
+		}
+	}
 }

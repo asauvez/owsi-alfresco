@@ -8,9 +8,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.alfresco.model.ContentModel;
@@ -44,6 +44,7 @@ import fr.openwide.alfresco.component.model.node.model.association.OneToManyAsso
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
 import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -299,6 +300,11 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	@Override
 	public void setProperty(NodeRef nodeRef, MultiNodeReferencePropertyModel property, List<NodeRef> value) {
 		setProperty(nodeRef, property.getNameReference(), (Serializable) value);
+	}
+	@Override
+	public <C extends Serializable> void copyProperty(NodeRef source, NodeRef target, PropertyModel<C> property) {
+		C value = getProperty(source, property.getNameReference());
+		setProperty(target, property.getNameReference(), value);
 	}
 
 	@Override

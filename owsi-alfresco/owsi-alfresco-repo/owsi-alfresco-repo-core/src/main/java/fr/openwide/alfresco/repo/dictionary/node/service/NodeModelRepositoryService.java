@@ -21,6 +21,7 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAsso
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -88,6 +89,7 @@ public interface NodeModelRepositoryService {
 	<C extends Serializable> void setProperty(NodeRef nodeRef, MultiPropertyModel<C> property, List<C> value);
 	<C extends Serializable> void setProperty(NodeRef nodeRef, NameReference property, C value);
 	void setProperty(NodeRef nodeRef, MultiNodeReferencePropertyModel property, List<NodeRef> value);
+	<C extends Serializable> void copyProperty(NodeRef source, NodeRef target, PropertyModel<C> property);
 
 	Optional<NodeRef> getPrimaryParent(NodeRef nodeRef);
 	List<NodeRef> getParentAssocs(NodeRef nodeRef);
