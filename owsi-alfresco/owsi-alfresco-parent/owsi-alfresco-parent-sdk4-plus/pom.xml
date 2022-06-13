@@ -46,23 +46,6 @@
 		
 		<plugins>
 			<plugin>
-				<!-- Génére un fichier git.properties dans les JAR avec des informations sur la compilation -->
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<version>4.0.0</version>
-				<executions>
-					<execution>
-						<id>get-the-git-infos</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<generateGitPropertiesFile>true</generateGitPropertiesFile>
-				</configuration>
-			</plugin>
-			<plugin>
 				<!-- Permet de générer des WS avec une annotation -->
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
