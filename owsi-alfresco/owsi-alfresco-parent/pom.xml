@@ -18,7 +18,6 @@
 	<modules>
 		<module>owsi-alfresco-parent-bom</module>
 		<module>owsi-alfresco-parent-api</module>
-		<module>owsi-alfresco-parent-app</module>
 		<module>owsi-alfresco-repo-migration-maven-plugin</module>
 		<module>owsi-alfresco-parent-repo-component</module>
 		<module>owsi-alfresco-parent-alfresco</module>
