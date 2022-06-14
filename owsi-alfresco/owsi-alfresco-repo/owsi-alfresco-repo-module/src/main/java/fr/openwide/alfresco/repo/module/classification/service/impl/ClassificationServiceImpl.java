@@ -27,6 +27,7 @@ import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileExistsException;
@@ -36,6 +37,8 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.slf4j.Logger;
@@ -71,6 +74,7 @@ import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.ReclassifyParams;
 import fr.openwide.alfresco.repo.module.classification.model.builder.AbstractClassificationBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.builder.ClassificationBuilder;
+import fr.openwide.alfresco.repo.module.classification.model.builder.NewVersionBuilder;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerClassificationPolicy;
@@ -111,6 +115,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	private TransactionService transactionService;
 	private DictionaryService dictionaryService;
 	@Autowired private ContentService contentService;
+	@Autowired private VersionService versionService;
 
 	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
 	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
@@ -677,8 +682,21 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		restrictions.eq(property, value);
 	}
 	
-	public void newContentVersion(NodeRef source, NodeRef target, PropertyModel<?>[] propertiesToCopy) {
-		for (PropertyModel<?> property : propertiesToCopy) {
+	public void newContentVersion(NodeRef source, NodeRef target, NewVersionBuilder newVersionBuilder) {
+		nodeModelRepositoryService.addAspect(target, CmModel.versionable);
+		
+		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(2);
+		
+		String description = newVersionBuilder.getDescription();
+		if (description != null && description.length() != 0) {
+			versionProperties.put(Version.PROP_DESCRIPTION, description);
+		}
+		if (newVersionBuilder.getVersionType() != null) {
+			versionProperties.put(VersionModel.PROP_VERSION_TYPE, newVersionBuilder.getVersionType());
+		}
+		versionService.createVersion(target, versionProperties);
+		
+		for (PropertyModel<?> property : newVersionBuilder.getPropertiesToCopy()) {
 			nodeModelRepositoryService.copyProperty(source, target, property);
 		}
 		

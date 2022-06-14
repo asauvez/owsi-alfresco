@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
-import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 
 public class PreviousVersionBuilder<B extends AbstractClassificationBuilder<B>> {
@@ -40,9 +39,9 @@ public class PreviousVersionBuilder<B extends AbstractClassificationBuilder<B>> 
 		}); 
 	}
 
-	public B newVersion(PropertyModel<?> ... propertiesToCopy) {
+	public B newVersion(NewVersionBuilder newVersionBuilder) {
 		return ifPresent(previousNodeRef -> {
-			classificationBuilder.service.newContentVersion(classificationBuilder.getNodeRef(), previousNodeRef, propertiesToCopy);
+			classificationBuilder.service.newContentVersion(classificationBuilder.getNodeRef(), previousNodeRef, newVersionBuilder);
 			classificationBuilder.getNodeModelService().deleteNode(classificationBuilder.getNodeRef());
 			classificationBuilder.getEvent().setNodeRef(previousNodeRef);
 		}); 
