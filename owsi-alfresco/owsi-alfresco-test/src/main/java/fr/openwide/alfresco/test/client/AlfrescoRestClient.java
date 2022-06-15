@@ -18,6 +18,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -102,6 +103,8 @@ public class AlfrescoRestClient {
 	}
 	
 	public class ErrorStatusException extends RuntimeException {
+		private static final long serialVersionUID = 8366239982176669064L;
+		
 		private CloseableHttpResponse response;
 
 		public ErrorStatusException(CloseableHttpResponse response) {
@@ -181,6 +184,16 @@ public class AlfrescoRestClient {
 		return httpPost;
 	}
 
+	public HttpPost postRequest(String url, byte[] content) {
+		HttpPost httpPost = new HttpPost(getBaseUrl() + url);
+		httpPost.setHeader("Accept", "application/json");
+
+		ByteArrayEntity entity = new ByteArrayEntity(content);
+		httpPost.setEntity(entity);
+		
+		return httpPost;
+	}
+	
 	public HttpPut putRequest(String url, Object objectJson) {
 		String jsonString = convertObjectToJson(objectJson);
 				

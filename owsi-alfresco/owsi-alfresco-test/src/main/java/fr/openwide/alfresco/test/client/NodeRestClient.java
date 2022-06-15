@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import com.fasterxml.jackson.databind.JavaType;
 
@@ -64,7 +64,7 @@ public class NodeRestClient {
 	}
 
 	public void assertPathValue(NodeModelIT<?> node, String path) {
-		Assert.assertEquals(path, node.getPath().getName().replaceFirst("/Espace racine", "/Company Home"));
+		Assertions.assertEquals(path, node.getPath().getName().replaceFirst("/Espace racine", "/Company Home"));
 	}
 	
 	private JavaType getNodeEntryModelITClass(Class<?> propertiesClass) {
