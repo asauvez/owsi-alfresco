@@ -241,7 +241,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			try {
 				XMLStreamWriter xmlView = XMLOutputFactory.newFactory()
 						.createXMLStreamWriter(zipOutPutStream, "UTF-8");
-				xmlView.writeStartDocument();
+				xmlView.writeStartDocument("UTF-8", "1.0");
 				xmlView.writeStartElement("view", "view", NamespaceService.REPOSITORY_VIEW_1_0_URI);
 		
 				ChildAssociationRef primaryParent = nodeService.getPrimaryParent(nodeRef);
@@ -270,7 +270,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			XMLStreamWriter xmlSpring = XMLOutputFactory.newFactory()
 					.createXMLStreamWriter(zipOutPutStream, "UTF-8");
 			xmlSpring.setDefaultNamespace(SPRING_BEAN_NAMESPACE);
-			xmlSpring.writeStartDocument();
+			xmlSpring.writeStartDocument("UTF-8", "1.0");
 			xmlSpring.writeStartElement(SPRING_BEAN_NAMESPACE, "beans");
 			
 			xmlSpring.writeStartElement(SPRING_BEAN_NAMESPACE, "bean");
@@ -611,7 +611,7 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 				try {
 					XMLStreamWriter xmlWriter = XMLOutputFactory.newFactory()
 							.createXMLStreamWriter(zipOutPutStream, "UTF-8");
-					xmlWriter.writeStartDocument();
+					xmlWriter.writeStartDocument("UTF-8", "1.0");
 					xmlWriter.writeStartElement("properties");
 
 					xmlWriter.writeStartElement("entry");
