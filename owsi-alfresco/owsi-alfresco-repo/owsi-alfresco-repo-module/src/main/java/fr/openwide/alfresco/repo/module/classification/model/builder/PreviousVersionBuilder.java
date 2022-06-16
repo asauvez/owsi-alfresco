@@ -40,6 +40,8 @@ public class PreviousVersionBuilder<B extends AbstractClassificationBuilder<B>> 
 	}
 
 	public B newVersion(NewVersionBuilder newVersionBuilder) {
+		classificationBuilder.service.setVersionnable(classificationBuilder.getNodeRef());
+		
 		return ifPresent(previousNodeRef -> {
 			classificationBuilder.service.newContentVersion(classificationBuilder.getNodeRef(), previousNodeRef, newVersionBuilder);
 			classificationBuilder.getNodeModelService().deleteNode(classificationBuilder.getNodeRef());

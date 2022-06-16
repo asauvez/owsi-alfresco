@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.slf4j.Logger;
@@ -682,9 +683,17 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		restrictions.eq(property, value);
 	}
 	
+	public void setVersionnable(NodeRef nodeRef) {
+		if (! nodeModelRepositoryService.hasAspect(nodeRef, CmModel.versionable)) {
+			nodeModelRepositoryService.addAspect(nodeRef, CmModel.versionable);
+			
+			Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(2);
+			versionProperties.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
+			versionService.createVersion(nodeRef, null);
+		}
+	}
+	
 	public void newContentVersion(NodeRef source, NodeRef target, NewVersionBuilder newVersionBuilder) {
-		nodeModelRepositoryService.addAspect(target, CmModel.versionable);
-		
 		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(2);
 		
 		String description = newVersionBuilder.getDescription();
