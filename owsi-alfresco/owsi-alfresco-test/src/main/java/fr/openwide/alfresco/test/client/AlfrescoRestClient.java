@@ -281,6 +281,7 @@ public class AlfrescoRestClient {
 		try {
 			CloseableHttpResponse response = executeRequest(httpDelete);
 			switch (response.getStatusLine().getStatusCode()) {
+			case 200:
 			case 204:
 				break;
 			default:
