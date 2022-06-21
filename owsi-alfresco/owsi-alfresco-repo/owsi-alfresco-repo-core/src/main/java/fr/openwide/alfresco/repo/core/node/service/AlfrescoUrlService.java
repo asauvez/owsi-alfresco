@@ -11,6 +11,8 @@ import org.alfresco.model.DataListModel;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.quickshare.QuickShareDTO;
+import org.alfresco.service.cmr.quickshare.QuickShareService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -24,6 +26,8 @@ import org.alfresco.util.UrlUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
@@ -68,6 +72,15 @@ public class AlfrescoUrlService {
 	@Autowired private SiteService siteService;
 	@Autowired private AlfrescoGlobalProperties alfrescoGlobalProperties;
 	@Autowired private FileFolderService fileFolderService;
+	@Autowired private QuickShareService quickShareService;
+	
+	public void redirectTo(WebScriptResponse res, String url) {
+		res.setHeader(WebScriptResponse.HEADER_LOCATION, url);
+		res.setStatus(Status.STATUS_MOVED_TEMPORARILY);
+	}
+	public void erreur404(WebScriptResponse res) {
+		res.setStatus(Status.STATUS_NOT_FOUND);
+	}
 	
 	/** Inspired by: https://github.com/Alfresco/share/blob/6.0/share/src/main/webapp/components/documentlibrary/actions.js */
 	public String getShareOnlineEditionUrl(NodeRef nodeRef) {
@@ -104,6 +117,10 @@ public class AlfrescoUrlService {
 	public String getWebDavUrl(NodeRef nodeRef) {
 		return UrlUtil.getAlfrescoUrl(sysAdminParams) + webDavService.getWebdavUrl(nodeRef);
 	}
+	
+	public String getShareUrl() {
+		return UrlUtil.getShareUrl(sysAdminParams);
+	}
 	public String getShareViewUrl(NodeRef nodeRef) {
 		SiteInfo site = siteService.getSite(nodeRef);
 		
@@ -121,7 +138,7 @@ public class AlfrescoUrlService {
 				it.next(); // ignore "sites"
 				it.next(); // ignore nom du site
 				if (! it.hasNext()) {
-					return UrlUtil.getShareUrl(sysAdminParams) + "/page/site/" + site.getShortName() + "/dashboard";
+					return getShareUrl() + "/page/site/" + site.getShortName() + "/dashboard";
 				}
 				it.next(); // ignore documentlibrary
 			}
@@ -131,18 +148,18 @@ public class AlfrescoUrlService {
 				path.append("/").append(encodeUrl(folderName));
 			}
 
-			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
+			return getShareUrl() + "/page/" 
 				+ ((site != null) 
 						? "site/" + site.getShortName() + "/documentlibrary"
 						: "repository")
 				+ ((path.length() > 0) ? "#filter=path%7C" + encodeUrl(path.toString()) + "%7C" : "");
 			
 		} else if (nodeService.getType(nodeRef).equals(DataListModel.TYPE_DATALIST)) {
-			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
+			return getShareUrl() + "/page/" 
 					+ ((site != null) ? "site/" + site.getShortName() : "")
 					+ "/data-lists?list=" + nodeRef.getId();
 		} else {
-			return UrlUtil.getShareUrl(sysAdminParams) + "/page/" 
+			return getShareUrl() + "/page/" 
 				+ ((site != null) ? "site/" + site.getShortName() : "")
 				+ "/document-details?nodeRef=" + nodeRef;
 		}
@@ -200,5 +217,10 @@ public class AlfrescoUrlService {
 			return getContentAppUrl() + "/libraries/" + primaryParent.getParentRef().getId()
 					+ "/preview/" + nodeRef.getId();
 		}
+	}
+	
+	public String getQuickShareUrl(NodeRef nodeRef) {
+		QuickShareDTO shareInfo = quickShareService.shareContent(nodeRef);
+		return getShareUrl() + "/s/" + shareInfo.getId();
 	}
 }
