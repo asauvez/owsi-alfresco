@@ -13,6 +13,7 @@
 
 	<properties>
 		<alfresco.module.name>owsi-alfresco-repo-solraudit</alfresco.module.name>
+		<dependency.alfresco-repository.version>14.145</dependency.alfresco-repository.version>
 	</properties>
 	
 	<dependencies>

@@ -3,7 +3,9 @@ package fr.openwide.alfresco.repo.solraudit.service.impl;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -11,21 +13,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
-import org.alfresco.repo.search.impl.lucene.SolrJSONResultSet;
+import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
+import org.alfresco.repo.policy.BaseBehaviour;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.policy.BehaviourFilter;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.search.impl.solr.SolrJSONResultSet;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericBucket;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericFacetResponse;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric;
 import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.search.StatsRequestParameters;
+import org.alfresco.service.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +55,16 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SolrAuditServiceImpl.class);
 
+	@Autowired private NodeService nodeService;
 	@Autowired private SearchService searchService;
 	@Autowired private FileFolderService fileFolderService;
 	@Autowired @Qualifier("repositoryHelper") private Repository repositoryHelper;
 	@Autowired private MimetypeService mimetypeService;
-	
+	@Autowired private PolicyComponent policyComponent;
+	@Autowired
+	@Qualifier("policyBehaviourFilter")
+	private BehaviourFilter behaviourFilter;
+
 	@Autowired @Qualifier("global-properties")
 	private Properties globalProperties;
 
@@ -194,4 +210,66 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	private boolean isPivotMimeType(String pivot) {
 		return pivot.endsWith(".mimetype");
 	}
+	
+	@Override
+	public void registerPropertiesPolicy(QName container, Consumer<NodeRef> consumer) {
+		OnUpdatePropertiesPolicy onUpdatePropertiesPolicy = new OnUpdatePropertiesPolicy() {
+			@Override
+			public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after) {
+				if (! nodeService.exists(nodeRef)) {
+					return;
+				}
+				
+				behaviourFilter.disableBehaviour(nodeRef, ContentModel.ASPECT_AUDITABLE);
+				try {
+					consumer.accept(nodeRef);
+				} finally {
+					behaviourFilter.enableBehaviour(nodeRef, ContentModel.ASPECT_AUDITABLE);
+				}
+			}
+		};
+		
+		policyComponent.bindClassBehaviour(OnUpdatePropertiesPolicy.QNAME, container, 
+			new BaseBehaviour(NotificationFrequency.TRANSACTION_COMMIT) {
+				@SuppressWarnings("unchecked")
+				@Override
+				public <T> T getInterface(Class<T> policy) {
+					if (policy == OnUpdatePropertiesPolicy.class) {
+						return (T) onUpdatePropertiesPolicy;
+					}
+					return null;
+				}
+			});
+	}
+	
+	
+	
+	@Override
+	public void registerDateGroup(QName container, QName propertyText) {
+		registerDateGroup(container, ContentModel.PROP_CREATED, propertyText, "yyyy/MM");
+	}
+	@Override
+	public void registerDateGroup(QName container, QName propertyDate, QName propertyText, String format) {
+		registerPropertiesPolicy(container, (nodeRef) -> {
+			Date date = (Date) nodeService.getProperty(nodeRef, propertyDate);
+			String dateGroup = (date != null) ? new SimpleDateFormat(format).format(date) : null;
+			nodeService.setProperty(nodeRef, propertyText, dateGroup);
+		});
+	}
+	
+	@Override
+	public void registerLogSize(QName container, QName propertyText) {
+		registerPropertiesPolicy(container, (nodeRef) -> {
+			// Stock une valeur approché de la taille (10, 100, 1000, etc.)
+			ContentData contentData = (ContentData) nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
+			if (contentData != null) {
+				long size = contentData.getSize();
+				long sizeLog = (long) Math.pow(10, (int) Math.log10(size));
+				nodeService.setProperty(nodeRef, propertyText, Long.toString(sizeLog));
+			} else {
+				nodeService.setProperty(nodeRef, propertyText, null);
+			}
+		});
+	}
+	
 }
