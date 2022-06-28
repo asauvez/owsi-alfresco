@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -62,10 +63,15 @@ public class AlfrescoGlobalProperties implements InitializingBean {
 		return Boolean.parseBoolean(getProperty(key, Boolean.toString(defaultValue)));
 	}
 	public List<String> getPropertyList(String key) {
-		return Arrays.asList(getPropertyMandatory(key).split(","));
+		return toList(getPropertyMandatory(key));
 	}
 	public List<String> getPropertyList(String key, String defaultValue) {
-		return Arrays.asList(getProperty(key, defaultValue).split(","));
+		return toList(getProperty(key, defaultValue));
 	}
-
+	private List<String> toList(String value) {
+		return Arrays.asList(value.split(",")).stream()
+				.map(String::trim)
+				.filter(s -> ! s.isEmpty())
+				.collect(Collectors.toUnmodifiableList());
+	}
 }

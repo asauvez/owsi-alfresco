@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -78,10 +79,11 @@ public class AlfrescoRestClient {
 	}
 	
 	private CloseableHttpResponse executeRequest(HttpUriRequest request) {
+		System.out.println(request);
+		
 		String login = getTechnicalUser();
 		String password = properties.getProperty("test.password", "admin");
 		
-		request.setHeader("Content-type", "application/json");
 		request.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString((login + ":" + password).getBytes()));
 
 		try {
@@ -142,7 +144,7 @@ public class AlfrescoRestClient {
 		}
 	}
 
-	private <T> int requestResponseStatus(HttpRequestBase httpRequest) {
+	private int requestResponseStatus(HttpRequestBase httpRequest) {
 		try (CloseableHttpResponse response = executeRequest(httpRequest)) {
 			return response.getStatusLine().getStatusCode();
 		} catch (IOException e) {
@@ -194,6 +196,16 @@ public class AlfrescoRestClient {
 		return httpPost;
 	}
 	
+	public HttpPost postRequest(String url, ContentType contentType, byte[] content) {
+		HttpPost httpPost = new HttpPost(getBaseUrl() + url);
+		httpPost.setHeader("Accept", "application/json");
+
+		ByteArrayEntity entity = new ByteArrayEntity(content, contentType);
+		httpPost.setEntity(entity);
+		
+		return httpPost;
+	}
+
 	public HttpPut putRequest(String url, Object objectJson) {
 		String jsonString = convertObjectToJson(objectJson);
 				
@@ -233,6 +245,11 @@ public class AlfrescoRestClient {
 	
 	@SuppressWarnings("unchecked")
 	public <T> T convertResponseToObject(CloseableHttpResponse response, Class<T> className) {
+		if(className == ContentType.class) {
+			String contentType = response.getEntity().getContentType().getValue();
+			return (T) ContentType.create(contentType.substring(0, contentType.indexOf(";")));
+		}
+
 		try (InputStream in = response.getEntity().getContent()) {
 			byte[] b = IOUtils.toByteArray(in);
 			if (className == byte[].class) {
