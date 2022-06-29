@@ -106,8 +106,12 @@ public abstract class SwaggerWebScript extends AbstractWebScript {
 							SwaggerParameterModel model = new SwaggerParameterModel();
 							model.name = param.name();
 							model.description = param.description();
-							model.in = param.in().name().toLowerCase();
+							model.in = param.in().getLabel();
 							model.required = param.required();
+							
+							if (param.in() == SwaggerParameterIn.FORMDATA) {
+								ws.consumes.add("multipart/form-data");
+							}
 							
 							if (param.schema() != Void.class) {
 								model.schema = new SwaggerSchema(schemaGenerator.generateSchema(param.schema()));

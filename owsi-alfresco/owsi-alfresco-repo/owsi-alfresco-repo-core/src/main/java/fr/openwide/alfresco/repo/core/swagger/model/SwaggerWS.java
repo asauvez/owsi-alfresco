@@ -18,6 +18,7 @@ public class SwaggerWS {
 	@JsonProperty public String[] tags;
 	
 	@JsonProperty public List<String> produces = new ArrayList<>();
+	@JsonProperty public List<String> consumes = new ArrayList<>();
 	@JsonProperty public List<SwaggerParameterModel> parameters = new ArrayList<>();
 	@JsonProperty public Map<String, SwaggerResponseModel> responses = new TreeMap<>();
 }
