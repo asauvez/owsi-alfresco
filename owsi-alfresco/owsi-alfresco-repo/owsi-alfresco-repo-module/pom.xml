@@ -18,10 +18,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-api-module</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
 			<artifactId>owsi-alfresco-repo-core</artifactId>
 		</dependency>
 		<dependency>

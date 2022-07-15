@@ -21,11 +21,6 @@
 			</dependency>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-api-module</artifactId>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-app-core</artifactId>
 				<version>0.9.5-SNAPSHOT</version>
 			</dependency>

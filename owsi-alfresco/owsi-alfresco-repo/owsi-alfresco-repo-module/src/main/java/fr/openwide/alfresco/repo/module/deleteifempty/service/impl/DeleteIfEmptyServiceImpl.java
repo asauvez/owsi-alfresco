@@ -14,11 +14,11 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
+import fr.openwide.alfresco.repo.module.OwsiModel;
 
 public class DeleteIfEmptyServiceImpl implements InitializingBean, 
 		OnDeleteChildAssociationPolicy, OnMoveNodePolicy, OnDeleteNodePolicy {

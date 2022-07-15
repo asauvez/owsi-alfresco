@@ -10,7 +10,6 @@
 
 	<modules>
 		<module>owsi-alfresco</module>
-		<module>owsi-alfresco-app</module>
 		<module>owsi-alfresco-demo</module>
 	</modules>
 

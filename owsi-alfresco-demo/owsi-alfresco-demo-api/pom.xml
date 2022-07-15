@@ -14,10 +14,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-api-module</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>

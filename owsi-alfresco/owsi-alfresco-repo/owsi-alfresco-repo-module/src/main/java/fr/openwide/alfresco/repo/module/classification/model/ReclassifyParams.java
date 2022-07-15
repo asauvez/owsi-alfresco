@@ -4,9 +4,9 @@ import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.module.OwsiModel;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 
 public class ReclassifyParams {

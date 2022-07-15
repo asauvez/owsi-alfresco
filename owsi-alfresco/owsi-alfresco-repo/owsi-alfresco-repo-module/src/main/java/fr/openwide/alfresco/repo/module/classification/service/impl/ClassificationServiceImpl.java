@@ -51,7 +51,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 
 import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
@@ -70,6 +69,7 @@ import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionReposit
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
+import fr.openwide.alfresco.repo.module.OwsiModel;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationMode;
 import fr.openwide.alfresco.repo.module.classification.model.ReclassifyParams;

@@ -7,10 +7,10 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
+import fr.openwide.alfresco.repo.module.OwsiModel;
 import fr.openwide.alfresco.repo.module.identification.service.IdentificationRepositoryService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 

@@ -33,6 +33,7 @@ mvn gitflow:release
 Nouveautés
 ==========
 ## depuis 0.9.5
+ * Suppression de la partie owsi-alfresco-app et owsi-alfresco-api. 
 
 ## depuis 0.9.4
  * Compatible Alfresco 7.2.

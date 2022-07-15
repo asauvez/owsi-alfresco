@@ -7,13 +7,13 @@ import java.util.Optional;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.module.model.OwsiModel;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
 import fr.openwide.alfresco.component.model.repository.model.st.StSiteContainer.SiteContainerType;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
+import fr.openwide.alfresco.repo.module.OwsiModel;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
 import fr.openwide.alfresco.repo.module.classification.service.impl.ClassificationServiceImpl;
 
