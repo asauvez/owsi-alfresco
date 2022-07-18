@@ -41,32 +41,6 @@
             <username>openwide</username>
             <password>openwide</password>
         </server>
-        <server>
-            <id>nexus-owsi-wombat</id>
-            <username>openwide</username>
-            <password>openwide</password>
-        </server>
-        <server>
-            <id>nexus-owsi-core</id>
-            <username>openwide</username>
-            <password>openwide</password>
-        </server>
-        <server>
-            <id>nexus-owsi-core-snapshots</id>
-            <username>openwide</username>
-            <password>openwide</password>
-        </server>
-        <server>
-            <id>nexus-owsi-liferay</id>
-            <username>openwide</username>
-            <password>openwide</password>
-        </server>
-        <server>
-            <id>nexus-owsi-liferay-snapshots</id>
-            <username>openwide</username>
-            <password>openwide</password>
-        </server>
-
 
         <server>
             <id>nexus-owsi-external</id>
@@ -243,7 +217,7 @@
                 <downloadSources>true</downloadSources>
             </properties>
             <activation>
-                <jdk>1.5</jdk>
+                <jdk>11</jdk>
             </activation>
 
             <repositories>

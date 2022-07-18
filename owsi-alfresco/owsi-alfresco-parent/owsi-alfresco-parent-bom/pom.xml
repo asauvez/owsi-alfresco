@@ -16,37 +16,6 @@
 		<dependencies>
 			<dependency>
 				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-api-core</artifactId>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-app-core</artifactId>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-app-core</artifactId>
-				<type>test-jar</type>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-app-module</artifactId>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-app-web</artifactId>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
-				<artifactId>owsi-alfresco-component-kerberos</artifactId>
-				<version>0.9.5-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>fr.openwide.alfresco</groupId>
 				<artifactId>owsi-alfresco-repo-core</artifactId>
 				<version>0.9.5-SNAPSHOT</version>
 			</dependency>

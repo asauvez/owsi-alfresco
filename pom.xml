@@ -1,81 +1,83 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.openwide.alfresco</groupId>
-    <artifactId>owsi-alfresco-root</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
-    <packaging>pom</packaging>
+	<groupId>fr.openwide.alfresco</groupId>
+	<artifactId>owsi-alfresco-root</artifactId>
+	<version>0.9.5-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-    <name>OWSI Alfresco root</name>
+	<name>OWSI Alfresco root</name>
 
 	<modules>
 		<module>owsi-alfresco</module>
 		<module>owsi-alfresco-demo</module>
 	</modules>
 
-    <scm>
-        <developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
-        <url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi</url>
-        <tag>HEAD</tag>
-    </scm>
+	<scm>
+		<developerConnection>scm:git:git@git.projects.openwide.fr:open-wide/alfresco-tools-owsi.git</developerConnection>
+		<url>https://gitlab.openwide.fr/open-wide/alfresco-tools-owsi</url>
+		<tag>HEAD</tag>
+	</scm>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.amashchenko.maven.plugin</groupId>
-		            <artifactId>gitflow-maven-plugin</artifactId>
-		            <version>1.18.0</version>
-		            <configuration>
-		            	<gitFlowConfig>
-			            	<developmentBranch>dev</developmentBranch>
-					        <featureBranchPrefix>ft-</featureBranchPrefix>
-					        <releaseBranchPrefix>rl-</releaseBranchPrefix>
-					        <hotfixBranchPrefix>hf-</hotfixBranchPrefix>
-				        </gitFlowConfig>
-		            </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.amashchenko.maven.plugin</groupId>
+					<artifactId>gitflow-maven-plugin</artifactId>
+					<version>1.18.0</version>
+					<configuration>
+						<gitFlowConfig>
+							<developmentBranch>dev</developmentBranch>
+							<featureBranchPrefix>ft-</featureBranchPrefix>
+							<releaseBranchPrefix>rl-</releaseBranchPrefix>
+							<hotfixBranchPrefix>hf-</hotfixBranchPrefix>
+						</gitFlowConfig>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 
-    <organization>
-        <name>Smile</name>
-        <url>http://www.smile.fr/</url>
-    </organization>
+	<organization>
+		<name>Smile</name>
+		<url>http://www.smile.fr/</url>
+	</organization>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <repositories>
-        <repository>
-            <id>nexus.internal.releases</id>
-            <url>https://nexus.galaxy.intranet/content/repositories/InternalSmileReleases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>nexus.internal.snapshots</id>
-            <url>https://nexus.galaxy.intranet/content/repositories/InternalSmileSnapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<repositories>
+		<repository>
+			<id>nexus.internal.releases</id>
+			<url>https://nexus.galaxy.intranet/content/repositories/InternalSmileReleases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>nexus.internal.snapshots</id>
+			<url>https://nexus.galaxy.intranet/content/repositories/InternalSmileSnapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
 
-        <repository>
-            <id>nexus.internal.third-party</id>
-            <url>https://nexus.galaxy.intranet/content/repositories/nonCentralArtifacts/</url>
-        </repository>
-        <repository>
-            <id>nexus.mirror.alfresco.release.repo</id>
-            <url>https://nexus.galaxy.intranet/repository/alfresco-artifacts-repository/</url>
-        </repository>
-    </repositories>
+		<repository>
+			<id>nexus.internal.third-party</id>
+			<url>https://nexus.galaxy.intranet/content/repositories/nonCentralArtifacts/</url>
+		</repository>
+		<repository>
+			<id>nexus.mirror.alfresco.release.repo</id>
+			<url>https://nexus.galaxy.intranet/repository/alfresco-artifacts-repository/</url>
+		</repository>
+	</repositories>
 
 
 </project>

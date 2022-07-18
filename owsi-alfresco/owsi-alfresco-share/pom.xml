@@ -16,9 +16,6 @@
   	<name>OWSI Alfresco - Share</name>
 	<description>Composants pour le développement d'extensions dans le Share</description>
   
-	<!-- modules>
-		<module>owsi-alfresco-repo-wsgenerator</module>	
-	</modules-->
 	<modules>
 		<module>owsi-alfresco-share-datalistgroupe</module>
 	</modules>
