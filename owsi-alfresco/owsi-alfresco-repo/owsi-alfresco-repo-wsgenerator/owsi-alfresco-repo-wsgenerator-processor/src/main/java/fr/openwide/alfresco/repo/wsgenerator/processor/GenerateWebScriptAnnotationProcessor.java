@@ -90,7 +90,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 			
 			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateBootstrapModel.class)) {
 				generateComment(annotatedClassElement);
-				processBootstrapModel(annotatedClassElement, processingEnv.getFiler());
+				processBootstrapModel(annotatedClassElement);
 			}
 			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateJavaModel.class)) {
 				processJavaModel(annotatedClassElement, processingEnv.getFiler());
@@ -297,7 +297,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		springContextXml.writeEndElement(); // bean
 	}
 
-	private void processBootstrapModel(Element annotatedClassElement, Filer filer) throws XMLStreamException {
+	private void processBootstrapModel(Element annotatedClassElement) throws XMLStreamException {
 		GenerateBootstrapModel generateBootstrapModel = annotatedClassElement.getAnnotation(GenerateBootstrapModel.class);
 		Name className = ((QualifiedNameable) annotatedClassElement).getQualifiedName();
 
@@ -379,7 +379,7 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		}
 	}
 
-	private void processJavaModel(Element annotatedClassElement, Filer filer) throws XMLStreamException {
+	private void processJavaModel(Element annotatedClassElement, Filer filer) {
 		JavaModelGenerator javaModelGenerator = new JavaModelGenerator();
 		String packageName = ((QualifiedNameable) annotatedClassElement).getQualifiedName().toString();
 		if (annotatedClassElement instanceof TypeElement) {

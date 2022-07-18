@@ -30,8 +30,6 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
-import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
@@ -43,7 +41,6 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAsso
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
-import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
@@ -68,11 +65,11 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	private final String KEY_DATADICTIONARY_NODEREF = "owsi.key.datadictionary.noderef";
 	
 	@Override
-	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException {
+	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws FileExistsException {
 		return createNode(parentRef, type, name, new HashMap<>());
 	}
 	@Override
-	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws DuplicateChildNodeNameRemoteException {
+	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws FileExistsException {
 		conversionService.setProperty(properties, CmModel.object.name, name);
 		
 		return nodeService.createNode(parentRef, 
@@ -82,7 +79,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 				properties).getChildRef();
 	}
 	@Override
-	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean bean) throws DuplicateChildNodeNameRemoteException {
+	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean bean) throws FileExistsException {
 		Map<QName, Serializable> properties = new HashMap<>();
 		for (Entry<NameReference, Serializable> entry : bean.getProperties().entrySet()) {
 			properties.put(conversionService.getRequired(entry.getKey()), entry.getValue());
@@ -92,16 +89,12 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	
 	
 	@Override
-	public NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException {
-		try {
-			return fileFolderService.create(parentRef, folderName, ContentModel.TYPE_FOLDER).getNodeRef();
-		} catch (FileExistsException e) {
-			throw new DuplicateChildNodeNameRemoteException("FileExistsException with FileFolderService", e);
-		}
+	public NodeRef createFolder(NodeRef parentRef, String folderName) throws FileExistsException {
+		return fileFolderService.create(parentRef, folderName, ContentModel.TYPE_FOLDER).getNodeRef();
 	}
 	@Override
 	public NodeRef getOrCreateFolder(NodeRef parentRef, String folderName)
-			throws DuplicateChildNodeNameRemoteException {
+			throws FileExistsException {
 		NodeRef folderRef = fileFolderService.searchSimple(parentRef, folderName);
 		if (folderRef == null) {
 			folderRef = createFolder(parentRef, folderName);
@@ -267,7 +260,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	@Override
 	public <E extends Enum<E>> E getProperty(NodeRef nodeRef, EnumTextPropertyModel<E> property) {
-		return PropertiesNode.textToEnum(property, (String) getProperty(nodeRef, property.getNameReference()));
+		return NodeBean.textToEnum(property, (String) getProperty(nodeRef, property.getNameReference()));
 	}
 	@Override
 	@SuppressWarnings("unchecked")
@@ -290,7 +283,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	@Override
 	public <E extends Enum<E>> void setProperty(NodeRef nodeRef, EnumTextPropertyModel<E> property, E value) {
-		String code = PropertiesNode.enumToText(value);
+		String code = NodeBean.enumToText(value);
 		setProperty(nodeRef, property.getNameReference(), code);
 	}
 	@Override
@@ -463,7 +456,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 				return;
 			}
 		}
-		throw new IllegalStateRemoteException("Can't find secondary child association " + parentRef + "/" + childRef);
+		throw new IllegalStateException("Can't find secondary child association " + parentRef + "/" + childRef);
 	}
 	@Override
 	public void unlinkSecondaryParents(NodeRef nodeRef, ChildAssociationModel childAssociationModel) {

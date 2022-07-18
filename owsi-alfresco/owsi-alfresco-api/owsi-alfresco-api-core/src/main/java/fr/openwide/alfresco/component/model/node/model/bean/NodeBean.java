@@ -7,7 +7,7 @@ import java.util.Map;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.property.PropertyEnumeration;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -42,7 +42,48 @@ public abstract class NodeBean {
 		return (List<C>) properties.get(property.getNameReference());
 	}
 	public <E extends Enum<E>> E getProperty(EnumTextPropertyModel<E> property) {
-		return PropertiesNode.textToEnum(property, (String) properties.get(property.getNameReference()));
+		return textToEnum(property, (String) properties.get(property.getNameReference()));
+	}
+	public static <E extends Enum<E>> E textToEnum(EnumTextPropertyModel<E> propertyModel, String code) {
+		if (code == null) {
+			return null;
+		}
+		
+		Class<E> enumClass = propertyModel.getEnumClass();
+		if (PropertyEnumeration.class.isAssignableFrom(enumClass)) {
+			E otherValue = null;
+			for (E e : enumClass.getEnumConstants()) {
+				String enumCode = ((PropertyEnumeration) e).getCode();
+				if (code.equals(enumCode)) {
+					return e;
+				}
+				if (PropertyEnumeration.OTHER_VALUES.equals(enumCode)) {
+					otherValue = e;
+				}
+			}
+			if (otherValue != null) {
+				return otherValue;
+			}
+		} else {
+			for (E e : enumClass.getEnumConstants()) {
+				if (code.equals(e.name())) {
+					return e;
+				}
+			}
+		}
+		throw new IllegalStateException("Can't find value for '" + code + "' in enum " + enumClass.getName());
+	}
+	public static <E extends Enum<E>> String enumToText(E e) {
+		if (e == null) {
+			return null;
+		}
+		String code = (e instanceof PropertyEnumeration) 
+				? ((PropertyEnumeration) e).getCode() 
+				: e.name();
+		if (PropertyEnumeration.OTHER_VALUES.equals(code)) {
+			throw new IllegalStateException("You can't set back the OTHER_VALUES.");
+		}
+		return code;
 	}
 	
 	public <C extends Serializable> void setProperty(SinglePropertyModel<C> property, C value) {
@@ -52,7 +93,7 @@ public abstract class NodeBean {
 		properties.put(property.getNameReference(), (Serializable) value);
 	}
 	public <E extends Enum<E>> void setProperty(EnumTextPropertyModel<E> property, E value) {
-		properties.put(property.getNameReference(), PropertiesNode.enumToText(value));
+		properties.put(property.getNameReference(), enumToText(value));
 	}
 	public void setProperty(NodeReferencePropertyModel property, NodeReference value) {
 		properties.put(property.getNameReference(), value);

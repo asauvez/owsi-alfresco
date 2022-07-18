@@ -18,13 +18,12 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.api.core.remote.model.StoreReference;
-import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
-import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 
 public class ConversionServiceImpl implements ConversionService {
 
@@ -39,7 +38,7 @@ public class ConversionServiceImpl implements ConversionService {
 	@Override
 	public NodeRef getRequired(NodeReference nodeReference) {
 		if (nodeReference == null) {
-			throw new InvalidPayloadException("Node reference is required");
+			throw new IllegalStateException("Node reference is required");
 		}
 		return get(nodeReference);
 	}
@@ -51,7 +50,7 @@ public class ConversionServiceImpl implements ConversionService {
 	@Override
 	public StoreRef getRequired(StoreReference storeReference) {
 		if (storeReference == null) {
-			throw new InvalidPayloadException("Store reference is required");
+			throw new IllegalStateException("Store reference is required");
 		}
 		return new StoreRef(storeReference.getReference());
 	}
@@ -65,7 +64,7 @@ public class ConversionServiceImpl implements ConversionService {
 	@Override
 	public QName getRequired(NameReference nameReference) {
 		if (nameReference == null) {
-			throw new InvalidPayloadException("Name reference is required");
+			throw new IllegalStateException("Name reference is required");
 		}
 		return get(nameReference);
 	}
@@ -159,7 +158,7 @@ public class ConversionServiceImpl implements ConversionService {
 	}
 	@Override
 	public <E extends Enum<E>> E getProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property) {
-		return PropertiesNode.textToEnum(property, (String) values.get(get(property.getNameReference())));
+		return NodeBean.textToEnum(property, (String) values.get(get(property.getNameReference())));
 	}
 	
 	@Override
@@ -172,7 +171,7 @@ public class ConversionServiceImpl implements ConversionService {
 	}
 	@Override
 	public <E extends Enum<E>> void setProperty(Map<QName, Serializable> values, EnumTextPropertyModel<E> property, E value) {
-		values.put(get(property.getNameReference()), PropertiesNode.enumToText(value));
+		values.put(get(property.getNameReference()), NodeBean.enumToText(value));
 	}
 	@Override
 	public void setProperty(Map<QName, Serializable> values, NodeReferencePropertyModel property, NodeRef value) {

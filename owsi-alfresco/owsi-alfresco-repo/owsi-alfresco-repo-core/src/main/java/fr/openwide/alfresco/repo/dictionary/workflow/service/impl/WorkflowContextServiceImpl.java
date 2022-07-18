@@ -7,7 +7,7 @@ import org.activiti.engine.delegate.VariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.component.model.node.model.embed.PropertiesNode;
+import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
@@ -30,7 +30,7 @@ public class WorkflowContextServiceImpl implements WorkflowContextService {
 	}
 	@Override
 	public <E extends Enum<E>> E getVariable(VariableScope context, EnumTextPropertyModel<E> property) {
-		return PropertiesNode.textToEnum(property, getVariable(context, property.getNameReference()));
+		return NodeBean.textToEnum(property, getVariable(context, property.getNameReference()));
 	}
 	@Override
 	public <C extends Serializable> List<C> getVariable(VariableScope context, MultiPropertyModel<C> property) {
@@ -47,7 +47,7 @@ public class WorkflowContextServiceImpl implements WorkflowContextService {
 	}
 	@Override
 	public <E extends Enum<E>> void setVariable(VariableScope context, EnumTextPropertyModel<E> property, E value) {
-		String code = PropertiesNode.enumToText(value);
+		String code = NodeBean.enumToText(value);
 		setVariable(context, property.getNameReference(), code);
 	}
 	@Override

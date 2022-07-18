@@ -11,9 +11,7 @@ import java.util.Set;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.AbstractDatePropertyModel;
@@ -204,33 +202,6 @@ public class RestrictionBuilder extends Restriction {
 		return restriction;
 	}
 
-	@Override
-	public void testInit(NodeScopeBuilder nodeScopeBuilder) {
-		for (Restriction restriction : restrictions) {
-			restriction.testInit(nodeScopeBuilder);
-		}
-	}
-	@Override
-	public boolean test(BusinessNode node) {
-		switch (operator) {
-		case AND:
-			for (Restriction restriction : restrictions) {
-				if (! restriction.test(node)) {
-					return false;
-				}
-			}
-			return true;
-		case OR:
-			for (Restriction restriction : restrictions) {
-				if (restriction.test(node)) {
-					return true;
-				}
-			}
-			return false;
-		}
-		throw new IllegalStateException();
-	}
-	
 	@Override
 	protected boolean isNeedingParenthesis() {
 		return true;

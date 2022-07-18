@@ -7,10 +7,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
-import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
@@ -30,11 +30,11 @@ import fr.openwide.alfresco.component.model.node.model.property.single.SinglePro
 
 public interface NodeModelRepositoryService {
 
-	NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws DuplicateChildNodeNameRemoteException;
-	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws DuplicateChildNodeNameRemoteException;
-	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean properties) throws DuplicateChildNodeNameRemoteException;
-	NodeRef createFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
-	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName) throws DuplicateChildNodeNameRemoteException;
+	NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws FileExistsException;
+	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws FileExistsException;
+	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean properties) throws FileExistsException;
+	NodeRef createFolder(NodeRef parentRef, String folderName) throws FileExistsException;
+	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName) throws FileExistsException;
 	
 	boolean exists(NodeRef nodeRef);
 	void moveNode(NodeRef nodeRef, NodeRef newParentRef);

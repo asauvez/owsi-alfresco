@@ -7,14 +7,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.Predicate;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.AbstractMultiNumberPropertyModel;
@@ -27,7 +24,7 @@ import fr.openwide.alfresco.component.model.node.model.property.single.DateTimeP
 import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
-public abstract class Restriction implements Predicate<BusinessNode> {
+public abstract class Restriction {
 	
 	private Map<ContainerModel, String> CMIS_TYPES_REPLACEMENT = new HashMap<>();
 	{
@@ -76,14 +73,6 @@ public abstract class Restriction implements Predicate<BusinessNode> {
 		return (not) 
 				? "NOT " + (isNeedingParenthesis() ? "(" + query + ")" : query)  
 				: query;
-	}
-	
-	public void testInit(@SuppressWarnings("unused") NodeScopeBuilder nodeScopeBuilder) {
-		// nop
-	}
-	@Override
-	public boolean test(BusinessNode node) {
-		throw new UnsupportedOperationException();
 	}
 	
 	public final String toCmisQueryContent() {

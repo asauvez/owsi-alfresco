@@ -33,7 +33,6 @@ import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryServ
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
 import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
-import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 
 public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepositoryService {
 
@@ -54,7 +53,7 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 		}
 
 		if (rsp.getQuery() == null || rsp.getQuery().isEmpty()) {
-			throw new InvalidPayloadException("The query should not be an empty string.");
+			throw new IllegalStateException("The query should not be an empty string.");
 		}
 
 		SearchParameters sp = new SearchParameters();
@@ -140,7 +139,7 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 			}
 			return res;
 		} catch (FTSQueryException ex) {
-			throw new InvalidPayloadException(rsp.getQuery(), ex);
+			throw new IllegalStateException(rsp.getQuery(), ex);
 		}
 	}
 	
@@ -197,7 +196,7 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 			}
 			return nbTotal;
 		} catch (FTSQueryException ex) {
-			throw new InvalidPayloadException(rsp.getQuery(), ex);
+			throw new IllegalStateException(rsp.getQuery(), ex);
 		}
 	}
 	

@@ -9,12 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.domain.node.NodeExistsException;
-import org.alfresco.repo.node.integrity.IntegrityException;
-import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.TempFileProvider;
 import org.slf4j.Logger;
@@ -37,16 +33,8 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import fr.openwide.alfresco.api.core.node.exception.NoSuchNodeRemoteException;
-import fr.openwide.alfresco.api.core.node.exception.NodeExistsRemoteException;
-import fr.openwide.alfresco.api.core.remote.exception.AccessDeniedRemoteException;
-import fr.openwide.alfresco.api.core.remote.exception.IllegalStateRemoteException;
-import fr.openwide.alfresco.api.core.remote.exception.IntegrityRemoteException;
-import fr.openwide.alfresco.api.core.remote.exception.InvalidMessageRemoteException;
-import fr.openwide.alfresco.api.core.remote.exception.RepositoryRemoteException;
 import fr.openwide.alfresco.api.core.util.ThresholdBufferFactory;
 import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
-import fr.openwide.alfresco.repo.remote.framework.exception.InvalidPayloadException;
 import fr.openwide.alfresco.repo.remote.framework.model.InnerTransactionParameters;
 
 /**
@@ -109,7 +97,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 			outer.setRequired(RequiredTransaction.none);
 			descriptionImpl.setRequiredTransactionParameters(outer);
 		} else {
-			throw new IllegalStateRemoteException("Could not alter webscript description: " + description.getClass());
+			throw new IllegalStateException("Could not alter webscript description: " + description.getClass());
 		}
 		
 		File tempDirectory = TempFileProvider.getTempDir(tempDirectoryName);
@@ -134,46 +122,14 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		
 		// construct model for script / template
 		R resValue = null;
-		Exception resException = null;
 		int statusCode;
 		try {
 			resValue = transactionedExecute(payload, bufferedRequest);
 			statusCode = (resValue != null) ? Status.STATUS_OK : Status.STATUS_NO_CONTENT;
-		} catch (InvalidNodeRefException e) {
-			LOGGER.warn("Node does not exist", e);
-			resException = new NoSuchNodeRemoteException(e);
-			statusCode = Status.STATUS_NOT_FOUND;
-		} catch (AccessDeniedRemoteException | AccessDeniedException e) {
-			LOGGER.warn("Could not get access", e);
-			resException = e;
-			statusCode = Status.STATUS_FORBIDDEN;
-		} catch (InvalidPayloadException e) {
-			String message = buildExceptionMessage("Could not use payload", e);
-			LOGGER.warn(message, e);
-			// any invalid payload exception is encapsulated inside InvalidMessageRemoteException which can be serialized
-			resException = new InvalidMessageRemoteException(message, e);
-			statusCode = Status.STATUS_BAD_REQUEST;
-		} catch (InvalidMessageRemoteException e) {
-			LOGGER.warn("Could not parse message", e);
-			resException = e;
-			statusCode = Status.STATUS_BAD_REQUEST;
-		} catch (RepositoryRemoteException e) {
-			LOGGER.warn("Could not execute request", e);
-			resException = e;
-			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
-		} catch (IntegrityException e) {
-			LOGGER.warn("Integrity error", e);
-			resException = new IntegrityRemoteException(e);
-			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
-		} catch (NodeExistsException e) {
-			LOGGER.warn("Node exists", e);
-			resException = new NodeExistsRemoteException(e);
-			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} catch (Throwable e) {
 			// any unexpected exception is encapsulated inside IllegalStateRemoteException which can be serialized
 			String message = buildExceptionMessage("Unexpected error occured", e);
 			LOGGER.error(message, e);
-			resException = new IllegalStateRemoteException(message, e);
 			statusCode = Status.STATUS_INTERNAL_SERVER_ERROR;
 		} finally {
 			if (bufferedRequest != null) {
@@ -189,12 +145,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, agent != null && agent.contains("Mozilla"));
 		
 		// render response according to model
-		if (resException == null) {
-			handleResult(res, resValue);
-		} else {
-			setExceptionHeader(res, resException);
-			objectMapper.writeValue(res.getOutputStream(), resException);
-		}
+		handleResult(res, resValue);
 	}
 
 	protected R transactionedExecute(final P parameter, final BufferedRequest bufferedRequest) throws Exception {
@@ -241,11 +192,6 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 	protected abstract R executeImpl(P payload);
 	protected abstract void handleResult(WebScriptResponse res, R resValue) throws IOException;
 
-	protected static void setExceptionHeader(WebScriptResponse res, Exception e) {
-		res.setContentType("application/json;charset=UTF-8");
-		res.setHeader(RepositoryRemoteException.HEADER_EXCEPTION_CLASS_NAME, e.getClass().getName());
-	}
-
 	protected static String buildExceptionMessage(String prefix, Throwable e) {
 		StringBuilder message = new StringBuilder(prefix).append(": ").append(e.getMessage());
 		if (e.getSuppressed() != null) {
@@ -268,7 +214,7 @@ public abstract class AbstractRemoteWebScript<R, P> extends AbstractWebScript {
 	protected String getRequiredParameter(WebScriptRequest req, String name) {
 		String value = req.getParameter(name);
 		if (! StringUtils.hasText(value)) {
-			throw new InvalidMessageRemoteException("Could not get required parameter: " + name);
+			throw new IllegalStateException("Could not get required parameter: " + name);
 		}
 		return value;
 	}

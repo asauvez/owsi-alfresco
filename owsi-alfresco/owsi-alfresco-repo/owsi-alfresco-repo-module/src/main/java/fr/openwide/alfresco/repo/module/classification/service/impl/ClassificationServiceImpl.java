@@ -49,7 +49,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import fr.openwide.alfresco.api.core.node.exception.DuplicateChildNodeNameRemoteException;
 import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
@@ -486,7 +485,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 							return nodeModelRepositoryService.createNode(destinationFolder, CmModel.folder, cleanFolderName);
 						}
 					}, false, true);
-				} catch (DuplicateChildNodeNameRemoteException ex) {
+				} catch (FileExistsException ex) {
 					// si un autre processus a crée le même répertoire entre temps, on recommence le fait de le chercher
 					newFolderRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>() {
 						@Override

@@ -22,13 +22,6 @@
 		<property name="authenticationService" ref="AuthenticationService" />
 	</bean>
 
-	<bean id="owsi.service.chaosMonkey" class="fr.openwide.alfresco.repo.core.chaosmonkey.service.impl.ChaosMonkeyImpl">
-		<property name="failOccurance" value="${owsi.chaosmonkey.failOccurance}" />
-		<property name="seed" value="${owsi.chaosmonkey.seed}" />
-		<property name="exception" value="${owsi.chaosmonkey.exception}" />
-		<property name="maxRetries" value="${server.transaction.max-retries}"/>
-	</bean>
-
 	<!-- Services with model -->
 
 	<bean id="owsi.service.nodeModelRepositoryService" class="fr.openwide.alfresco.repo.dictionary.node.service.impl.NodeModelRepositoryServiceImpl">

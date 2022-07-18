@@ -1,8 +1,6 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
 import fr.openwide.alfresco.api.core.remote.model.NodeReference;
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 
 public class IdRestriction extends Restriction {
 
@@ -13,15 +11,6 @@ public class IdRestriction extends Restriction {
 		this.nodeReference = nodeRef;
 	}
 
-	@Override
-	public void testInit(NodeScopeBuilder nodeScopeBuilder) {
-		nodeScopeBuilder.nodeReference();
-	}
-	@Override
-	public boolean test(BusinessNode node) {
-		return nodeReference.equals(node.getNodeReference());
-	}
-	
 	@Override
 	protected String toFtsQueryInternal() {
 		return "ID:" + nodeReference.getReference().replace(":", "\\:");

@@ -1,7 +1,5 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
-import fr.openwide.alfresco.component.model.node.model.BusinessNode;
-import fr.openwide.alfresco.component.model.node.model.NodeScopeBuilder;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 
 public class TypeRestriction extends Restriction {
@@ -19,15 +17,6 @@ public class TypeRestriction extends Restriction {
 		return this;
 	}
 
-	@Override
-	public void testInit(NodeScopeBuilder nodeScopeBuilder) {
-		nodeScopeBuilder.type();
-	}
-	@Override
-	public boolean test(BusinessNode node) {
-		return node.isType(type);
-	}
-	
 	@Override
 	protected String toFtsQueryInternal() {
 		return ((exact) ? "EXACTTYPE:" : "TYPE:") + type.toLucene();
