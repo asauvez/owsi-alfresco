@@ -358,7 +358,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 					// nop
 				} else if (pv.getValue() instanceof Date) {
 					writer.writeCharacters(iso8601.format((Date) pv.getValue()));
-				} else if (pv.getValue() instanceof ContentData) {
+				} else if (   pv.getValue() instanceof ContentData 
+						   && ((ContentData) pv.getValue()).getContentUrl() != null) {
 					ContentData originalContentData = (ContentData) pv.getValue();
 					ContentData contentData = new ContentData(
 							"classpath:" + getContentPath(nodeRef, property, originalContentData, params),
@@ -687,7 +688,8 @@ public class ContentStoreExportServiceImpl implements ContentStoreExportService 
 			Map<QName, Serializable> properties) throws IOException {
 		for (Entry<QName, Serializable> property : properties.entrySet()) {
 			//seul un content data nous interesse
-			if (property.getValue() instanceof ContentData) {
+			if (   property.getValue() instanceof ContentData 
+				&& ((ContentData) property.getValue()).getContentUrl() != null) {
 				ContentData contentData = (ContentData) property.getValue();
 				String contentUrl = getContentPath(nodeRef, property.getKey(), contentData, params);
 				

@@ -3,9 +3,8 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-parent-repo-component</artifactId>
+		<artifactId>owsi-alfresco</artifactId>
 		<version>0.9.5-SNAPSHOT</version>
-		<relativePath>../owsi-alfresco-parent/owsi-alfresco-parent-repo-component/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-repo</artifactId>
 	<packaging>pom</packaging>
@@ -14,7 +13,6 @@
 	<description>Composants pour le développement d'extensions dans l'application Alfresco</description>
 
 	<modules>
-		<module>owsi-alfresco-repo-wsgenerator</module>	
 		<module>owsi-alfresco-repo-core</module>
 		<module>owsi-alfresco-repo-module</module>
 		<module>owsi-alfresco-repo-contentstoreexport</module>
@@ -24,4 +22,67 @@
 		<module>owsi-alfresco-repo-solraudit</module>
 	</modules>
 
+	<dependencies>
+		<dependency>
+			<groupId>${alfresco.groupId}</groupId>
+			<artifactId>alfresco-remote-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.ori</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/config</directory>
+				<targetPath>alfresco/module/${alfresco.module.name}</targetPath>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/webapp</directory>
+				<targetPath>META-INF/resources</targetPath>
+			</resource>
+		</resources>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>4.5</version>
+				<executions>
+					<execution>
+						<id>maven-processor-plugin-default</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<processors>
+								<processor>fr.openwide.alfresco.repo.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
+							</processors>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>fr.openwide.alfresco</groupId>
+						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
+						<version>${project.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
 </project>

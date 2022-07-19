@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>fr.openwide.alfresco</groupId>
-    <artifactId>owsi-alfresco-share</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
-  </parent>
-  
-  <artifactId>owsi-alfresco-share-datalistgroupe</artifactId>
-  <name>OWSI Alfresco - Share - Gestion des groupes sous forme DataList</name>
- 
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-share</artifactId>
+		<version>0.9.5-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>owsi-alfresco-share-datalistgroupe</artifactId>
+	<name>OWSI Alfresco - Share - Gestion des groupes sous forme DataList</name>
+
 </project>

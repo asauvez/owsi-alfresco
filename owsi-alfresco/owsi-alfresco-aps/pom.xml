@@ -3,9 +3,8 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-parent</artifactId>
+		<artifactId>owsi-alfresco</artifactId>
 		<version>0.9.5-SNAPSHOT</version>
-		<relativePath>../owsi-alfresco-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>owsi-alfresco-aps</artifactId>
 	<packaging>pom</packaging>

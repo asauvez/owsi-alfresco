@@ -38,9 +38,6 @@ import fr.openwide.alfresco.repo.migrationtool.plugin.model.Module;
  * Pour chaque fichier patché de Alfresco, créer un fichier .x.y.z.ori avec le fichier original extrait des JAR Alfresco.
  * Par exemple, pour un fichier contentModel.xml surchargé, le plugin crée un fichier contentModel.xml.6.0.0.ori.
  * 
- * Le plugin est automatiquement appelé si le pom.xml hérite de owsi-alfresco-parent-repo-component, 
- * owsi-alfresco-parent-alfresco ou owsi-alfresco-parent-share.
- * 
  * Il est préférable d'exclure les fichiers *.ori des fichiers JAR ou WAR générés. C'est fait automatiquement si le
  * pom.xml hérite des mêmes modules.
  * 

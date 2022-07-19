@@ -1,27 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.openwide.alfresco</groupId>
-    <artifactId>owsi-alfresco</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
-    <packaging>pom</packaging>
+	<groupId>fr.openwide.alfresco</groupId>
+	<artifactId>owsi-alfresco</artifactId>
+	<version>0.9.5-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-    <name>OWSI Alfresco</name>
-    <description>Capitalisation des développements utilisés sur les projets Alfresco</description>
+	<name>OWSI Alfresco</name>
+	<description>Capitalisation des développements utilisés sur les projets Alfresco</description>
 
 	<properties>
 		<jdk.version>11</jdk.version>
+		<alfresco.groupId>org.alfresco</alfresco.groupId>
+		<alfresco.bomDependencyArtifactId>acs-packaging</alfresco.bomDependencyArtifactId>
+		<alfresco.platform.version>7.2.0.3</alfresco.platform.version>
 	</properties>
 
 	<modules>
-		<module>owsi-alfresco-parent</module>
+		<module>owsi-alfresco-repo-wsgenerator</module>	
 		<module>owsi-alfresco-repo</module>
 		<module>owsi-alfresco-share</module>
 		<module>owsi-alfresco-adf</module>
 		<module>owsi-alfresco-test</module>
 		<module>owsi-alfresco-aps</module>
-  </modules>
+	</modules>
+
+	<organization>
+		<name>Smile</name>
+		<url>http://www.smile.fr/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>${alfresco.groupId}</groupId>
+				<artifactId>${alfresco.bomDependencyArtifactId}</artifactId>
+				<version>${alfresco.platform.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>
@@ -54,55 +82,81 @@
 		</pluginManagement>
 	</build>
 
-    <organization>
-        <name>Smile</name>
-        <url>http://www.smile.fr/</url>
-    </organization>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>nexus.internal.snapshots</id>
+			<url>https://nexus.galaxy.intranet/repository/InternalSmileSnapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>nexus.internal.releases</id>
+			<url>https://nexus.galaxy.intranet/repository/InternalSmileReleases/</url>
+		</repository>
+	</distributionManagement>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus.internal.snapshots</id>
-            <url>https://nexus.galaxy.intranet/repository/InternalSmileSnapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus.internal.releases</id>
-            <url>https://nexus.galaxy.intranet/repository/InternalSmileReleases/</url>
-        </repository>
-    </distributionManagement>
-    
-    <repositories>
-        <repository>
-            <id>nexus.internal.releases</id>
-            <url>https://nexus.galaxy.intranet/content/repositories/InternalSmileReleases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>nexus.internal.snapshots</id>
-            <url>https://nexus.galaxy.intranet/content/repositories/InternalSmileSnapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
+	<repositories>
+		<repository>
+			<id>alfresco-public</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>alfresco-public-snapshots</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
+		</repository>
+		<!-- Alfresco Enterprise Edition Artifacts, put username/pwd for server 
+			in settings.xml -->
+		<repository>
+			<id>alfresco-private-repository</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
+		</repository>
+		<repository>
+			<id>alfresco-internal</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/internal</url>
+		</repository>
 
-        <repository>
-            <id>nexus.internal.third-party</id>
-            <url>https://nexus.galaxy.intranet/content/repositories/nonCentralArtifacts/</url>
-        </repository>
-        <repository>
-            <id>nexus.mirror.alfresco.release.repo</id>
-            <url>https://nexus.galaxy.intranet/repository/alfresco-artifacts-repository/</url>
-        </repository>
-    </repositories>
 
+		<repository>
+			<id>nexus.internal.releases</id>
+			<url>https://nexus.galaxy.intranet/content/repositories/InternalSmileReleases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>nexus.internal.snapshots</id>
+			<url>https://nexus.galaxy.intranet/content/repositories/InternalSmileSnapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+
+		<repository>
+			<id>nexus.internal.third-party</id>
+			<url>https://nexus.galaxy.intranet/content/repositories/nonCentralArtifacts/</url>
+		</repository>
+		<repository>
+			<id>nexus.mirror.alfresco.release.repo</id>
+			<url>https://nexus.galaxy.intranet/repository/alfresco-artifacts-repository/</url>
+		</repository>
+	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>alfresco-plugin-public</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>alfresco-plugin-public-snapshots</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	
 
 </project>

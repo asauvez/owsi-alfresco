@@ -15,25 +15,6 @@
 		
 		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.6 -->
 		<jdk.version>1.6</jdk.version>
-		
-		
-		<dependency.spring.version>3.0.5.RELEASE</dependency.spring.version>
-		<owsi-alfresco.api.spring.version>3.0.5.RELEASE</owsi-alfresco.api.spring.version>
 	</properties>
 	
-	<dependencies>
-		<dependency>
-			<groupId>fr.openwide.alfresco</groupId>
-			<artifactId>owsi-alfresco-repo-wsgenerator-annotation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-	</dependencies>
-
 </project>
