@@ -12,6 +12,10 @@
 	<name>OWSI Alfresco - Repository</name>
 	<description>Composants pour le développement d'extensions dans l'application Alfresco</description>
 
+	<properties>
+		<alfresco.module.name>${project.artifactId}</alfresco.module.name>
+	</properties>
+
 	<modules>
 		<module>owsi-alfresco-repo-core</module>
 		<module>owsi-alfresco-repo-module</module>
@@ -57,6 +61,7 @@
 		</resources>
 		
 		<plugins>
+			<!-- Generate WS, Service and Cron XML -->
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>

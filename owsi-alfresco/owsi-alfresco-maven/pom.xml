@@ -16,6 +16,7 @@
 		<module>owsi-alfresco-repo-wsgenerator</module>
 		<module>owsi-alfresco-adf-maven-plugin</module>
 		<module>owsi-alfresco-aps-appInGit-maven-plugin</module>
+		<module>owsi-alfresco-repo-migration-maven-plugin</module>
 	</modules>
 
 </project>

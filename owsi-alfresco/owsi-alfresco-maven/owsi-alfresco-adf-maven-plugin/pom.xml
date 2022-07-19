@@ -9,6 +9,8 @@
 	<artifactId>owsi-alfresco-adf-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
 
+	<name>OWSI Alfresco - Maven - Generation of ADF project</name>
+
 	<properties>
 		<java.version>8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>

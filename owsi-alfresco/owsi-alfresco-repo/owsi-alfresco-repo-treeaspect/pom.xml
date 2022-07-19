@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>owsi-alfresco-repo-treeaspect</artifactId>
 
-	<name>OWSI Alfresco - Repository - Copy aspect to child</name>
+	<name>OWSI Alfresco - Repository - Tree Aspect</name>
 
 	<properties>
 		<alfresco.module.name>owsi-alfresco-repo-treeaspect</alfresco.module.name>

@@ -3,13 +3,13 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-parent</artifactId>
+		<artifactId>owsi-alfresco-maven</artifactId>
 		<version>0.9.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-repo-migration-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
 
-	<name>OWSI Alfresco - Repository - Migration Maven Plugin</name>
+	<name>OWSI Alfresco - Maven - Migration Maven Plugin</name>
 
 	<properties>		
 		<!-- Pour que le plugin marche sur des vieux Alfresco tournant en Java 1.6 --> 
