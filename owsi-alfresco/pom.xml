@@ -18,12 +18,10 @@
 	</properties>
 
 	<modules>
-		<module>owsi-alfresco-repo-wsgenerator</module>	
+		<module>owsi-alfresco-maven</module>
 		<module>owsi-alfresco-repo</module>
 		<module>owsi-alfresco-share</module>
-		<module>owsi-alfresco-adf</module>
 		<module>owsi-alfresco-test</module>
-		<module>owsi-alfresco-aps</module>
 	</modules>
 
 	<organization>

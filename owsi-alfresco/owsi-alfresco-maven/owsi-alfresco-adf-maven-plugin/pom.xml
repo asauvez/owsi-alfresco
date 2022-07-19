@@ -3,7 +3,7 @@
 
 	<parent>
 		<groupId>fr.openwide.alfresco</groupId>
-		<artifactId>owsi-alfresco-adf</artifactId>
+		<artifactId>owsi-alfresco-maven</artifactId>
 		<version>0.9.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>owsi-alfresco-adf-maven-plugin</artifactId>

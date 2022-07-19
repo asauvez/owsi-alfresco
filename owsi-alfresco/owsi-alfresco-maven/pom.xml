@@ -6,13 +6,15 @@
 		<artifactId>owsi-alfresco</artifactId>
 		<version>0.9.5-SNAPSHOT</version>
 	</parent>
-	<artifactId>owsi-alfresco-aps</artifactId>
+
+	<name>OWSI Alfresco - Maven</name>
+
+	<artifactId>owsi-alfresco-maven</artifactId>
 	<packaging>pom</packaging>
-
-	<name>OWSI Alfresco - APS</name>
-	<description>Composants pour APS</description>
-
+	
 	<modules>
+		<module>owsi-alfresco-repo-wsgenerator</module>
+		<module>owsi-alfresco-adf-maven-plugin</module>
 		<module>owsi-alfresco-aps-appInGit-maven-plugin</module>
 	</modules>
 
