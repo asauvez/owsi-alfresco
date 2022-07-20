@@ -23,16 +23,10 @@
 			<artifactId>owsi-alfresco-test</artifactId>
 			<version>${owsi-alfresco.version}</version>
 		</dependency>
-			<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpmime</artifactId>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>testcontainers</artifactId>
-				<version>1.17.3</version>
-				<scope>test</scope>
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
 		</dependency>
 	</dependencies>
 

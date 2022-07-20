@@ -22,7 +22,7 @@ import fr.openwide.alfresco.test.model.NodeModelIT;
 import fr.openwide.alfresco.test.model.PropertiesModelIT;
 
 @TestMethodOrder(Alphanumeric.class)
-public class ClassificationTest {
+public class ClassificationIT {
 
 	private AlfrescoRestClient alfrescoRestClient = new AlfrescoRestClient("demo");
 	private NodeRestClient nodeRestClient = new NodeRestClient(alfrescoRestClient);

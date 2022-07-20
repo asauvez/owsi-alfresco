@@ -30,6 +30,27 @@ Vous risquez d'avoir besoin de modifier votre `~/.m2/settings.xml`. Pour celà l
 * Pour livrer une nouvelle version
 mvn gitflow:release
 
+Projets
+=======
+├── owsi-alfresco-maven 								: Ce qui est lancé dans Maven (plugin ou processor)
+│   ├── owsi-alfresco-adf-maven-plugin 					: Permet de lancer un projet Content App.
+│   ├── owsi-alfresco-aps-appInGit-maven-plugin 		: Permet de stocker dans Git un workflow APS 
+│   ├── owsi-alfresco-repo-migration-maven-plugin		: Permet de maitriser les surcharges d'Alfresco
+│   └── owsi-alfresco-repo-wsgenerator					: Aide à créer des WS, des services, des crons, des patch et des modèles
+│       ├── owsi-alfresco-repo-wsgenerator-annotation	: Les annotations pour générer
+│       └── owsi-alfresco-repo-wsgenerator-processor	: Le processor qui génére le XML
+├── owsi-alfresco-repo									: Ce qui est intégré dans la partie repo
+│   ├── owsi-alfresco-repo-contentstoreexport			: Permet d'exporter une partie du Content Store
+│   ├── owsi-alfresco-repo-core							: Utilitaires globaux
+│   ├── owsi-alfresco-repo-datalistgroupe				: Permet à des non adminstrateurs de gérer des groupes
+│   ├── owsi-alfresco-repo-emailed2eml					: Permet de transformer les emails reçus en fichier .eml
+│   ├── owsi-alfresco-repo-module						: Utilitaires utilisant les metas owsi:*.
+│   ├── owsi-alfresco-repo-solraudit					: Genere des audits des documents présents dans la GED
+│   └── owsi-alfresco-repo-treeaspect					: Permet de faire hériter des metas sur tous les sous noeuds
+├── owsi-alfresco-share									: Ce est intégré dans la partie Share
+│   └── owsi-alfresco-share-datalistgroupe				: Permet à des non adminstrateurs de gérer des groupes
+└── owsi-alfresco-test									: Permet de faire des tests d'intégration à distance
+
 Nouveautés
 ==========
 ## depuis 0.9.5
