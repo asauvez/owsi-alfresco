@@ -524,7 +524,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	@Override
 	public void registerCopyPropertyCmName(AspectModel aspectOfRootNode, PropertyModel<String> propertyToCopy) {
-		registerCopyProperty(aspectOfRootNode, propertyToCopy, CmModel.object.name);
+		registerCopyProperty(aspectOfRootNode, CmModel.object.name, propertyToCopy);
 	}
 	@Override
 	public <T extends Serializable> void registerCopyProperty(AspectModel aspectOfRootNode,

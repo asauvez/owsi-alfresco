@@ -15,6 +15,45 @@
 	</namespaces>
 
 	<aspects>
+		<aspect name="demo:treeAspectRootFolder">
+			<title>Racine de la demo TreeAspect</title>
+		</aspect>
+
+		<aspect name="demo:treeAspectRegionInfo">
+			<title>Information sur la région</title>
+			<properties>
+				<property name="demo:treeAspectRegionName">
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+		<aspect name="demo:treeAspectRegionFolder">
+			<title>Dossier d'une région</title>
+			<mandatory-aspects>
+				<aspect>demo:treeAspectRegionInfo</aspect>
+			</mandatory-aspects>
+		</aspect>
+
+		<aspect name="demo:treeAspectClientInfo">
+			<title>Information sur le client</title>
+			<properties>
+				<property name="demo:treeAspectClientName">
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+		<aspect name="demo:treeAspectClientFolder">
+			<title>Dossier d'un client</title>
+			<mandatory-aspects>
+				<aspect>demo:treeAspectClientInfo</aspect>
+			</mandatory-aspects>
+		</aspect>
+
+		<aspect name="demo:treeAspectFactureDocument">
+			<title>Facture d'un client</title>
+		</aspect>		
+
+
 		<aspect name="demo:auditInfo">
 			<title>Informations utiles pour l'audit</title>
 			<properties>

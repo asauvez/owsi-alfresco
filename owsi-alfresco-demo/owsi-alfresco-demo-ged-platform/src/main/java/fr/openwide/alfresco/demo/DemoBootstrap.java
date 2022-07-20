@@ -1,5 +1,6 @@
 package fr.openwide.alfresco.demo;
 
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteRole;
 import org.alfresco.service.cmr.site.SiteVisibility;
@@ -21,7 +22,9 @@ public class DemoBootstrap extends RunAtEveryLaunchPatch {
 		AuthorityReference demoUser = bootstrapService.getOrCreateUser("demo", "Utilisateur", "Demo", null, "demo");
 		SiteInfo siteInfo = bootstrapService.getOrCreateSite(SITE_NAME, "demo", "", SiteVisibility.PRIVATE);
 		bootstrapService.setSiteMembership(siteInfo, demoUser, SiteRole.SiteCollaborator);
-		bootstrapService.getOrCreateDocumentLibrary(siteInfo);
+		NodeRef documentLibrary = bootstrapService.getOrCreateDocumentLibrary(siteInfo);
+		
+		bootstrapService.getOrCreateFolder(documentLibrary, "treeAspect", DemoModel.treeAspectRootFolder);
 		
 		return "success";
 	}

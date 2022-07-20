@@ -33,6 +33,10 @@ public class ContainerModel extends Model {
 		return Collections.unmodifiableMap(mandatoryAspects);
 	}
 	public <A extends AspectModel> A addMandatoryAspect(A aspect) {
+		if (aspect == null) {
+			throw new IllegalStateException("In your model, declare mandatory aspects before declaring them mandatory in another aspect.");
+		}
+		
 		mandatoryAspects.put(aspect.getNameReference(), aspect);
 		for (PropertyModel<?> property : aspect.getProperties().values()) {
 			properties.put(property.getNameReference(), property);

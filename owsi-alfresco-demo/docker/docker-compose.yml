@@ -43,7 +43,7 @@ services:
       - owsi-alfresco-demo-ged-db-volume:/var/lib/postgresql/data
   owsi-alfresco-demo-ged-ass:
     image: alfresco/alfresco-search-services:2.0.3
-    #entrypoint: ["echo", "Solr6 désactivé. Commenter cette ligne pour le réactiver."]
+    entrypoint: ["echo", "Solr6 désactivé. Commenter cette ligne pour le réactiver."]
     environment:
       SOLR_ALFRESCO_HOST: owsi-alfresco-demo-ged-acs
       SOLR_ALFRESCO_PORT: 8080
