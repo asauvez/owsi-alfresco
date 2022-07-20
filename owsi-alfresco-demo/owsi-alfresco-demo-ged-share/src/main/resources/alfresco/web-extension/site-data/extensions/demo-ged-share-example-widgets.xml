@@ -1,0 +1,11 @@
+<extension>
+  <modules>
+    <module>
+      <id>owsi-alfresco-demo-ged-share - Example Aikau Widgets</id>
+      <version>1.0</version>
+      <auto-deploy>true</auto-deploy>
+      <configurations>
+      </configurations>
+    </module>
+  </modules>
+</extension>

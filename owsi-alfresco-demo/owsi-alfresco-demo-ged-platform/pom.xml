@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>owsi-alfresco-demo-ged-platform</artifactId>
+	<name>Alfresco Platform/Repository JAR Module</name>
+	<description>Platform/Repo JAR Module (to be included in the alfresco.war) - part of AIO - SDK 4.4
+    </description>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>fr.openwide.alfresco.demo</groupId>
+		<artifactId>owsi-alfresco-demo-ged</artifactId>
+		<version>0.9.5-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${alfresco.groupId}</groupId>
+			<artifactId>alfresco-remote-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-module</artifactId>
+			<version>${owsi-alfresco.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-solraudit</artifactId>
+			<version>${owsi-alfresco.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- Permet de générer des WS avec une annotation -->
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>3.3.3</version>
+				<executions>
+					<execution>
+						<id>maven-processor-plugin-default</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<configuration>
+							<processors>
+								<processor>fr.openwide.alfresco.repo.wsgenerator.processor.GenerateWebScriptAnnotationProcessor</processor>
+							</processors>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>fr.openwide.alfresco</groupId>
+						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
+						<version>${owsi-alfresco.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

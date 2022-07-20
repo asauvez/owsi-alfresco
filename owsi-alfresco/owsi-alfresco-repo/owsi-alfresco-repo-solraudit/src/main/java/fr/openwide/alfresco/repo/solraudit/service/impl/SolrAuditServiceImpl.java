@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.search.StatsRequestParameters;
 import org.alfresco.service.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -49,7 +50,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
  * Génére un fichier CSV avec le nombre et la taille des fichiers selons des critères spécifiques.
  */
 @GenerateService
-public class SolrAuditServiceImpl implements SolrAuditService {
+public class SolrAuditServiceImpl implements SolrAuditService, InitializingBean {
 
 	private static final String PIVOT_LABEL = "piv1";
 
@@ -68,6 +69,20 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	@Autowired @Qualifier("global-properties")
 	private Properties globalProperties;
 
+	private String pathElements;
+	private String fileNamePattern;
+	private List<String> pivots;
+	private String query;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		pathElements = globalProperties.getProperty("owsi.solraudit.storePath", "solrAudit");
+		fileNamePattern = globalProperties.getProperty("owsi.solraudit.storeFileName", "solrAudit_{0,date,yyyy-MM-dd}.csv");
+		pivots = new ArrayList<>(Arrays.asList(
+				globalProperties.getProperty("owsi.solraudit.pivot", "SITE,cm:content.mimetype").split(",")));
+		query = globalProperties.getProperty("owsi.solraudit.query", "TYPE:\"" + ContentModel.TYPE_CONTENT + "\"");
+	}
+	
 	@Override
 	public void generateAudit(PrintWriter out) {
 		generateAuditInternal(out, StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, true);
@@ -84,9 +99,7 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	}
 	@Override
 	public void storeAudit(boolean includeTrashcan) {
-		String pathElements = globalProperties.getProperty("owsi.solraudit.storePath", "solrAudit");
-		String fileName = globalProperties.getProperty("owsi.solraudit.storeFileName", "solrAudit_{0,date,yyyy-MM-dd}.csv");
-		fileName = MessageFormat.format(fileName, new Date());
+		String fileName = MessageFormat.format(fileNamePattern, new Date());
 		
 		NodeRef folder = repositoryHelper.getCompanyHome();
 		for (String pathElement : pathElements.split("/")) {
@@ -120,10 +133,6 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 	
 	private void generateAuditInternal(PrintWriter out, StoreRef storeRef, boolean includeHeaders) {
 		logger.debug("Generate audit for storeRef " + storeRef.getProtocol());
-		// owsi.solraudit.pivot=cm:creator,SITE,cm:content.mimetype
-		List<String> pivots = new ArrayList<>(Arrays.asList(
-				globalProperties.getProperty("owsi.solraudit.pivot", "SITE").split(",")));
-		String query = globalProperties.getProperty("owsi.solraudit.query", "TYPE:\"" + ContentModel.TYPE_CONTENT + "\"");
 		
 		// Ajout header CSV
 		if (includeHeaders) {
@@ -242,7 +251,16 @@ public class SolrAuditServiceImpl implements SolrAuditService {
 			});
 	}
 	
-	
+	@Override
+	public void setQuery(String query) {
+		this.query = query;
+	}
+	@Override
+	public void addPivots(QName... properties) {
+		for (QName property : properties) {
+			pivots.add(property.toPrefixString());
+		}
+	}
 	
 	@Override
 	public void registerDateGroup(QName container, QName propertyText) {

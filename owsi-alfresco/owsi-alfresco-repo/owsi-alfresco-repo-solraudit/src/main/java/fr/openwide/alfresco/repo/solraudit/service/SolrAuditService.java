@@ -15,8 +15,10 @@ public interface SolrAuditService {
 	void storeAudit();
 	void storeAudit(boolean includeTrashcan);
 	
-	
 	void registerPropertiesPolicy(QName container, Consumer<NodeRef> consumer);
+	
+	void setQuery(String query);
+	void addPivots(QName ... properties);
 	
 	void registerDateGroup(QName container, QName propertyText);
 	void registerDateGroup(QName container, QName propertyDate, QName propertyString, String format);
