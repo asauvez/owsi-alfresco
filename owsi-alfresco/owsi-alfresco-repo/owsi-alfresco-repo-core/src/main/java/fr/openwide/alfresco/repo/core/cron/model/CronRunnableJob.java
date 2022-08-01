@@ -29,10 +29,12 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 			return;
 		}
 		
+		long beforeTime = System.currentTimeMillis();
+		String msg = ">>> Scheduled start";
 		if (logAsInfo) {
-			logger.info( ">>> Scheduled start");
+			logger.info(msg);
 		} else {
-			logger.debug(">>> Scheduled start");
+			logger.debug(msg);
 		}
 		
 		try {
@@ -57,10 +59,12 @@ public class CronRunnableJob extends AbstractScheduledLockedJob {
 				}
 			}, runAs);
 
+			long seconds = (System.currentTimeMillis() - beforeTime) / 1000;
+			String message = "<<< Schedule end (" + seconds + " seconds)";
 			if (logAsInfo) {
-				logger.info( "<<< Schedule end");
+				logger.info(message);
 			} else {
-				logger.debug("<<< Schedule end");
+				logger.debug(message);
 			}
 		} catch (Exception ex) {
 			logger.error(runnable.getClass().getName(), ex);

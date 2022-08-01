@@ -1,7 +1,7 @@
 Description
 ===========
 Owsi-Alfresco est un ensemble d'outils destinés à rendre plus rapide et maintenable les développements autour 
-d'Alfresco 6.0.0.
+d'Alfresco 7.2.0.
 
 
 Liens

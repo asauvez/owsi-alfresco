@@ -11,6 +11,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron;
 @GenerateCron(
 	id = "owsi.solraudit.cron",
 	cronExpression = "${owsi.solraudit.cronExpression}",
+	startDelay = "PT1M",
 	enable = "${owsi.solraudit.enabled:true}",
 	logAsInfo = true
 )
