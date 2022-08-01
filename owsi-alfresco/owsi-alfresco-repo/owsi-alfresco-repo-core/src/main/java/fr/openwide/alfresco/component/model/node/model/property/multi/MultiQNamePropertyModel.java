@@ -1,24 +1,22 @@
 package fr.openwide.alfresco.component.model.node.model.property.multi;
 
-import java.io.Serializable;
-
 import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
-public class MultiAnyPropertyModel extends MultiPropertyModel<Serializable> {
+public class MultiQNamePropertyModel extends MultiPropertyModel<QName> {
 
-	public MultiAnyPropertyModel(ContainerModel type, QName qName) {
+	public MultiQNamePropertyModel(ContainerModel type, QName qName) {
 		super(type, qName);
 	}
 
 	@Override
-	public Class<Serializable> getValueClass() {
-		return Serializable.class;
+	public Class<QName> getValueClass() {
+		return QName.class;
 	}
-	
+
 	@Override
 	public String getDataType() {
-		return "d:any";
+		return "d:text";
 	}
 }

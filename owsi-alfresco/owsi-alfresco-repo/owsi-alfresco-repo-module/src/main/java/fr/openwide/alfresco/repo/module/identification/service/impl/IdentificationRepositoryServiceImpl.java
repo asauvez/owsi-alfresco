@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
@@ -21,19 +21,19 @@ public class IdentificationRepositoryServiceImpl implements IdentificationReposi
 	@Autowired private NodeModelRepositoryService nodeModelService;
 	
 	@Override
-	public Optional<NodeRef> getByIdentifier(NameReference identifier) {
+	public Optional<NodeRef> getByIdentifier(QName identifier) {
 		return nodeSearchModelService.searchReferenceUnique(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of());
 	}
 
 	@Override
-	public List<NodeRef> listByIdentifier(NameReference identifier) {
+	public List<NodeRef> listByIdentifier(QName identifier) {
 		return nodeSearchModelService.searchReference(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of());
 	}
 
 	@Override
-	public void setIdentifier(NodeRef nodeRef, NameReference identifier) {
+	public void setIdentifier(NodeRef nodeRef, QName identifier) {
 		nodeModelService.setProperty(nodeRef, OwsiModel.identifiable.identifier, identifier);
 	}
 }

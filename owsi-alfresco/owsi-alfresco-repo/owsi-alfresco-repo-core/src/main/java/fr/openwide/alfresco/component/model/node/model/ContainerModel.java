@@ -5,31 +5,32 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.association.AssociationModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class ContainerModel extends Model {
 
-	private Map<NameReference, PropertyModel<?>> properties = new HashMap<>();
+	private Map<QName, PropertyModel<?>> properties = new HashMap<>();
 
-	private Map<NameReference, AspectModel> mandatoryAspects = new HashMap<>();
+	private Map<QName, AspectModel> mandatoryAspects = new HashMap<>();
 	
-	public ContainerModel(NameReference nameReference) {
-		super(nameReference);
+	public ContainerModel(QName qName) {
+		super(qName);
 	}
 
-	public Map<NameReference, PropertyModel<?>> getProperties() {
+	public Map<QName, PropertyModel<?>> getProperties() {
 		return Collections.unmodifiableMap(properties);
 	}
-	public PropertyModel<?> getProperty(NameReference nameReference) {
-		return properties.get(nameReference);
+	public PropertyModel<?> getProperty(QName qName) {
+		return properties.get(qName);
 	}
 	public void addProperty(PropertyModel<?> property) {
-		properties.put(property.getNameReference(), property);
+		properties.put(property.getQName(), property);
 	}
 
-	public Map<NameReference, AspectModel> getMandatoryAspects() {
+	public Map<QName, AspectModel> getMandatoryAspects() {
 		return Collections.unmodifiableMap(mandatoryAspects);
 	}
 	public <A extends AspectModel> A addMandatoryAspect(A aspect) {
@@ -37,9 +38,9 @@ public class ContainerModel extends Model {
 			throw new IllegalStateException("In your model, declare mandatory aspects before declaring them mandatory in another aspect.");
 		}
 		
-		mandatoryAspects.put(aspect.getNameReference(), aspect);
+		mandatoryAspects.put(aspect.getQName(), aspect);
 		for (PropertyModel<?> property : aspect.getProperties().values()) {
-			properties.put(property.getNameReference(), property);
+			properties.put(property.getQName(), property);
 		}
 		return aspect;
 	}
@@ -68,7 +69,7 @@ public class ContainerModel extends Model {
 			tabulation.append("	");
 		}
 		
-		xml.append(tabulation.toString()).append("<").append(containerType).append(" name=\"").append(this.getNameReference().getFullName()).append("\">\n");
+		xml.append(tabulation.toString()).append("<").append(containerType).append(" name=\"").append(this.getQName().toPrefixString()).append("\">\n");
 			this.getXmlProperties(xml, this, profondeur + 1);
 		xml.append(tabulation.toString()).append("</").append(containerType).append(">\n");
 		
@@ -91,7 +92,7 @@ public class ContainerModel extends Model {
 		
 		try {
 			ContainerModel parentModel = (ContainerModel) container.getClass().getSuperclass().getConstructor().newInstance();
-			xml.append(tabulation.toString()).append("<parent>").append(parentModel.getNameReference().getFullName()).append("</parent>\n");
+			xml.append(tabulation.toString()).append("<parent>").append(parentModel.getQName().toPrefixString()).append("</parent>\n");
 		} catch (NoSuchMethodException ex) {
 			// Ignore, on doit être à la racine
 		}

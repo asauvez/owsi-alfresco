@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.st;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
@@ -11,11 +12,11 @@ import fr.openwide.alfresco.component.model.repository.model.sys.SysUndeletable;
 public class StSite extends CmFolder {
 	
 	public StSite() {
-		super(NameReference.create(StModel.NAMESPACE, "site"));
+		super(StModel.NAMESPACE.createQName("site"));
 	}
 
-	protected StSite(NameReference nameReference) {
-		super(nameReference);
+	protected StSite(QName qName) {
+		super(qName);
 	}
 
 	public static final String DASHBOARD_SITE_PRESET = "site-dashboard";

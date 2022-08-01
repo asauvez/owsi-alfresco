@@ -1,15 +1,15 @@
 package fr.openwide.alfresco.component.model.node.model;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
 
 public class TypeModel extends ContainerModel {
 
-	public TypeModel(NameReference nameReference) {
-		super(nameReference);
+	public TypeModel(QName qName) {
+		super(qName);
 	}
 
-	public TypeModel(TypeModel typeModel, NameReference nameReference) {
-		this(nameReference);
+	public TypeModel(TypeModel typeModel, QName qName) {
+		this(qName);
 		copy(typeModel, this);
 	}
 	

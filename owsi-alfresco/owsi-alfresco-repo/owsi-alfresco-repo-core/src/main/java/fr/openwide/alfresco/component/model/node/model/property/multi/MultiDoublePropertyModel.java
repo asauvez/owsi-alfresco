@@ -1,12 +1,13 @@
 package fr.openwide.alfresco.component.model.node.model.property.multi;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class MultiDoublePropertyModel extends AbstractMultiNumberPropertyModel<Double> {
 
-	public MultiDoublePropertyModel(ContainerModel type, NameReference nameReference) {
-		super(type, nameReference);
+	public MultiDoublePropertyModel(ContainerModel type, QName qName) {
+		super(type, qName);
 	}
 
 	@Override

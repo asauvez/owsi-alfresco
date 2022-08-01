@@ -28,22 +28,19 @@ import org.alfresco.service.namespace.QName;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 
 	private PolicyComponent policyComponent;
 	private BehaviourFilter policyFilter;
 
-	private ConversionService conversionService;
-	
 	@Override
 	public <T extends ClassPolicy> void bindClassBehaviour(ContainerModel type, NotificationFrequency frequency,
 			Class<T> eventType, T policy) {
 		try {
 			QName policyQName = (QName) eventType.getField("QNAME").get(null);
 			policyComponent.bindClassBehaviour(policyQName, 
-					conversionService.getRequired(type.getNameReference()), 
+					type.getQName(), 
 					new JavaBehaviour(policy, policyQName.getLocalName(), frequency));
 		} catch (IllegalAccessException | NoSuchFieldException ex) {
 			throw new IllegalStateException(ex);
@@ -55,8 +52,8 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 		try {
 			QName policyQName = (QName) eventType.getField("QNAME").get(null);
 			policyComponent.bindAssociationBehaviour(policyQName, 
-					conversionService.getRequired(type.getNameReference()),
-					conversionService.getRequired(association.getNameReference()), 
+					type.getQName(),
+					association.getQName(), 
 					new JavaBehaviour(policy, policyQName.getLocalName(), frequency));
 		} catch (IllegalAccessException | NoSuchFieldException ex) {
 			throw new IllegalStateException(ex);
@@ -125,8 +122,7 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	@Override
 	public <T> T disableBehaviours(Collection<? extends ContainerModel> types, Callable<T> callable) {
 		for (ContainerModel type : types) {
-			QName typeQName = conversionService.getRequired(type.getNameReference());
-			policyFilter.disableBehaviour(typeQName);
+			policyFilter.disableBehaviour(type.getQName());
 		}
 		try {
 			return callable.call();
@@ -134,8 +130,7 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 			throw (e instanceof RuntimeException) ? (RuntimeException) e : new IllegalStateException(e);
 		} finally {
 			for (ContainerModel type : types) {
-				QName typeQName = conversionService.getRequired(type.getNameReference());
-				policyFilter.enableBehaviour(typeQName);
+				policyFilter.enableBehaviour(type.getQName());
 			}
 		}
 	}
@@ -156,9 +151,6 @@ public class PolicyRepositoryServiceImpl implements PolicyRepositoryService {
 	}
 	public void setPolicyFilter(BehaviourFilter policyFilter) {
 		this.policyFilter = policyFilter;
-	}
-	public void setConversionService(ConversionService conversionService) {
-		this.conversionService = conversionService;
 	}
 
 }

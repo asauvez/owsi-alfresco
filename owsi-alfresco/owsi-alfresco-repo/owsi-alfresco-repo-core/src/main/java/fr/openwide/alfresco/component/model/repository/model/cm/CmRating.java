@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.FloatPropertyModel;
@@ -10,11 +11,11 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmRating extends CmObject {
 
 	public CmRating() {
-		super(NameReference.create(CmModel.NAMESPACE, "rating"));
+		super(CmModel.NAMESPACE.createQName("rating"));
 	}
 
-	protected CmRating(NameReference nameReference) {
-		super(nameReference);
+	protected CmRating(QName qName) {
+		super(qName);
 	}
 	
 	public final FloatPropertyModel ratingScore = PropertyModels.newFloat(this, CmModel.NAMESPACE, "ratingScore");

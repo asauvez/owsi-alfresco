@@ -2,14 +2,15 @@ package fr.openwide.alfresco.component.model.node.model.property.single;
 
 import java.io.Serializable;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class SinglePropertyModel<C extends Serializable> extends PropertyModel<C> {
 
-	public SinglePropertyModel(ContainerModel type, NameReference nameReference) {
-		super(type, nameReference);
+	public SinglePropertyModel(ContainerModel type, QName qName) {
+		super(type, qName);
 	}
 
 }

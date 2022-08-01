@@ -110,7 +110,7 @@ public class JavaModelGenerator {
 			return loadModel(input);
 		}
 	}
-	private M2Model loadModel(InputStream input) throws IOException {
+	private M2Model loadModel(InputStream input) {
 		ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(IXMLReaderFactory.class.getClassLoader());
@@ -157,7 +157,7 @@ public class JavaModelGenerator {
 				.append("package ").append(packageName).append(";\n\n");
 
 			Set<String> classesToImport = new TreeSet<>();
-			classesToImport.add("fr.openwide.alfresco.api.core.remote.model.NameReference");
+			classesToImport.add("org.alfresco.service.namespace.QName");
 			classesToImport.add(StringUtils.substringBeforeLast(packageName, ".") + "." + javaRootInterfaceName);
 			
 			String containerType = (m2Class instanceof M2Aspect) ? "AspectModel" : "TypeModel";
@@ -189,10 +189,10 @@ public class JavaModelGenerator {
 					.append(containerType);
 			writer.append(" {\n\n")
 				.append("	public ").append(className).append("() {\n")
-				.append("		super(NameReference.create(").append(javaRootInterfaceName).append(".NAMESPACE, \"").append(containerName).append("\"));\n")
+				.append("		super(").append(javaRootInterfaceName).append(".NAMESPACE.createQName(\"").append(containerName).append("\"));\n")
 				.append("	}\n\n")
-				.append("	protected ").append(className).append("(NameReference nameReference) {\n")
-				.append("		super(nameReference);\n")
+				.append("	protected ").append(className).append("(QName qName) {\n")
+				.append("		super(qName);\n")
 				.append("	}\n\n");
 			if (generateJavaModel.useBean()) {
 				writer
@@ -318,8 +318,8 @@ public class JavaModelGenerator {
 		String className = getAssocClassName(assoc);
 		
 		writer.append("	public final ").append(className).append(" ").append(toJavaName(name))
-			.append(" = new ").append(className).append("(NameReference.create(")
-			.append(javaRootInterfaceName).append(".NAMESPACE, \"").append(name).append("\"));\n");
+			.append(" = new ").append(className).append("(")
+			.append(javaRootInterfaceName).append(".NAMESPACE.createQName(\"").append(name).append("\"));\n");
 	}
 	private String getAssocClassName(M2ClassAssociation assoc) {
 		if (assoc.isChild()) {
@@ -342,9 +342,9 @@ public class JavaModelGenerator {
 		switch (type) {
 		case "d:int": return "Integer";
 		case "d:datetime": return "DateTime";
-		case "d:noderef": return "NodeReference";
-		case "d:qname": return "NameReference";
-		case "d:category": return "NodeReference";
+		case "d:noderef": return "NodeRef";
+		case "d:qname": return "QName";
+		case "d:category": return "NodeRef";
 		case "d:mltext": return "Text";
 		}
 		return StringUtils.capitalize(StringUtils.substringAfter(type, ":"));
@@ -356,9 +356,9 @@ public class JavaModelGenerator {
 		case "d:date": return "java.util.Date";
 		case "d:time": return "java.util.Date";
 		case "d:datetime": return "java.util.Date";
-		case "d:noderef": return "fr.openwide.alfresco.api.core.remote.model.NodeReference";
-		case "d:qname": return "fr.openwide.alfresco.api.core.remote.model.NameReference";
-		case "d:category": return "fr.openwide.alfresco.api.core.remote.model.NodeReference";
+		case "d:noderef": return "org.alfresco.service.cmr.repository.NodeRef";
+		case "d:qname": return "org.alfresco.service.namespace.QName";
+		case "d:category": return "org.alfresco.service.cmr.repository.NodeRef";
 		case "d:text": return "String";
 		case "d:mltext": return "String";
 		case "d:content": return "fr.openwide.alfresco.api.core.node.model.RepositoryContentData";

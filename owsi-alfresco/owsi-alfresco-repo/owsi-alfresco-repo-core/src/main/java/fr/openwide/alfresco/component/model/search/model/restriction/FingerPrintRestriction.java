@@ -1,14 +1,14 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 public class FingerPrintRestriction extends Restriction {
 
-	private final NodeReference nodeRef;
+	private final NodeRef nodeRef;
 	private Integer overlap;
 	private Integer confident;
 
-	public FingerPrintRestriction(RestrictionBuilder parent, NodeReference nodeRef) {
+	public FingerPrintRestriction(RestrictionBuilder parent, NodeRef nodeRef) {
 		super(parent);
 		this.nodeRef = nodeRef;
 	}
@@ -24,7 +24,7 @@ public class FingerPrintRestriction extends Restriction {
 
 	@Override
 	protected String toFtsQueryInternal() {
-		return "FINGERPRINT:" + nodeRef.getUuid()
+		return "FINGERPRINT:" + nodeRef.getId()
 				+ ((overlap != null) ? "_" + overlap : "")
 				+ ((confident != null) ? "_" + confident : "");
 	}

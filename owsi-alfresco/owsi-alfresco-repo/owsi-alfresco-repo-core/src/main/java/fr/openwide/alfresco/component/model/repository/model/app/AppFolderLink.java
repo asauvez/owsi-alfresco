@@ -1,17 +1,18 @@
 package fr.openwide.alfresco.component.model.repository.model.app;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.repository.model.AppModel;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmLink;
 
 public class AppFolderLink extends CmLink {
 	
 	public AppFolderLink() {
-		super(NameReference.create(AppModel.NAMESPACE, "folderlink"));
+		super(AppModel.NAMESPACE.createQName("folderlink"));
 	}
 
-	protected AppFolderLink(NameReference nameReference) {
-		super(nameReference);
+	protected AppFolderLink(QName qName) {
+		super(qName);
 	}
 
 }

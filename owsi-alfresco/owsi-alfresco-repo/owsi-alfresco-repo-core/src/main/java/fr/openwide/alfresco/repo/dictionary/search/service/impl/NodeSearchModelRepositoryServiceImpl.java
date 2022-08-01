@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.alfresco.repo.search.impl.parsers.FTSQueryException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.FieldHighlightParameters;
 import org.alfresco.service.cmr.search.GeneralHighlightParameters;
 import org.alfresco.service.cmr.search.LimitBy;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import fr.openwide.alfresco.api.core.remote.model.StoreReference;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SortDefinition;
 import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryFieldHighlightParameters;
@@ -32,7 +32,6 @@ import fr.openwide.alfresco.component.model.search.model.restriction.Restriction
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepositoryService {
 
@@ -42,7 +41,6 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 	@Autowired private SearchService searchService;
 	@Autowired private TransactionService transactionService;
 	@Autowired private Environment environment;
-	@Autowired private ConversionService conversionService;
 	
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
 	
@@ -57,8 +55,8 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 		}
 
 		SearchParameters sp = new SearchParameters();
-		for (StoreReference storeReference : rsp.getStoreReferences()) {
-			sp.addStore(conversionService.getRequired(storeReference));
+		for (StoreRef storeRef : rsp.getStoreRefs()) {
+			sp.addStore(storeRef);
 		}
 		sp.setLanguage(rsp.getLanguage().getAlfrescoName());
 		sp.setQuery(rsp.getQuery());
@@ -82,7 +80,7 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 		}
 		
 		for (SortDefinition sd : rsp.getSorts()) {
-			sp.addSort(sd.getProperty().getFullName(), sd.isAscending());
+			sp.addSort(sd.getProperty().toPrefixString(), sd.isAscending());
 		}
 		
 		RepositoryGeneralHighlightParameters rhighlight = rsp.getHighlight();
@@ -90,7 +88,7 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 			List<FieldHighlightParameters> fields = new ArrayList<>();
 			for (RepositoryFieldHighlightParameters field : rhighlight.getFields()) {
 				fields.add(new FieldHighlightParameters(
-						field.getField().getFullName(), 
+						field.getField().toPrefixString(), 
 						field.getSnippetCount(), 
 						field.getFragmentSize(), 
 						field.getMergeContiguous(), 
@@ -174,7 +172,7 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 			} else {
 				sp.setLimitBy(LimitBy.FINAL_SIZE);
 				// Force sort pour que tri soit prédictif
-				// sp.addSort(SysModel.referenceable.nodeUuid.getNameReference().getFullName(), true);
+				// sp.addSort(SysModel.referenceable.nodeUuid.getQName().getFullName(), true);
 				
 				for (int batchNumber = 0; ; batchNumber ++) {
 					int skipCount = batchNumber * searchBuilder.getFrameSize();
@@ -244,22 +242,22 @@ public class NodeSearchModelRepositoryServiceImpl implements NodeSearchModelRepo
 	private int consumeInTransaction(BatchSearchQueryBuilder searchBuilder, Iterator<NodeRef> iterator) {
 		int nbInBatch = 0;
 		while (iterator.hasNext() && (searchBuilder.getTransactionSize() == null || nbInBatch < searchBuilder.getTransactionSize())) {
-			NodeRef nodeReference = iterator.next();
-			if (nodeModelRepositoryService.exists(nodeReference)) {
+			NodeRef nodeRef = iterator.next();
+			if (nodeModelRepositoryService.exists(nodeRef)) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("**** Consume " + nbInBatch + "/" + nodeReference);
+					LOGGER.debug("**** Consume " + nbInBatch + "/" + nodeRef);
 				}
 				if (searchBuilder.getConsumer() != null) {
-					searchBuilder.getConsumer().accept(nodeReference);
+					searchBuilder.getConsumer().accept(nodeRef);
 				}
 				
 				if (searchBuilder.getAlreadyDoneAspect() != null) {
-					nodeModelRepositoryService.addAspect(nodeReference, searchBuilder.getAlreadyDoneAspect());
+					nodeModelRepositoryService.addAspect(nodeRef, searchBuilder.getAlreadyDoneAspect());
 				}
 				
 				nbInBatch ++;
 			} else {
-				LOGGER.warn(nodeReference + " does not exist");
+				LOGGER.warn(nodeRef + " does not exist");
 			}
 		}
 		return nbInBatch;

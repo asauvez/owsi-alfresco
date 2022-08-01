@@ -4,20 +4,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.Model;
 import fr.openwide.alfresco.component.model.node.model.constraint.ConstraintException;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public abstract class PropertyModel<C extends Serializable> extends Model {
 
 	private final ContainerModel type;
 	private final List<PropertyConstraint> constraints = new ArrayList<>(); 
 
-	public PropertyModel(ContainerModel type, NameReference nameReference) {
-		super(nameReference);
+	public PropertyModel(ContainerModel type, QName qName) {
+		super(qName);
 		this.type = type;
 		type.addProperty(this);
 	}
@@ -39,14 +40,14 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 		validateType(value);
 		for (PropertyConstraint constraint : constraints) {
 			if (! constraint.valid(this, value)) {
-				throw new ConstraintException(getNameReference() + ": Value does not satisfy constraint " + constraint.getMessage());
+				throw new ConstraintException(getQName() + ": Value does not satisfy constraint " + constraint.getMessage());
 			}
 		}
 	}
 
 	protected void validateType(Serializable value) {
 		if (value != null && ! getValueClass().isInstance(value)) {
-			throw new ConstraintException(getNameReference() + ": Value of type " + value.getClass().getName() + " instead of " + getValueClass().getName() + ".");
+			throw new ConstraintException(getQName() + ": Value of type " + value.getClass().getName() + " instead of " + getValueClass().getName() + ".");
 		}
 	}
 	
@@ -72,7 +73,7 @@ public abstract class PropertyModel<C extends Serializable> extends Model {
 			tabulation.append("	");
 		}
 		
-		xml.append(tabulation.toString()).append("<property name=\"") .append(this.getNameReference().getFullName()).append("\">\n")
+		xml.append(tabulation.toString()).append("<property name=\"") .append(this.getQName().toPrefixString()).append("\">\n")
 			.append(tabulation.toString()).append("	<type>").append(this.getDataType()).append("</type>\n");
 		
 		if (this instanceof MultiPropertyModel) {

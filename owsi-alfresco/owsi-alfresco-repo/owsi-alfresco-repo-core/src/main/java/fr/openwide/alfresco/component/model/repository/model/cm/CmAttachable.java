@@ -1,20 +1,21 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
-public class CmAttachable extends AspectModel{
+public class CmAttachable extends AspectModel {
 
 	public CmAttachable() {
-		super(NameReference.create(CmModel.NAMESPACE, "attachable"));
+		super(CmModel.NAMESPACE.createQName("attachable"));
 	}
 
-	protected CmAttachable(NameReference nameReference) {
-		super(nameReference);
+	protected CmAttachable(QName qName) {
+		super(qName);
 	}
 	
-	public final ManyToManyAssociationModel attachments = new ManyToManyAssociationModel(NameReference.create(CmModel.NAMESPACE, "attachments"));
+	public final ManyToManyAssociationModel attachments = new ManyToManyAssociationModel(CmModel.NAMESPACE.createQName("attachments"));
 	
 }

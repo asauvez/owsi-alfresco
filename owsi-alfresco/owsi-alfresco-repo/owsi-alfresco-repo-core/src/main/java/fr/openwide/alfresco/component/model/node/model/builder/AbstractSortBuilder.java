@@ -19,7 +19,7 @@ public class AbstractSortBuilder<B extends AbstractQueryBuilder<B, ?, ?>> {
 		return sort(property, false);
 	}
 	public B sort(SinglePropertyModel<? extends Comparable<?>> property, boolean ascending) {
-		builder.getParameters().getSorts().add(new SortDefinition(property.getNameReference(), ascending));
+		builder.getParameters().getSorts().add(new SortDefinition(property.getQName(), ascending));
 		return builder;
 	}
 

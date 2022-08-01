@@ -1,14 +1,16 @@
 package fr.openwide.alfresco.api.core.remote.model;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.NamespaceServiceMemoryImpl;
+import org.alfresco.service.namespace.QName;
 
 public class NamespaceReference implements Serializable {
 
-	private static Map<String, String> uriByPrefix = new ConcurrentHashMap<>(); 
-	private static Map<String, String> prefixByUri = new ConcurrentHashMap<>();
+	private static NamespaceService namespaceService = new NamespaceServiceMemoryImpl();
 	
 	private final String prefix;
 	private final String uri;
@@ -19,9 +21,12 @@ public class NamespaceReference implements Serializable {
 	}
 	public static NamespaceReference create(String prefix, String uri) {
 		NamespaceReference namespaceReference = new NamespaceReference(prefix, uri);
-		uriByPrefix.put(prefix, uri);
-		prefixByUri.put(uri, prefix);
+		namespaceService.registerNamespace(prefix, uri);
 		return namespaceReference;
+	}
+	
+	public QName createQName(String localName) {
+		return QName.createQName(this.prefix, localName, namespaceService);
 	}
 
 	public String getPrefix() {
@@ -32,18 +37,18 @@ public class NamespaceReference implements Serializable {
 	}
 
 	public static String getUriByPrefix(String prefix) {
-		String uri = uriByPrefix.get(prefix);
+		String uri = namespaceService.getNamespaceURI(prefix);
 		if (uri == null) {
 			throw new IllegalArgumentException("Unknown prefix " + prefix);
 		}
 		return uri;
 	}
 	public static String getPrefixByUri(String uri) {
-		String prefix = prefixByUri.get(uri);
-		if (prefix == null) {
+		Collection<String> prefix = namespaceService.getPrefixes(uri);
+		if (prefix == null || prefix.isEmpty()) {
 			throw new IllegalArgumentException("Unknown uri " + uri);
 		}
-		return prefix;
+		return prefix.iterator().next();
 	}
 
 	@Override

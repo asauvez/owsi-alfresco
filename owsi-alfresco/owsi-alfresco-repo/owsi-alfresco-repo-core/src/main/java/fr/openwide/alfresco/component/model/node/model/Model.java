@@ -2,26 +2,26 @@ package fr.openwide.alfresco.component.model.node.model;
 
 import java.util.Objects;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
-
+import org.alfresco.service.namespace.QName;
 
 public abstract class Model {
 
-	protected final NameReference nameReference;
+	protected final QName qName;
 
-	public Model(NameReference nameReference) {
-		this.nameReference = nameReference;
+	public Model(QName qName) {
+		this.qName = qName;
 	}
 
 	public String toLucene() {
-		return nameReference.getNamespace().replace("-", "\\-") 
+		String[] split = qName.toPrefixString().split(":");
+		return split[0].replace("-", "\\-") 
 			+ "\\:" 
-			+ nameReference.getName().replace("-", "\\-");
+			+ split[1].replace("-", "\\-");
 	}
 
 	@Override
 	public String toString() {
-		return nameReference.toString();
+		return getQName().toPrefixString();
 	}
 	@Override
 	public boolean equals(Object object) {
@@ -33,17 +33,16 @@ public abstract class Model {
 		}
 		if (object.getClass() == this.getClass()) {
 			Model other = (Model) object;
-			return Objects.equals(getNameReference(), other.getNameReference());
+			return Objects.equals(getQName(), other.getQName());
 		}
 		return false;
 	}
 	@Override
 	public int hashCode() {
-		return getNameReference().hashCode();
+		return getQName().hashCode();
 	}
 
-	public NameReference getNameReference() {
-		return nameReference;
+	public QName getQName() {
+		return qName;
 	}
-
 }

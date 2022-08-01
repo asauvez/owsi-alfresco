@@ -1,21 +1,22 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmVersionable extends AspectModel {
 
 	public CmVersionable() {
-		super(NameReference.create(CmModel.NAMESPACE, "versionable"));
+		super(CmModel.NAMESPACE.createQName("versionable"));
 	}
 
-	protected CmVersionable(NameReference nameReference) {
-		super(nameReference);
+	protected CmVersionable(QName qName) {
+		super(qName);
 	}
 
 	public final TextPropertyModel versionLabel = PropertyModels.newText(this, CmModel.NAMESPACE, "versionLabel",

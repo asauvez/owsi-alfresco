@@ -1,19 +1,19 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 public class AncestorRestriction extends Restriction {
 
-	private final NodeReference parentRef;
+	private final NodeRef parentRef;
 
-	public AncestorRestriction(RestrictionBuilder parent, NodeReference parentRef) {
+	public AncestorRestriction(RestrictionBuilder parent, NodeRef parentRef) {
 		super(parent);
 		this.parentRef = parentRef;
 	}
 
 	@Override
 	protected String toFtsQueryInternal() {
-		return "ANCESTOR:" + parentRef.getReference().replace(":", "\\:");
+		return "ANCESTOR:" + parentRef.toString().replace(":", "\\:");
 	}
 
 }

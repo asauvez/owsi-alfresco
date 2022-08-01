@@ -4,19 +4,19 @@ import org.alfresco.service.namespace.QName;
 
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
-public class FloatPropertyModel extends AbstractNumberPropertyModel<Float> {
+public class QNamePropertyModel extends SinglePropertyModel<QName> {
 
-	public FloatPropertyModel(ContainerModel type, QName qName) {
+	public QNamePropertyModel(ContainerModel type, QName qName) {
 		super(type, qName);
 	}
 
 	@Override
-	public Class<Float> getValueClass() {
-		return Float.class;
+	public Class<QName> getValueClass() {
+		return QName.class;
 	}
 
 	@Override
 	public String getDataType() {
-		return "d:float";
+		return "d:text";
 	}
 }

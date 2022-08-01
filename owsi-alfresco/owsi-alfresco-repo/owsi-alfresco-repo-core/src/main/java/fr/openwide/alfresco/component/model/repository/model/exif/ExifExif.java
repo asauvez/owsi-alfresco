@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.exif;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
@@ -13,11 +14,11 @@ import fr.openwide.alfresco.component.model.repository.model.ExifModel;
 public class ExifExif extends AspectModel {
 
 	public ExifExif() {
-		super(NameReference.create(ExifModel.NAMESPACE, "exif"));
+		super(ExifModel.NAMESPACE.createQName("exif"));
 	}
 
-	protected ExifExif(NameReference nameReference) {
-		super(nameReference);
+	protected ExifExif(QName qName) {
+		super(qName);
 	}
 
 	public final DateTimePropertyModel dateTimeOriginal = PropertyModels.newDateTime(this, ExifModel.NAMESPACE, "dateTimeOriginal");

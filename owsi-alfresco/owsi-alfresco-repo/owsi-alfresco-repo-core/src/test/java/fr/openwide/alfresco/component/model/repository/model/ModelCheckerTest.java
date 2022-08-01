@@ -17,7 +17,7 @@ public class ModelCheckerTest {
 		checker.checkModel(StModel.class);
 		checker.checkModel(RnModel.class);
 		checker.checkModel(EmailServerModel.class);
-				
+		
 		assertEquals(
 				  "SysReferenceable : Field name storeProtocol is not the same as the property name store-protocol\n"
 				+ "SysReferenceable : Field name storeIdentifier is not the same as the property name store-identifier\n"

@@ -34,7 +34,6 @@ import org.springframework.context.ApplicationContext;
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.api.core.node.model.PermissionReference;
 import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
@@ -44,7 +43,6 @@ import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionReposit
 import fr.openwide.alfresco.repo.dictionary.policy.service.PolicyRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 public class PermissionRepositoryServiceImpl implements PermissionRepositoryService {
 
@@ -52,7 +50,6 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	
 	private PermissionService permissionService;
 	private AuthorityService authorityService;
-	private ConversionService conversionService;
 	@Autowired private NodeModelRepositoryService nodeModelService;
 	private NodeSearchModelRepositoryService nodeSearchModelService;
 	private PolicyRepositoryService policyRepositoryService;
@@ -97,12 +94,11 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 		List<RepositoryAccessControl> res = new ArrayList<>(permissions.size());
 		for (AccessPermission permission : permissions) {
 			if (inherited || ! permission.isInherited()) {
-				NodeReference nodeReference = conversionService.get(nodeRef);
 				AuthorityReference authority = AuthorityReference.authority(permission.getAuthority());
 				PermissionReference permissionRef = PermissionReference.create(permission.getPermission());
 				boolean allowed = permission.getAccessStatus() == AccessStatus.ALLOWED;
 				
-				res.add(new RepositoryAccessControl(nodeReference, authority, permissionRef, allowed, permission.isInherited()));
+				res.add(new RepositoryAccessControl(nodeRef, authority, permissionRef, allowed, permission.isInherited()));
 			}
 		}
 		return res;
@@ -155,12 +151,12 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 					try (ResultSet res = stmt.executeQuery()) {
 						while(res.next()) {
 							int col = 1;
-							NodeReference nodeReference = NodeReference.create(res.getString(col ++), res.getString(col ++), res.getString(col ++));
+							NodeRef nodeRef = new NodeRef(res.getString(col ++), res.getString(col ++), res.getString(col ++));
 							AuthorityReference authority = AuthorityReference.authority(res.getString(col ++));
 							PermissionReference permission = PermissionReference.create(res.getString(col ++));
 							boolean allowed = res.getBoolean(col ++);
 							
-							list.add(new RepositoryAccessControl(nodeReference, authority, permission, allowed, false));
+							list.add(new RepositoryAccessControl(nodeRef, authority, permission, allowed, false));
 						}
 					}
 				}
@@ -211,8 +207,8 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 			if (maxItem.isPresent() && maxItem.get() == cpt) {
 				break;
 			}
-			setPermission(conversionService.getRequired(acl.getNodeReference()), newAuthority, acl.getPermission(), acl.isAllowed());
-			deletePermission(conversionService.getRequired(acl.getNodeReference()), oldAuthority, acl.getPermission());
+			setPermission(acl.getNodeRef(), newAuthority, acl.getPermission(), acl.isAllowed());
+			deletePermission(acl.getNodeRef(), oldAuthority, acl.getPermission());
 			cpt ++;
 		}
 		
@@ -310,18 +306,15 @@ public class PermissionRepositoryServiceImpl implements PermissionRepositoryServ
 	}
 	
 	private Consumer<NodeRef> disableBehaviour(Consumer<NodeRef> consumer) {
-		return nodeReference ->  policyRepositoryService.disableBehaviour(CmModel.auditable, () -> consumer.accept(nodeReference));
+		return nodeRef ->  policyRepositoryService.disableBehaviour(CmModel.auditable, () -> consumer.accept(nodeRef));
 	}
 
 	private Consumer<NodeRef> getChangePropConsumer(String propName, TextPropertyModel propertyModel) {
-		return nodeReference -> {nodeModelService.setProperty(nodeReference, propertyModel, propName);};
+		return nodeRef -> {nodeModelService.setProperty(nodeRef, propertyModel, propName);};
 	}
 	
 	public void setPermissionService(PermissionService permissionService) {
 		this.permissionService = permissionService;
-	}
-	public void setConversionService(ConversionService conversionService) {
-		this.conversionService = conversionService;
 	}
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;

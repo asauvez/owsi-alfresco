@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
@@ -11,11 +12,11 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmLockable extends AspectModel {
 
 	public CmLockable() {
-		super(NameReference.create(CmModel.NAMESPACE, "lockable"));
+		super(CmModel.NAMESPACE.createQName("lockable"));
 	}
 
-	protected CmLockable(NameReference nameReference) {
-		super(nameReference);
+	protected CmLockable(QName qName) {
+		super(qName);
 	}
 
 	public final TextPropertyModel lockOwner = PropertyModels.newText(this, CmModel.NAMESPACE, "lockOwner");

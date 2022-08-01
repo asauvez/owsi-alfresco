@@ -1,13 +1,14 @@
 package fr.openwide.alfresco.component.model.node.model.property.single;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.api.core.node.model.RepositoryContentData;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
 public class ContentPropertyModel extends SinglePropertyModel<RepositoryContentData> {
 
-	public ContentPropertyModel(ContainerModel type, NameReference nameReference) {
-		super(type, nameReference);
+	public ContentPropertyModel(ContainerModel type, QName qName) {
+		super(type, qName);
 	}
 
 	@Override

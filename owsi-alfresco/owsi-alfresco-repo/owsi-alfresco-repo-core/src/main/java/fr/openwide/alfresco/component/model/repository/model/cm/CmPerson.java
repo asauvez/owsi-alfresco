@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
@@ -9,24 +10,24 @@ import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPr
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.single.NodeReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.NodeRefPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class CmPerson extends CmAuthority {
 
 	public CmPerson() {
-		super(NameReference.create(CmModel.NAMESPACE, "person"));
+		super(CmModel.NAMESPACE.createQName("person"));
 	}
 
-	protected CmPerson(NameReference nameReference) {
-		super(nameReference);
+	protected CmPerson(QName qName) {
+		super(qName);
 	}
 
 	public final TextPropertyModel userName = PropertyModels.newText(this, CmModel.NAMESPACE, "userName",
 			MandatoryEnforcedPropertyConstraint.INSTANCE);
 	
-	public final NodeReferencePropertyModel homeFolder = PropertyModels.newNodeReference(this, CmModel.NAMESPACE, "homeFolder");
+	public final NodeRefPropertyModel homeFolder = PropertyModels.newNodeRef(this, CmModel.NAMESPACE, "homeFolder");
 	public final TextPropertyModel firstName = PropertyModels.newText(this, CmModel.NAMESPACE, "firstName");
 	public final TextPropertyModel lastName = PropertyModels.newText(this, CmModel.NAMESPACE, "lastName");
 	public final TextPropertyModel middleName = PropertyModels.newText(this, CmModel.NAMESPACE, "middleName");
@@ -64,5 +65,5 @@ public class CmPerson extends CmAuthority {
 	public final LongPropertyModel sizeQuota = PropertyModels.newLong(this, CmModel.NAMESPACE, "sizeQuota",
 			ProtectedPropertyConstraint.INSTANCE);
 
-	public final OneToOneAssociationModel avatar = new OneToOneAssociationModel(NameReference.create(CmModel.NAMESPACE, "avatar"));
+	public final OneToOneAssociationModel avatar = new OneToOneAssociationModel(CmModel.NAMESPACE.createQName("avatar"));
 }

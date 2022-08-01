@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
-import fr.openwide.alfresco.api.core.remote.model.StoreReference;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.api.core.search.model.RepositoryQueryConsistency;
 import fr.openwide.alfresco.api.core.search.model.RepositorySearchParameters;
 import fr.openwide.alfresco.api.core.search.model.SearchQueryLanguage;
@@ -44,8 +45,8 @@ public class SearchQueryBuilder extends AbstractQueryBuilder<SearchQueryBuilder,
 	}
 	
 	
-	public SearchQueryBuilder storeReferences(List<StoreReference> storeReferences) {
-		getParameters().setStoreReferences(storeReferences);
+	public SearchQueryBuilder storeReferences(List<StoreRef> storeRefs) {
+		getParameters().setStoreRefs(storeRefs);
 		return this;
 	}
 
@@ -74,12 +75,12 @@ public class SearchQueryBuilder extends AbstractQueryBuilder<SearchQueryBuilder,
 		return this;
 	}
 	
-	public GeneralHighlightBuilder highlight(List<NameReference> fields) {
+	public GeneralHighlightBuilder highlight(List<QName> fields) {
 		return new GeneralHighlightBuilder(this, fields);
 	}
 	public GeneralHighlightBuilder highlight(PropertyModel<?> ... fields) {
 		return highlight(Arrays.asList(fields).stream()
-				.map(field -> field.getNameReference())
+				.map(field -> field.getQName())
 				.collect(Collectors.toList()));
 	}
 	public GeneralHighlightBuilder highlight() {

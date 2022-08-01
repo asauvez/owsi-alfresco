@@ -1,15 +1,15 @@
 package fr.openwide.alfresco.component.model.node.model;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
 
 public class AspectModel extends ContainerModel {
 
-	public AspectModel(NameReference nameReference) {
-		super(nameReference);
+	public AspectModel(QName qName) {
+		super(qName);
 	}
 
-	public AspectModel(AspectModel aspectModel, NameReference nameReference) {
-		this(nameReference);
+	public AspectModel(AspectModel aspectModel, QName qName) {
+		this(qName);
 		copy(aspectModel, this);
 	}
 	

@@ -8,20 +8,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang3.time.FastDateFormat;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.AbstractMultiNumberPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDateTimePropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNameReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiQNamePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.AbstractNumberPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
-import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.QNamePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public abstract class Restriction {
@@ -104,13 +104,13 @@ public abstract class Restriction {
 	}
 	
 	protected String toCmisAlias(ContainerModel container) {
-		return container.getNameReference().toString().replace(':', '_');
+		return container.getQName().toPrefixString().replace(':', '_');
 	}
 	protected String toCmisProperty(PropertyModel<?> property) {
 		if (CMIS_PROPERTIES_REPLACEMENT.containsKey(property)) {
 			return "o." + CMIS_PROPERTIES_REPLACEMENT.get(property);
 		} else {
-			return toCmisAlias(property.getType()) + "." + property.getNameReference().getFullName();
+			return toCmisAlias(property.getType()) + "." + property.getQName().getPrefixString();
 		}
 	}
 	
@@ -145,8 +145,8 @@ public abstract class Restriction {
 			return dateFormat.format((Date) value);
 		} else if (propertyModel instanceof AbstractNumberPropertyModel || propertyModel instanceof AbstractMultiNumberPropertyModel) {
 			return value.toString();
-		} else if (propertyModel instanceof NameReferencePropertyModel || propertyModel instanceof MultiNameReferencePropertyModel) {
-			return toFtsLuceneValue(((NameReference) value).getFullyQualified());
+		} else if (propertyModel instanceof QNamePropertyModel || propertyModel instanceof MultiQNamePropertyModel) {
+			return toFtsLuceneValue(((QName) value).toString());
 		} else {
 			return toFtsLuceneValue(value.toString());
 		}
@@ -162,8 +162,8 @@ public abstract class Restriction {
 			return "TIMESTAMP '" + dateFormat.format((Date) value) + "'";
 		} else if (propertyModel instanceof AbstractNumberPropertyModel || propertyModel instanceof AbstractMultiNumberPropertyModel) {
 			return value.toString();
-		} else if (propertyModel instanceof NameReferencePropertyModel || propertyModel instanceof MultiNameReferencePropertyModel) {
-			return toCmisLuceneValue(((NameReference) value).getFullyQualified());
+		} else if (propertyModel instanceof QNamePropertyModel || propertyModel instanceof MultiQNamePropertyModel) {
+			return toCmisLuceneValue(((QName) value).toString());
 		} else {
 			return toCmisLuceneValue(value.toString());
 		}

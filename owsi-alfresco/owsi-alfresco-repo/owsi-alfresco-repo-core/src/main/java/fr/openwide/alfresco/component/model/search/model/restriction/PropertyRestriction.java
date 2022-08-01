@@ -19,16 +19,16 @@ public class PropertyRestriction extends Restriction {
 
 	@Override
 	protected String toFtsQueryInternal() {
-		return method.name() + ":\"" + property.getNameReference().getFullyQualified() + "\"";
+		return method.name() + ":\"" + property.getQName().toString() + "\"";
 	}
 	
 	@Override
 	protected String toCmisQueryWhereInternal() {
 		switch (method) {
 		case ISNULL:
-			return property.getNameReference().getFullName() + " IS NULL";
+			return property.getQName().toPrefixString() + " IS NULL";
 		case ISNOTNULL:
-			return property.getNameReference().getFullName() + " IS NOT NULL";
+			return property.getQName().toPrefixString() + " IS NOT NULL";
 		case ISUNSET:
 		case EXISTS:
 		default:

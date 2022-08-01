@@ -19,14 +19,12 @@ import org.springframework.extensions.webscripts.AbstractWebScript;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.search.model.BatchSearchQueryBuilder;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
@@ -50,7 +48,6 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 	@Autowired private NodeSearchModelRepositoryService nodeSearchModelRepositoryService;
 	@Autowired private NodeService nodeService;
 	@Autowired @Qualifier("NamespaceService") private NamespacePrefixResolver prefixResolver;
-	@Autowired private ConversionService conversionService;
 	@Autowired private DictionaryService dictionaryService;
 	
 	@Override
@@ -73,8 +70,8 @@ public class ReplacePropertyValueWebScript extends AbstractWebScript {
 				"owsi.replacePropertyValue." + propertyQName.toPrefixString());
 		
 		// Condition
-		NameReference propertyWhereNameReference = conversionService.get(QName.resolveToQName(prefixResolver,property));
-		TextPropertyModel propertyWhereModel = new TextPropertyModel(new ContainerModel(propertyWhereNameReference), propertyWhereNameReference);
+		QName propertyWhereQName = QName.resolveToQName(prefixResolver,property);
+		TextPropertyModel propertyWhereModel = new TextPropertyModel(new ContainerModel(propertyWhereQName), propertyWhereQName);
 		builder.restriction(new RestrictionBuilder()
 				.eq(propertyWhereModel, oldValue).of());
 		

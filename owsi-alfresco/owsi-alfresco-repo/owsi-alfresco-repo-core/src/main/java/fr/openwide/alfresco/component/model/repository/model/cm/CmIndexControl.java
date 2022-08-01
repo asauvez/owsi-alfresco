@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
@@ -9,11 +10,11 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmIndexControl extends AspectModel {
 
 	public CmIndexControl() {
-		super(NameReference.create(CmModel.NAMESPACE, "indexControl"));
+		super(CmModel.NAMESPACE.createQName("indexControl"));
 	}
 
-	protected CmIndexControl(NameReference nameReference) {
-		super(nameReference);
+	protected CmIndexControl(QName qName) {
+		super(qName);
 	}
 
 	public final BooleanPropertyModel isIndexed = PropertyModels.newBoolean(this, CmModel.NAMESPACE, "isIndexed");

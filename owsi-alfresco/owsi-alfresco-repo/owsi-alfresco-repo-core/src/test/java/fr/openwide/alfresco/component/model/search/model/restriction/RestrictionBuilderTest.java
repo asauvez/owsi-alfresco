@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.junit.Test;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.RnModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
@@ -43,14 +43,14 @@ public class RestrictionBuilderTest {
 				"	OR =cm\\:name:\"tata\")", 
 			new RestrictionBuilder()
 				.path("/app:company_home/st:sites/cm:swsdp/cm:documentLibrary").orBelow().of()
-				.parent(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
+				.parent(new NodeRef("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
 				.eq(CmModel.object.name, "toto").of()
 				.eq(SysModel.referenceable.nodeDbid, 123L).of()
 				.startsWith(CmModel.object.name, "titi").of()
 				.match(CmModel.object.name, "titi").fuzzy(0.9).of()
 				.hasAspect(CmModel.workingCopy).not().of()
-				.id(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
-				.eq(RnModel.thumbnail.contentPropertyName, CmModel.content.content.getNameReference()).of()
+				.id(new NodeRef("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
+				.eq(RnModel.thumbnail.contentPropertyName, CmModel.content.content.getQName()).of()
 				.eq(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.gt(CmModel.auditable.modified, new Date(1234567890123L)).of()
 				.le(CmModel.auditable.modified, new Date(1234567890123L)).of()
@@ -61,7 +61,7 @@ public class RestrictionBuilderTest {
 				.isNotNull(CmModel.author.author).of()
 				.isUnset(CmModel.author.author).of()
 				.exists(CmModel.author.author).of()
-				.fingerPrint(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c"))
+				.fingerPrint(new NodeRef("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c"))
 					.overlap(20)
 					.confident(80).of()
 				.or()
@@ -103,7 +103,7 @@ public class RestrictionBuilderTest {
 				"AND NOT (o.cmis:name='titi'\n" +
 				"	OR o.cmis:name='tata')", 
 			new RestrictionBuilder()
-				.id(NodeReference.create("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
+				.id(new NodeRef("workspace://SpacesStore/aeb883c2-ad52-43f1-ab9f-1bf16137e79c")).of()
 				.eq(CmModel.titled.title, "toto").of()
 				.eq(CmModel.object.name, "toto").of()
 				.eq(CmModel.object.name, "tata").not().of()

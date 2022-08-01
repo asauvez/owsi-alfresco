@@ -12,7 +12,6 @@ import fr.openwide.alfresco.api.core.node.model.RepositoryAccessControl;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.remote.framework.web.script.AbstractMessageRemoteWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
@@ -39,8 +38,6 @@ public class PermissionsListWebScript extends AbstractMessageRemoteWebScript<Str
 	private PermissionRepositoryService permissionRepositoryService;
 	@Autowired
 	private NodeModelRepositoryService nodeModelRepositoryService;
-	@Autowired
-	private ConversionService conversionService;
 	
 	@Override
 	protected WebScriptRequest extractPayload(WebScriptRequest req) {
@@ -64,11 +61,11 @@ public class PermissionsListWebScript extends AbstractMessageRemoteWebScript<Str
 		StringBuilder buf = new StringBuilder();
 		for (RepositoryAccessControl acl : list) {
 			buf
-				.append(acl.getNodeReference()).append(";")
+				.append(acl.getNodeRef()).append(";")
 				.append(acl.getAuthority()).append(";")
 				.append(acl.getPermission()).append(";")
 				.append(acl.isAllowed()).append(";")
-				.append(nodeModelRepositoryService.getPath(conversionService.getRequired(acl.getNodeReference()))).append(";")
+				.append(nodeModelRepositoryService.getPath(acl.getNodeRef())).append(";")
 				.append("\n");
 		}
 		return buf.toString();

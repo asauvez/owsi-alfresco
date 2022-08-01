@@ -1,13 +1,13 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 public class ParentRestriction extends Restriction {
 
-	private final NodeReference parentRef;
+	private final NodeRef parentRef;
 	private boolean primary = false;
 
-	public ParentRestriction(RestrictionBuilder parent, NodeReference parentRef) {
+	public ParentRestriction(RestrictionBuilder parent, NodeRef parentRef) {
 		super(parent);
 		this.parentRef = parentRef;
 	}
@@ -19,7 +19,7 @@ public class ParentRestriction extends Restriction {
 
 	@Override
 	protected String toFtsQueryInternal() {
-		return ((primary) ? "PRIMARYPARENT:" : "PARENT:") + parentRef.getReference().replace(":", "\\:");
+		return ((primary) ? "PRIMARYPARENT:" : "PARENT:") + parentRef.toString().replace(":", "\\:");
 	}
 
 }

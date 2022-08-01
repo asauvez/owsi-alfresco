@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiTextPropertyModel;
@@ -11,11 +12,11 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmEmailed extends AspectModel{
 
 	public CmEmailed() {
-		super(NameReference.create(CmModel.NAMESPACE, "emailed"));
+		super(CmModel.NAMESPACE.createQName("emailed"));
 	}
 
-	protected CmEmailed(NameReference nameReference) {
-		super(nameReference);
+	protected CmEmailed(QName qName) {
+		super(qName);
 	}
 	
 	public final TextPropertyModel originator = PropertyModels.newText(this, CmModel.NAMESPACE, "originator");

@@ -27,19 +27,17 @@ import org.springframework.extensions.webscripts.WebScriptResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.core.swagger.web.script.SwaggerWebScript;
 import fr.openwide.alfresco.repo.dictionary.search.service.NodeSearchModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
-import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptAuthentication;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptFormatDefault;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptTransactionAllow;
+import fr.openwide.alfresco.repo.wsgenerator.annotation.SwaggerParameter;
 
 
 /**
@@ -67,7 +65,6 @@ public class DataListValuesWebScript extends SwaggerWebScript implements Initial
 	private Set<String> authorizedTypes;
 	
 	@Autowired private NodeSearchModelRepositoryService nodeSearchModelRepositoryService;
-	@Autowired private ConversionService conversionService;
 	
 	@Autowired AlfrescoGlobalProperties globalProperties;
 	@Autowired private NodeService nodeService;
@@ -111,11 +108,10 @@ public class DataListValuesWebScript extends SwaggerWebScript implements Initial
 //		if (! DataListModel.TYPE_DATALIST_ITEM.equals(typeDef.getParentName())) {
 //			throw new IllegalArgumentException("Expected subtype of '" + DataListModel.TYPE_DATALIST_ITEM.toPrefixString(prefixResolver) + "' but got '" + dataListTypeName + "'");
 //		}
-		NameReference nameReference = conversionService.get(typeDef.getName());
-		
+
 		List<Map<String, Serializable>> options = new ArrayList<>();
 		List<NodeRef> items = nodeSearchModelRepositoryService.searchReference(new RestrictionBuilder()
-				.isType(new TypeModel(nameReference)).of());
+				.isType(new TypeModel(typeDef.getName())).of());
 		
 		for (NodeRef item : items) {
 			Map<String, Serializable> map = new HashMap<>();

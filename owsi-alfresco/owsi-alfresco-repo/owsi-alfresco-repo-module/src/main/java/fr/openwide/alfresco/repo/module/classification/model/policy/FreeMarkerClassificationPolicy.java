@@ -14,7 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.core.configurationlogger.AlfrescoGlobalProperties;
@@ -49,7 +50,7 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 	public FreeMarkerClassificationPolicy(AlfrescoGlobalProperties globalProperties, ContainerModel model) throws IOException {
 		Configuration cfg = new Configuration();
 
-		String policyKey = model.getNameReference().getFullName().replace(':', '_');
+		String policyKey = model.getQName().toPrefixString().replace(':', '_');
 		
 		String ftsRootPropertyKey = "owsi.classification." + policyKey + ".root.fts";
 		Optional<String> ftsRootTemplatesAsString = globalProperties.getPropertyOptional(ftsRootPropertyKey);
@@ -112,11 +113,11 @@ public class FreeMarkerClassificationPolicy implements ClassificationPolicy<Cont
 
 	@Override
 	public void classify(ClassificationBuilder builder, ContainerModel model, ClassificationEvent event) {
-		Map<NameReference, Serializable> properties = builder.getNodeModelService().getProperties(builder.getNodeRef());
+		Map<QName, Serializable> properties = builder.getNodeModelService().getProperties(builder.getNodeRef());
 		
 		Map<String, Object> dataModel = new HashMap<>();
-		for (Entry<NameReference, Serializable> entry : properties.entrySet()) {
-			dataModel.put(entry.getKey().getFullName().replace(':', '_'), entry.getValue());
+		for (Entry<QName, Serializable> entry : properties.entrySet()) {
+			dataModel.put(entry.getKey().toPrefixString().replace(':', '_'), entry.getValue());
 		}
 		
 		ClassificationWithRootBuilder rootBuilder;

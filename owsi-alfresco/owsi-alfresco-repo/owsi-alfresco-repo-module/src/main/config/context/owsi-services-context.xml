@@ -7,7 +7,6 @@
 			depends-on="owsi.dictionaryBootstrap">
 		<property name="nodeSearchModelService" ref="owsi.service.nodeSearchModelService"/>
 		<property name="policyRepositoryService" ref="owsi.service.policyService"/>
-		<property name="conversionService" ref="owsi.service.conversionService" />
 		<property name="transactionService" ref="transactionService" />
 		<property name="dictionaryService" ref="DictionaryService" />
 		

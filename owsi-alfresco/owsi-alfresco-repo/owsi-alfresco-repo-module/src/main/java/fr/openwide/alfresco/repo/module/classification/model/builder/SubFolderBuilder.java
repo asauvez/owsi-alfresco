@@ -15,23 +15,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
 public class SubFolderBuilder {
 	
-	private final List<NameReference> properties;
+	private final List<QName> properties;
 	private Function<Serializable, Serializable> format = null;
 	private String defaultValue = null;
 
-	public SubFolderBuilder(NameReference ... properties) {
+	public SubFolderBuilder(QName ... properties) {
 		this.properties = Arrays.asList(properties);
 	}
 	public SubFolderBuilder(PropertyModel<?> ... properties) {
 		this.properties = Arrays.asList(properties).stream()
-				.map(p -> p.getNameReference())
+				.map(p -> p.getQName())
 				.collect(Collectors.toList());
 	}
 

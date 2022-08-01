@@ -3,7 +3,8 @@ package fr.openwide.alfresco.component.model.search.model.highlight;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryFieldHighlightParameters;
 import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryGeneralHighlightParameters;
 import fr.openwide.alfresco.api.core.search.model.highlight.RepositoryHighlightResults;
@@ -22,7 +23,7 @@ import fr.openwide.alfresco.component.model.search.model.SearchQueryBuilder;
 public class GeneralHighlightBuilder {
 	
 	private final SearchQueryBuilder searchQueryBuilder;
-	private final List<NameReference> fields;
+	private final List<QName> fields;
 	
 	private String prefix = "<strong>";
 	private String postfix = "</strong>";
@@ -33,17 +34,17 @@ public class GeneralHighlightBuilder {
 	private Integer maxAnalyzedChars = null;
 	private Boolean usePhraseHighlighter = null;
 
-	public GeneralHighlightBuilder(SearchQueryBuilder searchQueryBuilder, List<NameReference> fields) {
+	public GeneralHighlightBuilder(SearchQueryBuilder searchQueryBuilder, List<QName> fields) {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.fields = fields;
 	}
 
-	public GeneralHighlightBuilder field(NameReference field) {
+	public GeneralHighlightBuilder field(QName field) {
 		this.fields.add(field);
 		return this;
 	}
 	public GeneralHighlightBuilder field(PropertyModel<?> field) {
-		return field(field.getNameReference());
+		return field(field.getQName());
 	}
 
 	public GeneralHighlightBuilder prefix(String prefix) {
@@ -82,7 +83,7 @@ public class GeneralHighlightBuilder {
 	
 	private RepositoryGeneralHighlightParameters getHighlight() {
 		List<RepositoryFieldHighlightParameters> rfields = new ArrayList<>();
-		for (NameReference field : fields) {
+		for (QName field : fields) {
 			rfields.add(new RepositoryFieldHighlightParameters(field, null, null, null, null, null));
 		}
 		return new RepositoryGeneralHighlightParameters(snippetCount, fragmentSize, mergeContiguous, prefix, postfix, maxAnalyzedChars, usePhraseHighlighter, rfields);

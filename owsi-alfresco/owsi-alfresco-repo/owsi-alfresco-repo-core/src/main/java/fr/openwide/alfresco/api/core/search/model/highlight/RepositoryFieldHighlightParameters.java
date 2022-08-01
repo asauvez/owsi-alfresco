@@ -1,16 +1,16 @@
 
 package fr.openwide.alfresco.api.core.search.model.highlight;
 
+import org.alfresco.service.namespace.QName;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
-
 public class RepositoryFieldHighlightParameters extends RepositoryHighlightParameters {
-	private final NameReference field;
+	private final QName field;
 
     @JsonCreator
-	public RepositoryFieldHighlightParameters(@JsonProperty("field") NameReference field,
+	public RepositoryFieldHighlightParameters(@JsonProperty("field") QName field,
 			@JsonProperty("snippetCount") Integer snippetCount, @JsonProperty("fragmentSize") Integer fragmentSize,
 			@JsonProperty("mergeContiguous") Boolean mergeContiguous, @JsonProperty("prefix") String prefix,
 			@JsonProperty("postfix") String postfix) {
@@ -18,7 +18,7 @@ public class RepositoryFieldHighlightParameters extends RepositoryHighlightParam
 		this.field = field;
 	}
 	
-	public NameReference getField() {
+	public QName getField() {
 		return field;
 	}
 }

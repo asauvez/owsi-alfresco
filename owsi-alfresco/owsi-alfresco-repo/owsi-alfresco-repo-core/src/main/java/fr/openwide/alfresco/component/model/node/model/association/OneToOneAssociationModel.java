@@ -1,11 +1,11 @@
 package fr.openwide.alfresco.component.model.node.model.association;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
 
 public class OneToOneAssociationModel extends AssociationModel {
 
-	public OneToOneAssociationModel(NameReference nameReference) {
-		super(nameReference);
+	public OneToOneAssociationModel(QName qName) {
+		super(qName);
 	}
 	
 	@Override

@@ -1,21 +1,22 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
-import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeRefPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class CmGeneralClassifiable extends AspectModel {
 
 	public CmGeneralClassifiable() {
-		super(NameReference.create(CmModel.NAMESPACE, "generalclassifiable"));
+		super(CmModel.NAMESPACE.createQName("generalclassifiable"));
 	}
 
-	protected CmGeneralClassifiable(NameReference nameReference) {
-		super(nameReference);
+	protected CmGeneralClassifiable(QName qName) {
+		super(qName);
 	}
 
 	// vrai type = d:category
-	public final MultiNodeReferencePropertyModel categories = PropertyModels.newMultiNodeReference(this, CmModel.NAMESPACE, "categories");
+	public final MultiNodeRefPropertyModel categories = PropertyModels.newMultiNodeRef(this, CmModel.NAMESPACE, "categories");
 }

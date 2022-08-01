@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.usr;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
@@ -11,11 +12,11 @@ import fr.openwide.alfresco.component.model.repository.model.UsrModel;
 public class UsrUser extends UsrAuthority {
 
 	public UsrUser() {
-		super(NameReference.create(UsrModel.NAMESPACE, "user"));
+		super(UsrModel.NAMESPACE.createQName("user"));
 	}
 
-	protected UsrUser(NameReference nameReference) {
-		super(nameReference);
+	protected UsrUser(QName qName) {
+		super(qName);
 	}
 	
 	public final TextPropertyModel username = PropertyModels.newText(this, CmModel.NAMESPACE, "username");

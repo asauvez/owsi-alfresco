@@ -1,16 +1,17 @@
 package fr.openwide.alfresco.component.model.repository.model.rn;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.repository.model.RnModel;
 
 public class RnVisibleRendition extends RnRendition {
 
 	public RnVisibleRendition() {
-		super(NameReference.create(RnModel.NAMESPACE, "visibleRendition"));
+		super(RnModel.NAMESPACE.createQName("visibleRendition"));
 	}
 
-	protected RnVisibleRendition(NameReference nameReference) {
-		super(nameReference);
+	protected RnVisibleRendition(QName qName) {
+		super(qName);
 	}
 
 }

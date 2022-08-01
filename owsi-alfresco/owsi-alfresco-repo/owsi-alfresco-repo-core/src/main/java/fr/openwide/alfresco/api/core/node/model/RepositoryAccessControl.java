@@ -3,14 +3,15 @@ package fr.openwide.alfresco.api.core.node.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import com.google.common.base.Joiner;
 
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
 
 public class RepositoryAccessControl implements Serializable {
 
-	private NodeReference nodeReference;
+	private NodeRef nodeRef;
 	private AuthorityReference authority;
 	private PermissionReference permission;
 	private boolean allowed;
@@ -18,19 +19,19 @@ public class RepositoryAccessControl implements Serializable {
 
 	public RepositoryAccessControl() {}
 
-	public RepositoryAccessControl(NodeReference nodeReference, AuthorityReference authority, PermissionReference permission, boolean allowed, boolean inherited) {
-		this.nodeReference = nodeReference;
+	public RepositoryAccessControl(NodeRef nodeRef, AuthorityReference authority, PermissionReference permission, boolean allowed, boolean inherited) {
+		this.nodeRef = nodeRef;
 		this.authority = authority;
 		this.permission = permission;
 		this.allowed = allowed;
 		this.inherited = inherited;
 	}
 
-	public NodeReference getNodeReference() {
-		return nodeReference;
+	public NodeRef getNodeRef() {
+		return nodeRef;
 	}
-	public void setNodeReference(NodeReference nodeReference) {
-		this.nodeReference = nodeReference;
+	public void setNodeRef(NodeRef nodeRef) {
+		this.nodeRef = nodeRef;
 	}
 
 	public AuthorityReference getAuthority() {
@@ -63,7 +64,7 @@ public class RepositoryAccessControl implements Serializable {
 	
 	@Override
 	public String toString() {
-		return Joiner.on(":").join(nodeReference, authority, permission, allowed);
+		return Joiner.on(":").join(nodeRef, authority, permission, allowed);
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class RepositoryAccessControl implements Serializable {
 		}
 		if (object instanceof RepositoryAccessControl) {
 			RepositoryAccessControl other = (RepositoryAccessControl) object;
-			return Objects.equals(nodeReference, other.getNodeReference())
+			return Objects.equals(nodeRef, other.getNodeRef())
 				&& Objects.equals(authority, other.getAuthority())
 				&& Objects.equals(permission, other.getPermission())
 				&& Objects.equals(allowed, other.isAllowed());
@@ -86,7 +87,7 @@ public class RepositoryAccessControl implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(nodeReference, authority, permission, allowed);
+		return Objects.hash(nodeRef, authority, permission, allowed);
 	}
 
 }

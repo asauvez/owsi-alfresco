@@ -55,6 +55,7 @@ Nouveautés
 ==========
 ## depuis 0.9.5
  * Suppression de la partie owsi-alfresco-app et owsi-alfresco-api. 
+ * Plus besoin de ConversionService. On manipule directement des QNames.
 
 ## depuis 0.9.4
  * Compatible Alfresco 7.2.
@@ -63,11 +64,11 @@ Nouveautés
  * Fix encoding swagger
 
 ## depuis 0.9.2
+ * @GenerateJavaModel: pour générer le modèle en Java.
  * AlfrescoUrlService : Fix URL dossier Share
  * SearchQueryBuilder: maxPermissionChecks/maxPermissionCheckTimeMillis
  * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
  * ClassificationService: Deprecie l'utilisation de BusinessNode
- * @GenerateJavaModel: pour générer le modèle en Java.
  * Suppression de l'enforcer dans owsi-alfresco-parent-app
 
 ## depuis 0.8.9
@@ -192,6 +193,11 @@ Release du 05/07/2021
 
 Migration
 =========
+## vers 0.9.5
+* NameReference est remplacé par QName.
+* NameReference.create(CmModel.NAMESPACE, "toto") devient CmModel.NAMESPACE.createQName("toto")
+* NodeReference est remplacé par NodeRef.
+* ConversionService n'est plus nécessaire.
 
 ## vers 0.9.2
 * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.

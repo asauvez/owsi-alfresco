@@ -1,18 +1,19 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmFolder extends CmObject {
 
 	public CmFolder() {
-		super(NameReference.create(CmModel.NAMESPACE, "folder"));
+		super(CmModel.NAMESPACE.createQName("folder"));
 	}
 
-	protected CmFolder(NameReference nameReference) {
-		super(nameReference);
+	protected CmFolder(QName qName) {
+		super(qName);
 	}
 
-	public final ChildAssociationModel contains = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "contains"));
+	public final ChildAssociationModel contains = new ChildAssociationModel(CmModel.NAMESPACE.createQName("contains"));
 }

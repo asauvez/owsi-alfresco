@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.dictionary.NamespaceDAO;
 import org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -49,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
@@ -80,7 +80,6 @@ import fr.openwide.alfresco.repo.module.classification.model.policy.ConsumerClas
 import fr.openwide.alfresco.repo.module.classification.model.policy.FreeMarkerClassificationPolicy;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
 import fr.openwide.alfresco.repo.module.classification.util.ClassificationCache;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.treeaspect.service.ChildAspectService;
 import fr.openwide.alfresco.repo.treeaspect.service.RegisterRootPropertyName;
 import fr.openwide.alfresco.repo.treeaspect.service.TreeAspectService;
@@ -111,14 +110,14 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Autowired private ChildAspectService childAspectService;
 	@Autowired private RegisterRootPropertyName registerRootPropertyName;
 	
-	private ConversionService conversionService;
 	private TransactionService transactionService;
 	private DictionaryService dictionaryService;
 	@Autowired private ContentService contentService;
 	@Autowired private VersionService versionService;
+	@Autowired private NamespaceDAO namespaceDAO;
 
-	private Map<NameReference, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
-	private Map<NameReference, ContainerModel> models = new ConcurrentHashMap<>();
+	private Map<QName, ClassificationPolicy<?>> policies = new LinkedHashMap<>();
+	private Map<QName, ContainerModel> models = new ConcurrentHashMap<>();
 
 	private ClassificationCache queryCache;
 	private ClassificationCache pathCache;
@@ -137,14 +136,14 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	/** On fait dans ContextRefreshedEvent car les models peuvent ne pas avoir été initialisé */
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		for (String nameReference : globalProperties.getPropertyList("owsi.classification.freemarker.models", "")) {
-			if (! nameReference.trim().isEmpty()) {
-				ContainerModel containerModel = new ContainerModel(NameReference.create(nameReference.trim()));
+		for (String modelS : globalProperties.getPropertyList("owsi.classification.freemarker.models", "")) {
+			if (! modelS.trim().isEmpty()) {
+				ContainerModel containerModel = new ContainerModel(QName.createQName(modelS.trim(), namespaceDAO));
 				try {
 					addClassification(containerModel, new FreeMarkerClassificationPolicy(globalProperties, containerModel));
 				} catch (IOException e) {
-					logger.error(nameReference, e);
-					throw new IllegalStateException(nameReference, e);
+					logger.error(modelS, e);
+					throw new IllegalStateException(modelS, e);
 				}
 				policyRepositoryService.onAddAspect(containerModel, NotificationFrequency.TRANSACTION_COMMIT, this);
 			}
@@ -160,13 +159,13 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	@Override
 	public <T extends ContainerModel> void addClassification(T model, ClassificationPolicy<T> policy) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Add classification for {}.", model.getNameReference());
+			logger.debug("Add classification for {}.", model.getQName());
 		}
-		ClassificationPolicy<?> old = policies.put(model.getNameReference(), policy);
+		ClassificationPolicy<?> old = policies.put(model.getQName(), policy);
 		if (old != null) {
-			throw new IllegalStateException("There is at least two policies for " + model.getNameReference());
+			throw new IllegalStateException("There is at least two policies for " + model.getQName());
 		}
-		models.put(model.getNameReference(), model);
+		models.put(model.getQName(), model);
 	}
 	
 	@Override
@@ -184,7 +183,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 				params.container(model);
 				total += reclassify(params);
 			}
-			params.container((NameReference) null);
+			params.container((QName) null);
 			return total;
 		}
 		
@@ -231,7 +230,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return;
 		}
 		
-		if (OwsiModel.classifiable.getNameReference().equals(conversionService.get(aspectTypeQName))) {
+		if (OwsiModel.classifiable.getQName().equals(aspectTypeQName)) {
 			classify(new ClassificationEvent(nodeRef, ClassificationMode.CREATE));
 		} else {
 			nodeModelRepositoryService.addAspect(nodeRef, OwsiModel.classifiable);
@@ -296,7 +295,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			return;
 		}
 		
-		NameReference type = getPolicy(nodeRef);
+		QName type = getPolicy(nodeRef);
 		if (type == null) {
 			throw new IllegalStateException("Can't find a policy to classify " + nodeRef);
 		}
@@ -417,7 +416,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		String linkName = linkNameOpt.isPresent() ? linkNameOpt.get() 
 				: "Link to " + nodeModelRepositoryService.getProperty(nodeRef, CmModel.object.name);
 		Map<QName, Serializable> properties = new HashMap<>();
-		conversionService.setProperty(properties, AppModel.fileLink.destination, nodeRef);
+		nodeModelRepositoryService.setProperty(properties, AppModel.fileLink.destination, nodeRef);
 		nodeModelRepositoryService.createNode(destinationFolder, AppModel.fileLink, linkName, properties);
 	}
 	
@@ -431,24 +430,23 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		nodeModelRepositoryService.unlinkSecondaryParents(nodeRef, childAssociationModel);
 	}
 	
-	private NameReference getPolicy(NodeRef nodeRef) {
-		NameReference result = nodeModelRepositoryService.getProperty(nodeRef, OwsiModel.classifiable.classificationPolicy);
+	private QName getPolicy(NodeRef nodeRef) {
+		QName result = nodeModelRepositoryService.getProperty(nodeRef, OwsiModel.classifiable.classificationPolicy);
 
-		NameReference type = nodeModelRepositoryService.getType(nodeRef);
-		QName typeQName = conversionService.getRequired(type);
+		QName type = nodeModelRepositoryService.getType(nodeRef);
 		
 		// Cherche parmi les super types
-		ClassDefinition superType = dictionaryService.getType(typeQName);
+		ClassDefinition superType = dictionaryService.getType(type);
 		while (superType != null) {
-			ClassificationPolicy<?> policy = policies.get(conversionService.get(superType.getName()));
+			ClassificationPolicy<?> policy = policies.get((superType.getName()));
 			if (policy != null) {
-				result = setResult(nodeRef, result, conversionService.get(superType.getName()));
+				result = setResult(nodeRef, result, superType.getName());
 			}
 			superType = superType.getParentClassDefinition();
 		}
 		
 		// Cherche parmi les aspects
-		for (NameReference aspect : policies.keySet()) {
+		for (QName aspect : policies.keySet()) {
 			if (nodeModelRepositoryService.hasAspect(nodeRef, aspect)) {
 				result = setResult(nodeRef, result, aspect);
 			}
@@ -456,7 +454,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 		return result;
 	}
 	
-	private NameReference setResult(NodeRef nodeRef, NameReference previousResult, NameReference newResult) {
+	private QName setResult(NodeRef nodeRef, QName previousResult, QName newResult) {
 		if (previousResult != null) {
 			logger.warn("Ambigious classification policies: Node {} match for {} and {}. Using first one.", nodeRef, previousResult, newResult);
 			return previousResult;
@@ -520,7 +518,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	@Override
 	public void registerTreeAspect(AspectModel container) {
-		treeAspectService.registerAspect(conversionService.getRequired(container.getNameReference()));
+		treeAspectService.registerAspect(container.getQName());
 	}
 	@Override
 	public void registerCopyPropertyCmName(AspectModel aspectOfRootNode, PropertyModel<String> propertyToCopy) {
@@ -530,22 +528,22 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	public <T extends Serializable> void registerCopyProperty(AspectModel aspectOfRootNode,
 			PropertyModel<T> propertyToCopy, PropertyModel<T> propertyWhereCopy) {
 		registerRootPropertyName.registerCopyProperty(
-				conversionService.getRequired(aspectOfRootNode.getNameReference()), 
-				conversionService.getRequired(propertyToCopy.getNameReference()), 
-				conversionService.getRequired(propertyWhereCopy.getNameReference()));
+				aspectOfRootNode.getQName(), 
+				propertyToCopy.getQName(), 
+				propertyWhereCopy.getQName());
 	}
 	
 	@Override
 	public void registerChildAspectForFolder(ContainerModel parentAspect, ContainerModel childAspect) {
 		childAspectService.registerChildAspectForFolder(
-				conversionService.getRequired(parentAspect.getNameReference()), 
-				conversionService.getRequired(childAspect.getNameReference()));
+				parentAspect.getQName(), 
+				childAspect.getQName());
 	}
 	@Override
 	public void registerChildAspectForContent(ContainerModel parentAspect, ContainerModel childAspect) {
 		childAspectService.registerChildAspectForContent(
-				conversionService.getRequired(parentAspect.getNameReference()), 
-				conversionService.getRequired(childAspect.getNameReference()));
+				parentAspect.getQName(), 
+				childAspect.getQName());
 	}
 	
 	
@@ -564,9 +562,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public PermissionRepositoryService getPermissionRepositoryService() {
 		return permissionRepositoryService;
-	}
-	public ConversionService getConversionService() {
-		return conversionService;
 	}
 	
 	public Optional<NodeRef> getByNamedPath(String ... names) {
@@ -592,9 +587,6 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	public void setNodeSearchModelService(NodeSearchModelRepositoryService nodeSearchModelService) {
 		this.nodeSearchModelService = nodeSearchModelService;
-	}
-	public void setConversionService(ConversionService conversionService) {
-		this.conversionService = conversionService;
 	}
 	public void setTransactionService(TransactionService transactionService) {
 		this.transactionService = transactionService;

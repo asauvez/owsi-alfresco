@@ -1,20 +1,21 @@
 package fr.openwide.alfresco.component.model.repository.model.sys;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.LongPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class SysReferenceable extends AspectModel {
 
 	public SysReferenceable() {
-		super(NameReference.create(SysModel.NAMESPACE, "referenceable"));
+		super(SysModel.NAMESPACE.createQName("referenceable"));
 	}
 
-	protected SysReferenceable(NameReference nameReference) {
-		super(nameReference);
+	protected SysReferenceable(QName qName) {
+		super(qName);
 	}
 
 	public final TextPropertyModel storeProtocol = PropertyModels.newText(this, SysModel.NAMESPACE, "store-protocol");

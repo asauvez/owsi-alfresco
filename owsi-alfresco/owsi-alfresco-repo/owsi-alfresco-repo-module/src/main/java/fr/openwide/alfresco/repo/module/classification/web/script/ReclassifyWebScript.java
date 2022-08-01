@@ -4,6 +4,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.DictionaryDAO;
+import org.alfresco.repo.dictionary.NamespaceDAO;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.extensions.webscripts.Cache;
@@ -11,7 +14,6 @@ import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.repo.core.swagger.web.script.OwsiSwaggerWebScript;
 import fr.openwide.alfresco.repo.module.classification.model.ReclassifyParams;
 import fr.openwide.alfresco.repo.module.classification.service.ClassificationService;
@@ -39,6 +41,8 @@ public class ReclassifyWebScript extends DeclarativeWebScript {
 	
 	@Autowired
 	private ClassificationService classificationService;
+	@Autowired
+	private NamespaceDAO namespaceDAO;
 	
 	@Override
 	protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache) {
@@ -46,7 +50,7 @@ public class ReclassifyWebScript extends DeclarativeWebScript {
 
 		String modelNameS = req.getParameter("container");
 		if (StringUtils.isNotEmpty(modelNameS)) {
-			NameReference modelName = NameReference.create(modelNameS);
+			QName modelName = QName.createQName(modelNameS, namespaceDAO);
 			params.container(modelName);
 		}
 

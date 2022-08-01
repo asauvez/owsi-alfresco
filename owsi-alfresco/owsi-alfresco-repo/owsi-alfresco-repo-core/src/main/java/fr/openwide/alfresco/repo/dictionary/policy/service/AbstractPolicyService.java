@@ -25,13 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
+import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.SinglePropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 /**
  * Classe mère pour mettre en place des policy pour un type/aspect donnée.
@@ -43,7 +43,6 @@ public abstract class AbstractPolicyService implements InitializingBean {
 	
 	@Autowired protected PolicyRepositoryService policyRepositoryService;
 	@Autowired protected NodeModelRepositoryService nodeRepositoryService;
-	@Autowired protected ConversionService conversionService;
 	
 	private ContainerModel model;
 
@@ -157,22 +156,24 @@ public abstract class AbstractPolicyService implements InitializingBean {
 		if (before == null || after == null) return true;
 		
 		for (PropertyModel<?> property : properties) {
-			Serializable beforeValue = before.get(conversionService.getRequired(property.getNameReference()));
-			Serializable  afterValue =  after.get(conversionService.getRequired(property.getNameReference()));
+			Serializable beforeValue = before.get(property.getQName());
+			Serializable  afterValue =  after.get(property.getQName());
 			if (! Objects.equals(beforeValue, afterValue)) {
 				return true;
 			}
 		}
 		return false;
 	}
+	@SuppressWarnings("unchecked")
 	protected <C extends Serializable> C getProperty(Map<QName, Serializable> value, SinglePropertyModel<C> property) {
-		return conversionService.getProperty(value, property);
+		return (C) value.get(property.getQName());
 	}
+	@SuppressWarnings("unchecked")
 	protected <C extends Serializable> List<C> getProperty(Map<QName, Serializable> value, MultiPropertyModel<C> property) {
-		return conversionService.getProperty(value, property);
+		return (List<C>) value.get(property.getQName());
 	}
 	protected <E extends Enum<E>> E getProperty(Map<QName, Serializable> value, EnumTextPropertyModel<E> property) {
-		return conversionService.getProperty(value, property);
+		return NodeBean.textToEnum(property, (String) value.get(property.getQName()));
 	}	
 	protected <C extends Serializable> List<C> getListNewItems(Map<QName, Serializable> before, Map<QName, Serializable> after, MultiPropertyModel<C> property) {
 		List<C> beforeList = getProperty(before, property);

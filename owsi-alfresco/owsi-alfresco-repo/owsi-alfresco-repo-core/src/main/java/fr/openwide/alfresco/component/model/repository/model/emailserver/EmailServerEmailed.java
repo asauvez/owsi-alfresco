@@ -1,17 +1,18 @@
 package fr.openwide.alfresco.component.model.repository.model.emailserver;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.repository.model.EmailServerModel;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmEmailed;
 
 public class EmailServerEmailed extends CmEmailed {
 	
 	public EmailServerEmailed() {
-		super(NameReference.create(EmailServerModel.NAMESPACE, "emailed"));
+		super(EmailServerModel.NAMESPACE.createQName("emailed"));
 	}
 
-	protected EmailServerEmailed(NameReference nameReference) {
-		super(nameReference);
+	protected EmailServerEmailed(QName qName) {
+		super(qName);
 	}
 
 }

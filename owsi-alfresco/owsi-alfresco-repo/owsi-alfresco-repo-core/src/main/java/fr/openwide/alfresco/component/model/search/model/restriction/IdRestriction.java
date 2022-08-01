@@ -1,24 +1,24 @@
 package fr.openwide.alfresco.component.model.search.model.restriction;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 public class IdRestriction extends Restriction {
 
-	private final NodeReference nodeReference;
+	private final NodeRef nodeRef;
 
-	public IdRestriction(RestrictionBuilder parent, NodeReference nodeRef) {
+	public IdRestriction(RestrictionBuilder parent, NodeRef nodeRef) {
 		super(parent);
-		this.nodeReference = nodeRef;
+		this.nodeRef = nodeRef;
 	}
 
 	@Override
 	protected String toFtsQueryInternal() {
-		return "ID:" + nodeReference.getReference().replace(":", "\\:");
+		return "ID:" + nodeRef.toString().replace(":", "\\:");
 	}
 	
 	@Override
 	protected String toCmisQueryWhereInternal() {
-		return (nodeReference.getReference() != null) ? "o.cmis:objectId =" + toCmisLuceneValue(nodeReference.getReference()) : "";
+		return (nodeRef != null) ? "o.cmis:objectId =" + toCmisLuceneValue(nodeRef.toString()) : "";
 	}
 
 }

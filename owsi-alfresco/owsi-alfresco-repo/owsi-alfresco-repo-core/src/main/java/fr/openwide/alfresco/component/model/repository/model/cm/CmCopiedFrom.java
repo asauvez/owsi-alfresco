@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -8,13 +9,13 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmCopiedFrom extends AspectModel {
 
 	public CmCopiedFrom() {
-		super(NameReference.create(CmModel.NAMESPACE, "copiedfrom"));
+		super(CmModel.NAMESPACE.createQName("copiedfrom"));
 	}
 
-	protected CmCopiedFrom(NameReference nameReference) {
-		super(nameReference);
+	protected CmCopiedFrom(QName qName) {
+		super(qName);
 	}
 
-	public final ManyToOneAssociationModel original = new ManyToOneAssociationModel(NameReference.create(CmModel.NAMESPACE, "original"));
+	public final ManyToOneAssociationModel original = new ManyToOneAssociationModel(CmModel.NAMESPACE.createQName("original"));
 
 }

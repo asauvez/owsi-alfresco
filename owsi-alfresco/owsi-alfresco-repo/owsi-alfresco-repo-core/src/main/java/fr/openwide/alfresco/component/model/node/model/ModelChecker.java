@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 
@@ -23,11 +25,12 @@ public class ModelChecker {
 			Object value = field.get(null);
 			if (value instanceof ContainerModel) {
 				ContainerModel container = (ContainerModel) value;
-				if (! container.getNameReference().getNamespace().equals(nameSpace)) {
-					errors.add(model.getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the container namespace " + container.getNameReference());
+				String prefix = StringUtils.substringBefore(container.getQName().getPrefixString(), ":");
+				if (! prefix.equals(nameSpace)) {
+					errors.add(model.getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the container namespace " + container.getQName().toPrefixString());
 				}
-				if (! container.getNameReference().getName().equals(field.getName())) {
-					errors.add(model.getSimpleName() + " : Field name " + field.getName() + " is not the same as the container name " + container.getNameReference().getName());
+				if (! container.getQName().getLocalName().equals(field.getName())) {
+					errors.add(model.getSimpleName() + " : Field name " + field.getName() + " is not the same as the container name " + container.getQName().getLocalName());
 				}
 				checkContainer(nameSpace, container);
 			}
@@ -40,11 +43,12 @@ public class ModelChecker {
 				Object value = field.get(container);
 				if (value instanceof PropertyModel) {
 					PropertyModel<?> property = (PropertyModel<?>) value;
-					if (! property.getNameReference().getNamespace().equals(nameSpace)) {
-						errors.add(container.getClass().getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the property namespace " + property.getNameReference());
+					String prefix = StringUtils.substringBefore(property.getQName().getPrefixString(), ":");
+					if (! prefix.equals(nameSpace)) {
+						errors.add(container.getClass().getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the property namespace " + property.getQName().toPrefixString());
 					}
-					if (! property.getNameReference().getName().equals(field.getName())) {
-						errors.add(container.getClass().getSimpleName() + " : Field name " + field.getName() + " is not the same as the property name " + property.getNameReference().getName());
+					if (! property.getQName().getLocalName().equals(field.getName())) {
+						errors.add(container.getClass().getSimpleName() + " : Field name " + field.getName() + " is not the same as the property name " + property.getQName().getLocalName());
 					}
 				}
 			}

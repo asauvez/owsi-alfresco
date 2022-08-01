@@ -1,8 +1,9 @@
 package fr.openwide.alfresco.component.model.repository.model.rn;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
-import fr.openwide.alfresco.component.model.node.model.property.single.NameReferencePropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.QNamePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
@@ -10,14 +11,14 @@ import fr.openwide.alfresco.component.model.repository.model.cm.CmContent;
 public class CmThumbnail extends CmContent {
 
 	public CmThumbnail() {
-		super(NameReference.create(CmModel.NAMESPACE, "thumbnail"));
+		super(CmModel.NAMESPACE.createQName("thumbnail"));
 	}
 
-	protected CmThumbnail(NameReference nameReference) {
-		super(nameReference);
+	protected CmThumbnail(QName qName) {
+		super(qName);
 	}
 
 	public final TextPropertyModel thumbnailName = PropertyModels.newText(this, CmModel.NAMESPACE, "thumbnailName");
 
-	public final NameReferencePropertyModel contentPropertyName = PropertyModels.newNameReference(this, CmModel.NAMESPACE, "contentPropertyName");
+	public final QNamePropertyModel contentPropertyName = PropertyModels.newQName(this, CmModel.NAMESPACE, "contentPropertyName");
 }

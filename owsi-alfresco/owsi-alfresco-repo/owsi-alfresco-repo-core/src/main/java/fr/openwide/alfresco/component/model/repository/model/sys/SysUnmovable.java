@@ -1,16 +1,17 @@
 package fr.openwide.alfresco.component.model.repository.model.sys;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 
 public class SysUnmovable extends AspectModel {
 
 	public SysUnmovable() {
-		super(NameReference.create(SysModel.NAMESPACE, "unmovable"));
+		super(SysModel.NAMESPACE.createQName("unmovable"));
 	}
 
-	protected SysUnmovable(NameReference nameReference) {
-		super(nameReference);
+	protected SysUnmovable(QName qName) {
+		super(qName);
 	}
 }

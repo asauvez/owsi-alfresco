@@ -4,7 +4,6 @@ import org.alfresco.model.ContentModel;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 import fr.openwide.alfresco.repo.solraudit.service.SolrAuditService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 
@@ -12,13 +11,12 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 public class DemoSolrAudit implements InitializingBean {
 	
 	@Autowired private SolrAuditService solrAuditService;
-	@Autowired private ConversionService conversionService;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		solrAuditService.registerDateGroup(ContentModel.TYPE_CONTENT, 
-				conversionService.getRequired(DemoModel.auditInfo.createdMonth.getNameReference()));
+				DemoModel.auditInfo.createdMonth.getQName());
 		solrAuditService.registerLogSize(ContentModel.TYPE_CONTENT, 
-				conversionService.getRequired(DemoModel.auditInfo.sizeLog.getNameReference()));
+				DemoModel.auditInfo.sizeLog.getQName());
 	}
 }

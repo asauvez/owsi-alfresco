@@ -1,17 +1,18 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 
 public class CmClassifiable extends AspectModel {
 
 	public CmClassifiable() {
-		super(NameReference.create(CmModel.NAMESPACE, "classifiable"));
+		super(CmModel.NAMESPACE.createQName("classifiable"));
 	}
 
-	protected CmClassifiable(NameReference nameReference) {
-		super(nameReference);
+	protected CmClassifiable(QName qName) {
+		super(qName);
 	}
 
 }

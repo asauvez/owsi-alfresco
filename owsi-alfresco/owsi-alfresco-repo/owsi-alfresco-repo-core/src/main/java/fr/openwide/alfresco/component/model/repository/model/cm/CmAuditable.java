@@ -1,5 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.MandatoryEnforcedPropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.constraint.ProtectedPropertyConstraint;
@@ -7,16 +9,15 @@ import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.TextPropertyModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmAuditable extends AspectModel {
 
 	public CmAuditable() {
-		super(NameReference.create(CmModel.NAMESPACE, "auditable"));
+		super(CmModel.NAMESPACE.createQName("auditable"));
 	}
 
-	protected CmAuditable(NameReference nameReference) {
-		super(nameReference);
+	protected CmAuditable(QName qName) {
+		super(qName);
 	}
 
 	public final DateTimePropertyModel created = PropertyModels.newDateTime(this, CmModel.NAMESPACE, "created",

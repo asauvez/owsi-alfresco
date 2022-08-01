@@ -1,16 +1,17 @@
 package fr.openwide.alfresco.component.model.repository.model.sys;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 
 public class SysUndeletable extends AspectModel {
 
 	public SysUndeletable() {
-		super(NameReference.create(SysModel.NAMESPACE, "undeletable"));
+		super(SysModel.NAMESPACE.createQName("undeletable"));
 	}
 
-	protected SysUndeletable(NameReference nameReference) {
-		super(nameReference);
+	protected SysUndeletable(QName qName) {
+		super(qName);
 	}
 }

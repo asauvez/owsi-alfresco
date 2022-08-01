@@ -1,17 +1,18 @@
 package fr.openwide.alfresco.component.model.repository.model.st;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.repository.model.StModel;
 import fr.openwide.alfresco.component.model.repository.model.cm.CmFolder;
 
 public class StSites extends CmFolder {
 	
 	public StSites() {
-		super(NameReference.create(StModel.NAMESPACE, "sites"));
+		super(StModel.NAMESPACE.createQName("sites"));
 	}
 
-	protected StSites(NameReference nameReference) {
-		super(nameReference);
+	protected StSites(QName qName) {
+		super(qName);
 	}
 
 	/*

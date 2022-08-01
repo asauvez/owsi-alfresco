@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
 import fr.openwide.alfresco.component.model.node.model.property.single.IntegerPropertyModel;
@@ -9,11 +10,11 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmCountable extends AspectModel {
 
 	public CmCountable() {
-		super(NameReference.create(CmModel.NAMESPACE, "countable"));
+		super(CmModel.NAMESPACE.createQName("countable"));
 	}
 
-	protected CmCountable(NameReference nameReference) {
-		super(nameReference);
+	protected CmCountable(QName qName) {
+		super(qName);
 	}
 
 	public final IntegerPropertyModel hits = PropertyModels.newInteger(this, CmModel.NAMESPACE, "hits");

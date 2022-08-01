@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.alfresco.service.cmr.repository.NodeRef;
-
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
 
 public interface IdentificationRepositoryService {
 
-	Optional<NodeRef> getByIdentifier(NameReference identifier);
+	Optional<NodeRef> getByIdentifier(QName identifier);
 
-	List<NodeRef> listByIdentifier(NameReference identifier);
+	List<NodeRef> listByIdentifier(QName identifier);
 
-	void setIdentifier(NodeRef nodeRef, NameReference identifier);
+	void setIdentifier(NodeRef nodeRef, QName identifier);
 
 }

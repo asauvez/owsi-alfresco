@@ -94,9 +94,9 @@ public class BatchSearchQueryBuilder extends SearchQueryBuilder {
 	public BatchSearchQueryBuilder fakeResults(String fakeResults) {
 		if (fakeResults != null) {
 			List<NodeRef> list = new ArrayList<>();
-			for (String nodeReference : fakeResults.split(",")) {
-				if (! nodeReference.trim().isEmpty()) {
-					list.add(new NodeRef(nodeReference.trim()));
+			for (String nodeRef : fakeResults.split(",")) {
+				if (! nodeRef.trim().isEmpty()) {
+					list.add(new NodeRef(nodeRef.trim()));
 				}
 			}
 			fakeResults(list);

@@ -1,18 +1,19 @@
 package fr.openwide.alfresco.component.model.repository.model.sys;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.SysModel;
 
 public class SysContainer extends SysBase {
 
 	public SysContainer() {
-		super(NameReference.create(SysModel.NAMESPACE, "container"));
+		super(SysModel.NAMESPACE.createQName("container"));
 	}
 
-	protected SysContainer(NameReference nameReference) {
-		super(nameReference);
+	protected SysContainer(QName qName) {
+		super(qName);
 	}
 
-	public final ChildAssociationModel children = new ChildAssociationModel(NameReference.create(SysModel.NAMESPACE, "children"));
+	public final ChildAssociationModel children = new ChildAssociationModel(SysModel.NAMESPACE.createQName("children"));
 }

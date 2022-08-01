@@ -1,12 +1,13 @@
 package fr.openwide.alfresco.component.model.node.model.association;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.Model;
 
 public abstract class AssociationModel extends Model {
 
-	public AssociationModel(NameReference nameReference) {
-		super(nameReference);
+	public AssociationModel(QName qName) {
+		super(qName);
 	}
 	
 	public String getXmlModel() {
@@ -22,7 +23,7 @@ public abstract class AssociationModel extends Model {
 			tabulation.append("	");
 		}
 		
-		xml.append(tabulation.toString()).append("<association name=\"") .append(this.getNameReference().getFullName()).append("\">\n")
+		xml.append(tabulation.toString()).append("<association name=\"") .append(this.getQName().toPrefixString()).append("\">\n")
 			.append(tabulation.toString()).append("	<source>\n")
 			.append(tabulation.toString()).append("		<role>TODO<role>\n")
 			.append(tabulation.toString()).append("		<mandatory>" + isFromMany() + "<mandatory>\n")

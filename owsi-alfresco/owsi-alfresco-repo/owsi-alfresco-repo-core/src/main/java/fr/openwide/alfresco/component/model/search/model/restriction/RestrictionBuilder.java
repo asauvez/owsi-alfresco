@@ -9,7 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import fr.openwide.alfresco.api.core.remote.model.NodeReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.TypeModel;
@@ -73,17 +74,17 @@ public class RestrictionBuilder extends Restriction {
 		return add(new AspectRestriction(this, aspect));
 	}
 
-	public IdRestriction id(NodeReference nodeRef) {
+	public IdRestriction id(NodeRef nodeRef) {
 		return add(new IdRestriction(this, nodeRef));
 	}
 
 	/**
 	 * Est-ce que les noeuds retournés sont les fils directes du noeuds en question
 	 */
-	public ParentRestriction parent(NodeReference parentRef) {
+	public ParentRestriction parent(NodeRef parentRef) {
 		return add(new ParentRestriction(this, parentRef));
 	}
-	public AncestorRestriction ancestor(NodeReference parentRef) {
+	public AncestorRestriction ancestor(NodeRef parentRef) {
 		return add(new AncestorRestriction(this, parentRef));
 	}
 
@@ -94,7 +95,7 @@ public class RestrictionBuilder extends Restriction {
 		return add(new MatchRestriction<String>(this, property, value));
 	}
 	public MatchRestriction<String> match(ContentPropertyModel property, String value) {
-		TextPropertyModel textPropertyModel = new TextPropertyModel(property.getType(), property.getNameReference());
+		TextPropertyModel textPropertyModel = new TextPropertyModel(property.getType(), property.getQName());
 		return add(new MatchRestriction<String>(this, textPropertyModel, value));
 	}
 
@@ -187,8 +188,8 @@ public class RestrictionBuilder extends Restriction {
 	public TagRestriction tag(String tag) {
 		return add(new TagRestriction(this, tag));
 	}
-	public FingerPrintRestriction fingerPrint(NodeReference nodeReference) {
-		return add(new FingerPrintRestriction(this, nodeReference));
+	public FingerPrintRestriction fingerPrint(NodeRef nodeRef) {
+		return add(new FingerPrintRestriction(this, nodeRef));
 	}
 
 	public CustomRestriction custom(String customFtsQuery) {

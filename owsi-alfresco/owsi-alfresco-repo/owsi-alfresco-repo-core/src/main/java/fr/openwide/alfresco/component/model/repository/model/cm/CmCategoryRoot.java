@@ -1,18 +1,19 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmCategoryRoot extends CmObject {
 
 	public CmCategoryRoot() {
-		super(NameReference.create(CmModel.NAMESPACE, "category_root"));
+		super(CmModel.NAMESPACE.createQName("category_root"));
 	}
 
-	protected CmCategoryRoot(NameReference nameReference) {
-		super(nameReference);
+	protected CmCategoryRoot(QName qName) {
+		super(qName);
 	}
 
-	public final ChildAssociationModel categories = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "categories"));
+	public final ChildAssociationModel categories = new ChildAssociationModel(CmModel.NAMESPACE.createQName("categories"));
 }

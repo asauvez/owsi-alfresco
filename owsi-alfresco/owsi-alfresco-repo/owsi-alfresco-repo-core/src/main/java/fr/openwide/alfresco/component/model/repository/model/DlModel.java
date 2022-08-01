@@ -1,6 +1,5 @@
 package fr.openwide.alfresco.component.model.repository.model;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataList;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
@@ -12,6 +11,6 @@ public interface DlModel {
 	// ---- Aspects
 
 	// ---- Types
-	DlDataList dataList = new DlDataList(NameReference.create(NAMESPACE, "dataList"));
-	DlDataListItem dataListItem = new DlDataListItem(NameReference.create(NAMESPACE, "dataListItem"));
+	DlDataList dataList = new DlDataList(NAMESPACE.createQName("dataList"));
+	DlDataListItem dataListItem = new DlDataListItem(NAMESPACE.createQName("dataListItem"));
 }

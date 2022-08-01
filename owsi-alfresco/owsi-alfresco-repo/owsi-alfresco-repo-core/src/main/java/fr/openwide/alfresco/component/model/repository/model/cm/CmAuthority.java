@@ -1,17 +1,18 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.sys.SysBase;
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 
 public class CmAuthority extends SysBase {
 
 	public CmAuthority() {
-		super(NameReference.create(CmModel.NAMESPACE, "authority"));
+		super(CmModel.NAMESPACE.createQName("authority"));
 	}
 
-	protected CmAuthority(NameReference nameReference) {
-		super(nameReference);
+	protected CmAuthority(QName qName) {
+		super(qName);
 	}
 
 }

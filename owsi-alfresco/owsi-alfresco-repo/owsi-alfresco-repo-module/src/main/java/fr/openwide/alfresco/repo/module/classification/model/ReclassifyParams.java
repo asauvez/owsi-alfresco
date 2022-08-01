@@ -3,7 +3,8 @@ package fr.openwide.alfresco.repo.module.classification.model;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.module.OwsiModel;
@@ -11,20 +12,20 @@ import fr.openwide.alfresco.repo.module.classification.service.ClassificationSer
 
 public class ReclassifyParams {
 
-	private NameReference container;
+	private QName container;
 	private Integer batchSize = ClassificationService.DEFAULT_RECLASSIFY_BATCH_SIZE;
 	private RestrictionBuilder restrictions = new RestrictionBuilder();
 	private boolean useCmis = false;
 	
-	public NameReference getContainer() {
+	public QName getContainer() {
 		return container;
 	}
-	public ReclassifyParams container(NameReference container) {
+	public ReclassifyParams container(QName container) {
 		this.container = container;
 		return this;
 	}
 	public ReclassifyParams container(ContainerModel model) {
-		return container(model.getNameReference());
+		return container(model.getQName());
 	}	
 	
 	public Integer getBatchSize() {

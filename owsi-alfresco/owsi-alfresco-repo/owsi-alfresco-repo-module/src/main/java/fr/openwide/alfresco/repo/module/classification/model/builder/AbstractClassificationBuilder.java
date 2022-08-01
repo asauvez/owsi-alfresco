@@ -8,7 +8,6 @@ import java.util.Objects;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -31,30 +30,30 @@ public class AbstractClassificationBuilder<B extends AbstractClassificationBuild
 		return service.getNodeModelService();
 	}
 	@SuppressWarnings("unchecked")
-	public <C extends Serializable> C getProperty(NameReference property) {
+	public <C extends Serializable> C getProperty(QName property) {
 		if (event.getValuesOverride() != null) {
-			return (C) event.getValuesOverride().get(service.getConversionService().getRequired(property));
+			return (C) event.getValuesOverride().get(property);
 		} else {
 			return getNodeModelService().getProperty(getNodeRef(), property);
 		}
 	}
 	public <C extends Serializable> C getProperty(SinglePropertyModel<C> property) {
 		if (event.getValuesOverride() != null) {
-			return service.getConversionService().getProperty(event.getValuesOverride(), property);
+			return getNodeModelService().getProperty(event.getValuesOverride(), property);
 		} else {
 			return getNodeModelService().getProperty(getNodeRef(), property);
 		}
 	}
 	public <C extends Serializable> List<C> getProperty(MultiPropertyModel<C> property) {
 		if (event.getValuesOverride() != null) {
-			return service.getConversionService().getProperty(event.getValuesOverride(), property);
+			return getNodeModelService().getProperty(event.getValuesOverride(), property);
 		} else {
 			return getNodeModelService().getProperty(getNodeRef(), property);
 		}
 	}
 	public <E extends Enum<E>> E getProperty(EnumTextPropertyModel<E> property) {
 		if (event.getValuesOverride() != null) {
-			return service.getConversionService().getProperty(event.getValuesOverride(), property);
+			return getNodeModelService().getProperty(event.getValuesOverride(), property);
 		} else {
 			return getNodeModelService().getProperty(getNodeRef(), property);
 		}
@@ -66,8 +65,8 @@ public class AbstractClassificationBuilder<B extends AbstractClassificationBuild
 		if (before == null || after == null) return true;
 		
 		for (PropertyModel<?> property : properties) {
-			Serializable beforeValue = before.get(service.getConversionService().getRequired(property.getNameReference()));
-			Serializable  afterValue =  after.get(service.getConversionService().getRequired(property.getNameReference()));
+			Serializable beforeValue = before.get(property.getQName());
+			Serializable  afterValue =  after.get(property.getQName());
 			if (! Objects.equals(beforeValue, afterValue)) {
 				return true;
 			}

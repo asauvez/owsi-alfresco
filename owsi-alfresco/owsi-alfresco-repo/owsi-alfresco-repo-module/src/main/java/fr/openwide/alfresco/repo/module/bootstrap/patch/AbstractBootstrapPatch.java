@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
 import fr.openwide.alfresco.repo.module.identification.service.IdentificationRepositoryService;
-import fr.openwide.alfresco.repo.remote.conversion.service.ConversionService;
 
 /**
  * Base des patchs utilisant BootstrapService.
@@ -25,7 +24,6 @@ public abstract class AbstractBootstrapPatch extends AbstractModuleComponent {
 	@Autowired protected BootstrapService bootstrapService;
 	@Autowired protected NodeModelRepositoryService nodeModelService;
 	@Autowired protected IdentificationRepositoryService identificationService;
-	@Autowired protected ConversionService conversionService;
 
 	protected String getModuleConfigPath() {
 		return "alfresco/module/" + getModuleId();

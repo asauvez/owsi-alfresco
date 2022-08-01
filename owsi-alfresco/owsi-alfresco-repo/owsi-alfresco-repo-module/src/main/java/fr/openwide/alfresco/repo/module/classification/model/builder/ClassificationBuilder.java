@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
@@ -80,11 +80,11 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	/**
 	 * Recherche un noeud racine identifié par un owsi:identifiable. 
 	 */
-	public Optional<ClassificationWithRootBuilder> rootFolderIdentifier(NameReference identifier) {
+	public Optional<ClassificationWithRootBuilder> rootFolderIdentifier(QName identifier) {
 		return rootFolder(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of());
 	}
-	public ClassificationWithRootBuilder rootFoldersIdentifier(NameReference identifier) {
+	public ClassificationWithRootBuilder rootFoldersIdentifier(QName identifier) {
 		return rootFolders(new RestrictionBuilder()
 				.eq(OwsiModel.identifiable.identifier, identifier).of());
 	}

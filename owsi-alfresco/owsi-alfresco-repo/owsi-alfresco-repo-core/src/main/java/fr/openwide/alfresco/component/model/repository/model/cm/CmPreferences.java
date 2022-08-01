@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.cm;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
@@ -10,15 +11,15 @@ import fr.openwide.alfresco.component.model.repository.model.CmModel;
 public class CmPreferences extends AspectModel{
 
 	public CmPreferences() {
-		super(NameReference.create(CmModel.NAMESPACE, "preferences"));
+		super(CmModel.NAMESPACE.createQName("preferences"));
 	}
 
-	protected CmPreferences(NameReference nameReference) {
-		super(nameReference);
+	protected CmPreferences(QName qName) {
+		super(qName);
 	}
 	
 	public final ContentPropertyModel preferenceValues = PropertyModels.newContent(this, CmModel.NAMESPACE, "preferenceValues");
 
-	public final ChildAssociationModel preferenceImage = new ChildAssociationModel(NameReference.create(CmModel.NAMESPACE, "preferenceImage"));
+	public final ChildAssociationModel preferenceImage = new ChildAssociationModel(CmModel.NAMESPACE.createQName("preferenceImage"));
 	
 }

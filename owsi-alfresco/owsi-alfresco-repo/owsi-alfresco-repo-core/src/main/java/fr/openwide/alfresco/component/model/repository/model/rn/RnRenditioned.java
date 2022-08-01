@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.rn;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.RnModel;
@@ -8,12 +9,12 @@ import fr.openwide.alfresco.component.model.repository.model.RnModel;
 public class RnRenditioned extends AspectModel {
 
 	public RnRenditioned() {
-		super(NameReference.create(RnModel.NAMESPACE, "renditioned"));
+		super(RnModel.NAMESPACE.createQName("renditioned"));
 	}
 
-	protected RnRenditioned(NameReference nameReference) {
-		super(nameReference);
+	protected RnRenditioned(QName qName) {
+		super(qName);
 	}
 
-	public final ChildAssociationModel rendition = new ChildAssociationModel(NameReference.create(RnModel.NAMESPACE, "rendition"));
+	public final ChildAssociationModel rendition = new ChildAssociationModel(RnModel.NAMESPACE.createQName("rendition"));
 }

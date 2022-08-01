@@ -1,12 +1,13 @@
 package fr.openwide.alfresco.component.model.node.model.property.single;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 
 public class DateTimePropertyModel extends AbstractDatePropertyModel {
 
-	public DateTimePropertyModel(ContainerModel type, NameReference nameReference) {
-		super(type, nameReference);
+	public DateTimePropertyModel(ContainerModel type, QName qName) {
+		super(type, qName);
 	}
 
 	@Override

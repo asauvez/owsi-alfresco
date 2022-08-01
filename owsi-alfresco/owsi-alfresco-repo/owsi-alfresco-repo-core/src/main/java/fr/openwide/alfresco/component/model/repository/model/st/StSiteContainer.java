@@ -1,6 +1,7 @@
 package fr.openwide.alfresco.component.model.repository.model.st;
 
-import fr.openwide.alfresco.api.core.remote.model.NameReference;
+import org.alfresco.service.namespace.QName;
+
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyEnumeration;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModels;
@@ -10,11 +11,11 @@ import fr.openwide.alfresco.component.model.repository.model.StModel;
 public class StSiteContainer extends AspectModel {
 	
 	public StSiteContainer() {
-		super(NameReference.create(StModel.NAMESPACE, "siteContainer"));
+		super(StModel.NAMESPACE.createQName("siteContainer"));
 	}
 
-	protected StSiteContainer(NameReference nameReference) {
-		super(nameReference);
+	protected StSiteContainer(QName qName) {
+		super(qName);
 	}
 
 	public enum SiteContainerType implements PropertyEnumeration {
