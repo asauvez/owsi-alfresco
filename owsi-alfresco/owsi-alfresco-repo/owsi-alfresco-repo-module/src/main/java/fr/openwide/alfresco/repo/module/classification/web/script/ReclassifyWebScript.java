@@ -4,7 +4,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.NamespaceDAO;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
