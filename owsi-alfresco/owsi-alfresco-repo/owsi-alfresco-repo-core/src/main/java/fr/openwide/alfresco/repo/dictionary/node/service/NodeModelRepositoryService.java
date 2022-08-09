@@ -19,7 +19,9 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAss
 import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.bean.AspectNodeBean;
 import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
+import fr.openwide.alfresco.component.model.node.model.bean.TypeNodeBean;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -29,7 +31,7 @@ public interface NodeModelRepositoryService {
 
 	NodeRef createNode(NodeRef parentRef, TypeModel type, String name) throws FileExistsException;
 	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws FileExistsException;
-	NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean properties) throws FileExistsException;
+	NodeRef createNode(NodeRef parentRef, String name, TypeNodeBean properties) throws FileExistsException;
 	NodeRef createFolder(NodeRef parentRef, String folderName) throws FileExistsException;
 	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName) throws FileExistsException;
 	
@@ -60,7 +62,7 @@ public interface NodeModelRepositoryService {
 	void addAspect(NodeRef nodeRef, QName aspect, Map<QName, Serializable> properties);
 	void addAspect(NodeRef nodeRef, AspectModel aspect);
 	void addAspect(NodeRef nodeRef, AspectModel aspect, Map<QName, Serializable> properties);
-	void addAspect(NodeRef nodeRef, AspectModel aspect, NodeBean properties);
+	void addAspect(NodeRef nodeRef, AspectNodeBean properties);
 	
 	void removeAspect(NodeRef nodeRef, QName aspect);
 	void removeAspect(NodeRef nodeRef, AspectModel aspect);

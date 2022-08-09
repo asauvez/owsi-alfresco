@@ -37,7 +37,9 @@ import fr.openwide.alfresco.component.model.node.model.association.ManyToManyAss
 import fr.openwide.alfresco.component.model.node.model.association.ManyToOneAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToManyAssociationModel;
 import fr.openwide.alfresco.component.model.node.model.association.OneToOneAssociationModel;
+import fr.openwide.alfresco.component.model.node.model.bean.AspectNodeBean;
 import fr.openwide.alfresco.component.model.node.model.bean.NodeBean;
+import fr.openwide.alfresco.component.model.node.model.bean.TypeNodeBean;
 import fr.openwide.alfresco.component.model.node.model.property.PropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.EnumTextPropertyModel;
@@ -72,12 +74,12 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 				properties).getChildRef();
 	}
 	@Override
-	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, NodeBean bean) throws FileExistsException {
+	public NodeRef createNode(NodeRef parentRef, String name, TypeNodeBean bean) throws FileExistsException {
 		Map<QName, Serializable> properties = new HashMap<>();
 		for (Entry<QName, Serializable> entry : bean.getProperties().entrySet()) {
 			properties.put(entry.getKey(), entry.getValue());
 		}
-		return createNode(parentRef, type, name, properties);
+		return createNode(parentRef, bean.getTypeModel(), name, properties);
 	}
 	
 	
@@ -174,12 +176,12 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 		addAspect(nodeRef, aspect.getQName(), properties);
 	}
 	@Override
-	public void addAspect(NodeRef nodeRef, AspectModel aspect, NodeBean bean) {
+	public void addAspect(NodeRef nodeRef, AspectNodeBean bean) {
 		Map<QName, Serializable> properties = new HashMap<>();
 		for (Entry<QName, Serializable> entry : bean.getProperties().entrySet()) {
 			properties.put(entry.getKey(), entry.getValue());
 		}
-		addAspect(nodeRef, aspect.getQName(), properties);
+		addAspect(nodeRef, bean.getAspectModel().getQName(), properties);
 	}
 	
 	@Override
