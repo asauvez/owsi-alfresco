@@ -34,8 +34,8 @@ public class DeleteIfEmptyServiceImpl implements InitializingBean,
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		policyRepositoryService.onDeleteNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
-		policyRepositoryService.onMoveNode(CmModel.object, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onDeleteNode(CmModel.cmobject, NotificationFrequency.TRANSACTION_COMMIT, this);
+		policyRepositoryService.onMoveNode(CmModel.cmobject, NotificationFrequency.TRANSACTION_COMMIT, this);
 		policyRepositoryService.onDeleteChildAssociation(OwsiModel.deleteIfEmpty, CmModel.folder.contains, NotificationFrequency.TRANSACTION_COMMIT, this);
 		
 		deleteNodePermanently = globalProperties.getPropertyBoolean("owsi.deleteIfEmpty.deleteNodePermanently", true);

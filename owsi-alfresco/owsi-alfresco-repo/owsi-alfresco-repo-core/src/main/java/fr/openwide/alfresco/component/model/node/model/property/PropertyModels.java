@@ -4,7 +4,9 @@ import fr.openwide.alfresco.api.core.remote.model.NamespaceReference;
 import fr.openwide.alfresco.component.model.node.model.ContainerModel;
 import fr.openwide.alfresco.component.model.node.model.constraint.PropertyConstraint;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiAnyPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiAssociationRefPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiBooleanPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.multi.MultiChildAssociationRefPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDateTimePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiDoublePropertyModel;
@@ -15,7 +17,9 @@ import fr.openwide.alfresco.component.model.node.model.property.multi.MultiNodeR
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiQNamePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.multi.MultiTextPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.AnyPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.AssociationRefPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.BooleanPropertyModel;
+import fr.openwide.alfresco.component.model.node.model.property.single.ChildAssociationRefPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.ContentPropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DatePropertyModel;
 import fr.openwide.alfresco.component.model.node.model.property.single.DateTimePropertyModel;
@@ -103,12 +107,23 @@ public final class PropertyModels {
 	public static ContentPropertyModel newContent(ContainerModel type, NamespaceReference namespace, String name) {
 		return new ContentPropertyModel(type, namespace.createQName(name));
 	}
-
 	public static NodeRefPropertyModel newNodeRef(ContainerModel type, NamespaceReference namespace, String name) {
 		return new NodeRefPropertyModel(type, namespace.createQName(name));
 	}
 	public static MultiNodeRefPropertyModel newMultiNodeRef(ContainerModel type, NamespaceReference namespace, String name) {
 		return new MultiNodeRefPropertyModel(type, namespace.createQName(name));
+	}
+	public static AssociationRefPropertyModel newAssociationRef(ContainerModel type, NamespaceReference namespace, String name) {
+		return new AssociationRefPropertyModel(type, namespace.createQName(name));
+	}
+	public static MultiAssociationRefPropertyModel newMultiAssociationRef(ContainerModel type, NamespaceReference namespace, String name) {
+		return new MultiAssociationRefPropertyModel(type, namespace.createQName(name));
+	}
+	public static ChildAssociationRefPropertyModel newChildAssociationRef(ContainerModel type, NamespaceReference namespace, String name) {
+		return new ChildAssociationRefPropertyModel(type, namespace.createQName(name));
+	}
+	public static MultiChildAssociationRefPropertyModel newMultiChildAssociationRef(ContainerModel type, NamespaceReference namespace, String name) {
+		return new MultiChildAssociationRefPropertyModel(type, namespace.createQName(name));
 	}
 	public static QNamePropertyModel newQName(ContainerModel type, NamespaceReference namespace, String name) {
 		return new QNamePropertyModel(type, namespace.createQName(name));

@@ -20,7 +20,7 @@ public interface SolrAuditService {
 	void setQuery(String query);
 	void addPivots(QName ... properties);
 	
-	void registerDateGroup(QName container, QName propertyText);
+	void registerDateGroupMonthCreated(QName container, QName propertyText);
 	void registerDateGroup(QName container, QName propertyDate, QName propertyString, String format);
 
 	void registerLogSize(QName container, QName propertyText);

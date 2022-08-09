@@ -263,7 +263,7 @@ public class SolrAuditServiceImpl implements SolrAuditService, InitializingBean 
 	}
 	
 	@Override
-	public void registerDateGroup(QName container, QName propertyText) {
+	public void registerDateGroupMonthCreated(QName container, QName propertyText) {
 		registerDateGroup(container, ContentModel.PROP_CREATED, propertyText, "yyyy/MM");
 	}
 	@Override

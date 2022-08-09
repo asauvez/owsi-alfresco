@@ -29,7 +29,7 @@ public class ModelChecker {
 				if (! prefix.equals(nameSpace)) {
 					errors.add(model.getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the container namespace " + container.getQName().toPrefixString());
 				}
-				if (! container.getQName().getLocalName().equals(field.getName())) {
+				if (! container.getQName().getLocalName().replace("-", "_").equals(field.getName())) {
 					errors.add(model.getSimpleName() + " : Field name " + field.getName() + " is not the same as the container name " + container.getQName().getLocalName());
 				}
 				checkContainer(nameSpace, container);
@@ -47,7 +47,7 @@ public class ModelChecker {
 					if (! prefix.equals(nameSpace)) {
 						errors.add(container.getClass().getSimpleName() + " : Field NAMESPACE " + nameSpace + " is not the same as the property namespace " + property.getQName().toPrefixString());
 					}
-					if (! property.getQName().getLocalName().equals(field.getName())) {
+					if (! property.getQName().getLocalName().replace("-", "_").equals(field.getName())) {
 						errors.add(container.getClass().getSimpleName() + " : Field name " + field.getName() + " is not the same as the property name " + property.getQName().getLocalName());
 					}
 				}

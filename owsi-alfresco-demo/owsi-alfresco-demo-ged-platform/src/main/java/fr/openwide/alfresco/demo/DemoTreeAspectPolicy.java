@@ -12,6 +12,7 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
  * /Sites/demo/documentLibrary/treeAspect/<region>/<client>/facture.pdf
  * 
  * La facture hérite des metas treeAspectRegionName et treeAspectClientName, qui valent le nom du dossier région et client.
+ * Cela permet de faire des recherches par facette avec le nom de client par exemple.
  * 
  * @author adrsau
  */

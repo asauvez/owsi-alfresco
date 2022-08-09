@@ -11,7 +11,7 @@ import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.node.model.ChildAssociationModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.StModel;
-import fr.openwide.alfresco.component.model.repository.model.st.StSiteContainer.SiteContainerType;
+import fr.openwide.alfresco.component.model.repository.model.st.SiteContainerType;
 import fr.openwide.alfresco.component.model.search.model.restriction.RestrictionBuilder;
 import fr.openwide.alfresco.repo.module.OwsiModel;
 import fr.openwide.alfresco.repo.module.classification.model.ClassificationEvent;
@@ -100,7 +100,7 @@ public class ClassificationBuilder extends AbstractClassificationBuilder<Classif
 	public Optional<ClassificationWithRootBuilder> rootSite(String siteName) {
 		return rootFolder(new RestrictionBuilder()
 				.isType(StModel.site).of()
-				.eq(StModel.site.name, siteName).of());
+				.eq(CmModel.folder.name, siteName).of());
 	}
 	public Optional<ClassificationWithRootBuilder> rootSiteDocumentLibrary(String siteName) {
 		return rootSite(siteName)

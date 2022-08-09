@@ -235,7 +235,7 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	public ClassificationWithRootBuilder deletePrevious() {
-		String currentName = service.getNodeModelService().getProperty(getNodeRef(), CmModel.object.name);
+		String currentName = service.getNodeModelService().getProperty(getNodeRef(), CmModel.cmobject.name);
 		return doWithDestinationFolder(destinationFolder -> 
 			service.deletePrevious(destinationFolder, currentName));
 	}
@@ -294,6 +294,6 @@ public class ClassificationWithRootBuilder extends AbstractClassificationBuilder
 	}
 	
 	private String getNodeName() {
-		return service.getNodeModelService().getProperty(getNodeRef(), CmModel.object.name);
+		return service.getNodeModelService().getProperty(getNodeRef(), CmModel.cmobject.name);
 	}
 }

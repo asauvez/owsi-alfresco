@@ -111,7 +111,7 @@ public class UniqueNameRepositoryServiceImpl implements UniqueNameRepositoryServ
 	
 	@Override
 	public void moveWithUniqueName(NodeRef nodeRef, NodeRef parentFolder) {
-		moveWithUniqueName(nodeRef, nodeModelRepositoryService.getProperty(nodeRef, CmModel.object.name), 
+		moveWithUniqueName(nodeRef, nodeModelRepositoryService.getProperty(nodeRef, CmModel.cmobject.name), 
 				parentFolder, new UniqueNameGenerator());
 	}
 	

@@ -364,7 +364,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	public String getUniqueName(NodeRef document, Optional<String> newName, Collection<NodeRef> destinationFolders, 
 			UniqueNameGenerator uniqueNameGenerator) {
-		String expectedNewName = newName.orElse(nodeModelRepositoryService.getProperty(document, CmModel.object.name));
+		String expectedNewName = newName.orElse(nodeModelRepositoryService.getProperty(document, CmModel.cmobject.name));
 		return uniqueNameRepositoryService.getUniqueValidName(expectedNewName, 
 				destinationFolders, Optional.of(document), uniqueNameGenerator)
 			.orElse(expectedNewName);
@@ -414,10 +414,10 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	
 	public void createFileLink(NodeRef nodeRef, NodeRef destinationFolder, Optional<String> linkNameOpt) {
 		String linkName = linkNameOpt.isPresent() ? linkNameOpt.get() 
-				: "Link to " + nodeModelRepositoryService.getProperty(nodeRef, CmModel.object.name);
+				: "Link to " + nodeModelRepositoryService.getProperty(nodeRef, CmModel.cmobject.name);
 		Map<QName, Serializable> properties = new HashMap<>();
-		nodeModelRepositoryService.setProperty(properties, AppModel.fileLink.destination, nodeRef);
-		nodeModelRepositoryService.createNode(destinationFolder, AppModel.fileLink, linkName, properties);
+		nodeModelRepositoryService.setProperty(properties, CmModel.link.destination, nodeRef);
+		nodeModelRepositoryService.createNode(destinationFolder, AppModel.filelink, linkName, properties);
 	}
 	
 	public void createSecondaryParent(NodeRef node, NodeRef destinationFolder) {
@@ -522,7 +522,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 	}
 	@Override
 	public void registerCopyPropertyCmName(AspectModel aspectOfRootNode, PropertyModel<String> propertyToCopy) {
-		registerCopyProperty(aspectOfRootNode, CmModel.object.name, propertyToCopy);
+		registerCopyProperty(aspectOfRootNode, CmModel.cmobject.name, propertyToCopy);
 	}
 	@Override
 	public <T extends Serializable> void registerCopyProperty(AspectModel aspectOfRootNode,
@@ -580,7 +580,7 @@ public class ClassificationServiceImpl implements ClassificationService, Initial
 			tags = Collections.emptyList(); 
 		}
 		return tags.stream()
-				.map(tag -> getNodeModelService().getProperty(tag, CmModel.object.name))
+				.map(tag -> getNodeModelService().getProperty(tag, CmModel.cmobject.name))
 				.collect(Collectors.toSet());
 	}
 	

@@ -73,7 +73,7 @@ public class EmailDemoClassificationPolicy implements ClassificationPolicy<CmEma
 		builder.rootCompanyHome()
 			.subFolder("Email")
 			.subFolder("Par mois")
-			.subFolder(new SubFolderBuilder(model.sentDate)
+			.subFolder(new SubFolderBuilder(model.sentdate)
 				.formatDate("yyyy.MM"))
 			.moveWithUniqueName();
 	
@@ -90,7 +90,7 @@ public class EmailDemoClassificationPolicy implements ClassificationPolicy<CmEma
 		builder.rootCompanyHome()
 			.subFolder("Email")
 			.subFolder("Par tag")
-			.subFolder(new SubFolderBuilder(model.subjectLine)
+			.subFolder(new SubFolderBuilder(model.subjectline)
 					.regex("\\[([^\\]]*)\\]", 1))
 			.deletePrevious()
 			.createSecondaryParent();

@@ -33,7 +33,7 @@ public abstract class Restriction {
 	}
 	private Map<PropertyModel<?>, String> CMIS_PROPERTIES_REPLACEMENT = new HashMap<>();
 	{
-		CMIS_PROPERTIES_REPLACEMENT.put(CmModel.object.name, "cmis:name");
+		CMIS_PROPERTIES_REPLACEMENT.put(CmModel.cmobject.name, "cmis:name");
 		CMIS_PROPERTIES_REPLACEMENT.put(CmModel.auditable.created, "cmis:creationDate");
 		CMIS_PROPERTIES_REPLACEMENT.put(CmModel.auditable.modified, "cmis:lastModificationDate");
 		CMIS_PROPERTIES_REPLACEMENT.put(CmModel.auditable.creator, "cmis:createdBy");

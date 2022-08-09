@@ -10,7 +10,7 @@ public class SearchSortBuilder extends AbstractSortBuilder<SearchQueryBuilder> {
 		return asc(CmModel.titled.title);
 	}
 	public SearchQueryBuilder sortByName() {
-		return asc(CmModel.object.name);
+		return asc(CmModel.cmobject.name);
 	}
 	public SearchQueryBuilder sortByCreationTime() {
 		return desc(CmModel.auditable.created);

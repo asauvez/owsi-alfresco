@@ -14,7 +14,7 @@ public class DemoSolrAudit implements InitializingBean {
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		solrAuditService.registerDateGroup(ContentModel.TYPE_CONTENT, 
+		solrAuditService.registerDateGroupMonthCreated(ContentModel.TYPE_CONTENT, 
 				DemoModel.auditInfo.createdMonth.getQName());
 		solrAuditService.registerLogSize(ContentModel.TYPE_CONTENT, 
 				DemoModel.auditInfo.sizeLog.getQName());

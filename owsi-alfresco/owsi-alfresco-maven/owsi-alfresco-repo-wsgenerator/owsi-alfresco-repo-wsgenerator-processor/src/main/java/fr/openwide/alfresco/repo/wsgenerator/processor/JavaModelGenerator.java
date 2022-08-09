@@ -6,8 +6,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.SourceVersion;
@@ -42,7 +48,10 @@ public class JavaModelGenerator {
 					
 					Set<String> classesToImport = new TreeSet<>();
 					classesToImport.add("fr.openwide.alfresco.api.core.remote.model.NamespaceReference");
-					for (M2Aspect aspect : model.getAspects()) {
+					List<M2Aspect> aspects = new ArrayList<>(model.getAspects());
+					sortAspects(aspects);
+					
+					for (M2Aspect aspect : aspects) {
 						if (isSameNameSpace(namespace.getPrefix() + ":", aspect.getName())) {
 							classesToImport.add(namespacePackage + "." + getClassName(aspect.getName()));
 						}
@@ -60,7 +69,7 @@ public class JavaModelGenerator {
 						.append("	NamespaceReference NAMESPACE = NamespaceReference.create(\"")
 							.append(namespace.getPrefix()).append("\", \"").append(namespace.getUri()).append("\");\n\n");
 					
-					for (M2Aspect aspect : model.getAspects()) {
+					for (M2Aspect aspect : aspects) {
 						if (isSameNameSpace(namespace.getPrefix() + ":", aspect.getName())) {
 							manageClass(generateJavaModel, writer, 
 									modelPath, namespacePackage, javaRootInterfaceName, 
@@ -82,6 +91,34 @@ public class JavaModelGenerator {
 		}
 	}
 	
+	// Tri les aspects de tel manière que ceux déclaré en mandatory soient initialisé en premier. 
+	// Sinon, on se retrouve avec des aspects non encore initialisé lors de leur utilisation.
+	private void sortAspects(List<M2Aspect> aspects) {
+		Map<Object, M2Aspect> mapName = aspects.stream().collect(Collectors.toMap(aspect -> aspect.getName(), aspect -> aspect));
+		Map<String, Integer> mapDepth = aspects.stream().collect(Collectors.toMap(aspect -> aspect.getName(), aspect -> 0));
+		aspects.stream().forEach(aspect -> visitAspect(aspect, mapName, mapDepth, 0));
+		Collections.sort(aspects, new Comparator<M2Aspect>() {
+			@Override
+			public int compare(M2Aspect a1, M2Aspect a2) {
+				int depth1 = mapDepth.getOrDefault(a1.getName(), 0);
+				int depth2 = mapDepth.getOrDefault(a2.getName(), 0);
+				return depth2 - depth1;
+			}
+		});
+	}
+	private void visitAspect(M2Aspect aspect, Map<Object, M2Aspect> mapName, Map<String, Integer> mapDepth, int actualDepth) {
+		int currentDepth = mapDepth.getOrDefault(aspect.getName(), 0);
+		if (currentDepth < actualDepth) {
+			mapDepth.put(aspect.getName(), actualDepth);
+		}
+		for (String childAspectName : aspect.getMandatoryAspects()) {
+			M2Aspect childAspect = mapName.get(childAspectName);
+			if (childAspect != null) {
+				visitAspect(childAspect, mapName, mapDepth, currentDepth+1);
+			}
+		}
+	}
+
 	private M2Model loadModel(String modelPath, Filer filer) throws IOException {
 		try (InputStream input = getClass().getClassLoader().getResourceAsStream(modelPath)) {
 			if (input != null) {
@@ -149,7 +186,7 @@ public class JavaModelGenerator {
 		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
 		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
 		String className = getClassName(m2Class.getName());
-		javaRootInterfaceWriter.append("	").append(className).append(" ").append(containerName).append(" = new ").append(className).append("();\n");
+		javaRootInterfaceWriter.append("	").append(className).append(" ").append(toJavaName(containerName)).append(" = new ").append(className).append("();\n");
 		
 		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
 		try (Writer writer = classObject.openWriter()) {
@@ -224,7 +261,7 @@ public class JavaModelGenerator {
 			String modelPath, String packageName, String javaRootInterfaceName, 
 			M2Class m2Class, Filer filer) throws IOException {
 		String classPrefix = StringUtils.substringBefore(m2Class.getName(), ":");
-		String containerName = StringUtils.substringAfter(m2Class.getName(), ":");
+		String containerName = toJavaName(StringUtils.substringAfter(m2Class.getName(), ":"));
 		String className = getClassName(m2Class.getName()) + "Bean";
 		
 		JavaFileObject classObject = filer.createSourceFile(packageName + "." + className);
@@ -246,8 +283,10 @@ public class JavaModelGenerator {
 				}
 				classesToImport.add(StringUtils.substringBeforeLast(packageName, ".") + "." + javaRootInterfaceName);
 			}
-			if (! m2Class.getMandatoryAspects().isEmpty()) {
-				classesToImport.add(StringUtils.substringBeforeLast(packageName, ".") + "." + javaRootInterfaceName);
+			for (String aspect : m2Class.getMandatoryAspects()) {
+				if (isSameNameSpace(m2Class.getName(), aspect)) {
+					classesToImport.add(StringUtils.substringBeforeLast(packageName, ".") + "." + javaRootInterfaceName);
+				}
 			}
 			for (String classToImport : classesToImport) {
 				writer.append("import ").append(classToImport).append(";\n");
@@ -343,9 +382,12 @@ public class JavaModelGenerator {
 		case "d:int": return "Integer";
 		case "d:datetime": return "DateTime";
 		case "d:noderef": return "NodeRef";
+		case "d:assocref": return "AssociationRef";
+		case "d:childassocref": return "ChildAssociationRef";
 		case "d:qname": return "QName";
 		case "d:category": return "NodeRef";
 		case "d:mltext": return "Text";
+		case "d:locale": return "Locale";
 		}
 		return StringUtils.capitalize(StringUtils.substringAfter(type, ":"));
 	}
@@ -357,10 +399,13 @@ public class JavaModelGenerator {
 		case "d:time": return "java.util.Date";
 		case "d:datetime": return "java.util.Date";
 		case "d:noderef": return "org.alfresco.service.cmr.repository.NodeRef";
+		case "d:assocref": return "org.alfresco.service.cmr.repository.AssociationRef";
+		case "d:childassocref": return "org.alfresco.service.cmr.repository.ChildAssociationRef";
 		case "d:qname": return "org.alfresco.service.namespace.QName";
 		case "d:category": return "org.alfresco.service.cmr.repository.NodeRef";
 		case "d:text": return "String";
 		case "d:mltext": return "String";
+		case "d:locale": return "java.util.Locale";
 		case "d:content": return "fr.openwide.alfresco.api.core.node.model.RepositoryContentData";
 		case "d:any": return "java.io.Serializable";
 		}

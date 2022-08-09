@@ -85,7 +85,7 @@ public class SearchQueryBuilder extends AbstractQueryBuilder<SearchQueryBuilder,
 	}
 	public GeneralHighlightBuilder highlight() {
 		return highlight(
-				CmModel.object.name,
+				CmModel.cmobject.name,
 				CmModel.titled.title,
 				CmModel.titled.description,
 				CmModel.content.content);

@@ -63,7 +63,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	@Override
 	public NodeRef createNode(NodeRef parentRef, TypeModel type, String name, Map<QName, Serializable> properties) throws FileExistsException {
-		setProperty(properties, CmModel.object.name, name);
+		setProperty(properties, CmModel.cmobject.name, name);
 		
 		return nodeService.createNode(parentRef, 
 				ContentModel.ASSOC_CONTAINS, 
@@ -381,7 +381,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	 * Utiliser le UniqueNameRepositoryService
 	 */
 	public String getUniqueChildName(NodeRef folder, NodeRef document) {
-		String originalName = getProperty(document, CmModel.object.name);
+		String originalName = getProperty(document, CmModel.cmobject.name);
 		Optional<NodeRef> childByName = getChildByName(folder, originalName);
 		if (! childByName.isPresent() || childByName.get().equals(document)) {
 			return originalName;
@@ -408,7 +408,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	@Override
 	public void addChild(NodeRef parentRef, NodeRef childRef, QName assocType) {
-		String childName = getProperty(childRef, CmModel.object.name);
+		String childName = getProperty(childRef, CmModel.cmobject.name);
 		nodeService.addChild(parentRef, 
 				childRef, 
 				assocType, 
@@ -429,7 +429,7 @@ public class NodeModelRepositoryServiceImpl implements NodeModelRepositoryServic
 	}
 	@Override
 	public void removeChild(NodeRef parentRef, NodeRef childRef, QName assocType) {
-		String childName = getProperty(childRef, CmModel.object.name);
+		String childName = getProperty(childRef, CmModel.cmobject.name);
 		List<ChildAssociationRef> assocs = nodeService.getChildAssocs(
 				parentRef, 
 				assocType, 

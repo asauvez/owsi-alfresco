@@ -56,6 +56,7 @@ Nouveautés
 ## depuis 0.9.5
  * Suppression de la partie owsi-alfresco-app et owsi-alfresco-api. 
  * Plus besoin de ConversionService. On manipule directement des QNames.
+ * Generation automatique de CmModel et autres.
 
 ## depuis 0.9.4
  * Compatible Alfresco 7.2.
@@ -198,6 +199,7 @@ Migration
 * NameReference.create(CmModel.NAMESPACE, "toto") devient CmModel.NAMESPACE.createQName("toto")
 * NodeReference est remplacé par NodeRef.
 * ConversionService n'est plus nécessaire.
+* CmModel.object devient CmModel.cmobject
 
 ## vers 0.9.2
 * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
