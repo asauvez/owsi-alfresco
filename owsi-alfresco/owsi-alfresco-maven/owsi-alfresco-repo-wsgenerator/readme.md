@@ -44,7 +44,7 @@ Pour l'utiliser, dans le pom.xml du projet, ajouter :
 					<dependency>
 						<groupId>fr.openwide.alfresco</groupId>
 						<artifactId>owsi-alfresco-repo-wsgenerator-processor</artifactId>
-						<version>${project.version}</version>
+						<version>${owsi-alfresco.version}</version>
 					</dependency>
 				</dependencies>
 			</plugin>

@@ -1,12 +1,7 @@
 package fr.openwide.alfresco.repo.wsgenerator.processor;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -22,7 +17,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.MirroredTypeException;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
@@ -42,12 +36,9 @@ import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.GenerateWebScriptLifecycle;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript.WebScriptMethod;
-import fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint;
-import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({
-	"fr.openwide.alfresco.repo.wsgenerator.annotation.WebScriptEndPoint",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateWebScript",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService",
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateBootstrapModel",
@@ -56,9 +47,6 @@ import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
 	"fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateCron",
 })
 public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
-
-	// On écrit dans /tmp les URL, car le build peut se faire en deux fois
-	private File API_FOLDER = new File(System.getProperty("java.io.tmpdir"), getClass().getName());
 
 	private XMLStreamWriter springContextXml = null;
 	
@@ -107,10 +95,6 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 				generateComment(annotatedClassElement);
 				processScheduledJob(annotatedClassElement);
 			}
-			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(WebScriptEndPoint.class)) {
-				generateComment(annotatedClassElement);
-				processWsEndPoint(annotatedClassElement);
-			}
 			for (Element annotatedClassElement : roundEnv.getElementsAnnotatedWith(GenerateWebScript.class)) {
 				generateComment(annotatedClassElement);
 				processWs(annotatedClassElement);
@@ -138,20 +122,6 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		springContextXml.writeComment("Generated for " + className);
 	}
 
-	private void processWsEndPoint(Element annotatedClassElement) {
-		WebScriptEndPoint webScriptEndPoint = annotatedClassElement.getAnnotation(WebScriptEndPoint.class);
-		
-		API_FOLDER.mkdirs();
-		File apiUrlFile = new File(API_FOLDER, getFullName(annotatedClassElement));
-		try (PrintWriter out = new PrintWriter(new FileWriter(apiUrlFile))) {
-			out.println(webScriptEndPoint.method().name());
-			out.println(webScriptEndPoint.url());
-			out.flush();
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
 	private void processWs(Element annotatedClassElement) throws XMLStreamException {
 		GenerateWebScript generateWebScript = annotatedClassElement.getAnnotation(GenerateWebScript.class);
 		for (WebScriptMethod method : generateWebScript.method()) {
@@ -164,30 +134,6 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		String[] urls = generateWebScript.url();
 		Name className = ((TypeElement) annotatedClassElement).getQualifiedName();
 		String method = methodEnum.name().toLowerCase();
-		
-		try {
-			generateWebScript.paramClass();
-		} catch( MirroredTypeException mte ) {
-			String paramClass = mte.getTypeMirror().toString();
-			if (! WebScriptParam.class.getName().equals(paramClass)) {
-				if (urls.length != 0) {
-					throw new IllegalStateException(getFullName(annotatedClassElement) + " : When declaring @GenerateWebScript.paramClass(), url shoud not be defined.");
-				}
-				if (! "get".equals(method)) {
-					throw new IllegalStateException(getFullName(annotatedClassElement) + " : When declaring @GenerateWebScript.paramClass(), method shoud not be defined.");
-				}
-				File apiUrlFile = new File(API_FOLDER, paramClass);
-				if (! apiUrlFile.canRead()) {
-					throw new IllegalStateException(getFullName(annotatedClassElement) + " : When declaring @GenerateWebScript.paramClass(), API project should be build first.");
-				}
-				try (BufferedReader in = new BufferedReader(new FileReader(apiUrlFile))) {
-					method = in.readLine().toLowerCase();
-					urls = new String[] { in.readLine() };
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
-			}
-		}
 		
 		String firstUrl = (urls.length > 0) ? urls[0] : "";
 		String wsFolder = (! generateWebScript.wsFolder().isEmpty()) ? generateWebScript.wsFolder() : StringUtils.substringBeforeLast(firstUrl, "/").replace('{', '_').replace('}', '_');
@@ -552,11 +498,6 @@ public class GenerateWebScriptAnnotationProcessor extends AbstractProcessor {
 		xml.writeAttribute("key", key);
 		xml.writeCharacters(value);
 		xml.writeEndElement(); // entry
-	}
-
-	private String getFullName(Element element) {
-		Element parent = element.getEnclosingElement();
-		return ((parent != null) ? parent + "." : "") + element.getSimpleName().toString();
 	}
 
 }

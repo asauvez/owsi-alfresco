@@ -5,14 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import fr.openwide.alfresco.repo.wsgenerator.model.WebScriptParam;
-
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GenerateWebScript {
-	
-	@SuppressWarnings("rawtypes")
-	Class<? extends WebScriptParam> paramClass() default WebScriptParam.class; 
 	
 	enum WebScriptMethod { GET, PUT, POST, PATCH, DELETE, HEAD, OPTIONS; }
 	WebScriptMethod[] method() default WebScriptMethod.GET;
