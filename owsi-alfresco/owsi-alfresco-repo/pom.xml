@@ -26,6 +26,15 @@
 		<module>owsi-alfresco-repo-solraudit</module>
 	</modules>
 
+	<profiles>
+		<profile>
+			<id>enterprise</id>
+			<modules>
+				<module>owsi-alfresco-repo-core-enterprise</module>
+			</modules>
+		</profile>
+	</profiles>
+	
 	<dependencies>
 		<dependency>
 			<groupId>${alfresco.groupId}</groupId>

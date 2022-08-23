@@ -42,6 +42,7 @@ Projets
 ├── owsi-alfresco-repo									: Ce qui est intégré dans la partie repo
 │   ├── owsi-alfresco-repo-contentstoreexport			: Permet d'exporter une partie du Content Store
 │   ├── owsi-alfresco-repo-core							: Utilitaires globaux
+│   ├── owsi-alfresco-repo-core-enterprise				: Extension utilisable uniquement en version Enterprise
 │   ├── owsi-alfresco-repo-datalistgroupe				: Permet à des non adminstrateurs de gérer des groupes
 │   ├── owsi-alfresco-repo-emailed2eml					: Permet de transformer les emails reçus en fichier .eml
 │   ├── owsi-alfresco-repo-module						: Utilitaires utilisant les metas owsi:*.
@@ -57,6 +58,7 @@ Nouveautés
  * Suppression de la partie owsi-alfresco-app et owsi-alfresco-api. 
  * Plus besoin de ConversionService. On manipule directement des QNames.
  * Generation automatique de CmModel et autres.
+ * Projet compilé en version Community par défaut. Pour les extensions Enterprise, utiliser -Penterprise
 
 ## depuis 0.9.4
  * Compatible Alfresco 7.2.

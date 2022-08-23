@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.openwide.alfresco</groupId>
+		<artifactId>owsi-alfresco-repo</artifactId>
+		<version>0.9.5-SNAPSHOT</version>
+	</parent>
+	<artifactId>owsi-alfresco-repo-core-enterprise</artifactId>
+
+	<name>OWSI Alfresco - Repository - Core Enterprise</name>
+
+	<properties>
+		<alfresco.bomDependencyArtifactId>acs-packaging</alfresco.bomDependencyArtifactId>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.openwide.alfresco</groupId>
+			<artifactId>owsi-alfresco-repo-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Dependence enterprise pour AuthorizationServiceHelper -->
+		<dependency>
+			<groupId>org.alfresco.authorization</groupId>
+			<artifactId>alfresco-authorised-users</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
+	<repositories>
+		<!-- Alfresco Enterprise Edition Artifacts, put username/pwd for server 
+		in settings.xml -->
+		<repository>
+			<id>alfresco-private-repository</id>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
+		</repository>
+	</repositories>
+
+</project>

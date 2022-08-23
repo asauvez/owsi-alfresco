@@ -22,13 +22,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Dependence enterprise pour AuthorizationServiceHelper -->
-		<dependency>
-			<groupId>org.alfresco.authorization</groupId>
-			<artifactId>alfresco-authorised-users</artifactId>
-			<scope>provided</scope>
-		</dependency>
- 
 		<!-- Pour Swagger -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>

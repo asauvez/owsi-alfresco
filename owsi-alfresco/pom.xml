@@ -13,8 +13,7 @@
 	<properties>
 		<jdk.version>11</jdk.version>
 		<alfresco.groupId>org.alfresco</alfresco.groupId>
-		<alfresco.bomDependencyArtifactId>acs-packaging</alfresco.bomDependencyArtifactId>
-		<alfresco.platform.version>7.2.0.3</alfresco.platform.version>
+		<alfresco.platform.version>7.2.1</alfresco.platform.version>
 	</properties>
 
 	<modules>
@@ -121,12 +120,6 @@
 				<updatePolicy>daily</updatePolicy>
 			</snapshots>
 		</repository>
-		<!-- Alfresco Enterprise Edition Artifacts, put username/pwd for server 
-			in settings.xml -->
-		<repository>
-			<id>alfresco-private-repository</id>
-			<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
-		</repository>
 		<repository>
 			<id>alfresco-internal</id>
 			<url>https://artifacts.alfresco.com/nexus/content/groups/internal</url>
@@ -173,5 +166,30 @@
 		</pluginRepository>
 	</pluginRepositories>
 	
-
+	<profiles>
+		<profile>
+			<id>community</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<alfresco.bomDependencyArtifactId>acs-community-packaging</alfresco.bomDependencyArtifactId>
+			</properties>
+		</profile>
+		<profile>
+			<id>enterprise</id>
+			<properties>
+				<alfresco.bomDependencyArtifactId>acs-packaging</alfresco.bomDependencyArtifactId>
+			</properties>
+			<repositories>
+				<!-- Alfresco Enterprise Edition Artifacts, put username/pwd for server 
+				in settings.xml -->
+				<repository>
+					<id>alfresco-private-repository</id>
+					<url>https://artifacts.alfresco.com/nexus/content/groups/private</url>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+	
 </project>
