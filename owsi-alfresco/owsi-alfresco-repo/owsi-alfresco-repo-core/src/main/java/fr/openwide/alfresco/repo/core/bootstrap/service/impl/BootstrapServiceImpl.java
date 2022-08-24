@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
@@ -35,6 +36,7 @@ import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +47,13 @@ import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.CmModel;
 import fr.openwide.alfresco.component.model.repository.model.DlModel;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
+import fr.openwide.alfresco.repo.core.bootstrap.builder.FileBootstrap;
+import fr.openwide.alfresco.repo.core.bootstrap.builder.FolderBootstrap;
+import fr.openwide.alfresco.repo.core.bootstrap.builder.RandomFileGenerator;
+import fr.openwide.alfresco.repo.core.bootstrap.builder.SiteBootstrap;
 import fr.openwide.alfresco.repo.core.bootstrap.service.BootstrapService;
 import fr.openwide.alfresco.repo.dictionary.node.service.NodeModelRepositoryService;
+import fr.openwide.alfresco.repo.dictionary.permission.service.PermissionRepositoryService;
 import fr.openwide.alfresco.repo.wsgenerator.annotation.GenerateService;
 
 @GenerateService(
@@ -56,6 +63,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 	private final Logger logger = LoggerFactory.getLogger(BootstrapServiceImpl.class);
 	
 	@Autowired private NodeModelRepositoryService nodeModelRepositoryService;
+	@Autowired private PermissionRepositoryService permissionRepositoryService;
 	@Autowired private MutableAuthenticationService authenticationService;
 	@Autowired private PersonService personService;
 	@Autowired private AuthorityService authorityService;
@@ -197,8 +205,16 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 
 	@Override
-	public NodeRef importFileFromClassPath(NodeRef parentRef, String fileName) {
-		try (InputStream content = getClass().getClassLoader().getResourceAsStream(fileName)) {
+	public NodeRef importFileFromClassPath(NodeRef parentRef, String classpath) {
+		String fileName = FilenameUtils.getName(classpath);
+		nodeModelRepositoryService.getChildByName(parentRef, fileName)
+			.ifPresent(existingFile -> nodeModelRepositoryService.deleteNode(existingFile));
+		
+		try (InputStream content = getClass().getClassLoader().getResourceAsStream(classpath)) {
+			if (content == null) {
+				throw new IllegalStateException(classpath + " not found in classpath.");
+			}
+			
 			NodeRef nodeRef = nodeModelRepositoryService.createNode(parentRef, CmModel.content, fileName);
 			contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true)
 				.putContent(content);
@@ -227,7 +243,7 @@ public class BootstrapServiceImpl implements BootstrapService {
 	}
 	
 	@Override
-	public SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility) {
+	public SiteBootstrap createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility) {
 		// The site service is funny about permissions,
 		// so even though we're running as the system we
 		// still need to identify us as the admin user
@@ -248,18 +264,18 @@ public class BootstrapServiceImpl implements BootstrapService {
 				createDefaultDashboard(siteInfo);
 				siteService.createContainer(siteInfo.getShortName(), SiteService.DOCUMENT_LIBRARY, null, null);
 			}
-			return siteInfo;
+			return new SiteBootstrap(siteInfo, this);
 		} finally {
 			AuthenticationUtil.popAuthentication();
 		}
 	}
 	@Override
-	public SiteInfo getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility) {
+	public SiteBootstrap getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility) {
 		SiteInfo siteInfo = siteService.getSite(siteName);
 		if (siteInfo == null) {
-			siteInfo = createSite(siteName, siteTitle, siteDescription, siteVisibility);
+			siteInfo = createSite(siteName, siteTitle, siteDescription, siteVisibility).getSiteInfo();
 		}
-		return siteInfo;
+		return new SiteBootstrap(siteInfo, this);
 	}
 	@Override
 	public void setSiteMembership(SiteInfo info, AuthorityReference authority, SiteRole role) {
@@ -285,6 +301,16 @@ public class BootstrapServiceImpl implements BootstrapService {
 		}
 		return documentLibraryNodeRef;
 	}
+	
+	@Override
+	public FolderBootstrap getCompanyHome() {
+		return new FolderBootstrap(nodeModelRepositoryService.getCompanyHome(), this);
+	}
+	@Override
+	public FolderBootstrap getDataDictionary() {
+		return new FolderBootstrap(nodeModelRepositoryService.getDataDictionary(), this);
+	}
+	
 	
 	@Override
 	public NodeRef createFolder(NodeRef parentRef, String folderName, AspectModel ... aspects) {
@@ -370,5 +396,58 @@ public class BootstrapServiceImpl implements BootstrapService {
 				+ "      <theme/><dashboardSitePage>true</dashboardSitePage></properties>\n"
 				+ "    <page-type-id>generic</page-type-id></page>");
 
+	}
+	
+	public void generateRandomFiles(NodeRef rootFolderRef, RandomFileGenerator builder) {
+		Random random = new Random();
+		String[] extensions = new String[] { 
+				"avi", "doc", "docx", "eml", "gif", "html", "jpg", "mov", "mp3", "mp4", "mpg", "msg", 
+				"odf", "odg", "odp", "ods", "odt", "pdf", "png", "ppt", "pptx", "txt", "webm", "xls", "xlsx", "xml", "zip"
+		};
+		
+		NodeRef currentFolder = rootFolderRef;
+		for (int i=0; i<builder.getNumber(); i++) {
+			if (builder.isGenerateFolder()) {
+				int folderDecision = random.nextInt(100);
+				if (folderDecision < 10) {
+					if (! rootFolderRef.equals(currentFolder)) {
+						currentFolder = nodeModelRepositoryService.getPrimaryParent(currentFolder).get();
+					}
+				} else if (folderDecision < 20) {
+					currentFolder = nodeModelRepositoryService.getOrCreateFolder(currentFolder, "folder_" + random.nextInt(1000000000));
+					if (builder.getApplyToFolder() != null) {
+						builder.getApplyToFolder().accept(new FolderBootstrap(currentFolder, this));
+					}
+				}
+			}
+			
+			String extension = extensions[random.nextInt(extensions.length)];
+			String fileName = "generated_" + random.nextInt(1000000000) + "." + extension;
+			if (nodeModelRepositoryService.getChildByName(currentFolder, fileName).isEmpty()) {
+				NodeRef fileRef = nodeModelRepositoryService.createNode(currentFolder, CmModel.content, fileName);
+//				try (InputStream content = getClass().getClassLoader().getResourceAsStream("/quick/quick." + extension)) {
+//					if (content != null) {
+//						contentService.getWriter(fileRef, ContentModel.PROP_CONTENT, true)
+//							.putContent(content);
+//					}
+//				} catch (IOException e) {
+//					throw new IllegalStateException(e);
+//				}
+				
+				if (builder.getApplyToFile() != null) {
+					builder.getApplyToFile().accept(new FileBootstrap(fileRef, this));
+				}
+			}
+		}
+	}
+	
+	public NodeModelRepositoryService getNodeModelRepositoryService() {
+		return nodeModelRepositoryService;
+	}
+	public ContentService getContentService() {
+		return contentService;
+	}
+	public PermissionRepositoryService getPermissionRepositoryService() {
+		return permissionRepositoryService;
 	}
 }

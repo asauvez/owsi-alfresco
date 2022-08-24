@@ -8,6 +8,8 @@ import org.alfresco.service.cmr.site.SiteVisibility;
 import fr.openwide.alfresco.api.core.authority.model.AuthorityReference;
 import fr.openwide.alfresco.component.model.node.model.AspectModel;
 import fr.openwide.alfresco.component.model.repository.model.dl.DlDataListItem;
+import fr.openwide.alfresco.repo.core.bootstrap.builder.FolderBootstrap;
+import fr.openwide.alfresco.repo.core.bootstrap.builder.SiteBootstrap;
 
 
 public interface BootstrapService {
@@ -28,13 +30,17 @@ public interface BootstrapService {
 	NodeRef createRootCategory(String categoryName);
 	NodeRef createCategory(NodeRef parentCategory, String categoryName);
 
-	NodeRef importFileFromClassPath(NodeRef parentRef, String fileName);
+	NodeRef importFileFromClassPath(NodeRef parentRef, String classpath);
 	void importView(NodeRef parentRef, String viewFileName, String messageFileName);
 
-	SiteInfo createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
-	SiteInfo getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
+	SiteBootstrap createSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
+	SiteBootstrap getOrCreateSite(String siteName, String siteTitle, String siteDescription, SiteVisibility siteVisibility);
 	void setSiteMembership(SiteInfo info, AuthorityReference authority, SiteRole role);
 	void deleteSiteSwsdp();
+	
+	FolderBootstrap getCompanyHome();
+	FolderBootstrap getDataDictionary();
+	
 	
 	NodeRef createFolder(NodeRef parentRef, String folderName, AspectModel ... aspects);
 	NodeRef getOrCreateFolder(NodeRef parentRef, String folderName, AspectModel ... aspects);

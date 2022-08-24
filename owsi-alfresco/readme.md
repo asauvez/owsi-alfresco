@@ -59,6 +59,7 @@ Nouveautés
  * Plus besoin de ConversionService. On manipule directement des QNames.
  * Generation automatique de CmModel et autres.
  * Projet compilé en version Community par défaut. Pour les extensions Enterprise, utiliser -Penterprise
+ * Bootstrap de dossiers facilité.
 
 ## depuis 0.9.4
  * Compatible Alfresco 7.2.
@@ -202,6 +203,7 @@ Migration
 * NodeReference est remplacé par NodeRef.
 * ConversionService n'est plus nécessaire.
 * CmModel.object devient CmModel.cmobject
+* bootstrapService.createSite() renvoie des FolderBootstrap au lieu de SiteInfo.
 
 ## vers 0.9.2
 * Une partie de repo-core est déplacé dans app-component. Utile uniquement pour les projets faisant des appels distants.
